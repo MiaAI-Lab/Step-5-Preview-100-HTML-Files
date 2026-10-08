@@ -6,4 +6,5 @@ raw/
 _shoot.sh
 shots.sh
 probe.sh
+index-script.html
 *.log
