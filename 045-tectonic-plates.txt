@@ -1,0 +1,83 @@
+# TECTONICS — The Plates, Drawn Slowly
+
+## Short title
+Tectonic Plates
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a planetary tectonic
+plate simulation called TECTONICS. No external dependencies whatsoever — no CDN,
+no web fonts, no external images, no external SVG files, no JavaScript libraries.
+All CSS and JavaScript inline, works offline by double-clicking, responsive, valid
+HTML5.
+
+Artistic direction: a cross-section through a living planet. Behind the canvas, a
+night-purple room with a warm mantle glow at the bottom edge and a cool violet wash
+at the top left. On the canvas, the mantle is a radial gradient from molten orange
+#ff8a3d through #c8442a and #5a1a2a into dark #1a0a1e, drawn at 1.2 times the plate
+radius. Seven convection bands rotate through it at different rates, each a chain of
+forty warm dots whose alpha pulses on a triple-sine, scaled by the Plumes slider. On
+top of that, five mantle plumes — radial warm glows whose height breathes on a sine,
+also scaled by the slider — sit at their own polar positions.
+
+Each plate is a dark slab: a sixteen-point noisy polar blob filled with a diagonal
+gradient in its own hue (180–300), stroked with either an amber rim (a ridge, where
+the plate is pulling apart) or a violet rim (a trench, where it is subducting). The
+ridges get a second wide additive stroke so they read as hot, glowing seams. Plates
+drift on their own velocities scaled by the Speed slider, reverse direction when they
+leave the mantle, and each carries a slow self-rotation term. Rings of warm light
+(a quakes list) pop at random plate positions, expand and fade.
+
+Clicking near a plate splits it: a smaller sibling blob is pushed out with reversed
+velocity and the opposite boundary type, the original flips its boundary type, and a
+quake ring fires immediately — so the visitor can genuinely fracture the planet.
+Dragging horizontally applies a slow accumulating rotation offset to the hand-panned
+sphere.
+
+Layout: a full-viewport canvas over the room gradient with a floating UI overlay
+whose pointer-events pass through except on the controls. Top-left is a monospace
+label above an italic serif headline with one line in ridge amber, plus a short
+paragraph. Top-right is a monospace meter stack showing plate count, ridge count
+and the current drift rate in cm/year. Bottom is a glass tray with three sliders
+(Speed, Plumes, Plates 5–18), a Quakes toggle and a Reset button, plus a monospace
+hint.
+
+Interaction: the plates drift continuously. Speed scales all velocities and the
+quake rate; Plumes scales the convection bands and the plume height; Plates adds or
+removes plates live (each new plate generated with its own noisy blob, hue and
+boundary type). Clicking near a plate splits it. Dragging spins the view. Quakes can
+be switched off. On narrow screens the paragraph, meters and hint hide.
+
+## One-paragraph description of the intended design
+A molten cross-section of a planet: seven rotating convection bands and five
+breathing mantle plumes over a hot radial gradient, with up to eighteen dark
+violet-and-orange drifting plates whose rims glow amber at ridges and violet at
+trenches, popping quake rings as they move — fractureable by clicking, and retunable
+live through speed, plume and plate-count sliders.
+
+## Major visual techniques used
+- Mantle sphere as a four-stop radial gradient from molten orange to near-black,
+  drawn at 1.2× plate radius
+- Seven convection bands, each a chain of dots on an ellipse, rotating at different
+  rates with triple-sine alpha pulsing
+- Five mantle plumes as breathing radial gradients on individual phases
+- Noisy polar blob plates: sixteen points with random radius, filled with a diagonal
+  gradient in their own hue
+- Two boundary types: amber ridges with an extra wide additive stroke for heat,
+  violet trench rims
+- Drift with boundary reversal when a plate leaves the mantle, plus a slow
+  per-plate self-rotation
+- Quake rings: expanding circles whose life decays, spawned at random plate positions
+- Plate splitting on click: smaller sibling with reversed velocity, opposite boundary
+  type, original flips its boundary type
+- Live plate count, ridge count and derived drift rate (speed × 240 cm/yr)
+- Additive compositing for convection, plumes and quakes
+- Italic serif headline with one amber line against 8.5px tracked monospace
+- Floating glass tray with backdrop-filter blur; extras hidden under 760px
+
+## Intended interaction model
+A planet you can fracture. Visitors watch the plates drift and the plumes breathe,
+then click near one to split it apart and generate a new boundary, use the three
+sliders to change how fast the world turns, how much heat it has and how many plates
+it has, and drag to spin the view. Quakes and Reset give control over the
+bookkeeping. The simulation runs continuously whether or not anyone touches it.

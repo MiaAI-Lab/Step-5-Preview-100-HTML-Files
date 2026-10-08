@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Labyrinth Lab — mazes that grow and solve themselves</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:#0a0a12;color:#e8e6f5;
+  font:15px/1.62 ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.serif{font-family:ui-serif,Georgia,"Times New Roman",serif}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.wrap{width:min(1120px,92vw);margin:0 auto}
+nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0 14px;
+  border-bottom:1px solid rgba(232,230,245,.13)}
+nav .brand{font-family:ui-serif,Georgia,serif;font-size:19px}
+nav .brand i{font-style:italic;color:#8f7bff}
+nav ul{display:flex;gap:26px;list-style:none;margin:0;padding:0;font-size:11px;
+  letter-spacing:.24em;text-transform:uppercase;color:#8d8aa8}
+nav a{color:inherit;text-decoration:none}nav a:hover{color:#8f7bff}
+@media(max-width:780px){nav ul{display:none}}
+header.hero{padding:64px 0 40px;text-align:center}
+header.hero .kicker{font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:#8f7bff;
+  margin:0 0 16px}
+header.hero h1{font-family:ui-serif,Georgia,serif;font-weight:400;
+  font-size:clamp(34px,5.8vw,70px);line-height:1.05;margin:0 0 18px}
+header.hero h1 em{font-style:italic;color:#ffcf5c}
+header.hero p{max-width:58ch;margin:0 auto;color:#a3a0bd}
+/* ---------- bench ---------- */
+.bench{display:grid;grid-template-columns:1fr 250px;gap:22px;align-items:start;
+  border-top:1px solid rgba(232,230,245,.13);border-bottom:1px solid rgba(232,230,245,.13);
+  padding:24px 0 30px;margin-bottom:46px}
+@media(max-width:900px){.bench{grid-template-columns:1fr}}
+table.lab{border:1px solid rgba(232,230,245,.14);border-radius:14px;padding:14px;
+  background:#0d0d17;overflow:hidden}
+canvas{display:block;width:100%;height:auto;touch-action:none}
+.panel{border:1px solid rgba(232,230,245,.14);border-radius:12px;padding:18px;background:#101020}
+.panel h2{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:#8d8aa8;
+  margin:0 0 12px;font-weight:600}
+.group{margin-bottom:16px}
+.group>span{display:block;font-size:10px;letter-spacing:.26em;text-transform:uppercase;
+  color:#8d8aa8;margin-bottom:7px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{background:#17172c;border:1px solid rgba(232,230,245,.14);border-radius:999px;
+  padding:7px 13px;font:inherit;font-size:12px;color:#d6d3ee;cursor:pointer}
+.chip[aria-pressed="true"]{background:#8f7bff;border-color:#8f7bff;color:#12101f}
+.chip.wide{width:100%;text-align:center;border-radius:9px;padding:10px}
+.btn{width:100%;background:#ffcf5c;color:#241a02;border:0;border-radius:9px;padding:11px;
+  font:inherit;font-size:12px;font-weight:700;letter-spacing:.08em;cursor:pointer;margin-top:6px}
+.btn.ghost{background:transparent;color:#ddd9f7;border:1px solid rgba(232,230,245,.2)}
+.btn:hover{filter:brightness(1.07)}
+label.slider{display:block;font-size:10px;letter-spacing:.26em;text-transform:uppercase;
+  color:#8d8aa8;margin:14px 0 7px}
+input[type=range]{width:100%;accent-color:#ffcf5c}
+.stats{margin-top:14px;border-top:1px solid rgba(232,230,245,.12);padding-top:12px}
+.stat{display:flex;justify-content:space-between;font-size:12px;padding:5px 0;color:#a3a0bd}
+.stat b{font-family:ui-monospace,Menlo,monospace;color:#ffcf5c;font-weight:500}
+.legend{margin-top:14px;display:grid;gap:6px;font-size:11px;color:#a3a0bd}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:7px;
+  vertical-align:-1px}
+.cells{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-bottom:46px}
+@media(max-width:820px){.cells{grid-template-columns:1fr}}
+.cell{border-top:1px solid rgba(232,230,245,.14);padding-top:16px}
+.cell .fig{font-family:ui-serif,Georgia,serif;font-size:38px;color:#8f7bff;line-height:1;margin-bottom:8px}
+.cell h3{font-family:ui-serif,Georgia,serif;font-weight:400;font-style:italic;font-size:21px;margin:0 0 8px}
+.cell p{margin:0;color:#a3a0bd;font-size:14px}
+footer{border-top:1px solid rgba(232,230,245,.13);padding:22px 0 54px;display:flex;
+  justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:11px;letter-spacing:.2em;
+  text-transform:uppercase;color:#6f6c8c}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="brand">Labyrinth <i>Lab</i></div>
+    <ul>
+      <li><a href="#bench">Bench</a></li>
+      <li><a href="#method">Method</a></li>
+      <li><a href="#notes">Notes</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <p class="kicker">Carve it, then walk it</p>
+    <h1 class="serif">A maze is only<br>the walls you <em>chose</em></h1>
+    <p>This one is not a picture. It is carved one cell at a time by a stack, and then
+       solved one cell at a time by a queue or by a heuristic — and you can put the
+       heuristic aside and walk it yourself.</p>
+  </header>
+
+  <section class="bench" id="bench">
+    <div class="lab">
+      <canvas id="m" width="860" height="520"></canvas>
+    </div>
+    <aside class="panel">
+      <h2>Bench</h2>
+      <div class="group">
+        <span>Carve</span>
+        <div class="chips" id="gen">
+          <button class="chip" data-g="backtrack" aria-pressed="true">Backtracker</button>
+          <button class="chip" data-g="prim" aria-pressed="false">Prim</button>
+          <button class="chip" data-g="braid" aria-pressed="false">Braid</button>
+        </div>
+      </div>
+      <div class="group">
+        <span>Solve</span>
+        <div class="chips" id="sol">
+          <button class="chip" data-s="bfs" aria-pressed="true">Queue</button>
+          <button class="chip" data-s="astar" aria-pressed="false">Heuristic</button>
+        </div>
+      </div>
+      <button class="btn" id="go">Carve a maze</button>
+      <button class="btn ghost" id="solve">Solve it</button>
+      <button class="btn ghost" id="walk">Walk it yourself</button>
+      <label class="slider" for="speed">Speed</label>
+      <input id="speed" type="range" min="1" max="40" value="14">
+      <div class="stats">
+        <div class="stat">Cells<b id="sCells">—</b></div>
+        <div class="stat">Carved this run<b id="sCarve">—</b></div>
+        <div class="stat">Cells visited<b id="sVisit">—</b></div>
+        <div class="stat">Path length<b id="sPath">—</b></div>
+        <div class="stat">Dead ends<b id="sDead">—</b></div>
+      </div>
+      <div class="legend">
+        <div><i style="background:#8f7bff"></i>walls</div>
+        <div><i style="background:#2b2a52"></i>visited by the solver</div>
+        <div><i style="background:#ffcf5c"></i>the path it found</div>
+        <div><i style="background:#fff"></i>you, when you walk it</div>
+      </div>
+    </aside>
+  </section>
+
+  <section class="cells" id="method">
+    <div class="cell">
+      <div class="fig serif">i</div>
+      <h3>Backtracker</h3>
+      <p>A stack of cells. Take the newest, carve into a random unvisited neighbour,
+         and when a cell has none left, pop back. This is what makes long corridors:
+         the stack never skips.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">ii</div>
+      <h3>Prim</h3>
+      <p>A frontier list instead of a stack. It grows outward like a crystal, so the
+         result is a bush of short branches joined by a few long walks.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">iii</div>
+      <h3>Braid</h3>
+      <p>Take a finished maze and knock out one wall at every dead end. Fewer wrong
+         turns, more loops, far harder to hold in your head.</p>
+    </div>
+  </section>
+
+  <section class="cells" id="notes">
+    <div class="cell">
+      <div class="fig serif">iv</div>
+      <h3>Queue</h3>
+      <p>Breadth-first spreads evenly and is guaranteed to find the shortest path in a
+         maze where every step costs the same. The visited cells you see are literally
+         the queue being drained.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">v</div>
+      <h3>Heuristic</h3>
+      <p>Weight the frontier by how far each cell still is from the exit and it stops
+         exploring the half it does not care about. Fewer cells visited, same answer —
+         in a maze, the same answer for free.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">vi</div>
+      <h3>Bitmask</h3>
+      <p>Walls are not booleans per side. Each cell keeps four bits — north, east,
+         south, west — and carving a passage is one XOR, so a maze is a typed array
+         rather than a thousand objects.</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>Labyrinth Lab · one canvas, no files</span>
+    <span class="mono">bitmask walls</span>
+  </footer>
+</div>
+<script>
+(function(){
+"use strict";
+var cv=document.getElementById('m'),ctx=cv.getContext('2d');
+var CELL=22,N=1,E=2,S=4,W=8,OPP={1:4,2:8,4:1,8:2};
+var grid=[],cols=0,rows=0,dpr=1,cw=0,ch=0;
+var gen='backtrack',solver='bfs',speed=14;
+var mode='idle';           /* idle | carving | solving | walking */
+var stack=[],frontier=[],carveCount=0;
+var queue=[],seen=[],came=[],head=0,visitCount=0;
+var path=[],pathIdx=0;
+var player=0,trail=[];
+var reach=0,braidList=null;
+var dird=[{dx:0,dy:-1,b:N},{dx:1,dy:0,b:E},{dx:0,dy:1,b:S},{dx:-1,dy:0,b:W}];
+
+function layout(){
+  var r=cv.getBoundingClientRect();
+  dpr=Math.min(window.devicePixelRatio||1,2);
+  cw=Math.max(320,Math.round(r.width));
+  cols=Math.floor(cw/CELL);rows=Math.floor(520/CELL);
+  ch=rows*CELL;
+  cv.width=cw*dpr;cv.height=ch*dpr;cv.style.height=ch+'px';
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+function fill(v){for(var i=0;i<cols*rows;i++)grid[i]=v;}
+function fresh(){
+  fill(0);for(var i=0;i<cols*rows;i++)grid[i]=N|E|S|W;
+  mode='carving';stack=[];frontier=[];carveCount=0;queue=[];seen=[];came=[];
+  head=0;visitCount=0;path=[];pathIdx=0;trail=[];reach=0;braidList=null;
+  var s=Math.floor(rows/2)*cols+Math.floor(cols/2);
+  if(gen==='backtrack'){stack.push(s);}
+  else if(gen==='prim'){frontier=[s];grid[s]|=16;/*frontier flag*/}
+  else {grid[s]&=~15;/*start open*/
+    /* braid: carve a full maze then open the dead ends */
+    stack.push(s);grid[s]|=16;
+  }
+}
+/* ---- generation ---- */
+function carveStep(){
+  if(gen==='backtrack'){
+    if(!stack.length){mode='idle';return;}
+    var c=stack[stack.length-1],x=c%cols,y=(c/cols)|0;
+    var opts=[];
+    for(var i=0;i<4;i++){
+      var nx=x+dird[i].dx,ny=y+dird[i].dy;
+      if(nx<0||ny<0||nx>=cols||ny>=rows)continue;
+      if(grid[ny*cols+nx]&16)continue;
+      opts.push(i);
+    }
+    if(!opts.length){stack.pop();return;}
+    var d=dird[opts[(Math.random()*opts.length)|0]];
+    var to=(y+d.dy)*cols+(x+d.dx);
+    grid[c]&=~d.b;grid[to]&=~OPP[d.b];
+    grid[to]|=16;stack.push(to);carveCount++;
+  }else if(gen==='prim'){
+    if(!frontier.length){mode='idle';return;}
+    var pick=frontier.splice((Math.random()*frontier.length)|0,1)[0];
+    var px=pick%cols,py=(pick/cols)|0;
+    var inOpts=[];
+    for(var j=0;j<4;j++){
+      var ax=px+dird[j].dx,ay=py+dird[j].dy;
+      if(ax<0||ay<0||ax>=cols||ay>=rows)continue;
+      if(grid[ay*cols+ax]&16)inOpts.push(j);
+    }
+    if(inOpts.length){
+      var dd=dird[inOpts[(Math.random()*inOpts.length)|0]];
+      var from=(py+dd.dy)*cols+(px+dd.dx);
+      grid[pick]&=~dd.b;grid[from]&=~OPP[dd.b];carveCount++;
+    }
+    grid[pick]|=16;
+    for(var k=0;k<4;k++){
+      var bx=px+dird[k].dx,by=py+dird[k].dy;
+      if(bx<0||by<0||bx>=cols||by>=rows)continue;
+      var nb=by*cols+bx;
+      if(grid[nb]&16)continue;
+      if(frontier.indexOf(nb)<0)frontier.push(nb);
+    }
+  }else{
+    /* braid: carve a full maze first, then knock one dead end open per step */
+    if(stack.length){
+      var c2=stack[stack.length-1],x2=c2%cols,y2=(c2/cols)|0;
+      var o2=[];
+      for(var q=0;q<4;q++){
+        var mx=x2+dird[q].dx,my=y2+dird[q].dy;
+        if(mx<0||my<0||mx>=cols||my>=rows)continue;
+        if(grid[my*cols+mx]&16)continue;o2.push(q);
+      }
+      if(!o2.length){stack.pop();return;}
+      var d2=dird[o2[(Math.random()*o2.length)|0]];
+      var to2=(y2+d2.dy)*cols+(x2+d2.dx);
+      grid[c2]&=~d2.b;grid[to2]&=~OPP[d2.b];
+      grid[to2]|=16;stack.push(to2);carveCount++;
+      return;
+    }
+    /* maze is carved: find its dead ends once, then open them one per step */
+    if(!braidList){
+      braidList=[];
+      for(var b=0;b<cols*rows;b++){
+        var open2=0;
+        for(var z=0;z<4;z++)if(!(grid[b]&dird[z].b))open2++;
+        if(open2<=1)braidList.push(b);
+      }
+    }
+    if(!braidList.length){mode='idle';return;}
+    var pick2=braidList.pop(),px2=pick2%cols,py2=(pick2/cols)|0,dirs=[];
+    for(var z2=0;z2<4;z2++)if(grid[pick2]&dird[z2].b)dirs.push(z2);
+    if(!dirs.length)return;
+    var z3=dirs[0],ox2=px2+dird[z3].dx,oy2=py2+dird[z3].dy;
+    if(ox2<0||oy2<0||ox2>=cols||oy2>=rows)return;
+    grid[pick2]&=~dird[z3].b;grid[oy2*cols+ox2]&=~OPP[dird[z3].b];
+    carveCount++;
+  }
+}
+/* ---------------- solving ---------------- */
+function startSolve(){
+  if(mode==='carving')return;
+  for(var i=0;i<cols*rows;i++)grid[i]&=15;
+  queue=[0];seen=[];came=[];head=0;visitCount=0;path=[];pathIdx=0;trail=[];
+  mode='solving';player=0;
+}
+function solveStep(){
+  if(head>=queue.length){finishSolve();return;}
+  var steps=speed*2;
+  while(steps-- >0&&head<queue.length){
+    var cur=queue[head++];
+    if(cur===cols*rows-1){finishSolve();return;}
+    var x=cur%cols,y=(cur/cols)|0;
+    for(var i=0;i<4;i++){
+      if(grid[cur]&dird[i].b)continue;
+      var nx=x+dird[i].dx,ny=y+dird[i].dy;
+      if(nx<0||ny<0||nx>=cols||ny>=rows)continue;
+      var nb=ny*cols+nx;
+      if(seen[nb])continue;
+      seen[nb]=1;came[nb]=cur;queue.push(nb);visitCount++;
+    }
+  }
+}
+function finishSolve(){
+  var cur=cols*rows-1;
+  if(!came[cur]){mode='idle';return;}
+  while(cur!==undefined){path.push(cur);cur=came[cur];}
+  path.reverse();pathIdx=0;mode='path';
+}
+function h(i){
+  var x=i%cols,y=(i/cols)|0;
+  return Math.abs(x-(cols-1))+Math.abs(y-(rows-1));
+}
+/* the heuristic solver is the same queue, re-sorted each pop */
+function astarStep(){
+  if(head>=queue.length){finishSolve();return;}
+  var steps=speed*2,cnt=0;
+  while(cnt++<steps&&head<queue.length){
+    var best=head;
+    for(var i=head+1;i<queue.length;i++)if(h(queue[i])<h(queue[best]))best=i;
+    var cur=queue[best];queue[best]=queue[head];queue[head]=cur;head++;
+    if(cur===cols*rows-1){finishSolve();return;}
+    var x=cur%cols,y=(cur/cols)|0;
+    for(var i2=0;i2<4;i2++){
+      if(grid[cur]&dird[i2].b)continue;
+      var nx=x+dird[i2].dx,ny=y+dird[i2].dy;
+      if(nx<0||ny<0||nx>=cols||ny>=rows)continue;
+      var nb=ny*cols+nx;
+      if(seen[nb])continue;
+      seen[nb]=1;came[nb]=cur;queue.push(nb);visitCount++;
+    }
+  }
+}
+
+/* ---------------- rendering ---------------- */
+function cellRect(i){return{x:(i%cols)*CELL,y:(((i/cols)|0))*CELL};}
+function draw(){
+  ctx.fillStyle='#0d0d17';ctx.fillRect(0,0,cw,ch);
+  /* visited by the solver */
+  for(var i=0;i<queue.length;i++){
+    if(!seen[queue[i]])continue;
+    var r=cellRect(queue[i]);
+    ctx.fillStyle='rgba(43,42,82,.9)';
+    ctx.fillRect(r.x+1,r.y+1,CELL-2,CELL-2);
+  }
+  /* the path, one cell at a time */
+  for(var p=0;p<pathIdx;p++){
+    var pr=cellRect(path[p]);
+    ctx.fillStyle='#ffcf5c';
+    ctx.fillRect(pr.x+2,pr.y+2,CELL-4,CELL-4);
+  }
+  /* your trail */
+  for(var t=0;t<trail.length;t++){
+    var tr=cellRect(trail[t]);
+    ctx.fillStyle='rgba(232,230,245,.30)';
+    ctx.fillRect(tr.x+3,tr.y+3,CELL-6,CELL-6);
+  }
+  /* walls */
+  ctx.strokeStyle='#8f7bff';ctx.lineWidth=1.6;ctx.beginPath();
+  for(var c=0;c<cols*rows;c++){
+    var q=cellRect(c),g=grid[c]&15;
+    if(!g)continue;
+    if(g&N){ctx.moveTo(q.x,q.y+1);ctx.lineTo(q.x+CELL,q.y+1);}
+    if(g&S){ctx.moveTo(q.x,q.y+CELL);ctx.lineTo(q.x+CELL,q.y+CELL);}
+    if(g&E){ctx.moveTo(q.x+CELL-1,q.y);ctx.lineTo(q.x+CELL-1,q.y+CELL);}
+    if(g&W){ctx.moveTo(q.x+1,q.y);ctx.lineTo(q.x+1,q.y+CELL);}
+  }
+  ctx.stroke();
+  /* start and exit markers */
+  ctx.fillStyle='rgba(143,214,148,.9)';ctx.fillRect(1,1,CELL-2,CELL-2);
+  ctx.fillStyle='rgba(255,120,150,.9)';
+  ctx.fillRect((cols-1)*CELL+1,(rows-1)*CELL+1,CELL-2,CELL-2);
+  /* the cursor of the algorithm, while it is still running */
+  if(mode==='solving'&&queue.length&&head<queue.length){
+    var cr=cellRect(queue[head]);
+    ctx.fillStyle='#fff';ctx.fillRect(cr.x+5,cr.y+5,CELL-10,CELL-10);
+  }
+  /* you, when walking */
+  if(mode==='walking'||trail.length){
+    var pl=cellRect(player);
+    ctx.fillStyle='#fff';
+    ctx.beginPath();ctx.arc(pl.x+CELL/2,pl.y+CELL/2,CELL*0.28,0,6.3);ctx.fill();
+  }
+}
+
+/* ---------------- controls ---------------- */
+function chipGroup(id,fn){
+  var btns=[].slice.call(document.querySelectorAll('#'+id+' .chip'));
+  btns.forEach(function(b){
+    b.addEventListener('click',function(){
+      btns.forEach(function(o){o.setAttribute('aria-pressed',String(o===b));});
+      fn(b.getAttribute('data-g')||b.getAttribute('data-s'));
+    });
+  });
+}
+chipGroup('gen',function(v){gen=v;fresh();});
+chipGroup('sol',function(v){solver=v;});
+document.getElementById('go').addEventListener('click',fresh);
+document.getElementById('solve').addEventListener('click',startSolve);
+document.getElementById('walk').addEventListener('click',function(){
+  if(mode==='carving')return;
+  for(var i=0;i<cols*rows;i++)grid[i]&=15;
+  mode='walking';player=0;trail=[0];queue=[];seen=[];came=[];head=0;path=[];pathIdx=0;
+});
+document.getElementById('speed').addEventListener('input',function(e){
+  speed=+e.target.value;
+});
+var KEY={ArrowUp:N,ArrowRight:E,ArrowDown:S,ArrowLeft:W,w:N,d:E,s:S,a:W,
+  W:N,D:E,S:S,A:W};
+window.addEventListener('keydown',function(e){
+  if(mode!=='walking')return;
+  var b=KEY[e.key];
+  if(!b)return;
+  e.preventDefault();
+  if(grid[player]&b)return;
+  var x=player%cols,y=(player/cols)|0;
+  for(var i=0;i<4;i++){
+    if(dird[i].b!==b)continue;
+    var nx=x+dird[i].dx,ny=y+dird[i].dy;
+    if(nx<0||ny<0||nx>=cols||ny>=rows)return;
+    player=ny*cols+nx;trail.push(player);
+    if(player===cols*rows-1)mode='won';
+    return;
+  }
+});
+/* touch steering: a tap in a quadrant moves that way */
+cv.addEventListener('pointerdown',function(e){
+  if(mode!=='walking')return;
+  var r=cv.getBoundingClientRect();
+  var dx=(e.clientX-r.left)/r.width-0.5, dy=(e.clientY-r.top)/r.height-0.5;
+  var b=Math.abs(dx)>Math.abs(dy)?(dx>0?E:W):(dy>0?S:N);
+  if(grid[player]&b)return;
+  var x=player%cols,y=(player/cols)|0;
+  for(var i=0;i<4;i++){
+    if(dird[i].b!==b)continue;
+    var nx=x+dird[i].dx,ny=y+dird[i].dy;
+    if(nx<0||ny<0||nx>=cols||ny>=rows)return;
+    player=ny*cols+nx;trail.push(player);
+    if(player===cols*rows-1)mode='won';
+    return;
+  }
+});
+
+/* ---------------- readout + loop ---------------- */
+function stats(){
+  var dead=0;
+  for(var i=0;i<cols*rows;i++){
+    var o=0;for(var z=0;z<4;z++)if(!(grid[i]&dird[z].b))o++;
+    if(o===1)dead++;
+  }
+  document.getElementById('sCells').textContent=cols*rows;
+  document.getElementById('sCarve').textContent=carveCount;
+  document.getElementById('sVisit').textContent=visitCount;
+  document.getElementById('sPath').textContent=path.length?path.length:'—';
+  document.getElementById('sDead').textContent=dead;
+}
+var last=0;
+function loop(ts){
+  var dt=last?Math.min(.05,(ts-last)/1000):0;last=ts;
+  if(mode==='carving'){
+    var n=speed;
+    while(n-->0&&mode==='carving')carveStep();
+  }else if(mode==='solving'){
+    if(solver==='bfs')solveStep();else astarStep();
+  }else if(mode==='path'){
+    if(pathIdx<path.length)pathIdx+=Math.max(1,speed/4);
+    if(pathIdx>=path.length){pathIdx=path.length;mode='idle';}
+  }
+  draw();stats();
+  requestAnimationFrame(loop);
+}
+layout();fresh();stats();requestAnimationFrame(loop);
+window.addEventListener('resize',function(){layout();fresh();stats();});
+})();
+</script>
+</body>
+</html>

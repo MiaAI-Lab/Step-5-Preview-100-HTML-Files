@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SUCRÉ — The Cake Builder</title>
+<style>
+  :root{
+    --cream:#fff6f0;
+    --cream2:#ffe9e6;
+    --pink:#ff7aa8;
+    --pink-d:#e04f86;
+    --mint:#5fd6b4;
+    --choc:#5a3a2e;
+    --butter:#ffd166;
+    --ink:#4a2b38;
+    --disp:"Avenir Next",Avenir,"Segoe UI",Futura,"Century Gothic",Helvetica,sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--cream);color:var(--ink);font-family:var(--disp);
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;
+    background-image:
+      radial-gradient(circle at 12% 18%,rgba(255,122,168,.10) 0 22%,transparent 22%),
+      radial-gradient(circle at 88% 72%,rgba(95,214,180,.12) 0 20%,transparent 20%);
+  }
+  ::selection{background:var(--pink);color:#fff}
+
+  .wrap{max-width:1120px;margin:0 auto;padding:0 clamp(18px,4vw,40px)}
+
+  nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px 0;flex-wrap:wrap}
+  .logo{display:flex;align-items:center;gap:11px;font-weight:700;letter-spacing:-.01em;font-size:19px}
+  .logo i{
+    width:30px;height:30px;border-radius:50%;display:block;
+    background:radial-gradient(circle at 32% 28%,#fff,var(--pink) 45%,var(--pink-d));
+    box-shadow:0 4px 12px -3px rgba(224,79,134,.6)
+  }
+  nav ul{display:flex;gap:clamp(12px,2.4vw,28px);list-style:none;margin:0;padding:0}
+  nav a{
+    color:var(--ink);text-decoration:none;font-size:12px;font-weight:600;letter-spacing:.04em;
+    text-transform:uppercase;opacity:.72;transition:opacity .2s
+  }
+  nav a:hover{opacity:1}
+  .cart{
+    background:var(--ink);color:var(--cream);border:0;font-family:var(--mono);font-size:10px;
+    letter-spacing:.16em;text-transform:uppercase;padding:12px 20px;border-radius:999px;cursor:pointer;
+    transition:transform .25s,box-shadow .25s
+  }
+  .cart:hover{transform:translateY(-2px);box-shadow:0 12px 26px -10px rgba(74,43,56,.6)}
+
+  .hero{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,5vw,60px);align-items:center;padding:clamp(30px,6vw,80px) 0}
+  .hero .k{
+    font-family:var(--mono);font-size:10px;letter-spacing:.3em;text-transform:uppercase;
+    color:var(--pink-d);display:block;margin-bottom:20px
+  }
+  .hero h1{
+    font-size:clamp(38px,6.6vw,78px);line-height:.95;letter-spacing:-.035em;margin:0 0 22px;font-weight:700
+  }
+  .hero h1 em{
+    font-style:normal;
+    background:linear-gradient(100deg,var(--pink),var(--butter) 55%,var(--mint));
+    -webkit-background-clip:text;background-clip:text;color:transparent
+  }
+  .hero p{font-size:15px;line-height:1.75;opacity:.75;max-width:40ch;margin:0 0 30px}
+  .actions{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+  .btn{
+    background:var(--pink);color:#fff;border:0;font-family:var(--disp);font-weight:700;font-size:13px;
+    letter-spacing:.02em;padding:17px 32px;border-radius:999px;cursor:pointer;
+    box-shadow:0 16px 34px -14px rgba(224,79,134,.85);transition:transform .28s,box-shadow .28s
+  }
+  .btn:hover{transform:translateY(-3px);box-shadow:0 24px 44px -14px rgba(224,79,134,1)}
+  .btn.ghost{background:transparent;color:var(--ink);border:2px solid rgba(74,43,56,.22);box-shadow:none}
+  .btn.ghost:hover{border-color:var(--ink);box-shadow:none}
+
+  /* ---------- cake ---------- */
+  .stage{
+    position:relative;aspect-ratio:1;display:grid;place-items:center;
+    background:
+      radial-gradient(circle at 50% 40%,rgba(255,255,255,.9),rgba(255,233,230,.5) 55%,transparent 72%);
+    border-radius:50%;
+  }
+  .cake{position:relative;width:min(320px,72%);aspect-ratio:1;display:grid;place-items:end center}
+  .layer{
+    position:relative;width:100%;border-radius:14px 14px 8px 8px;margin-top:-6px;
+    box-shadow:inset 0 -10px 22px rgba(90,58,46,.16),inset 0 6px 14px rgba(255,255,255,.55),
+               0 12px 24px -14px rgba(74,43,56,.55);
+    transition:height .6s cubic-bezier(.34,1.4,.5,1),background .5s,transform .4s
+  }
+  .layer:hover{transform:translateY(-4px)}
+  .plate{
+    width:118%;height:16px;border-radius:50%;margin-bottom:-8px;
+    background:linear-gradient(180deg,#fff,#f0e2e6);
+    box-shadow:0 16px 30px -14px rgba(74,43,56,.5)
+  }
+  .candle{width:6px;height:26px;border-radius:3px;background:linear-gradient(180deg,#fff 0 50%,var(--pink) 50%);position:absolute;top:-26px;left:50%;transform:translateX(-50%)}
+  .flame{
+    position:absolute;top:-40px;left:50%;transform:translateX(-50%);
+    width:12px;height:18px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;
+    background:radial-gradient(circle at 50% 70%,#fff,var(--butter) 45%,rgba(255,120,60,.7));
+    filter:blur(.4px);animation:flick .28s infinite alternate
+  }
+  @keyframes flick{from{transform:translateX(-50%) scale(1) rotate(-3deg)}to{transform:translateX(-50%) scale(1.14) rotate(3deg)}}
+
+  /* ---------- builder ---------- */
+  .builder{display:grid;grid-template-columns:1.1fr 1fr;gap:clamp(24px,4vw,56px);padding:clamp(24px,5vw,64px) 0;align-items:start}
+  .builder h2{font-size:clamp(24px,3.6vw,40px);letter-spacing:-.025em;margin:0 0 8px;line-height:1.05}
+  .builder .sub{font-family:var(--mono);font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--pink-d);margin:0 0 26px}
+  .row{margin-bottom:22px}
+  .row .lab{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+  .row .lab b{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+  .row .lab span{font-family:var(--mono);font-size:11px;color:var(--pink-d)}
+  .steps{display:flex;gap:8px}
+  .steps button{
+    flex:1;border:2px solid rgba(74,43,56,.16);background:transparent;border-radius:12px;
+    padding:14px 6px;cursor:pointer;font-family:var(--disp);font-weight:700;font-size:12px;color:var(--ink);
+    transition:all .2s
+  }
+  .steps button:hover{border-color:var(--ink)}
+  .steps button.on{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+  .swatches{display:flex;gap:9px;flex-wrap:wrap}
+  .sw{
+    width:38px;height:38px;border-radius:50%;cursor:pointer;border:3px solid transparent;
+    transition:transform .22s,border-color .22s;position:relative
+  }
+  .sw:hover{transform:scale(1.12)}
+  .sw.on{border-color:var(--ink);transform:scale(1.12)}
+  .summary{
+    background:#fff;border-radius:22px;padding:26px 28px;
+    box-shadow:0 24px 50px -30px rgba(74,43,56,.5)
+  }
+  .summary h3{margin:0 0 18px;font-size:15px;letter-spacing:.02em}
+  .line{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px dashed rgba(74,43,56,.18);font-size:13px}
+  .line:last-of-type{border-bottom:0}
+  .line span{opacity:.7}
+  .line b{font-variant-numeric:tabular-nums}
+  .total{display:flex;justify-content:space-between;align-items:baseline;margin-top:16px;padding-top:16px;border-top:2px solid var(--ink)}
+  .total b{font-size:30px;letter-spacing:-.02em}
+  .total span{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;opacity:.6}
+
+  footer{border-top:2px solid rgba(74,43,56,.14);padding:26px 0 44px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;opacity:.6}
+
+  @media (max-width:880px){.hero,.builder{grid-template-columns:1fr}.hero{padding-top:20px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="logo"><i></i>SUCRÉ</div>
+    <ul>
+      <li><a href="#build">Build</a></li>
+      <li><a href="#menu">Menu</a></li>
+      <li><a href="#visit">Visit</a></li>
+    </ul>
+    <button class="cart" id="cart">Order · <span id="cartN">0</span></button>
+  </nav>
+
+  <section class="hero">
+    <div>
+      <span class="k">Est. 2019 · Corner of 4th &amp; Vine</span>
+      <h1>Build the cake<br>you keep <em>dreaming</em> about.</h1>
+      <p>Four sponges, five frostings, and a candle budget that is entirely your own.
+      The price updates as you go, the way it does at the counter.</p>
+      <div class="actions">
+        <button class="btn" id="start">Start building</button>
+        <button class="btn ghost" id="surprise">Surprise me</button>
+      </div>
+    </div>
+    <div class="stage">
+      <div class="cake" id="cake"><div class="plate"></div></div>
+    </div>
+  </section>
+
+  <section class="builder" id="build">
+    <div>
+      <h2>Configure yours</h2>
+      <p class="sub">Four decisions · two minutes</p>
+
+      <div class="row">
+        <div class="lab"><b>Sponge</b><span id="spongeName">Vanilla bean</span></div>
+        <div class="swatches" id="sponges"></div>
+      </div>
+
+      <div class="row">
+        <div class="lab"><b>Frosting</b><span id="frostName">Swiss buttercream</span></div>
+        <div class="swatches" id="frosts"></div>
+      </div>
+
+      <div class="row">
+        <div class="lab"><b>Tiers</b><span id="tierName">3 layers</span></div>
+        <div class="steps" id="tiers"></div>
+      </div>
+
+      <div class="row">
+        <div class="lab"><b>Candles</b><span id="candleName">3 candles</span></div>
+        <div class="steps" id="candles"></div>
+      </div>
+    </div>
+
+    <div class="summary">
+      <h3>Your cake</h3>
+      <div class="line"><span>Sponge</span><b id="sSponge">Vanilla bean · $18</b></div>
+      <div class="line"><span>Frosting</span><b id="sFrost">Swiss buttercream · $12</b></div>
+      <div class="line"><span>Tiers</span><b id="sTiers">3 layers · $21</b></div>
+      <div class="line"><span>Candles</span><b id="sCandle">3 candles · $4</b></div>
+      <div class="line"><span>Box &amp; ribbon</span><b>$6</b></div>
+      <div class="total"><span>Total</span><b id="total">$61</b></div>
+      <button class="btn" id="order" style="width:100%;margin-top:20px">Add to order</button>
+    </div>
+  </section>
+
+  <section id="menu">
+    <h2 style="font-size:clamp(24px,3.6vw,40px);letter-spacing:-.025em;margin:0 0 8px;line-height:1.05">On the counter today</h2>
+    <p class="sub" style="font-family:var(--mono);font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--pink-d);margin:0 0 26px">Baked at 5am · until it's gone</p>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px" id="menu-grid"></div>
+  </section>
+
+  <section id="visit" style="padding:clamp(30px,6vw,70px) 0">
+    <div style="background:var(--ink);color:var(--cream);border-radius:28px;padding:clamp(30px,5vw,56px);text-align:center">
+      <h2 style="font-size:clamp(24px,4vw,42px);letter-spacing:-.025em;margin:0 0 14px;line-height:1.05">Open until the last slice.</h2>
+      <p style="opacity:.7;max-width:44ch;margin:0 auto 26px;line-height:1.75;font-size:14px">Tuesday to Sunday, 8am until we run out. Which, on a Saturday, is usually before noon.</p>
+      <button class="btn" id="visitBtn">Find the shop</button>
+    </div>
+  </section>
+
+  <footer>
+    <span>© Sucré Patisserie</span>
+    <span>4th &amp; Vine</span>
+    <span>All butter, no shortening</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var SPONGES=[
+    {n:'Vanilla bean',c:'#ffe9c9',p:18},
+    {n:'Dark chocolate',c:'#5a3a2e',p:22},
+    {n:'Pistachio',c:'#cfe6b8',p:26},
+    {n:'Raspberry rose',c:'#ffc9d8',p:24},
+    {n:'Lemon poppy',c:'#fff3b0',p:20},
+    {n:'Earl grey',c:'#e6dcc9',p:24}
+  ];
+  var FROSTS=[
+    {n:'Swiss buttercream',c:'#fff1f3',p:12},
+    {n:'Cream cheese',c:'#fffaf0',p:14},
+    {n:'Ganache',c:'#4a2f26',p:18},
+    {n:'Pistachio cream',c:'#d8ecc4',p:20},
+    {n:'Raspberry curd',c:'#ff8fae',p:22},
+    {n:'Honey mascarpone',c:'#ffeec9',p:19}
+  ];
+  var sel={sponge:0,frost:0,tiers:3,candles:3};
+
+  function buildSwatches(id,arr,key){
+    var host=document.getElementById(id);
+    arr.forEach(function(o,i){
+      var d=document.createElement('div');
+      d.className='sw'+(sel[key]===i?' on':'');
+      d.title=o.n;
+      d.style.background=arr[i].c;
+      d.addEventListener('click',function(){
+        sel[key]=i;
+        host.querySelectorAll('.sw').forEach(function(x){x.classList.remove('on')});
+        d.classList.add('on');
+        if(key==='sponge')document.getElementById('spongeName').textContent=o.n;
+        else document.getElementById('frostName').textContent=o.n;
+        render();
+      });
+      host.appendChild(d);
+    });
+  }
+  function buildSteps(id,opts,key,labelId){
+    var host=document.getElementById(id);
+    opts.forEach(function(o,i){
+      var b=document.createElement('button');
+      b.textContent=o;
+      b.className=sel[key]===i?'on':'';
+      b.addEventListener('click',function(){
+        sel[key]=i;
+        host.querySelectorAll('button').forEach(function(x){x.classList.remove('on')});
+        b.classList.add('on');
+        document.getElementById(labelId).textContent=o;
+        render();
+      });
+      host.appendChild(b);
+    });
+  }
+
+  var TIERS=['1 layer','2 layers','3 layers','4 layers','5 layers'];
+  var CANDS=['No candles','1 candle','3 candles','5 candles','A whole pack'];
+  buildSwatches('sponges',SPONGES,'sponge');
+  buildSwatches('frosts',FROSTS,'frost');
+  buildSteps('tiers',TIERS,'tiers','tierName');
+  buildSteps('candles',CANDS,'candles','candleName');
+
+  var cake=document.getElementById('cake');
+  function render(){
+    var tiers=sel.tiers+1;
+    var sp=SPONGES[sel.sponge], fr=FROSTS[sel.frost];
+    var totalH=tiers*15+ (tiers-1)*9 + 26;
+    var h=Math.round(totalH/tiers);
+    cake.innerHTML='<div class="plate"></div>';
+    for(var i=0;i<tiers;i++){
+      var d=document.createElement('div');
+      d.className='layer';
+      var w=(100-i*5)+'%';
+      d.style.width=w;
+      d.style.height=h+'px';
+      d.style.background='linear-gradient(180deg,'+fr.c+','+sp.c+')';
+      d.title=sp.n+' & '+fr.n;
+      cake.appendChild(d);
+    }
+    var nc=sel.candles===0?0:sel.candles===1?1:sel.candles===2?3:sel.candles===3?5:9;
+    for(var k=0;k<nc;k++){
+      var cw=document.createElement('div');
+      cw.className='candle';
+      cw.style.left=(50+(k-(nc-1)/2)*11)+'%';
+      cw.style.top=(-(h+4))+'px';
+      var fl=document.createElement('div');
+      fl.className='flame';
+      cw.appendChild(fl);
+      cake.appendChild(cw);
+    }
+    var price=sp.p+fr.p+(sel.tiers+1)*7+nc*1.5+6;
+    document.getElementById('sSponge').textContent=sp.n+' · $'+sp.p;
+    document.getElementById('sFrost').textContent=fr.n+' · $'+fr.p;
+    document.getElementById('sTiers').textContent=(sel.tiers+1)+' layer'+(sel.tiers?'s':'')+' · $'+(sel.tiers+1)*7;
+    document.getElementById('sCandle').textContent=nc+' candle'+(nc===1?'':'s')+' · $'+(nc*1.5).toFixed(0);
+    document.getElementById('total').textContent='$'+price.toFixed(0);
+    document.getElementById('candleName').textContent=nc+' candle'+(nc===1?'':'s');
+  }
+  render();
+
+  var M=[
+    {n:'Almond croissant',p:'$5.50',c:'#f3d9a4'},
+    {n:'Canele',p:'$4.00',c:'#8a5a34'},
+    {n:'Passion fruit tart',p:'$7.25',c:'#ffcf5c'},
+    {n:'Pistachio cookie',p:'$3.75',c:'#cfe6b8'},
+    {n:'Choc brioche',p:'$6.00',c:'#5a3a2e'},
+    {n:'Lemon madeleine',p:'$3.25',c:'#fff3b0'}
+  ];
+  var mg=document.getElementById('menu-grid');
+  M.forEach(function(o){
+    var d=document.createElement('div');
+    d.style.cssText='background:#fff;border-radius:18px;padding:18px;display:flex;align-items:center;gap:14px;box-shadow:0 18px 36px -28px rgba(74,43,56,.6);transition:transform .3s;cursor:pointer';
+    d.innerHTML='<i style="width:40px;height:40px;border-radius:12px;background:'+o.c+';display:block;flex:0 0 auto"></i>'+
+      '<div style="flex:1"><b style="font-size:13px;display:block">'+o.n+'</b></div>'+
+      '<span style="font-family:var(--mono);font-size:12px;color:var(--pink-d)">'+o.p+'</span>';
+    d.addEventListener('mouseenter',function(){d.style.transform='translateY(-4px)'});
+    d.addEventListener('mouseleave',function(){d.style.transform=''});
+    d.addEventListener('click',function(){add()});
+    mg.appendChild(d);
+  });
+
+  var n=0;
+  function add(){
+    n++;
+    document.getElementById('cartN').textContent=n;
+    var c=document.getElementById('cart');
+    c.textContent='Order · '+n;
+    c.style.background='var(--mint)';
+    c.style.color='#053a2c';
+    setTimeout(function(){c.style.background='';c.style.color=''},700);
+  }
+  document.getElementById('order').addEventListener('click',add);
+  document.getElementById('cart').addEventListener('click',function(){
+    this.textContent=n?'Order · '+n+' ✓':'Empty basket';
+  });
+  document.getElementById('start').addEventListener('click',function(){
+    document.getElementById('build').scrollIntoView({behavior:'smooth'});
+  });
+  document.getElementById('surprise').addEventListener('click',function(){
+    sel.sponge=(Math.random()*SPONGES.length)|0;
+    sel.frost=(Math.random()*FROSTS.length)|0;
+    sel.tiers=(Math.random()*5)|0;
+    sel.candles=(Math.random()*5)|0;
+    document.querySelectorAll('#sponges .sw').forEach(function(x,i){x.classList.toggle('on',i===sel.sponge)});
+    document.querySelectorAll('#frosts .sw').forEach(function(x,i){x.classList.toggle('on',i===sel.frost)});
+    document.querySelectorAll('#tiers button').forEach(function(x,i){x.classList.toggle('on',i===sel.tiers)});
+    document.querySelectorAll('#candles button').forEach(function(x,i){x.classList.toggle('on',i===sel.candles)});
+    document.getElementById('spongeName').textContent=SPONGES[sel.sponge].n;
+    document.getElementById('frostName').textContent=FROSTS[sel.frost].n;
+    document.getElementById('tierName').textContent=TIERS[sel.tiers];
+    render();
+  });
+  document.getElementById('visitBtn').addEventListener('click',function(){
+    this.textContent='4th & Vine · see you soon ✓';
+    this.disabled=true;
+  });
+})();
+</script>
+</body>
+</html>

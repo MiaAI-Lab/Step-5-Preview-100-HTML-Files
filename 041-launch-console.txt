@@ -1,0 +1,82 @@
+# LAUNCH CONSOLE — Pad 4, T-Minus
+
+## Short title
+Launch Console
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a launch control console
+for a fictional vehicle, called LAUNCH CONSOLE. No external dependencies whatsoever
+— no CDN, no web fonts, no external images, no external SVG files, no JavaScript
+libraries. All CSS and JavaScript inline, works offline by double-clicking, responsive,
+valid HTML5.
+
+Artistic direction: mission control at 4 a.m. Near-black ground with a green cast
+(#080c0a → #0e1512), hairline rules at 14% green-white, and a three-colour
+semantic system used everywhere: green #57e08a for GO, amber #ffc45c for holds and
+standby, red #ff5f56 for NO-GO and scrub. Everything is monospace except the
+headline, which is a 200-weight sans at up to 64px with one 600-weight green word.
+
+The console is built to be operated. The countdown begins held at 04:00 T− and
+counts down at a chosen rate while running: Hold freezes it, Resume starts it at
+1×, Fast forward runs it at 8×, and Scrub resets it to 04:00 and cancels. Every
+transition writes a timestamped line into a scrolling flight control log, colour-coded
+green/amber/red/muted. The wind-aloft gauge recomputes every frame from a
+distribution that also tightens as the clock approaches zero, flipping to red above
+128 knots — so the longer you wait, the worse the weather gets, which is exactly the
+sort of joke a launch controller would make.
+
+Four panels: the countdown block (clock + a six-cell GO/NO-GO grid of Range,
+Vehicle, Recovery, Weather, Crew, Telemetry, plus the four transport buttons), an
+eight-cell systems grid built from 1px gaps (stage 1 thrust, stage 2 thrust,
+payload mass, guidance, telemetry rate, power, cabin pressure, abort modes), a
+live chamber-pressure trace, and the flight control log.
+
+The pressure trace is a rolling 80-sample canvas strip. The line is green while the
+count is running and amber while held, filled with a vertical gradient area to
+transparent, with a glowing head dot. While running, samples sit around 2150 kPa
+with occasional pressure spikes; while held, they flatten to a slow 2100 kHz sine.
+The chart has four horizontal rules and axis labels in MPa.
+
+The log is a live feed: ten scripted lines of range chatter (range safety,
+umbilical retract, crew ingress, guidance alignment, weather balloon, recovery ship,
+strongback, flight termination, cabin, shear layer) play out on a 4.2-second
+interval, colour-coded, so the console keeps talking while you operate it.
+
+Layout: a status bar across the top (pad, vehicle, mission, blinking status dot),
+a two-column hero, the countdown panel, the systems grid, the trace panel, the log
+panel, and a three-part monospace footer. The hero and countdown collapse to one
+column under 900px, the systems grid to two, the GO/NO-GO gauges to one.
+
+## One-paragraph description of the intended design
+A mission-control console that actually runs: a T− countdown with Hold, Resume,
+Fast-forward and Scrub transport that writes timestamped colour-coded lines into a
+live flight-control log, a six-cell GO/NO-GO grid whose weather gauge degrades
+toward red as the clock nears zero, an eight-cell systems grid, and a rolling
+chamber-pressure trace that turns from amber to green the moment the count resumes.
+
+## Major visual techniques used
+- Countdown clock driven by a real timer with a selectable rate multiplier (1× or 8×)
+- Four transport buttons with mutually exclusive lit states
+- Timestamped, colour-coded scrolling log driven by user actions and a scripted
+  chatter interval
+- Wind gauge that tightens toward zero and flips red above a threshold
+- Rolling 80-sample canvas trace with a gradient area fill, glowing head dot, and a
+  colour that reflects whether the count is running
+- GO/NO-GO grid built from 1px gaps over the hairline colour, each cell coloured by
+  semantic state
+- Eight-cell systems grid with name, value and a state line
+- Blinking status dot in steps(1) timing
+- Clock rendered once with a persistent unit span rather than rebuilt each frame
+- Monospace-only data typography against a 200-weight sans headline with one green
+  word
+- Three-colour semantic palette (green/amber/red) applied consistently
+- Status bar, hero, panels and footer all on hairline separators
+- Two-column hero and countdown collapsing under 900px; grids to two and one
+
+## Intended interaction model
+A console to be operated. Visitors press Hold to stop the count, Resume to start it,
+Fast forward to run it at 8×, and Scrub to cancel and reset — watching the log
+respond with a timestamped line each time, the weather gauge drift worse, and the
+pressure trace change colour. The chatter keeps arriving on its own, so the console
+is never silent.

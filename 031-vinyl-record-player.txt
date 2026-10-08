@@ -1,0 +1,84 @@
+# LACQUER — Side A, Take One
+
+## Short title
+Vinyl Record Player
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a vinyl record product
+page with a working turntable called LACQUER. No external dependencies whatsoever
+— no CDN, no web fonts, no external images, no external SVG files, no JavaScript
+libraries. All CSS and JavaScript inline, works offline by double-clicking, responsive,
+valid HTML5. No audio is used: the record is visual and kinetic only.
+
+Artistic direction: a dark listening room. Ground #14100f with a warm radial light
+from the upper left, paper-cream text #efe9dd, gold #c9a227 as the single accent,
+and proof red #b8342a on one catalog number and one italic word. Type is a
+high-contrast serif for headings and the paper label, a system sans for paragraphs,
+and 8.5–9.5px wide-tracked monospace for all metadata.
+
+The turntable is built in CSS. The platter is a circle with a radial highlight and
+paired inset shadows (a warm one above, a deep one below) plus a large soft drop
+shadow. The disc sits inside it in near-black, with its grooves drawn as a
+repeating-radial-gradient of 1px white lines every 4px at 3.5% alpha, and a light
+sweep drawn as a conic-gradient of two faint warm arcs so the dead wax appears to
+catch the room light as it turns. The paper label at the centre is a radial cream
+gradient with the artist name in serif, an italic red catalog line, and a 7px
+monospace speed line. A chrome spindle sits on top. The tone arm is a shaft with a
+rounded pivot at one end and a black cartridge head at the other, with a gold stylus
+pip, hinged at 92% of its width; at rest it parks at −24° and swings to +6° when the
+needle drops, over 1.4 seconds on a slow easing curve.
+
+The disc spins with a CSS animation whose duration is set from the selected speed —
+1.8 seconds at the default (33⅓ rpm), recomputed for 45 and 78 rpm and for "stopped"
+— and the animation is paused and resumed via animation-play-state rather than being
+restarted, so changing speed mid-spin does not jerk the record.
+
+Layout: a nav with a monospace brand and two links. A two-column deck: the platter
+on the left, and on the right a gold eyebrow, a serif headline with one italic gold
+word, a paragraph, a six-track list where each row shows a number, title and duration
+and turns gold when selected, and a transport row with Drop the needle / Pause, Lift
+the arm, and a speed slider showing stopped / 33⅓ / 45 / 78. Then a four-cell spec
+strip built from 1px gaps with large gold serif figures. Then a ruled monospace
+footer.
+
+Interaction: clicking any track selects it, swings the arm in and starts the platter
+turning. Drop the needle starts the record (loading the first track if none is
+chosen) and becomes Pause; Lift the arm stops it and parks the arm. The speed slider
+changes the rotation rate live, including a "stopped" position. The space bar
+toggles play and pause. The deck and specs collapse to one column and two columns
+respectively under 880px.
+
+## One-paragraph description of the intended design
+A listening-room record page whose turntable is real CSS: a platter with paired
+inset shadows, a near-black disc with a repeating-radial groove texture and a
+conic light sweep, a cream paper label, a hinged tone arm with a gold stylus that
+swings in on a 1.4-second easing when you pick a track, and a platter whose rotation
+rate you can change between stopped, 33⅓, 45 and 78 without restarting the spin.
+
+## Major visual techniques used
+- Platter depth from a radial highlight plus paired inset shadows and a wide soft
+  drop shadow
+- Groove texture from a repeating-radial-gradient of 1px lines every 4px at 3.5% alpha
+- Light sweep across the wax from a conic-gradient of two faint warm arcs
+- Cream paper label as a radial gradient with serif type, an italic red line and a
+  7px monospace speed line
+- Chrome spindle as a small radial-gradient circle on a higher z-index
+- Tone arm hinged at 92% width, with a shaft gradient, a rounded pivot and a black
+  cartridge head with a 2px gold stylus indicator
+- Arm swing from −24° to +6° over 1.4s on a slow cubic-bezier
+- Rotation rate changed by rewriting animation-duration, with play/pause done via
+  animation-play-state so the spin never restarts
+- Track list with gold selection state and monospace durations
+- Speed slider mapping to stopped / 33⅓ / 45 / 78 rpm
+- Space-bar transport toggle
+- Dark warm palette with a single gold accent and one proof-red word
+- Serif display with 0.3em monospace branding; 1px-gap spec strip
+- Two-column deck collapsing under 880px
+
+## Intended interaction model
+A turntable you operate. Visitors pick a track (or press Drop the needle) to swing
+the arm in and start the platter, Lift the arm to park it, and use the speed slider
+to change how fast the record turns — right down to stopped. Space does the same as
+the play button. The whole interaction is choosing a track and setting a speed;
+everything else on the page is the sleeve.

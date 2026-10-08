@@ -1,0 +1,80 @@
+# CLOCKWORK — brass, steel and patience
+
+## Short title
+Clockwork
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a watch movement on a dark
+plate, with a real gear train whose wheels are geometrically correct and whose mesh is
+computed rather than drawn by hand. No external dependencies whatsoever — no CDN, no
+web fonts, no external images, no JS libraries. All CSS and JavaScript inline, works
+offline by double-clicking, responsive, valid HTML5.
+
+Artistic direction: an enamel-black bench with brass on it. Ground #0a0c0f, panels
+#11151a, hairlines rgba(233,228,216,.12), body text #e9e4d8 with muted #a39d8c, brass
+#e0b063 as the one accent, and blued steel #4b6fa8 for the hands. Serif display type
+throughout with uppercase .2em–.42em track kickers and eyebrow rules.
+
+The movement: an SVG on a viewBox 620 × 460 containing six wheels, each generated at
+load as a real tooth profile. The module (tooth size) is fixed at 5 user units, so a
+wheel's pitch radius is exactly module × teeth / 2, its addendum radius one module
+outside that and its dedendum radius 1.15 modules inside. Each wheel is drawn three
+ways over itself: the toothed outline filled with a linear gradient (brass or steel),
+then the same outline reused as a clip path so four spokes cut through the centre and
+stop dead at the rim, then a hub with a ruby jewel in the middle.
+
+The mesh is the point. Each wheel knows its parent and the angle of the line of
+centres to it, and its rotation is solved as
+angle_self = -(n_parent / n_self) * (angle_parent - phi) + phi + PI - step*0.75,
+which is the standard external-gear relation with the half-tooth phase term that puts
+a tooth of one wheel into a gap of the other instead of tooth against tooth. Over the
+wheels sit three static finger bridges in blued steel with counter-sunk screws, and
+over the centre wheel two hands dividing at 60:1 for the minutes and 12:1 for the
+hours. A balance wheel with a spiral hairspring oscillates on its own sine.
+
+Panel: a row per wheel with teeth count and a live rpm figure, an impulses slider that
+sets the balance frequency, a Wind button that raises spring torque and lets it bleed
+back to 1 the way a mainspring does, and a case-back button that fades the plate and
+brings up a CSS rosette. Then two three-cell rows of notes on the train, the escapement,
+the hands, jewels, torque and the case back, then a ruled footer naming the tooth counts.
+
+Interaction: the train runs from the moment the page opens. The impulses slider changes
+how fast the balance swings; winding makes everything speed up and then slowly relax
+back to the base rate; opening the case back dims the movement and reveals the rosette.
+The rpm readout follows the same ratio arithmetic as the gears, so it goes up and down
+with the spring and inverts across the ratios.
+
+## One-paragraph description of the intended design
+A watch movement on a black plate where six wheels with real tooth profiles turn in
+pairs at the ratios their tooth counts demand — the phase of every mesh is solved from
+the line of centres so teeth fall into gaps — overlaid with steel bridges and two
+hands, while a balance wheel with a hairspring oscillates beside it, a Wind button
+charges the spring and lets it bleed away, and a per-wheel readout reports live rpm.
+
+## Major visual techniques used
+- Tooth profile generated as a path from a fixed module, so pitch radius, addendum
+  and dedendum are all derived rather than guessed
+- The gear outline reused as a clip path so the four spokes are cut by the rim
+  exactly instead of overflowing it
+- Brass and steel as linear gradients with a hard dark stroke on the tooth flanks
+- External gear relation solved per wheel from the parent's angle and the line of
+  centres, including the half-tooth phase that alternates tooth against gap
+- Recursive tree of wheels so each one inherits its driver's speed and direction
+- Motion work divisions applied on top: minute hand at 60× , hour hand at 12×
+- Balance wheel drawn as a rim, a cross, a hub and a spiral hairspring, oscillating
+  on a sine whose frequency is the impulses slider
+- Static finger bridges with counter-sunk screws laid over the train to give the
+  plate its depth
+- Mainspring model: winding raises torque, and a decay term bleeds it back to 1
+- Case back as a CSS rosette built from repeating-conic-gradient with ::before and
+  ::after cut-down discs, revealed by fading the plate behind it
+- Gem reds used only on pivot jewels, so a single hue carries the accent role
+- Two-column case collapsing to one column under 900px, menu links hidden under 780px
+
+## Intended interaction model
+Something to wind and watch. The train is already turning when the page loads; the
+impulses slider changes the beat, the Wind button speeds the whole movement up and
+then lets it fall back, and the case-back button slides the rosette in over the plate.
+Every number in the panel is computed from the same tooth counts that drive the
+drawing, so the readout cannot disagree with what is on screen.

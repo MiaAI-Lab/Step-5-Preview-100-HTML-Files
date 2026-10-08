@@ -1,0 +1,77 @@
+# THE LONG NOW — Issue 14: Slowness
+
+## Short title
+Editorial Magazine
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a long-form essay page
+for a fictional quarterly magazine called THE LONG NOW, issue 14 on the theme of
+slowness. No external dependencies whatsoever — no CDN, no web fonts, no external
+images, no external SVG files, no JavaScript libraries. All CSS and JavaScript
+inline, works offline by double-clicking, responsive, valid HTML5.
+
+Artistic direction: a printed quarterly, faithfully. Warm paper #faf7f1, true ink
+#141210, and exactly two accent colours — a proof red #c4342b and an ink blue
+#1c3f8f — used for one italic word each, for drop caps, for rule ornaments and for
+the numbers in the side tables. Everything is hairline and black: a 2px rule under
+the masthead, a 3px red reading-progress bar, and 1px hairline borders at 16% ink.
+Type is a high-contrast old-style serif for every word of the essay, set at
+14.5–17px with a 1.72 line-height and a 12-column measure, against 8.5–9.5px
+wide-tracked monospace for all metadata, captions and labels. The masthead is the
+only large tracked type besides the hero.
+
+Layout: a masthead row with the title (one word in italic red) and the issue
+metadata. A centred hero with a monospace eyebrow, a display headline in three
+lines at up to 124px with one italic blue word, a 44-character standfirst, and a
+byline. A rule ornament — two hairlines and a small ink diamond. Then the article
+itself, laid out on a 12-column asymmetric grid: a 7-column text column, a
+4-column sidebar starting at column 9 holding a "Field notes" research table and a
+figure with a CSS-only artwork (a repeating-conic-gradient ray pattern behind a
+radial wash over a cream gradient); then a full-12-column pull quote ruled top and
+bottom with 2px ink; then, deliberately out of order, a 4-column section before a
+7-column section so the eye has to travel. Then a centred full-width quote block,
+then a three-cell contents index built from 1px gaps. Then a ruled monospace
+footer.
+
+The figure artwork is pure CSS: a repeating-conic-gradient of blue-violet rays from
+an off-centre origin, a red radial wash, and a cream base, all in a 4:3 box.
+
+Interaction: pure scroll. A single rAF loop drives a red progress bar from the
+document scroll fraction, and an IntersectionObserver fades each paragraph,
+subhead, pull quote, figure, table cell and index card up by 18px with a 70ms
+three-step stagger. There are no buttons other than the article's structure itself;
+the page asks to be read. All three column classes collapse to full width under
+900px and the index to one column.
+
+## One-paragraph description of the intended design
+A quarterly essay page typeset like the printed object: warm paper, true ink, two
+accents, hairline rules, a 12-column asymmetric grid that runs wide-column text
+against a narrow sidebar and then deliberately swaps them, a red italic drop cap,
+ruled pull quotes, a CSS-only ray-pattern figure, a reading-progress bar and a
+slow scroll-reveal stagger.
+
+## Major visual techniques used
+- 12-column asymmetric grid with 7/4 and 4/7 column pairing and a full-12 break
+- Old-style serif essay typography at 1.72 line-height against 8.5px tracked
+  monospace metadata
+- Italic red drop cap via ::first-letter at 4.6em with float and padding
+- Ruled pull quote with 2px ink top and bottom borders and an italic 34px line
+- Reading-progress bar driven by document scroll fraction in one rAF loop
+- IntersectionObserver scroll reveal with a three-step 70ms stagger
+- CSS-only figure artwork from a repeating-conic-gradient ray pattern behind a
+  radial wash over a cream base
+- Research table with dashed hairline rules and right-aligned blue figures
+- Masthead with 2px ink rule and one italic red word
+- Rule ornament of two hairlines and a rotated ink diamond
+- Centred quote block bounded by 1px hairlines, italic, max-width 26 characters
+- Three-cell contents index built from 1px gaps over a hairline background
+- Two-accent discipline: proof red for emphasis, ink blue for figures and one word
+- Fluid type throughout via clamp(); full-width collapse under 900px
+
+## Intended interaction model
+A reading experience. The visitor scrolls; a red bar tracks how far through the
+essay they are, and each block fades up as it enters the frame. There is nothing to
+click, no navigation bar to use, and no interactive element besides the scroll
+itself — the page's whole job is to make 4,200 words feel like a magazine spread
+that happens to be a web page.

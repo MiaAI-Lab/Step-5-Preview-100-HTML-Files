@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lapidary — a stone, a cut, a refractive index</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:#0c0a14;color:#efeaf9;
+  font:15px/1.62 ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+.serif{font-family:ui-serif,Georgia,"Times New Roman",serif}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.wrap{width:min(1100px,92vw);margin:0 auto}
+nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0 14px;
+  border-bottom:1px solid rgba(239,234,249,.14)}
+nav .brand{font-family:ui-serif,Georgia,serif;font-size:19px}
+nav .brand i{font-style:italic;color:#9fd8ff}
+nav ul{display:flex;gap:26px;list-style:none;margin:0;padding:0;font-size:11px;
+  letter-spacing:.24em;text-transform:uppercase;color:#8f88a8}
+nav a{color:inherit;text-decoration:none}nav a:hover{color:#9fd8ff}
+@media(max-width:780px){nav ul{display:none}}
+header.hero{padding:50px 0 22px;text-align:center}
+header.hero .kicker{font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:#9fd8ff;
+  margin:0 0 14px}
+header.hero h1{font-family:ui-serif,Georgia,serif;font-weight:400;
+  font-size:clamp(32px,5.6vw,62px);line-height:1.05;margin:0 0 16px}
+header.hero h1 em{font-style:italic;color:#e8b8ff}
+header.hero p{max-width:60ch;margin:0 auto;color:#9d95b8}
+.stone{position:relative;border:1px solid rgba(239,234,249,.16);border-radius:16px;
+  overflow:hidden;background:#07050e;margin-bottom:18px}
+.stone canvas{display:block;width:100%;height:auto}
+.stone .cap{position:absolute;left:14px;top:12px;font-size:10px;letter-spacing:.26em;
+  text-transform:uppercase;color:rgba(239,234,249,.5);pointer-events:none}
+.stone .spec{position:absolute;right:14px;top:12px;font-family:ui-monospace,Menlo,monospace;
+  font-size:11px;color:rgba(159,216,255,.95);text-align:right;pointer-events:none;line-height:1.8}
+.dock{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;justify-content:space-between;
+  border-top:1px solid rgba(239,234,249,.14);border-bottom:1px solid rgba(239,234,249,.14);
+  padding:16px 0;margin-bottom:32px}
+.dock label{display:grid;gap:7px;font-size:10px;letter-spacing:.26em;text-transform:uppercase;
+  color:#8f88a8;min-width:150px}
+input[type=range]{width:100%;accent-color:#e8b8ff}
+.btn{background:#e8b8ff;color:#1e0a2a;border:0;border-radius:8px;padding:11px 15px;
+  font:inherit;font-size:12px;font-weight:700;letter-spacing:.08em;cursor:pointer;margin:0 6px 6px 0}
+.btn.ghost{background:transparent;color:#efeaf9;border:1px solid rgba(239,234,249,.24)}
+.btn:hover{filter:brightness(1.07)}
+.cuts{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.cuts button{background:#141024;border:1px solid rgba(239,234,249,.16);border-radius:999px;
+  padding:8px 14px;font:inherit;font-size:12px;color:#efeaf9;cursor:pointer}
+.cuts button[aria-pressed="true"]{background:#e8b8ff;border-color:#e8b8ff;color:#1e0a2a}
+.specs{display:flex;gap:6px;flex-wrap:wrap}
+.specs button{width:34px;height:34px;border-radius:50%;border:2px solid transparent;cursor:pointer;
+  background:radial-gradient(circle at 35% 30%,#fff,rgba(255,255,255,.2) 60%,transparent)}
+.specs button[aria-pressed="true"]{border-color:#efeaf9;transform:scale(1.12)}
+.readout{display:flex;flex-wrap:wrap;gap:12px 24px;margin-bottom:40px;
+  border-top:1px solid rgba(239,234,249,.14);padding-top:16px}
+.readout div{min-width:86px}
+.readout dt{font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:#8f88a8;margin:0 0 4px}
+.readout dd{margin:0;font-size:20px;font-family:ui-monospace,Menlo,monospace;color:#9fd8ff}
+.cells{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-bottom:46px}
+@media(max-width:820px){.cells{grid-template-columns:1fr}}
+.cell{border-top:1px solid rgba(239,234,249,.14);padding-top:16px}
+.cell .fig{font-family:ui-serif,Georgia,serif;font-size:38px;color:#e8b8ff;line-height:1;margin-bottom:8px}
+.cell h3{font-family:ui-serif,Georgia,serif;font-weight:400;font-style:italic;font-size:21px;margin:0 0 8px}
+.cell p{margin:0;color:#9d95b8;font-size:14px}
+footer{border-top:1px solid rgba(239,234,249,.14);padding:22px 0 54px;display:flex;
+  justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:11px;letter-spacing:.2em;
+  text-transform:uppercase;color:#6f6888}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="brand">Lapi<i>dary</i></div>
+    <ul>
+      <li><a href="#stone">Stone</a></li>
+      <li><a href="#dock">Cut</a></li>
+      <li><a href="#notes">Notes</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <p class="kicker">Critical angle · dispersion · index</p>
+    <h1 class="serif">A cut is the only<br>way to make it <em>shine</em></h1>
+    <p>A rough stone is a lump of glass. What makes it a gem is the cut: pavilions angled to
+       keep the light inside, bouncing it to the crown and back out at you, which is why the
+       right facet angle is worth more than the stone itself.</p>
+  </header>
+
+  <section class="stone" id="stone">
+    <canvas id="c" width="940" height="520"></canvas>
+    <p class="cap">one point of light, two ray paths, and whatever facets are between</p>
+    <div class="spec" id="spec"></div>
+  </section>
+
+  <section class="dock" id="dock">
+    <div>
+      <div class="cuts" id="cuts"></div>
+      <div class="specs" id="specs"></div>
+    </div>
+    <label for="pav">Pavilion angle <input id="pav" type="range" min="35" max="48" value="41"></label>
+    <label for="tur">Table <input id="tur" type="range" min="0" max="60" value="30"></label>
+    <label for="light">Light <input id="light" type="range" min="0" max="360" value="70"></label>
+    <div>
+      <button class="btn" id="spin">Turn the stone</button>
+      <button class="btn ghost" id="wow">Show the fire</button>
+    </div>
+  </section>
+
+  <dl class="readout">
+    <div><dt>Index</dt><dd id="rI">2.417</dd></div>
+    <div><dt>Critical angle</dt><dd id="rC">—</dd></div>
+    <div><dt>Brilliance</dt><dd id="rB">—</dd></div>
+    <div><dt>Fire</dt><dd id="rF">—</dd></div>
+    <div><dt>Yield</dt><dd id="rY">—</dd></div>
+    <div><dt>Species</dt><dd id="rS">diamond</dd></div>
+  </dl>
+
+  <section class="cells">
+    <div class="cell">
+      <div class="fig serif">i</div>
+      <h3>Total internal reflection</h3>
+      <p>Light leaving a dense medium past the critical angle cannot get out, so it turns
+         back in. Diamond's is 24 degrees, ruby's is 33, and that single number is why a
+         diamond's pavilion is cut where it is.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">ii</div>
+      <h3>Dispersion</h3>
+      <p>The index is not one number, it is a curve. Red is bent least and violet most, so
+         a cut that spreads the rays spreads the colour too — and fire is the spectrum
+         coming out the top.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">iii</div>
+      <h3>Yield</h3>
+      <p>The cut throws away most of the rough. A round brilliant keeps about a third of a
+         stone's weight, which is why a fine gem is mostly the cutter's decision and only
+         partly the mine's.</p>
+    </div>
+  </section>
+
+  <section class="cells" id="notes">
+    <div class="cell">
+      <div class="fig serif">iv</div>
+      <h3>The pavilion</h3>
+      <p>Too shallow and the light goes straight out the bottom and the stone looks dead.
+         Too steep and it leaks out the side and looks dark. The window is two degrees wide
+         and the slider is in it.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">v</div>
+      <h3>The table</h3>
+      <p>The flat top is where the light is supposed to leave. Widen it and more comes out
+         at once and the stone looks bigger; narrow it and the pattern tightens and the
+         fire concentrates.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">vi</div>
+      <h3>Fire</h3>
+      <p>Show the fire and each ray is drawn in the colour it actually comes out at, split
+         by the dispersion of this species. The same cut, the same light, a different
+         spectrum.</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>Lapidary · one canvas, no files</span>
+    <span class="mono">t · c · r · v · d</span>
+  </footer>
+</div>
+<script>
+(function(){
+"use strict";
+var cv=document.getElementById('c'),ctx=cv.getContext('2d');
+var W=cv.width,H=cv.height;
+var pav=41,table=30,lightAng=70,fire=false,spin=0,t=0;
+var SPECIES=[
+ {n:'diamond',n1:2.417,disp:0.044,yield:0.32,hue:0},
+ {n:'ruby',n1:1.762,disp:0.018,yield:0.28,hue:8},
+ {n:'sapphire',n1:1.768,disp:0.018,yield:0.28,hue:205},
+ {n:'emerald',n1:1.576,disp:0.014,yield:0.22,hue:140},
+ {n:'zircon',n1:1.925,disp:0.039,yield:0.35,hue:44},
+ {n:'moissanite',n1:2.654,disp:0.104,yield:0.40,hue:170},
+ {n:'spinel',n1:1.716,disp:0.020,yield:0.30,hue:300},
+ {n:'garnet',n1:1.774,disp:0.024,yield:0.26,hue:0}
+];
+var sp=SPECIES[0];
+var CUTS=[
+ {n:'round brilliant',crown:34,girdle:0.55,bezel:24},
+ {n:'oval',crown:31,girdle:0.62,bezel:22},
+ {n:'marquise',crown:33,girdle:0.58,bezel:22},
+ {n:'emerald',crown:25,girdle:0.72,bezel:18},
+ {n:'pear',crown:32,girdle:0.60,bezel:23},
+ {n:'princess',crown:30,girdle:0.68,bezel:20}
+];
+var cut=CUTS[0];
+function critical(){return Math.asin(1/sp.n1)*57.3;}
+/* the pavilion window: where the light leaves through the top instead of the bottom */
+function brilliance(){
+  /* shallow pavilions let light out the back; steep pavilions leak it out the side.
+     the good window is where the pavilion angle is between the critical ray and the
+     angle that sends light to the crown */
+  var c=critical();
+  var ideal=c+ (sp.n1>2?17:16);
+  var d=Math.abs(pav-ideal);
+  return Math.max(0,1-d/6);
+}
+function fireAmount(){
+  /* fire is dispersion times how much the cut spreads the rays */
+  return sp.disp*(1+ (Math.abs(table-53)*0.02)+ (58-pav)*0.05);
+}
+function yieldPct(){
+  return sp.yield*(1-Math.abs(pav-40.75)/12)*100;
+}
+/* ---------- the stone drawn as facets ---------- */
+var cx=W*0.5,cy=H*0.52,R=150;
+function stonePath(){
+  /* the outline: a girdle at the middle, a crown above and a pavilion below */
+  var p=[],i,n=16;
+  var g=cut===CUTS[0]?1:1;
+  var rx=R*cut.girdle*1.25, ry=R*cut.girdle*0.78;
+  for(i=0;i<=n;i++){
+    var a=i/n*Math.PI*2+spin;
+    var x=cx+Math.cos(a)*rx, y=cy-Math.abs(Math.sin(a))*ry*0.6;
+    p.push([x,y+Math.sin(a)*ry*0.3]);
+  }
+  return p;
+}
+function draw(){
+  /* the room: a dark box with one point of light */
+  var g0=ctx.createRadialGradient(W*0.5,H*0.3,20,W*0.5,H*0.5,W*0.8);
+  g0.addColorStop(0,'#151024');g0.addColorStop(1,'#07050e');
+  ctx.fillStyle=g0;ctx.fillRect(0,0,W,H);
+  /* the light source */
+  var la=lightAng*Math.PI/180;
+  var lx=W*0.5+Math.cos(la)*W*0.42, ly=H*0.5-Math.sin(la)*H*0.38;
+  var lg=ctx.createRadialGradient(lx,ly,1,lx,ly,120);
+  lg.addColorStop(0,'rgba(255,250,225,.9)');lg.addColorStop(0.2,'rgba(255,240,200,.35)');
+  lg.addColorStop(1,'rgba(255,235,190,0)');
+  ctx.fillStyle=lg;ctx.beginPath();ctx.arc(lx,ly,120,0,6.3);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(lx,ly,4,0,6.3);ctx.fill();
+  /* the ray paths: from the light into the stone, and whatever leaves */
+  var rays=[];
+  var crownA=(180-pav)*Math.PI/180;
+  for(var k=0;k<10;k++){
+    var src={x:lx,y:ly};
+    var ang0=Math.atan2(cy-ly,cx-lx)+(k-4.5)*0.045;
+    rays.push(trace(src,ang0));
+  }
+  /* the stone itself: facets shaded by their facing */
+  var p=stonePath();
+  var body=ctx.createLinearGradient(cx-R,cy-R,cx+R,cy+R);
+  body.addColorStop(0,'rgba(200,225,255,.22)');
+  body.addColorStop(0.5,'hsla('+sp.hue+',60%,70%,.10)');
+  body.addColorStop(1,'rgba(120,150,200,.20)');
+  ctx.fillStyle=body;
+  ctx.beginPath();
+  p.forEach(function(q,i){if(i===0)ctx.moveTo(q[0],q[1]);else ctx.lineTo(q[0],q[1]);});
+  ctx.closePath();ctx.fill();
+  /* the culet, the girdle and the crown facets */
+  var girdle=stonePath();
+  /* the crown: a ring of trapezoids from the girdle to the table */
+  var tableRx=R*cut.girdle*(table/100)*1.2, tableRy=R*cut.girdle*(table/100)*0.7;
+  var n=16;
+  for(var f=0;f<n;f++){
+    var a0=f/n*Math.PI*2+spin,a1=(f+1)/n*Math.PI*2+spin;
+    var g0x=cx+Math.cos(a0)*R*cut.girdle*1.25;
+    var g0y=cy-Math.abs(Math.sin(a0))*R*cut.girdle*0.6+Math.sin(a0)*R*cut.girdle*0.3;
+    var g1x=cx+Math.cos(a1)*R*cut.girdle*1.25;
+    var g1y=cy-Math.abs(Math.sin(a1))*R*cut.girdle*0.6+Math.sin(a1)*R*cut.girdle*0.3;
+    var t0x=cx+Math.cos(a0)*tableRx, t0y=cy-Math.abs(Math.sin(a0))*tableRy+Math.sin(a0)*tableRy*0.5;
+    var t1x=cx+Math.cos(a1)*tableRx, t1y=cy-Math.abs(Math.sin(a1))*tableRy+Math.sin(a1)*tableRy*0.5;
+    /* the facet brightness: faces toward the light are bright */
+    var mid=(a0+a1)/2;
+    var facing=Math.cos(mid-la);
+    var b=0.10+Math.max(0,facing)*0.5;
+    ctx.fillStyle='rgba(210,232,255,'+b.toFixed(3)+')';
+    ctx.beginPath();
+    ctx.moveTo(g0x,g0y);ctx.lineTo(g1x,g1y);ctx.lineTo(t1x,t1y);ctx.lineTo(t0x,t0y);
+    ctx.closePath();ctx.fill();
+    /* the pavilion facet, below the girdle */
+    var pavA=pav*Math.PI/180;
+    var p0x=cx+Math.cos(a0)*R*cut.girdle*1.25;
+    var p0y=cy-Math.abs(Math.sin(a0))*R*cut.girdle*0.6+Math.sin(a0)*R*cut.girdle*0.3;
+    var p1x=cx+Math.cos(a1)*R*cut.girdle*1.25;
+    var p1y=cy-Math.abs(Math.sin(a1))*R*cut.girdle*0.6+Math.sin(a1)*R*cut.girdle*0.3;
+    var culetX=cx, culetY=cy+R*0.62+ (48-pav)*2.2;
+    var pf=Math.cos(mid+Math.PI-la);
+    var pb=0.05+Math.max(0,-pf)*0.35;
+    ctx.fillStyle='rgba(160,200,255,'+pb.toFixed(3)+')';
+    ctx.beginPath();
+    ctx.moveTo(p0x,p0y);ctx.lineTo(p1x,p1y);ctx.lineTo(culetX,culetY);
+    ctx.closePath();ctx.fill();
+  }
+  /* the table itself */
+  ctx.fillStyle='rgba(230,244,255,'+(0.14+table/500).toFixed(2)+')';
+  ctx.beginPath();
+  ctx.ellipse(cx,cy,tableRx,tableRy,0,0,6.3);ctx.fill();
+  /* the rays drawn last, so they read on top */
+  rays.forEach(function(r){drawRay(r);});
+}
+/* ---------- a ray through the stone ---------- */
+function trace(src,ang){
+  /* walk the ray; where it crosses the stone, refract by Snell's law */
+  var pts=[{x:src.x,y:src.y}];
+  var x=src.x,y=src.y,dir=ang,depth=0,col=null;
+  for(var step=0;step<26;step++){
+    var nx=x+Math.cos(dir)*26, ny=y+Math.sin(dir)*26;
+    if(depth%2===0&&inside(nx,ny)){
+      depth++;dir=refract(dir,1,sp.n1);
+    }else if(depth%2===1&&!inside(nx,ny)){
+      /* leaving: past the critical angle it reflects instead */
+      var crit=critical()*Math.PI/180;
+      if(Math.abs(Math.sin(dir))>Math.sin(crit)){
+        dir=reflect(dir);depth=3;   /* total internal reflection */
+      }else{
+        depth++;dir=refract(dir,sp.n1,1);
+        /* dispersion: the exit angle depends on wavelength */
+        col=dispersionColour(dir);
+      }
+    }
+    x=nx;y=ny;
+    pts.push({x:x,y:y});
+    if(x<-40||x>W+40||y<-40||y>H+40)break;
+  }
+  return {pts:pts,col:col};
+}
+function inside(x,y){
+  var rx=R*cut.girdle*1.25, ry=R*cut.girdle*0.9;
+  var dx=(x-cx)/rx, dy=(y-cy)/ry;
+  return dx*dx+dy*dy<1;
+}
+function refract(dir,n1,n2){
+  var s=n1*Math.sin(dir)/n2;
+  return Math.asin(Math.max(-1,Math.min(1,s)));
+}
+function reflect(dir){return -dir;}
+function dispersionColour(dir){
+  /* red is bent least, violet most: the exit angle's deviation gives the colour */
+  var dev=Math.abs(dir)*57.3;
+  var h=220-Math.min(220,dev*2.4);
+  return 'hsla('+h.toFixed(0)+',95%,72%,.8)';
+}
+function drawRay(r){
+  /* show the fire and each ray leaves in the colour its own dispersion gives it */
+  ctx.strokeStyle=fire?(r.col||'rgba(255,240,205,.5)'):'rgba(255,240,205,.5)';
+  ctx.lineWidth=fire?1.6:1.2;
+  ctx.beginPath();
+  r.pts.forEach(function(p,i){if(i===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y);});
+  ctx.stroke();
+}
+/* ---------- controls ---------- */
+var cbox=document.getElementById('cuts');
+CUTS.forEach(function(c,i){
+  var b=document.createElement('button');
+  b.textContent=c.n;
+  b.setAttribute('aria-pressed',String(i===0));
+  b.addEventListener('click',function(){
+    cut=c;
+    [].slice.call(cbox.children).forEach(function(o){
+      o.setAttribute('aria-pressed',String(o===b));});
+  });
+  cbox.appendChild(b);
+});
+var sbox=document.getElementById('specs');
+SPECIES.forEach(function(s,i){
+  var b=document.createElement('button');
+  b.title=s.n;
+  b.style.background='radial-gradient(circle at 35% 30%,hsl('+s.hue+',80%,80%),hsl('+s.hue+',70%,45%))';
+  b.setAttribute('aria-pressed',String(i===0));
+  b.addEventListener('click',function(){
+    sp=s;
+    [].slice.call(sbox.children).forEach(function(o){
+      o.setAttribute('aria-pressed',String(o===b));});
+    document.getElementById('rS').textContent=s.n;
+    document.getElementById('rI').textContent=s.n1.toFixed(3);
+  });
+  sbox.appendChild(b);
+});
+function bind(id,fn){var el=document.getElementById(id);
+  el.addEventListener('input',function(){fn(+el.value);});}
+bind('pav',function(v){pav=v;});
+bind('tur',function(v){table=v;});
+bind('light',function(v){lightAng=v;});
+var spinBtn=document.getElementById('spin');
+var spinning=false;
+spinBtn.addEventListener('click',function(){
+  spinning=!spinning;
+  spinBtn.textContent=spinning?'Stop turning':'Turn the stone';
+});
+var fireBtn=document.getElementById('wow');
+fireBtn.addEventListener('click',function(){
+  fire=!fire;fireBtn.textContent=fire?'Hide the fire':'Show the fire';
+});
+function readout(){
+  document.getElementById('rC').textContent=critical().toFixed(1)+'°';
+  document.getElementById('rB').textContent=(brilliance()*100).toFixed(0)+'%';
+  document.getElementById('rF').textContent=(fireAmount()*100).toFixed(0)+'%';
+  document.getElementById('rY').textContent=yieldPct().toFixed(0)+'%';
+  var s=document.getElementById('spec');
+  s.innerHTML='n = '+sp.n1.toFixed(3)+'<br>θc = '+critical().toFixed(1)+'°<br>'+
+    'brilliance '+(brilliance()*100).toFixed(0)+'%';
+}
+var last=0;
+function loop(ts){
+  var dt=last?Math.min(.05,(ts-last)/1000):0;last=ts;
+  t+=dt;
+  if(spinning)spin+=dt*0.5;
+  draw();readout();
+  requestAnimationFrame(loop);
+}
+draw();readout();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

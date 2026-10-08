@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Broad Nib — pressure, angle, and one line of ink</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:#f2efe6;color:#2a2620;
+  font:15px/1.62 ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+.serif{font-family:ui-serif,Georgia,"Times New Roman",serif}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.wrap{width:min(1100px,92vw);margin:0 auto}
+nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0 14px;
+  border-bottom:1px solid rgba(42,38,32,.2)}
+nav .brand{font-family:ui-serif,Georgia,serif;font-size:19px}
+nav .brand i{font-style:italic;color:#1f3f6b}
+nav ul{display:flex;gap:26px;list-style:none;margin:0;padding:0;font-size:11px;
+  letter-spacing:.24em;text-transform:uppercase;color:#80786a}
+nav a{color:inherit;text-decoration:none}nav a:hover{color:#1f3f6b}
+@media(max-width:780px){nav ul{display:none}}
+header.hero{padding:54px 0 26px;text-align:center}
+header.hero .kicker{font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:#1f3f6b;
+  margin:0 0 14px}
+header.hero h1{font-family:ui-serif,Georgia,serif;font-weight:400;
+  font-size:clamp(32px,5.6vw,64px);line-height:1.05;margin:0 0 16px}
+header.hero h1 em{font-style:italic;color:#8c3a2c}
+header.hero p{max-width:60ch;margin:0 auto;color:#645c4e}
+.desk{position:relative;border:1px solid rgba(42,38,32,.16);border-radius:16px;
+  overflow:hidden;background:#f7f4ea;margin-bottom:18px}
+.desk canvas{display:block;width:100%;height:auto;touch-action:none;cursor:crosshair}
+.desk .cap{position:absolute;left:14px;top:12px;font-size:10px;letter-spacing:.26em;
+  text-transform:uppercase;color:rgba(42,38,32,.45);pointer-events:none}
+.dock{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;justify-content:space-between;
+  border-top:1px solid rgba(42,38,32,.2);border-bottom:1px solid rgba(42,38,32,.2);
+  padding:16px 0;margin-bottom:32px}
+.dock label{display:grid;gap:7px;font-size:10px;letter-spacing:.26em;text-transform:uppercase;
+  color:#80786a;min-width:150px}
+input[type=range]{width:100%;accent-color:#8c3a2c}
+.btn{background:#8c3a2c;color:#fdf3ef;border:0;border-radius:8px;padding:11px 15px;
+  font:inherit;font-size:12px;font-weight:700;letter-spacing:.08em;cursor:pointer;margin:0 6px 6px 0}
+.btn.ghost{background:transparent;color:#2a2620;border:1px solid rgba(42,38,32,.3)}
+.btn:hover{filter:brightness(1.07)}
+.nibs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.nibs button{background:#fff;border:1px solid rgba(42,38,32,.25);border-radius:999px;
+  padding:8px 14px;font:inherit;font-size:12px;color:#2a2620;cursor:pointer}
+.nibs button[aria-pressed="true"]{background:#2a2620;border-color:#2a2620;color:#f7f4ea}
+.inks{display:flex;gap:6px;flex-wrap:wrap}
+.inks button{width:32px;height:32px;border-radius:50%;border:2px solid transparent;cursor:pointer}
+.inks button[aria-pressed="true"]{border-color:#2a2620;transform:scale(1.12)}
+.readout{display:flex;flex-wrap:wrap;gap:12px 26px;margin-bottom:40px;
+  border-top:1px solid rgba(42,38,32,.2);padding-top:16px}
+.readout div{min-width:88px}
+.readout dt{font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:#80786a;margin:0 0 4px}
+.readout dd{margin:0;font-size:20px;font-family:ui-monospace,Menlo,monospace;color:#8c3a2c}
+.sheet{border:1px solid rgba(42,38,32,.2);border-radius:14px;padding:12px;background:#fbf9f2;
+  margin-bottom:40px}
+.sheet canvas{display:block;width:100%;height:auto}
+.cells{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-bottom:46px}
+@media(max-width:820px){.cells{grid-template-columns:1fr}}
+.cell{border-top:1px solid rgba(42,38,32,.25);padding-top:16px}
+.cell .fig{font-family:ui-serif,Georgia,serif;font-size:38px;color:#1f3f6b;line-height:1;margin-bottom:8px}
+.cell h3{font-family:ui-serif,Georgia,serif;font-weight:400;font-style:italic;font-size:21px;margin:0 0 8px}
+.cell p{margin:0;color:#645c4e;font-size:14px}
+footer{border-top:1px solid rgba(42,38,32,.2);padding:22px 0 54px;display:flex;
+  justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:11px;letter-spacing:.2em;
+  text-transform:uppercase;color:#80786a}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="brand">Broad <i>Nib</i></div>
+    <ul>
+      <li><a href="#desk">Desk</a></li>
+      <li><a href="#dock">Pen</a></li>
+      <li><a href="#notes">Notes</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <p class="kicker">Broad edge · nib angle · pressure</p>
+    <h1 class="serif">A stroke is a<br><em>rectangle</em> turning</h1>
+    <p>A broad nib is a chisel, and a letter is a series of those chisel marks laid down in
+       an order that keeps the thin stroke going up and the thick stroke going down. Change
+       the angle and the same hand writes a different script.</p>
+  </header>
+
+  <section class="desk" id="desk">
+    <canvas id="c" width="980" height="460"></canvas>
+    <p class="cap">draw with the mouse or a finger · the sheet is sized to the viewport</p>
+  </section>
+
+  <section class="dock" id="dock">
+    <div>
+      <div class="nibs" id="nibs"></div>
+      <div class="inks" id="inks"></div>
+    </div>
+    <label for="nib">Nib width <input id="nib" type="range" min="1" max="40" value="12"></label>
+    <label for="angle">Nib angle <input id="angle" type="range" min="0" max="180" value="45"></label>
+    <label for="press">Pressure <input id="press" type="range" min="20" max="200" value="100"></label>
+    <div>
+      <button class="btn" id="rules">Guidelines</button>
+      <button class="btn ghost" id="fresh">New sheet</button>
+    </div>
+  </section>
+
+  <section class="sheet">
+    <canvas id="s" width="980" height="150"></canvas>
+  </section>
+
+  <dl class="readout">
+    <div><dt>Strokes</dt><dd id="rS">0</dd></div>
+    <div><dt>Path length</dt><dd id="rL">0 mm</dd></div>
+    <div><dt>Family</dt><dd id="rF">foundational</dd></div>
+    <div><dt>Nib</dt><dd id="rN">12 px @ 45°</dd></div>
+    <div><dt>Ink</dt><dd id="rI">iron gall</dd></div>
+    <div><dt>Ductus</dt><dd id="rD">thick down, thin up</dd></div>
+  </dl>
+
+  <section class="cells">
+    <div class="cell">
+      <div class="fig serif">i</div>
+      <h3>Three scripts</h3>
+      <p>Foundational holds the nib at 30 degrees, Uncial and Carolingian at 40, and
+         Italic at 45 with a faster hand. The angle slider moves continuously between
+         them, so the same stroke can be a Roman minuscule or a Blackletter.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">ii</div>
+      <h3>The ductus</h3>
+      <p>Every historical hand has a prescribed order of strokes. Draw down and the nib
+         lies flat and the stroke is thick; draw up and it stands on its edge and the
+         stroke is thin. That is the whole grammar, and the sheet below spells it out.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">iii</div>
+      <h3>Pressure</h3>
+      <p>Rubbing a flexible nib harder spreads it, so the thick stroke can be made by
+         leaning on the pen rather than by direction alone. Two ways to the same letter,
+         and the pressure slider is the second one.</p>
+    </div>
+  </section>
+
+  <section class="cells" id="notes">
+    <div class="cell">
+      <div class="fig serif">iv</div>
+      <h3>Guidelines</h3>
+      <p>Four lines: x-height, waist, base and descender. Everything is drawn between
+         them, and the nib width sets the spacing, because the pen you choose decides
+         the size you write at.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">v</div>
+      <h3>Ink</h3>
+      <p>Iron gall is nearly black and bites into the sheet. Walnut and sepia are warm and
+         fugitive. Gouache is opaque and sits on top. Each ink here has its own colour and
+         its own level of coverage.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">vi</div>
+      <h3>Fresh sheet</h3>
+      <p>A new sheet is a new piece of paper: it clears what you drew and leaves the
+         guidelines, because the guide lines are not part of the writing.</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>Broad Nib · two canvases, no files</span>
+    <span class="mono">30° · 40° · 45° · 0°</span>
+  </footer>
+</div>
+<script>
+(function(){
+"use strict";
+var cv=document.getElementById('c'),ctx=cv.getContext('2d');
+var W=cv.width,H=cv.height;
+var sc=document.getElementById('s'),sctx=sc.getContext('2d');
+var SW=sc.width,SH=sc.height;
+var nib=12,angle=45,press=100,rules=true,strokes=0,pathLen=0,t=0;
+var NIBS=[
+ {n:'foundational',a:30,note:'30° · even weight'},
+ {n:'uncial',a:40,note:'40° · round pen'},
+ {n:'carolingian',a:40,note:'40° · open hand'},
+ {n:'italic',a:45,note:'45° · fast'},
+ {n:'blackletter',a:0,note:'0° · vertical'},
+ {n:'copperplate',a:52,note:'52° · pointed'}
+];
+var INKS=[
+ {n:'iron gall',c:'rgba(26,22,18,0.92)'},
+ {n:'walnut',c:'rgba(94,58,26,0.82)'},
+ {n:'sepia',c:'rgba(74,52,34,0.72)'},
+ {n:'gouache',c:'rgba(28,26,24,0.98)'},
+ {n:'red lead',c:'rgba(140,44,32,0.88)'},
+ {n:'ultramarine',c:'rgba(28,40,90,0.88)'}
+];
+var ink=INKS[0];
+/* the writing is stored as a list of points so the guidelines can redraw under it */
+var strokes_=[];
+var cur=null;
+/* ---------- the broad-nib geometry ---------- */
+/* a broad nib is a rectangle at an angle; tracing it along a path gives the stroke.
+   The width of the drawn line is the full nib width when moving along the nib's axis,
+   and thinner when moving across it */
+function nibWidth(dx,dy){
+  var a=angle*Math.PI/180;
+  var ax=Math.cos(a),ay=Math.sin(a);
+  /* the direction of travel, normalised */
+  var len=Math.hypot(dx,dy)||1;
+  var ux=dx/len,uy=dy/len;
+  /* how much of the travel is along the nib axis */
+  var along=Math.abs(ux*ax+uy*ay);
+  /* the edge presents its full width when travelling across it */
+  var w=nib*(1-along)*0.98+1.2;
+  /* pressure spreads the nib */
+  w*=press/100;
+  return w;
+}
+/* ---------- drawing the sheet ---------- */
+function drawSheet(){
+  ctx.fillStyle='#fbf9f2';ctx.fillRect(0,0,W,H);
+  if(rules){
+    /* the four guidelines: waist, x-height, base, descender */
+    var x=Math.max(2,nib*0.5);
+    var xh=Math.max(60,nib*5);
+    var base=H*0.62, waist=base-xh, desc=base+xh*0.36;
+    ctx.strokeStyle='rgba(28,44,80,.16)';ctx.lineWidth=1;
+    ctx.setLineDash([2,6]);
+    [waist,base,desc].forEach(function(y){
+      ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();
+    });
+    ctx.setLineDash([]);
+    /* the nib spacing marks along the base */
+    ctx.strokeStyle='rgba(28,44,80,.14)';
+    for(var i=0;i*x<W;i++){
+      ctx.beginPath();ctx.moveTo(i*x,base-4);ctx.lineTo(i*x,base+4);ctx.stroke();
+    }
+    ctx.fillStyle='rgba(28,44,80,.30)';
+    ctx.font='10px ui-monospace,Menlo,monospace';
+    ctx.textAlign='left';ctx.textBaseline='top';
+    ctx.fillText('waist',6,waist-12);ctx.fillText('x-height',6,base+4);
+    ctx.fillText('descender',6,desc+4);
+  }
+  /* the strokes: each segment a quadrilateral wide by the nib at its angle */
+  ctx.strokeStyle=ink.c;
+  ctx.lineCap='round';ctx.lineJoin='round';
+  strokes_.forEach(function(s){
+    for(var i=1;i<s.pts.length;i++){
+      var a=s.pts[i-1],b=s.pts[i];
+      ctx.lineWidth=nibWidth(b.x-a.x,b.y-a.y);
+      ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
+    }
+  });
+  /* the nib itself, at the last point */
+  if(cur&&cur.pts.length){
+    var p=cur.pts[cur.pts.length-1];
+    ctx.save();
+    ctx.translate(p.x,p.y);ctx.rotate(angle*Math.PI/180);
+    ctx.fillStyle='rgba(28,44,80,.5)';
+    ctx.fillRect(-nib/2,-nib*0.34,nib,nib*0.68);
+    ctx.restore();
+  }
+}
+/* ---------- the ductus sheet ---------- */
+function drawDuctus(){
+  sctx.fillStyle='#fbf9f2';sctx.fillRect(0,0,SW,SH);
+  var base=SH*0.5, xh=SH*0.24;
+  sctx.strokeStyle='rgba(28,44,80,.16)';sctx.lineWidth=1;
+  sctx.setLineDash([2,6]);
+  sctx.beginPath();sctx.moveTo(0,base-xh);sctx.lineTo(SW,base-xh);sctx.stroke();
+  sctx.beginPath();sctx.moveTo(0,base);sctx.lineTo(SW,base);sctx.stroke();
+  sctx.setLineDash([]);
+  /* the same letter written four times, each stroke in order, so the ductus is visible */
+  var order=[[0,1],[2,3],[4,5]];
+  var letters=['n','o','r','a','b','c'];
+  var lx=40;
+  letters.forEach(function(ch,j){
+    var ox=lx;
+    /* an arc for the round letters, two strokes for the rest */
+    if(ch==='o'||ch==='c'||ch==='a'){
+      sctx.strokeStyle='#8c3a2c';sctx.lineWidth=3;
+      sctx.beginPath();sctx.arc(ox+16,base-xh*0.45,xh*0.5,0.3,5.9);sctx.stroke();
+      sctx.strokeStyle='rgba(140,44,32,.25)';sctx.lineWidth=1.2;
+      sctx.beginPath();sctx.arc(ox+16,base-xh*0.45,xh*0.5,0.3,5.9);sctx.stroke();
+    }else{
+      sctx.strokeStyle='#8c3a2c';sctx.lineWidth=3;
+      sctx.beginPath();sctx.moveTo(ox,base-xh);sctx.lineTo(ox,base);sctx.stroke();
+      sctx.beginPath();sctx.moveTo(ox+24,base-xh);sctx.lineTo(ox+24,base);sctx.stroke();
+      sctx.beginPath();sctx.moveTo(ox,base-xh*0.6);sctx.lineTo(ox+24,base-xh*0.6);sctx.stroke();
+    }
+    /* the numbered order dots */
+    sctx.fillStyle='#1f3f6b';sctx.font='10px ui-monospace,Menlo,monospace';
+    sctx.textAlign='center';sctx.textBaseline='top';
+    sctx.fillText(ch,ox+12,base+6);
+    sctx.fillText(String(j+1),ox+12,base+22);
+    lx+=54;
+  });
+  /* the thick/thin rule, drawn with the actual nib geometry */
+  sctx.strokeStyle=ink.c;
+  /* a down stroke: the nib lies flat, so it is the full nib width */
+  for(var i=0;i<40;i++){
+    var y=base+30+i*1.6;
+    sctx.lineWidth=nibWidth(0,1.7);
+    sctx.beginPath();sctx.moveTo(90,y);sctx.lineTo(90,y+1.7);sctx.stroke();
+  }
+  sctx.fillStyle='#645c4e';sctx.font='10px ui-monospace,Menlo,monospace';
+  sctx.textAlign='left';sctx.textBaseline='middle';
+  sctx.fillText('down',108,base+60);
+  for(var k=0;k<40;k++){
+    var y2=base+30+k*1.6;
+    sctx.lineWidth=2.2*press/100;
+    sctx.beginPath();sctx.moveTo(150,y2);sctx.lineTo(150,y2+1.7);sctx.stroke();
+  }
+  sctx.fillText('up',168,base+60);
+}
+/* ---------- controls ---------- */
+var nbox=document.getElementById('nibs');
+NIBS.forEach(function(n,i){
+  var b=document.createElement('button');
+  b.textContent=n.n;
+  b.setAttribute('aria-pressed',String(i===0));
+  b.addEventListener('click',function(){
+    angle=n.a;
+    document.getElementById('angle').value=n.a;
+    [].slice.call(nbox.children).forEach(function(o){
+      o.setAttribute('aria-pressed',String(o===b));});
+    document.getElementById('rF').textContent=n.n;
+    document.getElementById('rD').textContent=n.note;
+  });
+  nbox.appendChild(b);
+});
+var ibox=document.getElementById('inks');
+INKS.forEach(function(n,i){
+  var b=document.createElement('button');
+  b.title=n.n;
+  b.style.background=n.c;
+  b.setAttribute('aria-pressed',String(i===0));
+  b.addEventListener('click',function(){
+    ink=n;
+    [].slice.call(ibox.children).forEach(function(o){
+      o.setAttribute('aria-pressed',String(o===b));});
+    document.getElementById('rI').textContent=n.n;
+  });
+  ibox.appendChild(b);
+});
+function bind(id,fn){var el=document.getElementById(id);
+  el.addEventListener('input',function(){fn(+el.value);});}
+bind('nib',function(v){nib=v;});
+bind('angle',function(v){angle=v;});
+bind('press',function(v){press=v;});
+document.getElementById('rules').addEventListener('click',function(){rules=!rules;});
+document.getElementById('fresh').addEventListener('click',function(){
+  strokes_=[];strokes=0;pathLen=0;
+});
+/* ---------- the pointer ---------- */
+cv.addEventListener('pointerdown',function(e){
+  var r=cv.getBoundingClientRect();
+  var x=(e.clientX-r.left)*(W/r.width),y=(e.clientY-r.top)*(H/r.height);
+  cur={pts:[{x:x,y:y}]};
+  cv.setPointerCapture(e.pointerId);
+});
+cv.addEventListener('pointermove',function(e){
+  if(!cur)return;
+  var r=cv.getBoundingClientRect();
+  var x=(e.clientX-r.left)*(W/r.width),y=(e.clientY-r.top)*(H/r.height);
+  var last=cur.pts[cur.pts.length-1];
+  if(Math.hypot(x-last.x,y-last.y)<2)return;
+  pathLen+=Math.hypot(x-last.x,y-last.y);
+  cur.pts.push({x:x,y:y});
+});
+function end(){if(cur&&cur.pts.length>1){strokes_.push(cur);strokes++;}cur=null;}
+cv.addEventListener('pointerup',end);
+cv.addEventListener('pointercancel',end);
+function readout(){
+  document.getElementById('rS').textContent=strokes;
+  /* 3.78 px per millimetre at 96 dpi */
+  document.getElementById('rL').textContent=(pathLen/3.78).toFixed(0)+' mm';
+  document.getElementById('rN').textContent=nib+' px @ '+angle+'°';
+}
+var last2=0;
+function loop(ts){
+  var dt=last2?Math.min(.05,(ts-last2)/1000):0;last2=ts;
+  t+=dt;drawSheet();drawDuctus();readout();
+  requestAnimationFrame(loop);
+}
+drawSheet();drawDuctus();readout();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

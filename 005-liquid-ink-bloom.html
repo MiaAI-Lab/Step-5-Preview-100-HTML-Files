@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>INKBLOOM — A Studio for Wet Ink</title>
+<style>
+  :root{
+    --paper:#f3ece0;
+    --paper-2:#e9dfcf;
+    --ink:#1b1a18;
+    --ink-soft:#4a463f;
+    --line:rgba(27,26,24,.16);
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    --sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    background:var(--paper);color:var(--ink);font-family:var(--sans);
+    overflow:hidden;-webkit-font-smoothing:antialiased;
+  }
+  /* paper */
+  .paper{
+    position:fixed;inset:0;z-index:0;
+    background:
+      radial-gradient(120% 90% at 20% 10%,#fbf6ec 0%,transparent 60%),
+      radial-gradient(100% 80% at 85% 90%,var(--paper-2) 0%,transparent 65%),
+      var(--paper);
+  }
+  .fibre{
+    position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.14;mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='260'><filter id='f'><feTurbulence type='fractalNoise' baseFrequency='.02 .55' numOctaves='4' seed='7'/></filter><rect width='260' height='260' filter='url(%23f)'/></svg>");
+  }
+  #wet{position:fixed;inset:0;z-index:2;touch-action:none;cursor:crosshair}
+
+  .ui{position:fixed;z-index:4;inset:auto 0 0 0;display:flex;justify-content:center;padding:0 16px 18px;pointer-events:none}
+  .bar{
+    pointer-events:auto;display:flex;align-items:center;gap:clamp(10px,1.6vw,22px);flex-wrap:wrap;justify-content:center;
+    background:rgba(251,247,239,.82);border:1px solid var(--line);border-radius:20px;
+    padding:12px clamp(14px,2vw,24px);
+    box-shadow:0 20px 50px -28px rgba(27,26,24,.5);
+    backdrop-filter:blur(14px) saturate(120%);
+    max-width:min(100%,980px);
+  }
+  .grp{display:flex;align-items:center;gap:8px}
+  .lab{font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-soft)}
+  .sw{width:26px;height:26px;border-radius:50%;border:1px solid var(--line);cursor:pointer;position:relative;transition:transform .25s}
+  .sw:hover{transform:scale(1.12)}
+  .sw.on{box-shadow:0 0 0 2px var(--paper),0 0 0 3px var(--ink)}
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;width:92px;height:18px;background:transparent;cursor:pointer
+  }
+  input[type=range]::-webkit-slider-runnable-track{height:2px;background:var(--ink-soft);border-radius:2px}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--ink);margin-top:-6px;border:0}
+  input[type=range]::-moz-range-track{height:2px;background:var(--ink-soft);border-radius:2px}
+  input[type=range]::-moz-range-thumb{width:14px;height:14px;border:0;border-radius:50%;background:var(--ink)}
+  .btn{
+    font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;
+    background:var(--ink);color:var(--paper);border:0;border-radius:999px;padding:10px 16px;cursor:pointer;
+    transition:transform .22s,opacity .22s
+  }
+  .btn:hover{transform:translateY(-1px);opacity:.86}
+  .btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+
+  /* header */
+  .head{position:fixed;z-index:4;top:0;left:0;right:0;padding:clamp(18px,3vw,34px) clamp(18px,4vw,44px);pointer-events:none}
+  .head .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.34em;text-transform:uppercase;color:var(--ink-soft)}
+  .head h1{
+    font-family:var(--serif);font-weight:400;font-style:italic;
+    font-size:clamp(34px,6vw,68px);line-height:.98;letter-spacing:-.02em;margin:8px 0 0;
+  }
+  .head p{margin:10px 0 0;max-width:44ch;font-size:13.5px;line-height:1.6;color:var(--ink-soft)}
+  .seal{
+    position:fixed;z-index:4;right:clamp(18px,4vw,44px);top:clamp(18px,3vw,34px);
+    width:58px;height:58px;border:1.5px solid var(--ink);border-radius:6px;
+    display:grid;place-items:center;transform:rotate(-4deg);
+    font-family:var(--serif);font-style:italic;font-size:20px;color:var(--ink);
+    opacity:.85;
+  }
+  .seal::after{content:"";position:absolute;inset:4px;border:1px solid var(--ink);border-radius:3px;opacity:.35}
+  @media (max-width:720px){
+    .head p{display:none}
+    .seal{width:44px;height:44px;font-size:15px}
+    input[type=range]{width:66px}
+  }
+</style>
+</head>
+<body>
+<div class="paper"></div>
+<div class="fibre"></div>
+<canvas id="wet"></canvas>
+
+<div class="head">
+  <div class="k">Inkbloom Studio · est. 2026</div>
+  <h1>Wet ink,<br>left alone.</h1>
+  <p>Touch the paper. Every bloom is grown, not drawn — a closed curve whose edge
+  is warped by layered noise so the pigment bleeds the way fibre makes it bleed.</p>
+</div>
+<div class="seal">墨</div>
+
+<div class="ui">
+  <div class="bar">
+    <div class="grp">
+      <span class="lab">Pigment</span>
+      <div class="sw on" data-c="27,26,24" style="background:#1b1a18" title="Sumi black"></div>
+      <div class="sw" data-c="38,58,112" style="background:#263a70" title="Indigo"></div>
+      <div class="sw" data-c="132,44,36" style="background:#842c24" title="Sanguine"></div>
+      <div class="sw" data-c="42,86,72" style="background:#2a5648" title="Viridian"></div>
+      <div class="sw" data-c="146,104,26" style="background:#92681a" title="Ochre"></div>
+    </div>
+    <div class="grp">
+      <span class="lab">Flow</span>
+      <input type="range" id="flow" min="6" max="90" value="34" aria-label="Bloom size">
+      <span class="lab">Bleed</span>
+      <input type="range" id="bleed" min="0" max="100" value="42" aria-label="Bleed">
+      <span class="lab">Speed</span>
+      <input type="range" id="spd" min="1" max="10" value="4" aria-label="Growth speed">
+    </div>
+    <div class="grp">
+      <button class="btn ghost" id="auto">Auto ▸</button>
+      <button class="btn ghost" id="wipe">New sheet</button>
+      <button class="btn" id="png">Keep</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var cv=document.getElementById('wet'), c=cv.getContext('2d');
+  var W,H,DPR=Math.min(window.devicePixelRatio||1,2);
+  var blooms=[], rgb=[27,26,24], flow=34, bleed=42, spd=4, auto=false;
+
+  function resize(){
+    W=window.innerWidth;H=window.innerHeight;
+    cv.width=W*DPR;cv.height=H*DPR;cv.style.width=W+'px';cv.style.height=H+'px';
+    c.setTransform(DPR,0,0,DPR,0,0);
+  }
+  resize();
+
+  /* --- cheap smooth noise: sum of sines with per-bloom phases --- */
+  function edge(theta,seed,amt){
+    return 1
+      + amt*0.55*Math.sin(theta*3+seed)
+      + amt*0.30*Math.sin(theta*5-seed*1.7+1.2)
+      + amt*0.15*Math.sin(theta*8+seed*0.6+2.4);
+  }
+
+  function Bloom(x,y,r,rgbw){
+    this.x=x; this.y=y;
+    this.r=r; this.max=r*(1.5+Math.random()*1.9);
+    this.grow=0.55+Math.random()*0.7;
+    this.seed=Math.random()*Math.PI*2;
+    this.wob=Math.random()*0.6+0.4;
+    this.life=0;
+    this.sat=[];
+    var n=2+((Math.random()*3)|0);
+    for(var i=0;i<n;i++){
+      var a=Math.random()*6.283, d=this.max*(0.25+Math.random()*0.45);
+      this.sat.push({a:a,d:d,r:this.max*(0.16+Math.random()*0.26),s:Math.random()*6.283});
+    }
+    /* ink weight: a dark core, a wide wash, a dry-brush fringe */
+    this.core=rgbw.join(',');
+  }
+  Bloom.prototype.step=function(dt){
+    this.life+=dt;
+    if(this.r<this.max) this.r=Math.min(this.max,this.r+this.grow*(spd*0.35)*dt*0.06);
+    this.wob+=dt*0.0004*(spd*0.3);
+    for(var i=0;i<this.sat.length;i++){
+      var s=this.sat[i];
+      s.d+=dt*0.004*this.grow;
+    }
+    return this.r<this.max || this.life<2600;
+  };
+  Bloom.prototype.draw=function(ctx){
+    var amt=bleed/100*0.42;
+    /* wash halo */
+    ctx.globalCompositeOperation='multiply';
+    this.blob(ctx,this.r*1.5,amt*1.7,0.30);
+    this.blob(ctx,this.r*1.0,amt,0.55);
+    this.blob(ctx,this.r*0.62,amt*0.7,0.85);
+    /* dark heart */
+    ctx.globalCompositeOperation='source-over';
+    ctx.globalAlpha=0.9;
+    var g=ctx.createRadialGradient(this.x,this.y,0,this.x,this.y,Math.max(1,this.r*0.5));
+    g.addColorStop(0,'rgba('+this.core+',0.95)');
+    g.addColorStop(1,'rgba('+this.core+',0)');
+    ctx.fillStyle=g;
+    ctx.beginPath();ctx.arc(this.x,this.y,Math.max(1,this.r*0.5),0,6.283);ctx.fill();
+    /* satellites */
+    for(var i=0;i<this.sat.length;i++){
+      var s=this.sat[i];
+      var sx=this.x+Math.cos(s.a)*s.d, sy=this.y+Math.sin(s.a)*s.d;
+      this.blob(ctx,s.r*(0.7+0.3*Math.sin(this.life*0.001+s.s)),amt*1.2,0.34,sx,sy);
+    }
+    ctx.globalAlpha=1;
+    ctx.globalCompositeOperation='source-over';
+  };
+  Bloom.prototype.blob=function(ctx,R,amt,alpha,cx,cy){
+    cx=cx===undefined?this.x:cx; cy=cy===undefined?this.y:cy;
+    if(R<0.6)return;
+    var N=46;
+    ctx.beginPath();
+    for(var i=0;i<=N;i++){
+      var th=i/N*6.283;
+      var rr=R*(1+0.05*Math.sin(th*6+this.seed))*edge(th,this.seed+this.wob,amt);
+      var x=cx+Math.cos(th)*rr, y=cy+Math.sin(th)*rr;
+      if(i===0)ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.closePath();
+    var g=ctx.createRadialGradient(cx,cy,0,cx,cy,R);
+    var cl=this.col;
+    g.addColorStop(0,'rgba('+this.core+','+(alpha*0.95).toFixed(3)+')');
+    g.addColorStop(0.55,'rgba('+this.core+','+(alpha*0.45).toFixed(3)+')');
+    g.addColorStop(1,'rgba('+this.core+',0)');
+    ctx.fillStyle=g;
+    ctx.fill();
+  };
+
+  var last=0, acc=0;
+  function frame(ts){
+    var dt=Math.min(48,ts-last||16); last=ts;
+    c.clearRect(0,0,W,H);
+    for(var i=blooms.length-1;i>=0;i--){
+      if(!blooms[i].step(dt)){blooms.splice(i,1);continue;}
+      blooms[i].draw(c);
+    }
+    acc+=dt;
+    if(auto && acc>420){
+      acc=0;
+      drop(W*(0.12+Math.random()*0.76),H*(0.18+Math.random()*0.62),flow*(0.7+Math.random()*0.8));
+    }
+    requestAnimationFrame(frame);
+  }
+  function drop(x,y,r){
+    var rgbw=rgb.slice();
+    blooms.push(new Bloom(x,y,r,rgbw));
+    if(blooms.length>90)blooms.splice(0,12);
+  }
+
+  var painting=false, px=0,py=0, moved=0;
+  function pos(e){var r=cv.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top];}
+  cv.addEventListener('pointerdown',function(e){
+    var p=pos(e);painting=true;px=p[0];py=p[1];moved=0;
+    cv.setPointerCapture(e.pointerId);
+    drop(px,py,flow*(0.72+Math.random()*0.5));
+  });
+  cv.addEventListener('pointermove',function(e){
+    if(!painting)return;
+    var p=pos(e);
+    var d=Math.hypot(p[0]-px,p[1]-py);
+    moved+=d;
+    if(d>flow*0.55){
+      drop(p[0],p[1],flow*(0.5+Math.random()*0.7));
+      px=p[0];py=p[1];
+    }
+  });
+  ['pointerup','pointercancel','pointerleave'].forEach(function(t){
+    cv.addEventListener(t,function(){painting=false;});
+  });
+
+  document.querySelectorAll('.sw').forEach(function(s){
+    s.addEventListener('click',function(){
+      document.querySelectorAll('.sw').forEach(function(x){x.classList.remove('on')});
+      s.classList.add('on');
+      rgb=s.dataset.c.split(',').map(Number);
+    });
+  });
+  document.getElementById('flow').addEventListener('input',function(){flow=+this.value;});
+  document.getElementById('bleed').addEventListener('input',function(){bleed=+this.value;});
+  document.getElementById('spd').addEventListener('input',function(){spd=+this.value;});
+  document.getElementById('wipe').addEventListener('click',function(){blooms=[];});
+  var ab=document.getElementById('auto');
+  ab.addEventListener('click',function(){
+    auto=!auto;
+    ab.textContent=auto?'Auto ❚❚':'Auto ▸';
+    ab.classList.toggle('ghost',!auto);
+  });
+  document.getElementById('png').addEventListener('click',function(){
+    var out=document.createElement('canvas');
+    out.width=W*DPR;out.height=H*DPR;
+    var o=out.getContext('2d');
+    var g=o.createLinearGradient(0,0,W,H);
+    g.addColorStop(0,'#fbf6ec');g.addColorStop(1,'#eee4d4');
+    o.fillStyle=g;o.fillRect(0,0,out.width,out.height);
+    o.drawImage(cv,0,0);
+    var a=document.createElement('a');
+    a.download='inkbloom.png';
+    a.href=out.toDataURL('image/png');
+    a.click();
+  });
+
+  /* opening composition */
+  setTimeout(function(){
+    drop(W*0.32,H*0.44,flow*1.9);
+    setTimeout(function(){drop(W*0.58,H*0.52,flow*1.4);},380);
+    setTimeout(function(){drop(W*0.44,H*0.68,flow*1.1);},760);
+  },420);
+
+  var rt;
+  window.addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(resize,140);});
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

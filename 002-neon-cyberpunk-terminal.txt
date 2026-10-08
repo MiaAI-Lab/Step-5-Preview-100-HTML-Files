@@ -1,0 +1,80 @@
+# NEO//TERM — Sector 7 Uplink
+
+## Short title
+Neon Cyberpunk Terminal
+
+## The exact prompt used to generate this HTML file
+
+Build a completely self-contained single-file HTML page that is a cyberpunk
+terminal / netrunner console. No external dependencies of any kind: no CDN, no
+web fonts, no external images, no external SVG files, no JavaScript libraries —
+everything inline, working offline by double-clicking the file. Must be responsive
+and validate as standard HTML5.
+
+Artistic direction: a CRT monitor in a rainy 2099 apartment. The whole viewport is
+treated as a screen. Layers, back to front: a full-viewport canvas "digital rain"
+of katakana and hex glyphs falling in cyan with a magenta ghost trail; a masked
+perspective grid of thin cyan lines fading out toward the edges; a slow horizontal
+"refresh roll" band sweeping down the screen; a scanline overlay built from a
+repeating-linear-gradient with mix-blend-mode multiply; and a radial vignette that
+flickers at irregular keyframes to imitate a bad refresh rate.
+
+Layout: a three-row grid filling the viewport — header, main stage, footer. Header
+carries a pulsing beacon logo and live header telemetry (node, ping, uptime, wall
+clock). Main stage is a two-column split: left column has a huge glitched display
+headline ("WAKE UP") whose ::before/::after clones in magenta and cyan are clipped
+and jump-translated on separate step() animations; below it two "hud node" panels
+with corner-bracket borders — one containing five live neon telemetry bars that
+re-randomise every few seconds, one containing a short noir broadcast paragraph.
+Right column is an actual working console: it boots line by line with a
+character-by-character typing effect, then accepts typed commands (help, scan,
+nodes, uplink, ice, whoami, neon, clear) and prints realistic responses. Footer
+has an infinite horizontal marquee of slogans behind edge masks.
+
+Typography: monospace only — ui-monospace / SF Mono / Menlo / Consolas — used at
+many different tracking widths so the page reads as an instrument. No other
+typeface appears.
+
+Colour palette: near-black violet #07030f, cyan #22e8ff, hot magenta #ff2d95,
+amber #ffe066, mint #7dffb2, on a pale blue text colour. Everything glows via
+text-shadow and box-shadow rather than blur filters.
+
+Interaction: the visitor types real commands into a real input; scan runs a
+progressive multi-line discovery with random hosts; neon flips the two accent
+colours by rewriting CSS custom properties; clear wipes the buffer; telemetry bars
+and clock update on their own. On narrow screens the two columns stack and the
+page scrolls normally.
+
+## One-paragraph description of the intended design
+A rainy-futurist CRT console that behaves like a machine rather than a poster: a
+glowing katakana rain, a masked wireframe grid, scanlines and an unsteady
+vignette sit behind a glitched display headline, two corner-bracketed HUD panels
+of live telemetry, and a genuinely typeable terminal that boots itself into
+existence on load and answers eight commands.
+
+## Major visual techniques used
+- Canvas katakana/hex digital rain with glyph-per-column velocities and a
+  magenta duplicate head glyph
+- CRT simulation: repeating-linear-gradient scanlines with mix-blend-mode multiply,
+  an irregular keyframe flicker, a sweeping refresh-roll band, radial vignette
+- CSS glitch type using ::before/::after content:attr(data-t) clones, clip-path
+  insets and step() timing functions
+- Wireframe perspective grid via two intersecting linear-gradients with a radial
+  mask-image fade
+- Neon glow built purely from text-shadow / box-shadow, no blur filters
+- Corner-bracket HUD frames from absolutely positioned 10px borders
+- Animated telemetry bars re-randomising on an interval, with the numeric label
+  rewritten to match
+- Real command interpreter with a character-by-character boot typing effect
+- Live header telemetry (ping, uptime, wall clock) on a 1s interval
+- CSS-variable palette swap driven from JavaScript
+- Infinite marquee behind horizontal mask-image gradients
+- Full-viewport grid layout (auto / 1fr / auto) that collapses to one column
+  under 860px; prefers-reduced-motion honoured
+
+## Intended interaction model
+The page is a toy console. Visitors are invited to type `help` first, then run
+`scan`, `ice`, `uplink` and `neon` to see the machine respond; everything else is
+ambient and self-running. Input is always auto-focused so typing works
+immediately, submissions are echoed as prompt lines, and unknown commands produce
+a not-found error with a hint. The layout never traps the scroll on mobile.

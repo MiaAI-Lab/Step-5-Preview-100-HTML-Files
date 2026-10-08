@@ -1,0 +1,80 @@
+# NEON & GLASS — A Sign Shop
+
+## Short title
+Neon Sign Shop
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a fictional neon sign
+shop called NEON & GLASS, whose centrepiece is a wall of working neon signs. No
+external dependencies whatsoever — no CDN, no web fonts, no external images, no
+external SVG files, no JavaScript libraries. All CSS and JavaScript inline, works
+offline by double-clicking, responsive, valid HTML5.
+
+Artistic direction: dark walls and hot glass. The page ground is near-black violet
+#0b0710 with panels at #171028; the sign wall is a radial violet wash over a dark
+linear gradient with a hundred-pixel inset shadow so it reads as a recessed shop
+window, and a brick course faintly visible behind at 14% opacity (two intersecting
+repeating-linear-gradients). Five colours do all the luminous work: rose #ff4fa3,
+ice cyan #3ee0ff, lime #b8ff5c, amber #ffb45e and smoke #c8a8ff.
+
+The neon effect is built from three stacked layers on one word. The word itself is
+coloured with the sign's hue and given four stacked text-shadows at 4, 12, 28 and
+60 pixels in the same colour — which is exactly how neon reads: a tight core with
+progressively wider halos. A `.tube` layer sits absolutely over the same word with
+a 1.5px near-white text-stroke and white and coloured glows at 55% opacity, so the
+letterforms read as actual glass tubing with a bright wall and a coloured bleed. And
+a `.sign::after` glow — a radial of the sign's own colour at 10% with a 14px blur,
+inset behind the word — provides the overall bloom that lights the brick around it.
+Each word runs a five-second flicker animation keyed at 41–43% and 77–81%, so the
+sign stutters like a real transformer failing. Turning a sign off collapses all
+three layers to almost nothing.
+
+Five signs hang on the wall at descending sizes and five different colours: Motel
+(huge, rose), Vacancy (large, cyan, italic), Open Late (lime, wide-tracked,
+ultralight sans), 24 Hours (amber) and a small italic pink "diner · next left".
+
+Layout: a nav with a serif brand and three links. A centred hero with a cyan
+eyebrow, a serif headline with one italic pink word, and a paragraph about bending
+glass. Then the sign wall with its brick, the five signs, a hint line and three
+tool buttons. Then a five-cell colour swatch row (one per gas fill, each a circle
+glowing in its own colour). Then a three-cell notes row with large pink serif
+figures (850 degrees, 12 000 volts, 1 movement per letter). Then a ruled monospace
+footer.
+
+Interaction: clicking any sign switches it off and on again. "All on" and "All off"
+set every sign at once. "Random flicker" starts an interval that toggles signs at
+random every 340 milliseconds until pressed again (its label becomes "Stop
+flicker"). The notes and swatches collapse to one column under 820px.
+
+## One-paragraph description of the intended design
+A neon shop wall in a recessed dark window: five glass words — huge rose Motel,
+cyan italic Vacancy, wide-tracked lime Open Late, amber 24 Hours and a small pink
+arrow — each built from a four-layer stack of stacked text-shadows, a white
+text-stroke tube overlay and a blurred colour bloom, all stuttering on a five-second
+flicker, switchable individually or all at once, with a random-flicker mode.
+
+## Major visual techniques used
+- Four-layer neon stack: coloured word, four stacked text-shadows (4/12/28/60px), a
+  white 1.5px text-stroke tube overlay at 55%, and a blurred 10% colour bloom
+- Five-second flicker animation keyed at two points (41–43% and 77–81%) to imitate a
+  failing transformer
+- Off state collapsing all three glow layers to near-zero
+- Brick course from two intersecting repeating-linear-gradients at 14% opacity
+- Recessed window from a radial violet wash, a dark linear gradient and a
+  hundred-pixel inset shadow
+- Sign sizing hierarchy from 84px down to 26px across five colours
+- Mixed typefaces across the signs: serif, italic serif, ultralight wide-tracked sans
+- Swatch row where each circle glows in its own colour via a box-shadow in
+  currentColor
+- All on / All off / Random flicker controls, with the flicker button rewording
+  itself and stopping the interval
+- Notes grid of large pink serif figures built from 1px gaps
+- Dark palette with one dominant pink accent and four supporting hues
+- Responsive: notes and swatches to one column under 820px
+
+## Intended interaction model
+A wall you can operate. Visitors click individual signs to switch them off and on,
+or use the three buttons to light the whole wall, darken it, or put it into a random
+flicker that stutters like a bad transformer. Everything else on the page is the
+shop's own copy — the wall is the interface.

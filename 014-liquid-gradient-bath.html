@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CHROMA BATH — A Liquid Colour Instrument</title>
+<style>
+  :root{
+    --ink:#0b0a12;
+    --paper:#f6f3ee;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden}
+  body{background:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+  #c{position:fixed;inset:0;z-index:0;display:block}
+
+  .ui{position:fixed;inset:0;z-index:2;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(16px,3vw,34px)}
+  .top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+  .ttl{font-family:var(--mono);font-size:9.5px;letter-spacing:.4em;text-transform:uppercase;color:rgba(255,255,255,.72);mix-blend-mode:difference}
+  .ttl h1{
+    font-family:var(--sans);font-weight:200;font-size:clamp(22px,3.6vw,42px);
+    letter-spacing:-.02em;margin:10px 0 0;line-height:.98;text-transform:none;color:#fff
+  }
+  .ttl p{margin:10px 0 0;font-size:11.5px;line-height:1.7;max-width:32ch;color:rgba(255,255,255,.6);font-family:var(--sans);letter-spacing:0;text-transform:none}
+  .readout{
+    font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;
+    color:rgba(255,255,255,.75);text-align:right;mix-blend-mode:difference;line-height:2.2
+  }
+  .readout b{display:block;font-size:15px;letter-spacing:.04em;color:#fff;font-weight:400}
+
+  .bottom{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+  .tray{
+    pointer-events:auto;display:flex;gap:clamp(8px,1.4vw,16px);flex-wrap:wrap;align-items:center;
+    background:rgba(20,18,30,.5);border:1px solid rgba(255,255,255,.16);border-radius:14px;
+    padding:10px clamp(12px,1.8vw,18px);backdrop-filter:blur(12px)
+  }
+  .g{display:flex;align-items:center;gap:7px}
+  .k{font-family:var(--mono);font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.55)}
+  .v{font-family:var(--mono);font-size:9px;color:#fff;min-width:24px;font-variant-numeric:tabular-nums}
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;width:66px;height:14px;background:transparent;cursor:pointer
+  }
+  input[type=range]::-webkit-slider-runnable-track{height:2px;background:rgba(255,255,255,.3);border-radius:2px}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;border-radius:50%;background:#fff;margin-top:-5px;border:0}
+  input[type=range]::-moz-range-track{height:2px;background:rgba(255,255,255,.3);border-radius:2px}
+  input[type=range]::-moz-range-thumb{width:11px;height:11px;border:0;border-radius:50%;background:#fff}
+  button{
+    pointer-events:auto;font-family:var(--mono);font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;
+    background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);color:#fff;
+    padding:9px 13px;border-radius:999px;cursor:pointer;transition:background .2s
+  }
+  button:hover{background:#fff;color:#12101c}
+  .swatches{pointer-events:auto;display:flex;gap:7px}
+  .sw{width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid rgba(255,255,255,.3);transition:transform .25s,border-color .25s}
+  .sw:hover{transform:scale(1.14)}
+  .sw.on{border-color:#fff;transform:scale(1.14)}
+
+  @media (max-width:720px){
+    .ttl p{display:none}
+    .readout{display:none}
+    .ui{padding:14px}
+  }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div class="ui">
+  <div class="top">
+    <div class="ttl">
+      Liquid colour instrument
+      <h1>CHROMA BATH</h1>
+      <p>Four blobs of colour drifting through a soft field. Drag them, change the
+      temperature, or let the whole thing run away.</p>
+    </div>
+    <div class="readout">
+      Palette<b id="rPal">Dusk</b>
+      Blobs<b id="rN">4</b>
+      Frame<b id="rF">0</b>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <div class="tray">
+      <div class="g"><span class="k">Heat</span><input type="range" id="heat" min="0" max="100" value="42" aria-label="Heat"><span class="v" id="heatV">42</span></div>
+      <div class="g"><span class="k">Flow</span><input type="range" id="flow" min="0" max="100" value="55" aria-label="Flow"><span class="v" id="flowV">55</span></div>
+      <div class="g"><span class="k">Blur</span><input type="range" id="blur" min="0" max="100" value="60" aria-label="Blur"><span class="v" id="blurV">60</span></div>
+      <button id="add">+ Blob</button>
+      <button id="reset">Reset</button>
+    </div>
+    <div class="swatches" id="sw"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var cv=document.getElementById('c'),c=cv.getContext('2d');
+  var W,H,DPR=Math.min(devicePixelRatio||1,2);
+  var blobs=[],heat=42,flow=55,blur=60,frame=0;
+  var PALETTES=[
+    {n:'Dusk',   bg:'#0b0a12', cols:['#ff4d6d','#7b5bff','#3ee0d0','#ffc857']},
+    {n:'Ember',  bg:'#160a06', cols:['#ff7a1a','#ff2d55','#ffd166','#c1121f']},
+    {n:'Kelp',   bg:'#04120e', cols:['#2ec4b6','#a8e10c','#1b998b','#e9ff70']},
+    {n:'Bone',   bg:'#efe9dd', cols:['#e07a5f','#3d405b','#81b29a','#f2cc8f'],light:true},
+    {n:'Ultra',  bg:'#0a0416', cols:['#f72585','#7209b7','#4361ee','#4cc9f0']},
+    {n:'Sand',   bg:'#1a1206', cols:['#e9b44c','#9b2915','#50c2c9','#e6d3a3']}
+  ];
+  var pi=0;
+
+  function mk(x,y,r,col){
+    return {x:x,y:y,r:r,col:col,
+      vx:(Math.random()-.5)*1.2,vy:(Math.random()-.5)*1.2,
+      ph:Math.random()*6.283,sp:0.4+Math.random()*0.9,
+      drag:false,tx:x,ty:y};
+  }
+  function build(){
+    blobs=[];
+    var n=4;
+    for(var i=0;i<n;i++){
+      var a=(i/n)*6.283;
+      blobs.push(mk(W/2+Math.cos(a)*Math.min(W,H)*0.18,
+                    H/2+Math.sin(a)*Math.min(W,H)*0.18,
+                    Math.min(W,H)*(0.16+Math.random()*0.12),
+                    PALETTES[pi].cols[i%PALETTES[pi].cols.length]));
+    }
+  }
+  function resize(){
+    W=innerWidth;H=innerHeight;
+    cv.width=W*DPR;cv.height=H*DPR;cv.style.width=W+'px';cv.style.height=H+'px';
+    c.setTransform(DPR,0,0,DPR,0,0);
+    paintBG();
+  }
+  function paintBG(){
+    var g=c.createLinearGradient(0,0,W,H);
+    g.addColorStop(0,PALETTES[pi].bg);
+    g.addColorStop(1,shade(PALETTES[pi].bg,heat/100*0.5));
+    c.fillStyle=g;c.fillRect(0,0,W,H);
+  }
+  function shade(hex,amt){
+    var r=parseInt(hex.substr(1,2),16),g2=parseInt(hex.substr(3,2),16),b=parseInt(hex.substr(5,2),16);
+    r=Math.round(r+(255-r)*amt*0.5);g2=Math.round(g2+(255-g2)*amt*0.5);b=Math.round(b+(255-b)*amt*0.5);
+    return 'rgb('+r+','+g2+','+b+')';
+  }
+
+  function draw(){
+    frame++;
+    c.setTransform(DPR,0,0,DPR,0,0);
+    c.clearRect(0,0,W,H);
+    paintBG();
+
+    var spd=flow/100*2.2+0.15;
+    var i;
+    for(i=0;i<blobs.length;i++){
+      var b=blobs[i];
+      b.ph+=0.006*b.sp*spd;
+      if(!b.drag){
+        b.x+=b.vx*spd + Math.cos(b.ph)*0.35*spd;
+        b.y+=b.vy*spd + Math.sin(b.ph*1.3)*0.35*spd;
+        /* soft bounce */
+        var pad=b.r*0.4;
+        if(b.x<pad){b.x=pad;b.vx*=-1}
+        if(b.x>W-pad){b.x=W-pad;b.vx*=-1}
+        if(b.y<pad){b.y=pad;b.vy*=-1}
+        if(b.y>H-pad){b.y=H-pad;b.vy*=-1}
+      }else{
+        b.x+=(b.tx-b.x)*0.16;
+        b.y+=(b.ty-b.y)*0.16;
+      }
+    }
+
+    /* draw blobs with screen blending so they add light */
+    c.save();
+    c.globalCompositeOperation=PALETTES[pi].light?'multiply':'screen';
+    for(i=0;i<blobs.length;i++){
+      var b2=blobs[i];
+      var rr=b2.r*(1+0.06*Math.sin(b2.ph*2));
+      var g3=c.createRadialGradient(b2.x,b2.y,0,b2.x,b2.y,rr);
+      g3.addColorStop(0,hexA(b2.col,0.95));
+      g3.addColorStop(0.45,hexA(b2.col,0.42));
+      g3.addColorStop(1,hexA(b2.col,0));
+      c.fillStyle=g3;
+      c.beginPath();c.arc(b2.x,b2.y,rr,0,6.283);c.fill();
+    }
+    c.restore();
+
+    /* grain */
+    if(blur>0){
+      c.save();
+      c.globalAlpha=blur/100*0.10;
+      for(var q=0;q<420;q++){
+        c.fillStyle=Math.random()<0.5?'#ffffff':'#000000';
+        c.fillRect(Math.random()*W,Math.random()*H,1.4,1.4);
+      }
+      c.restore();
+    }
+
+    if(frame%12===0)document.getElementById('rF').textContent=frame;
+    requestAnimationFrame(draw);
+  }
+  function hexA(hex,a){
+    var r=parseInt(hex.substr(1,2),16),g2=parseInt(hex.substr(3,2),16),b=parseInt(hex.substr(5,2),16);
+    return 'rgba('+r+','+g2+','+b+','+a+')';
+  }
+
+  /* drag */
+  var held=null;
+  function pt(e){var r=cv.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top];}
+  cv.addEventListener('pointerdown',function(e){
+    var p=pt(e);
+    for(var i=blobs.length-1;i>=0;i--){
+      var b=blobs[i];
+      if(Math.hypot(p[0]-b.x,p[1]-b.y)<b.r*0.75){
+        held=b;b.drag=true;b.tx=p[0];b.ty=p[1];
+        cv.setPointerCapture(e.pointerId);
+        return;
+      }
+    }
+    /* empty space: drop a new blob */
+    var nb=mk(p[0],p[1],Math.min(W,H)*(0.12+Math.random()*0.14),
+      PALETTES[pi].cols[(Math.random()*PALETTES[pi].cols.length)|0]);
+    blobs.push(nb);
+    document.getElementById('rN').textContent=blobs.length;
+  });
+  cv.addEventListener('pointermove',function(e){
+    if(!held)return;
+    var p=pt(e);held.tx=p[0];held.ty=p[1];
+  });
+  function drop(){if(held){held.drag=false;held=null;}}
+  cv.addEventListener('pointerup',drop);
+  cv.addEventListener('pointercancel',drop);
+
+  /* controls */
+  document.getElementById('heat').addEventListener('input',function(){
+    heat=+this.value;document.getElementById('heatV').textContent=heat;
+  });
+  document.getElementById('flow').addEventListener('input',function(){
+    flow=+this.value;document.getElementById('flowV').textContent=flow;
+  });
+  document.getElementById('blur').addEventListener('input',function(){
+    blur=+this.value;document.getElementById('blurV').textContent=blur;
+  });
+  document.getElementById('add').addEventListener('click',function(){
+    if(blobs.length>14)return;
+    blobs.push(mk(Math.random()*W,Math.random()*H,Math.min(W,H)*(0.12+Math.random()*0.16),
+      PALETTES[pi].cols[(Math.random()*PALETTES[pi].cols.length)|0]));
+    document.getElementById('rN').textContent=blobs.length;
+  });
+  document.getElementById('reset').addEventListener('click',function(){
+    build();document.getElementById('rN').textContent=blobs.length;
+  });
+
+  /* swatches */
+  var sw=document.getElementById('sw');
+  PALETTES.forEach(function(P,i){
+    var d=document.createElement('div');
+    d.className='sw'+(i===0?' on':'');
+    d.title=P.n;
+    d.style.background='linear-gradient(135deg,'+P.cols[0]+','+P.cols[1]+' 50%,'+P.cols[2]+')';
+    d.addEventListener('click',function(){
+      pi=i;
+      sw.querySelectorAll('.sw').forEach(function(x){x.classList.remove('on')});
+      d.classList.add('on');
+      document.getElementById('rPal').textContent=P.n;
+      blobs.forEach(function(b,j){b.col=P.cols[j%P.cols.length]});
+      paintBG();
+    });
+    sw.appendChild(d);
+  });
+
+  window.addEventListener('resize',function(){clearTimeout(window.__r);window.__r=setTimeout(resize,140)});
+  resize();build();
+  requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>

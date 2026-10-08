@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Room — a chart, a set, a solo</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:#0a0806;color:#f0e6d6;
+  font:15px/1.62 ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+.serif{font-family:ui-serif,Georgia,"Times New Roman",serif}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.wrap{width:min(1120px,92vw);margin:0 auto}
+nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0 14px;
+  border-bottom:1px solid rgba(240,230,214,.14)}
+nav .brand{font-family:ui-serif,Georgia,serif;font-size:19px}
+nav .brand i{font-style:italic;color:#e8b25c}
+nav ul{display:flex;gap:26px;list-style:none;margin:0;padding:0;font-size:11px;
+  letter-spacing:.24em;text-transform:uppercase;color:#9a8b76}
+nav a{color:inherit;text-decoration:none}nav a:hover{color:#e8b25c}
+@media(max-width:780px){nav ul{display:none}}
+header.hero{padding:52px 0 24px;text-align:center}
+header.hero .kicker{font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:#e8b25c;
+  margin:0 0 14px}
+header.hero h1{font-family:ui-serif,Georgia,serif;font-weight:400;
+  font-size:clamp(32px,5.6vw,64px);line-height:1.05;margin:0 0 16px}
+header.hero h1 em{font-style:italic;color:#8fc7a8}
+header.hero p{max-width:60ch;margin:0 auto;color:#a2937c}
+.scene{position:relative;border:1px solid rgba(240,230,214,.16);border-radius:16px;
+  overflow:hidden;background:#07060a;margin-bottom:18px}
+.scene canvas{display:block;width:100%;height:auto}
+.scene .cap{position:absolute;left:14px;top:12px;font-size:10px;letter-spacing:.26em;
+  text-transform:uppercase;color:rgba(240,230,214,.5);pointer-events:none}
+.scene .chart{position:absolute;right:14px;top:12px;font-family:ui-monospace,Menlo,monospace;
+  font-size:12px;color:rgba(232,178,92,.95);text-align:right;pointer-events:none;line-height:1.9}
+.dock{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;justify-content:space-between;
+  border-top:1px solid rgba(240,230,214,.14);border-bottom:1px solid rgba(240,230,214,.14);
+  padding:16px 0;margin-bottom:32px}
+.dock label{display:grid;gap:7px;font-size:10px;letter-spacing:.26em;text-transform:uppercase;
+  color:#9a8b76;min-width:150px}
+input[type=range]{width:100%;accent-color:#e8b25c}
+.btn{background:#e8b25c;color:#221803;border:0;border-radius:8px;padding:11px 15px;
+  font:inherit;font-size:12px;font-weight:700;letter-spacing:.08em;cursor:pointer;margin:0 6px 6px 0}
+.btn.ghost{background:transparent;color:#f0e6d6;border:1px solid rgba(240,230,214,.24)}
+.btn:hover{filter:brightness(1.07)}
+.readout{display:flex;flex-wrap:wrap;gap:12px 26px;margin-bottom:40px;
+  border-top:1px solid rgba(240,230,214,.14);padding-top:16px}
+.readout div{min-width:84px}
+.readout dt{font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:#9a8b76;margin:0 0 4px}
+.readout dd{margin:0;font-size:20px;font-family:ui-monospace,Menlo,monospace;color:#8fc7a8}
+.staffwrap{border:1px solid rgba(240,230,214,.14);border-radius:14px;padding:12px;
+  background:#0d0b09;margin-bottom:40px}
+.staffwrap canvas{display:block;width:100%;height:auto}
+.cells{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-bottom:46px}
+@media(max-width:820px){.cells{grid-template-columns:1fr}}
+.cell{border-top:1px solid rgba(240,230,214,.16);padding-top:16px}
+.cell .fig{font-family:ui-serif,Georgia,serif;font-size:38px;color:#8fc7a8;line-height:1;margin-bottom:8px}
+.cell h3{font-family:ui-serif,Georgia,serif;font-weight:400;font-style:italic;font-size:21px;margin:0 0 8px}
+.cell p{margin:0;color:#a2937c;font-size:14px}
+footer{border-top:1px solid rgba(240,230,214,.14);padding:22px 0 54px;display:flex;
+  justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:11px;letter-spacing:.2em;
+  text-transform:uppercase;color:#7b6c58}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="brand">The <i>Room</i></div>
+    <ul>
+      <li><a href="#scene">Room</a></li>
+      <li><a href="#dock">Set</a></li>
+      <li><a href="#notes">Notes</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <p class="kicker">A chart, four players, one solo</p>
+    <h1 class="serif">The changes are<br>the <em>same</em> every time</h1>
+    <p>Anybody can play the changes. What the room is waiting for is what happens over
+       them — so the chart below is fixed, and the line that crosses it is generated fresh
+       from a scale walk every time it comes round.</p>
+  </header>
+
+  <section class="scene" id="scene">
+    <canvas id="c" width="1000" height="440"></canvas>
+    <p class="cap">the spotlight follows the soloist · smoke in the beam</p>
+    <div class="chart" id="chart"></div>
+  </section>
+
+  <div class="staffwrap">
+    <canvas id="s" width="1000" height="150"></canvas>
+  </div>
+
+  <section class="dock" id="dock">
+    <label for="tempo">Tempo <input id="tempo" type="range" min="60" max="240" value="132"></label>
+    <label for="density">Notes per bar <input id="density" type="range" min="2" max="12" value="6"></label>
+    <label for="spice">Chromatic <input id="spice" type="range" min="0" max="100" value="34"></label>
+    <div>
+      <button class="btn" id="play">Start the set</button>
+      <button class="btn ghost" id="take">Take a chorus</button>
+    </div>
+  </section>
+
+  <dl class="readout">
+    <div><dt>Tempo</dt><dd id="rT">132 bpm</dd></div>
+    <div><dt>Key</dt><dd id="rK">B♭</dd></div>
+    <div><dt>Bar</dt><dd id="rB">1 / 12</dd></div>
+    <div><dt>Chord</dt><dd id="rC">—</dd></div>
+    <div><dt>Tension</dt><dd id="rX">—</dd></div>
+    <div><dt>Choruses</dt><dd id="rR">0</dd></div>
+  </dl>
+
+  <section class="cells">
+    <div class="cell">
+      <div class="fig serif">i</div>
+      <h3>The changes</h3>
+      <p>Twelve bars of a blues in B♭: the same four bars twice, a turnaround, and the same
+         three again. The chart does not move; the solo over it never repeats.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">ii</div>
+      <h3>Tension</h3>
+      <p>Tonic, third, fifth and seventh of the chord are safe. Anything else is a colour,
+         and the more of them you stack the further the line is from the chord underneath
+         it, which is the number in the corner.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">iii</div>
+      <h3>Chromatic</h3>
+      <p>The chromatic slider is how often the walk steps outside the scale. At zero it is
+         a nursery rhyme; at the top it is a line that is only a line because you keep
+         going.</p>
+    </div>
+  </section>
+
+  <section class="cells" id="notes">
+    <div class="cell">
+      <div class="fig serif">iv</div>
+      <h3>Spotlight</h3>
+      <p>The soloist is a silhouette in a cone of smoke, and the cone's width and the
+         smoke's drift are what make a small drawing read as a room with air in it.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">v</div>
+      <h3>The staff</h3>
+      <p>Notes are written onto a ruled staff as the bar passes, left to right, and cleared
+         at the next chorus. It is the same data the drawing uses, not a decoration.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">vi</div>
+      <h3>A chorus</h3>
+      <p>One chorus is twelve bars, which is one trip round the changes. Take another and
+         the chart resets, the key stays, and the line is different.</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>The Room · two canvases, no files</span>
+    <span class="mono">blues in B♭ · 12 bars</span>
+  </footer>
+</div>
+<script>
+(function(){
+"use strict";
+var cv=document.getElementById('c'),ctx=cv.getContext('2d');
+var W=cv.width,H=cv.height;
+var sc=document.getElementById('s'),sctx=sc.getContext('2d');
+var SW=sc.width,SH=sc.height;
+var tempo=132,density=6,spice=34,playing=false,choruses=0,bar=0,t=0,noteT=0,notes=[];
+/* the changes: twelve bars of a blues in B flat */
+var CHART=['B♭7','E♭7','B♭7','B♭7','E♭7','B♭7','F7','E♭7','B♭7','E♭7','B♭7','F7'];
+/* a scale walk: mostly steps, sometimes a leap, sometimes outside the scale */
+var degree=0;
+function nextDegree(){
+  var r=Math.random();
+  var step=(Math.random()<0.5?-1:1)*(Math.random()<0.72?1:2);
+  if(r<spice/260)step=(Math.random()<0.5?-1:1)*1;   /* chromatic, may be off-scale */
+  degree+=step;
+  if(degree<-7)degree+=14;
+  if(degree>7)degree-=14;
+  return degree;
+}
+/* where a scale degree sits, in semitones, on the mixolydian set of a seventh chord */
+function tensionOf(deg){
+  var semis=[0,2,4,5,7,9,10];
+  var idx=((deg%7)+7)%7, oct=Math.floor(deg/7);
+  return semis[idx]+oct*12;
+}
+/* ---------- the room ---------- */
+var smoke=[];
+for(var i=0;i<70;i++)smoke.push({
+  x:Math.random()*W,y:Math.random()*H,r:20+Math.random()*70,
+  v:0.15+Math.random()*0.4,a:0.02+Math.random()*0.05});
+var soloistX=W*0.5,soloistY=H*0.62,targetX=soloistX;
+function drawRoom(dt){
+  /* the room: a warm dark box with a back wall and a floor */
+  var g=ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'#0d0a12');g.addColorStop(0.62,'#171018');g.addColorStop(1,'#0a0709');
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  /* the stage lights behind the band */
+  for(var s=0;s<3;s++){
+    var lg=ctx.createRadialGradient(W*(0.2+s*0.3),H*0.1,4,W*(0.2+s*0.3),H*0.1,220);
+    lg.addColorStop(0,'rgba(232,178,92,'+(0.16+0.03*Math.sin(t+s))+')');
+    lg.addColorStop(1,'rgba(232,178,92,0)');
+    ctx.fillStyle=lg;ctx.beginPath();ctx.arc(W*(0.2+s*0.3),H*0.1,220,0,6.3);ctx.fill();
+  }
+  /* smoke: drifting blobs, brighter inside the beam */
+  for(var i2=0;i2<smoke.length;i2++){
+    var p=smoke[i2];
+    p.y-=p.v*dt*6;p.x+=Math.sin(t*0.3+p.y*0.01)*dt*6;
+    if(p.y<-p.r){p.y=H+p.r;p.x=Math.random()*W;}
+    var inBeam=1-Math.min(1,Math.abs(p.x-targetX)/260);
+    var a=p.a*(0.35+inBeam*1.3);
+    var sg=ctx.createRadialGradient(p.x,p.y,p.r*0.2,p.x,p.y,p.r);
+    sg.addColorStop(0,'rgba(240,225,200,'+a.toFixed(3)+')');
+    sg.addColorStop(1,'rgba(240,225,200,0)');
+    ctx.fillStyle=sg;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,6.3);ctx.fill();
+  }
+  /* the beam: a cone from the stand to the floor */
+  var bg=ctx.createLinearGradient(targetX,H*0.1,targetX,H);
+  bg.addColorStop(0,'rgba(255,236,190,.20)');
+  bg.addColorStop(1,'rgba(255,225,170,.02)');
+  ctx.fillStyle=bg;
+  ctx.beginPath();
+  ctx.moveTo(targetX-10,H*0.12);
+  ctx.lineTo(targetX+10,H*0.12);
+  ctx.lineTo(targetX+180,H);
+  ctx.lineTo(targetX-180,H);
+  ctx.closePath();ctx.fill();
+  /* the pool on the floor */
+  var pg=ctx.createRadialGradient(targetX,H*0.94,4,targetX,H*0.94,190);
+  pg.addColorStop(0,'rgba(255,235,195,.22)');
+  pg.addColorStop(1,'rgba(255,235,195,0)');
+  ctx.fillStyle=pg;ctx.beginPath();ctx.ellipse(targetX,H*0.94,190,34,0,0,6.3);ctx.fill();
+  /* the quartet: three silhouettes behind, the soloist in the beam */
+  figures();
+  /* the spotlight stand */
+  ctx.fillStyle='#0a0709';
+  ctx.fillRect(targetX-12,H*0.12,24,10);
+  ctx.fillRect(targetX-2,H*0.12,4,H*0.9);
+}
+function figures(){
+  var band=[{x:W*0.18,y:H*0.68,r:0.85},{x:W*0.34,y:H*0.66,r:0.9},
+            {x:W*0.72,y:H*0.68,r:0.8},{x:W*0.86,y:H*0.66,r:0.75}];
+  band.forEach(function(p,i){
+    ctx.fillStyle='#0b0709';
+    /* body */
+    ctx.beginPath();
+    ctx.moveTo(p.x-26*p.r,p.y+70*p.r);
+    ctx.quadraticCurveTo(p.x-30*p.r,p.y-30*p.r,p.x-14*p.r,p.y-52*p.r);
+    ctx.lineTo(p.x+14*p.r,p.y-52*p.r);
+    ctx.quadraticCurveTo(p.x+30*p.r,p.y-30*p.r,p.x+26*p.r,p.y+70*p.r);
+    ctx.closePath();ctx.fill();
+    /* head */
+    ctx.beginPath();ctx.arc(p.x,p.y-64*p.r,13*p.r,0,6.3);ctx.fill();
+    /* instrument, a small shape held at the chest */
+    ctx.fillStyle='rgba(232,178,92,.18)';
+    ctx.beginPath();ctx.ellipse(p.x,p.y-16*p.r,22*p.r,10*p.r,i===1?0.3:-0.2,0,6.3);ctx.fill();
+    /* the rim light from the beam */
+    ctx.strokeStyle='rgba(255,230,190,.35)';ctx.lineWidth=1.4;
+    ctx.beginPath();
+    ctx.moveTo(p.x+14*p.r,p.y-52*p.r);
+    ctx.quadraticCurveTo(p.x+30*p.r,p.y-30*p.r,p.x+26*p.r,p.y+70*p.r);
+    ctx.stroke();
+  });
+  /* the soloist: a horn player in the beam, drawn larger */
+  ctx.fillStyle='#08060a';
+  ctx.beginPath();
+  ctx.moveTo(soloistX-30,soloistY+80);
+  ctx.quadraticCurveTo(soloistX-36,soloistY-30,soloistX-18,soloistY-58);
+  ctx.lineTo(soloistX+18,soloistY-58);
+  ctx.quadraticCurveTo(soloistX+36,soloistY-30,soloistX+30,soloistY+80);
+  ctx.closePath();ctx.fill();
+  ctx.beginPath();ctx.arc(soloistX,soloistY-70,15,0,6.3);ctx.fill();
+  /* the horn, angled, catching the light */
+  ctx.strokeStyle='rgba(255,235,190,.85)';ctx.lineWidth=3.4;
+  ctx.beginPath();ctx.moveTo(soloistX-6,soloistY-26);
+  ctx.quadraticCurveTo(soloistX+26,soloistY-40,soloistX+46,soloistY-16);ctx.stroke();
+  /* the bell */
+  ctx.fillStyle='rgba(255,235,190,.9)';
+  ctx.beginPath();ctx.ellipse(soloistX+50,soloistY-14,8,10,0.4,0,6.3);ctx.fill();
+  ctx.strokeStyle='rgba(255,230,190,.4)';ctx.lineWidth=1.4;
+  ctx.beginPath();ctx.moveTo(soloistX+18,soloistY-58);
+  ctx.quadraticCurveTo(soloistX+36,soloistY-30,soloistX+30,soloistY+80);ctx.stroke();
+}
+
+/* ---------- the staff ---------- */
+function drawStaff(){
+  sctx.fillStyle='#0d0b09';sctx.fillRect(0,0,SW,SH);
+  var top=SH*0.5;
+  sctx.strokeStyle='rgba(240,230,214,.22)';sctx.lineWidth=1;
+  for(var i=0;i<5;i++){
+    var y=top-20+i*10;
+    sctx.beginPath();sctx.moveTo(20,y);sctx.lineTo(SW-20,y);sctx.stroke();
+  }
+  /* the bar lines of the current chorus */
+  sctx.strokeStyle='rgba(240,230,214,.16)';
+  for(var b=0;b<=12;b++){
+    var x=20+b*((SW-40)/12);
+    sctx.beginPath();sctx.moveTo(x,top-24);sctx.lineTo(x,top+26);sctx.stroke();
+  }
+  /* the playhead, sitting at the current bar */
+  var px=20+bar*((SW-40)/12);
+  sctx.fillStyle='rgba(232,178,92,.15)';
+  sctx.fillRect(px,top-26,(SW-40)/12,54);
+  /* the notes written so far */
+  notes.forEach(function(n){
+    var x=20+(n.bar+n.beat)*((SW-40)/12);
+    var y=top+ (n.deg*4.2);
+    sctx.fillStyle=n.spice?'#ff9ecb':'#8fc7a8';
+    sctx.beginPath();sctx.ellipse(x,y,4.2,3,-0.2,0,6.3);sctx.fill();
+    sctx.strokeStyle=n.spice?'rgba(255,158,203,.7)':'rgba(143,199,168,.7)';
+    sctx.lineWidth=1;
+    sctx.beginPath();sctx.moveTo(x+4,y);sctx.lineTo(x+4,y-14);sctx.stroke();
+  });
+  /* the key signature, the smallest honest version of one */
+  sctx.fillStyle='rgba(240,230,214,.55)';
+  sctx.font='13px ui-serif,Georgia,serif';
+  sctx.fillText('B♭',4,top+8);
+}
+/* ---------- the clock: one sub-beat at a time ---------- */
+var beatInBar=0;
+function isSpice(deg){
+  var s=tensionOf(deg)%12;
+  return s!==0&&s!==3&&s!==7&&s!==10;
+}
+function step(dt){
+  noteT+=dt;
+  if(!playing)return;
+  var sub=60/tempo/4;
+  var guard=0;
+  while(noteT>=sub&&guard++<8){
+    noteT-=sub;
+    beatInBar++;
+    if(beatInBar>=4){
+      beatInBar=0;bar=(bar+1)%12;
+      if(bar===0){choruses++;notes=[];}
+    }
+    if(Math.random()<0.5+density/22){
+      var deg=nextDegree();
+      notes.push({bar:bar,beat:beatInBar/4,deg:deg,spice:isSpice(deg)});
+      if(notes.length>60)notes.shift();
+    }
+  }
+}
+/* ---------- the chart ---------- */
+function drawChart(){
+  var el=document.getElementById('chart');
+  var h='';
+  for(var i=0;i<12;i++){
+    h+='<span style="color:'+(i===bar?'#ffd9a0':'rgba(240,230,214,.5)')+'">'+
+      (i===bar?'▸ ':'  ')+CHART[i]+'</span><br>';
+  }
+  el.innerHTML=h;
+}
+/* ---------- controls ---------- */
+function bind(id,fn){var el=document.getElementById(id);
+  el.addEventListener('input',function(){fn(+el.value);});}
+bind('tempo',function(v){tempo=v;});
+bind('density',function(v){density=v;});
+bind('spice',function(v){spice=v;});
+var playBtn=document.getElementById('play');
+playBtn.addEventListener('click',function(){
+  playing=!playing;
+  playBtn.textContent=playing?'Stop the set':'Start the set';
+});
+document.getElementById('take').addEventListener('click',function(){
+  bar=0;notes=[];choruses++;degree=0;
+  targetX=W*0.5+Math.sin(choruses)*W*0.12;
+});
+function readout(){
+  document.getElementById('rT').textContent=tempo+' bpm';
+  document.getElementById('rB').textContent=(bar+1)+' / 12';
+  document.getElementById('rC').textContent=CHART[bar];
+  var d=notes.length?notes[notes.length-1]:null;
+  document.getElementById('rX').textContent=d?('♭'+((tensionOf(d.deg)%12)+1)):'—';
+  document.getElementById('rR').textContent=choruses;
+}
+/* ---------- loop ---------- */
+var last=0;
+function loop(ts){
+  var dt=last?Math.min(.05,(ts-last)/1000):0;last=ts;
+  t+=dt;step(dt);
+  /* the beam drifts toward the soloist's phrasing */
+  soloistX+=(targetX-soloistX)*dt*0.7;
+  drawRoom(dt);drawStaff();
+  if(playing&&Math.floor(t*2)%6===0)drawChart();
+  requestAnimationFrame(loop);
+}
+drawChart();drawStaff();readout();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

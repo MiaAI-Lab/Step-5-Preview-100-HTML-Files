@@ -1,0 +1,77 @@
+# COLDSTART — Firmware 4.11.2
+
+## Short title
+Fake OS Boot Sequence
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a convincing fake
+operating-system cold boot sequence called COLDSTART, firmware 4.11.2. No external
+dependencies whatsoever — no CDN, no web fonts, no external images, no external SVG
+files, no JavaScript libraries. All CSS and JavaScript inline, works offline by
+double-clicking, responsive, valid HTML5.
+
+Artistic direction: a green-phosphor terminal seen in a dark room. The whole page is
+one scrolling pre-formatted block of monospace text on near-black #04070a, in a
+pale green #c8f5d8, with three fixed overlay layers above it: a repeating-linear-
+gradient scanline mask, a radial vignette, and a full-screen flicker that only
+fires for one frame at 48% and 83% of a six-second cycle. A blinking block cursor
+(steps(1) timing, 1.05s) sits at the end of the log.
+
+Content: roughly ninety lines of authentic-looking kernel boot output, timed by
+millisecond stamps in square brackets and grouped under plain-text headers — CPU
+and memory map, ACPI, PCI enumeration with indented device tree lines, USB, thermal;
+mounting the root filesystem; loading kernel modules as a dotted list; starting the
+device manager with disks, RAID and TPM; network services including a DHCP failure
+that falls back to a link-local address (in amber); fifteen system services starting
+(cron, dbus, journald, sshd, nginx, postgres, redis, docker, containerd, kubelet…);
+integrity verification with sha256 counts and secure boot; hardware calibration;
+and a seven-item self-test with PASS results. Colour is semantic: cyan for success,
+amber for warnings, dim green for sub-lines, white with wide tracking for headers.
+
+Layout: the log fills the viewport and auto-scrolls to keep the newest line in
+view, with 40vh of bottom padding so the last lines are never hidden behind the
+chrome. A 2px cyan progress bar grows along the bottom edge in step with how many
+lines have been printed, glowing via box-shadow. A small monospace status block
+bottom-right shows the firmware version and a live uptime counter in tenths of a
+second.
+
+The finale: when the last line is printed, a prompt line with a blinking cursor is
+appended, and after 700ms a full-screen "System ready" panel fades in over
+everything — a glowing cyan ring with a dashed counter-rotating halo, a wide-tracked
+uppercase heading, a short paragraph, and two buttons.
+
+Interaction: the boot runs itself on load, printing one line at a time with a delay
+proportional to the line's length (2.2ms per character, capped at 90ms) so long
+lines take longer and the rhythm feels mechanical. "Skip to end" flushes every
+remaining line instantly and jumps to the finale; "Run again" clears the terminal
+and replays the whole sequence from the top. The uptime counter keeps running
+throughout. prefers-reduced-motion disables the flicker, the ring rotation and the
+cursor blink.
+
+## One-paragraph description of the intended design
+A green-phosphor cold boot that prints itself line by line under scanlines and a
+vignette: ninety lines of timestamped kernel output with semantic colour, a glowing
+progress bar tracking the print, a live uptime counter, and a glowing "System
+ready" finale ring you can replay or skip to.
+
+## Major visual techniques used
+- Timestamped kernel-log typography with indented device trees and dotted
+  module lists
+- Semantic colour classes (ok / warn / dim / hd) applied per line
+- CRT overlay stack: repeating-linear-gradient scanlines, radial vignette, and an
+  intermittent one-frame flicker keyed at 48% and 83% of a 6s cycle
+- Blinking block cursor in steps(1) timing
+- Auto-scrolling log with 40vh bottom padding so the tail is never occluded
+- 2px glowing progress bar driven by lines-printed ÷ lines-total
+- Per-line print delay proportional to character length, capped at 90ms
+- Instant flush for the skip path, using the same line renderer
+- Finale panel with a glowing ring, a dashed counter-rotating halo, and a fade-in
+- Live uptime counter in tenths of a second
+- prefers-reduced-motion disabling flicker, rotation and cursor blink
+
+## Intended interaction model
+A self-running performance with two controls. The boot plays automatically on load
+and needs nothing from the visitor; "Skip to end" is there for anyone who does not
+want to wait, and "Run again" replays it. Nothing else on the page is interactive —
+the experience is watching a machine talk about itself.

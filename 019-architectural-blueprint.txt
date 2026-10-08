@@ -1,0 +1,79 @@
+# DRAWING 07-A — The Meridian Pavilion, Annotated
+
+## Short title
+Architectural Blueprint
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: an animated architectural
+drawing sheet, "DRAWING 07-A — The Meridian Pavilion, issue for tender". No external
+dependencies whatsoever — no CDN, no web fonts, no external images, no external SVG
+files, no JavaScript libraries. All CSS and JavaScript inline, works offline by
+double-clicking, responsive, valid HTML5.
+
+Artistic direction: a cyanotype-style blueprint. Deep blue ground (#123a80 →
+#10367a → #0a2450) with two fixed faint blotches so the sheet reads as aged stock,
+a fine white graticule at 7% alpha whose spacing is set by a slider, and a double
+border frame (1.4px at 50% and 1px at 22%). All linework is off-white; hatching is
+off-white at 18%; dimension lines, the door swing and the section cut are amber
+#e0a326; the section arrows are red #c0392b. Type is monospace only, 8–9px for
+annotation and 17–30px for the title.
+
+The drawing: the plan is defined as polylines in a normalised 0–1 space and mapped
+into a box that is 62% of the viewport width with a 0.62 aspect. There are five
+paths — the outline rectangle, the reading-room divider, the alcove, the entrance
+notch and the hatch-zone boundary. The core technique is a partial-polyline
+renderer: it precomputes each path's segment lengths, then walks them emitting
+segments until the requested arclength fraction is consumed, interpolating along the
+final segment. That single function draws every line in the sheet progressively.
+
+The sequence, driven by one 0→1 progress value: the outline traces during the first
+45%; the four interior walls trace during 45–80%, each staggered by 22% so they
+arrive one after another; the left bay's diagonal hatch fills in during 78–95%; the
+amber door-swing arc and its leaf sweep in during 90–100%; then, once complete, the
+dimensions fade in (overall width and height, plus the two room dimensions along the
+bottom with witness ticks and monospace values), the room labels and areas fade in,
+and the red section cut A–A draws across the middle with filled arrows.
+
+Layout: a full-viewport canvas with a floating UI overlay whose pointer-events pass
+through except on controls. Top-left is an amber sheet label above a monospace
+uppercase title and a paragraph. Top-right is a drawing stamp block — "Drawn by
+A. Vance", scale, sheet size, "Checked · R. Okonjo". Bottom is a glass tray with
+Speed and Grid sliders, Dimensions and Labels toggles, and a Replay button, beside a
+monospace hint. Hovering a room label region highlights it with an amber bracket.
+
+Interaction: the sheet draws itself on load at a rate set by the Speed slider, and
+"Replay" resets progress to zero and starts again. The Grid slider changes the
+graticule spacing live. The Dimensions and Labels toggles hide and show those
+annotation layers without resetting the drawing. Hovering a room draws a bracket
+around its label. On narrow screens the paragraph, stamp and hint hide.
+
+## One-paragraph description of the intended design
+A blueprint that draws itself: a partial-arclength polyline renderer traces the
+outline, then four staggered interior walls, then a sequential diagonal hatch, an
+amber door swing, and finally dimension lines with witness ticks, room labels with
+areas and a red section cut — all in off-white linework on a blotchy deep blue
+ground with a fine graticule.
+
+## Major visual techniques used
+- Partial polyline rendering by arclength: precomputed segment lengths, walked until
+  the requested fraction is consumed, with interpolation along the final segment
+- Normalised 0–1 polyline coordinates mapped into a responsive drawing box
+- Staged choreography from one 0→1 progress value with overlapping time windows
+- Staggered interior walls (22% offset each) so they arrive sequentially
+- Sequential diagonal hatching inside a clipped rectangle
+- Amber dimension lines with perpendicular witness ticks and monospace values
+- Door-swing arc drawn with a growing angular sweep plus its leaf
+- Red section cut with filled triangular arrows and A–A labels
+- Crosshair hover brackets around room labels
+- Aged-stock ground from two fixed radial-gradient blotches
+- Fine graticule with slider-controlled spacing and a double border frame
+- Monospace-only typography for annotation, title and stamp
+- Floating glass tray with backdrop-filter blur; extras hidden under 760px
+
+## Intended interaction model
+A performance with transport controls. The sheet draws itself on load; visitors can
+change how fast it draws, change the graticule density, hide the dimensions or labels
+to see the bare linework, or hit Replay to watch it again. Hovering a room label
+brackets it. The drawing is fully deterministic — the same plan every time, just at
+a different speed.

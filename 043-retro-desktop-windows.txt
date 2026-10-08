@@ -1,0 +1,87 @@
+# WINDOWS 95 — A Desktop You Can Rearrange
+
+## Short title
+Retro Desktop Windows
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a working, draggable
+1995 desktop environment simulation. No external dependencies whatsoever — no CDN,
+no web fonts, no external images, no external SVG files, no JavaScript libraries.
+All CSS and JavaScript inline, works offline by double-clicking, responsive, valid
+HTML5.
+
+Artistic direction: period-correct Chicago-style UI. Teal desktop #008080 with a
+faint diagonal pattern, chrome grey #c0c0c0, navy title gradients (#000080 →
+#1084d0), and the era's defining trick: every bevel is four separate borders —
+white top-left, dark grey bottom-right — applied via border-color so nothing has a
+radius and nothing has a soft shadow except the hard 1px black drop on raised
+controls. Buttons press by inverting their bevel and shifting 1px down-right.
+Windows carry an inset white hairline and an inset black hairline plus a hard 4px
+drop shadow. Font smoothing is deliberately disabled with -webkit-font-smoothing:none
+to reproduce the aliased look.
+
+The environment is genuinely functional. Six window types are defined as data — My
+Computer (a drive list), Documents (a tabbed readme), Display Properties (a scheme
+dropdown, colour swatch bar, a preview of an active/inactive title pair), Media
+Player (a progress bar, timecode, transport buttons, a volume bar), Find (an input
+with a *.txt pattern, a drive select, and a results list) and Help (a contents list).
+Each window renders from that definition with a draggable navy title bar, three
+bevelled control buttons (minimise, maximise, close) and a recessed body panel.
+Windows are draggable by their title bar with pointer capture, constrained to the
+desktop, and clicking any window raises it above the others by incrementing a shared
+z counter. The taskbar reflects state: each open window gets a taskbar button,
+clicking it toggles that window between hidden and focused, and the focused one is
+rendered in the pressed-bevel state. The Start button opens a menu with a vertical
+navy gradient rail reading "Windows 95", six items, two separators and a Shut Down
+entry; Shut Down replaces the whole document with a black "It's now safe to turn off
+your computer" screen with a working Restart button. The taskbar clock ticks every
+second in 12-hour AM/PM. Desktop icons are also draggable and selectable.
+
+Layout: a fixed desktop region above a 40px taskbar; four draggable icons down the
+left edge; the Start menu anchored bottom-left; the taskbar across the bottom with
+the flag, task buttons and a tray clock.
+
+Interaction: double-click an icon to open its window; drag title bars and icons
+around; click a window to focus it; use the three title buttons to minimise,
+maximise (which really expands to fill the desktop) or close; click a taskbar
+button to toggle or focus; press Start to open the menu and Shut Down to end the
+session. Everything is pointer-event driven with pointer capture, so mouse and touch
+behave the same.
+
+## One-paragraph description of the intended design
+A period-correct 1995 desktop that actually works: teal ground, chrome bevels and
+navy gradient title bars built from four-sided border-color bevels with font
+smoothing off, six draggable windows with working minimise/maximise/close, a z-order
+that raises on click, a taskbar with toggling buttons and a ticking clock, a Start
+menu with a vertical gradient rail, draggable desktop icons, and a real Shut Down
+screen.
+
+## Major visual techniques used
+- Four-sided bevels via border-color (white top-left, dark grey bottom-right) with
+  zero radius, reproduced on buttons, windows, insets, inputs and bars
+- Pressed control states that invert the bevel and shift 1px down-right
+- Navy-to-blue gradient title bars with aliased bold white text
+- Hard box-shadow insets (white hairline + black hairline) plus a 4px offset drop
+  shadow on windows
+- -webkit-font-smoothing:none to reproduce aliased type
+- Draggable windows via pointer events with pointer capture and desktop clamping
+- Z-order management through an incrementing shared counter
+- Taskbar buttons that mirror open windows and toggle visibility/focus
+- Start menu with a vertical navy gradient rail (writing-mode: vertical-rl, rotated
+  180°)
+- Working maximise that resizes the window to the desktop area and remembers the
+  previous geometry
+- Shut Down screen that replaces the document and a Restart that reloads
+- Period-accurate widget set: fieldsets with legends, white progress bars, inset
+  list boxes with hover selection, tab strips
+- Draggable, selectable desktop icons with a dotted focus outline and navy
+  selected state
+- Fixed desktop region above a 40px taskbar; icons and windows shrink under 700px
+
+## Intended interaction model
+A desktop environment. Visitors open windows by double-clicking icons or using the
+Start menu, drag them by their title bars, layer them by clicking, and use the
+minimise, maximise and close buttons or the taskbar to manage them — with Start
+available for navigation and Shut Down for the full joke. Every control is wired to
+real state; nothing is a picture of a button.

@@ -1,0 +1,47 @@
+## The exact prompt used to generate this HTML file
+
+Generate 100 completely self-contained HTML files. DO NOT LOOK AT ANY OTHER FOLDER.
+ONLY IN THE CURRENT FOLDER. DO THIS AS A NEW AND CLEAN TASK. IGNORE EVERYTHING ELSE
+NOT RELATED TO THE TASK. DO NOT USE A GENERATOR. NEED TO CREATE THESE HTMLS ONE BY ONE,
+OR ONE BY AGENT. The goal is 100 unique, polished, fully self-contained single-file HTML
+pages, each with its own concept, its own visual language, and its own interaction model.
+
+This is file 100 of 100.
+
+# The Fluid Desk
+
+## Short title
+The Fluid Desk
+
+## One-paragraph description of the intended design
+A warm paper-coloured desk with one black tray at its centre and six fluids to put in it,
+each running the equation that describes it rather than an animation that resembles it.
+Ink diffusion and the smoke plume are both the incompressible Navier–Stokes equations
+solved on a 128-square grid by the stable-fluids recipe — advect, diffuse, project out the
+divergence with a Jacobi pressure solve — with buoyancy added for the smoke and a hanging
+plate in the flow so a vortex street sheds behind it on its own. The watercolour wash
+carries three pigment concentrations with different diffusion rates and granulation on a
+paper that dries at its edges, so edge darkening appears rather than being drawn.
+Ferrofluid is a container of dipoles pulled toward a magnet you move, spiking along the
+field above the Rosensweig threshold. The lava lamp is buoyant ink that rises, cools and
+falls. The soap films obey Young–Laplace: the pressure difference across a film is 4σ/r,
+so the small bubble empties into the large one until one film remains. Fields can be read
+as dye, vorticity, speed, pressure or divergence, and the type is a quiet old-style serif
+on paper with a teal and rust accent.
+
+## Major visual techniques used
+- Stable fluids: semi-Lagrangian advection, Jacobi diffusion, pressure projection
+- Staggered-free grid with one cell of padding and free-slip / no-slip boundary handling
+- A solid mask applied as cells where velocity and dye are zeroed, giving real wall drag
+- Interleaved three-channel dye array so one buffer carries the watercolour pigments
+- PutImageData of a 129-square grid scaled by the canvas, DPR-aware, no smoothing
+- Non-fluid trays: dipole force with cohesion, buoyancy with cooling, and film pressure
+- Vorticity, speed, pressure and divergence read directly out of the solver, not faked
+
+## Intended interaction model
+Six tray chips switch fluid and reseed the grid; five field chips choose what the tray
+shows. Three sliders drive viscosity, pointer force and time step live; Pause freezes time
+and Clear reseeds. Dragging in the tray splats force and dye in the direction of motion;
+for ferrofluid the pointer is the magnet itself. Keys 1–6 choose a tray, f cycles the
+field, space pauses and c clears. A HUD readout reports the current field value and the
+step count.

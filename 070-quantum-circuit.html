@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Circuit Bench — three wires, one Bloch sphere</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:#080b14;color:#e8edfb;
+  font:15px/1.62 ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+.serif{font-family:ui-serif,Georgia,"Times New Roman",serif}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.wrap{width:min(1120px,92vw);margin:0 auto}
+nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0 14px;
+  border-bottom:1px solid rgba(232,237,251,.14)}
+nav .brand{font-family:ui-serif,Georgia,serif;font-size:19px}
+nav .brand i{font-style:italic;color:#7ef0e0}
+nav ul{display:flex;gap:26px;list-style:none;margin:0;padding:0;font-size:11px;
+  letter-spacing:.24em;text-transform:uppercase;color:#8791ad}
+nav a{color:inherit;text-decoration:none}nav a:hover{color:#7ef0e0}
+@media(max-width:780px){nav ul{display:none}}
+header.hero{padding:56px 0 30px;text-align:center}
+header.hero .kicker{font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:#7ef0e0;
+  margin:0 0 14px}
+header.hero h1{font-family:ui-serif,Georgia,serif;font-weight:400;
+  font-size:clamp(32px,5.6vw,64px);line-height:1.05;margin:0 0 16px}
+header.hero h1 em{font-style:italic;color:#ff9ad5}
+header.hero p{max-width:60ch;margin:0 auto;color:#98a1bd}
+/* ---------- bench ---------- */
+.bench{display:grid;grid-template-columns:1fr 220px;gap:22px;align-items:start;
+  border-top:1px solid rgba(232,237,251,.14);border-bottom:1px solid rgba(232,237,251,.14);
+  padding:22px 0 28px;margin-bottom:36px}
+@media(max-width:900px){.bench{grid-template-columns:1fr}}
+.circuit{border:1px solid rgba(232,237,251,.14);border-radius:14px;padding:18px;
+  background:#0b1020;overflow-x:auto}
+.wire{display:flex;align-items:center;gap:0;margin:6px 0}
+.wire .lbl{width:54px;flex:none;font-size:11px;letter-spacing:.16em;color:#8791ad;
+  text-transform:uppercase}
+.line{position:relative;flex:none;width:8px;height:34px;background:rgba(126,240,224,.35)}
+.cell{width:42px;height:34px;flex:none;border-right:1px dashed rgba(232,237,251,.12);
+  display:grid;place-items:center;cursor:pointer;position:relative}
+.cell:hover{background:rgba(126,240,224,.07)}
+.cell .g{font-family:ui-monospace,Menlo,monospace;font-size:13px;color:#7ef0e0}
+.cell.on{background:rgba(126,240,224,.12)}
+.cell .g.meas{color:#ff9ad5}
+.cell .g.cnot{color:#ffd166}
+.cell .dot{width:8px;height:8px;border-radius:50%;background:#7ef0e0}
+/* ---------- panel ---------- */
+.panel{border:1px solid rgba(232,237,251,.14);border-radius:12px;padding:16px;background:#0b1020}
+.panel h2{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:#8791ad;
+  margin:0 0 12px;font-weight:600}
+.gates{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:14px}
+.gate{background:#121a30;border:1px solid rgba(232,237,251,.14);border-radius:8px;
+  padding:9px 0;font:inherit;font-size:12px;color:#dfe6fb;cursor:pointer;
+  font-family:ui-monospace,Menlo,monospace}
+.gate[aria-pressed="true"]{background:#7ef0e0;border-color:#7ef0e0;color:#04211d}
+.btn{width:100%;background:#ff9ad5;color:#2a0a20;border:0;border-radius:8px;padding:11px;
+  font:inherit;font-size:12px;font-weight:700;letter-spacing:.08em;cursor:pointer;margin-top:6px}
+.btn.ghost{background:transparent;color:#dfe6fb;border:1px solid rgba(232,237,251,.22)}
+.btn:hover{filter:brightness(1.07)}
+.kv{display:flex;justify-content:space-between;font-size:12px;padding:5px 0;color:#8791ad}
+.kv b{font-family:ui-monospace,Menlo,monospace;color:#7ef0e0;font-weight:500}
+/* ---------- bloch ---------- */
+.blochwrap{display:grid;grid-template-columns:300px 1fr;gap:22px;align-items:start;margin-bottom:40px}
+@media(max-width:900px){.blochwrap{grid-template-columns:1fr}}
+.bloch{border:1px solid rgba(232,237,251,.14);border-radius:14px;padding:14px;
+  background:radial-gradient(90% 90% at 50% 30%,#0e1526,#070a13 70%)}
+.bloch canvas{display:block;width:100%;height:auto}
+.probs{border:1px solid rgba(232,237,251,.14);border-radius:14px;padding:18px;background:#0b1020}
+.probs h2{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:#8791ad;
+  margin:0 0 14px;font-weight:600}
+.bar{margin-bottom:14px}
+.bar .top{display:flex;justify-content:space-between;font-size:12px;color:#98a1bd;margin-bottom:5px}
+.bar .top b{font-family:ui-monospace,Menlo,monospace;color:#ffd166;font-weight:500}
+.bar .track{height:8px;border-radius:4px;background:#141c33;overflow:hidden}
+.bar .fill{height:100%;background:linear-gradient(90deg,#7ef0e0,#ff9ad5);width:50%;
+  transition:width .5s ease}
+.cells{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-bottom:46px}
+@media(max-width:820px){.cells{grid-template-columns:1fr}}
+.cell{border-top:1px solid rgba(232,237,251,.14);padding-top:16px}
+.cell .fig{font-family:ui-serif,Georgia,serif;font-size:38px;color:#7ef0e0;line-height:1;margin-bottom:8px}
+.cell h3{font-family:ui-serif,Georgia,serif;font-weight:400;font-style:italic;font-size:21px;margin:0 0 8px}
+.cell p{margin:0;color:#98a1bd;font-size:14px}
+footer{border-top:1px solid rgba(232,237,251,.14);padding:22px 0 54px;display:flex;
+  justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:11px;letter-spacing:.2em;
+  text-transform:uppercase;color:#6b7593}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="brand">Circuit <i>Bench</i></div>
+    <ul>
+      <li><a href="#bench">Bench</a></li>
+      <li><a href="#state">State</a></li>
+      <li><a href="#notes">Notes</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <p class="kicker">Three wires · eight steps · one sphere</p>
+    <h1 class="serif">A qubit is a point<br>on a <em>sphere</em></h1>
+    <p>Not a bit with a question mark. It is a vector, and every gate is a rotation of
+       that vector. Place gates on the wires, run the circuit, and watch where each one
+       ends up pointing.</p>
+  </header>
+
+  <section class="bench" id="bench">
+    <div class="circuit">
+      <div id="wires"></div>
+    </div>
+    <aside class="panel">
+      <h2>Gates</h2>
+      <div class="gates" id="gates">
+        <button class="gate" data-g="X" aria-pressed="false">X</button>
+        <button class="gate" data-g="Y" aria-pressed="false">Y</button>
+        <button class="gate" data-g="Z" aria-pressed="false">Z</button>
+        <button class="gate" data-g="H" aria-pressed="true">H</button>
+        <button class="gate" data-g="S" aria-pressed="false">S</button>
+        <button class="gate" data-g="T" aria-pressed="false">T</button>
+        <button class="gate" data-g="R" aria-pressed="false">R</button>
+        <button class="gate" data-g="CNOT" aria-pressed="false">+</button>
+        <button class="gate" data-g="M" aria-pressed="false">M</button>
+      </div>
+      <button class="btn" id="run">Run the circuit</button>
+      <button class="btn ghost" id="clear">Clear the bench</button>
+      <div class="kv"><span>Steps</span><b id="kSteps">8</b></div>
+      <div class="kv"><span>Gates placed</span><b id="kGates">0</b></div>
+      <div class="kv"><span>Wire</span><b id="kWire">q0</b></div>
+      <div class="kv"><span>Last run</span><b id="kRun">—</b></div>
+    </aside>
+  </section>
+
+  <section class="blochwrap" id="state">
+    <div class="bloch"><canvas id="b" width="320" height="320"></canvas></div>
+    <div class="probs">
+      <h2>Amplitudes after the run</h2>
+      <div id="bars"></div>
+    </div>
+  </section>
+
+  <section class="cells">
+    <div class="cell">
+      <div class="fig serif">i</div>
+      <h3>The sphere</h3>
+      <p>The north pole is |0⟩, the south is |1⟩, and the equator is an equal
+         superposition with a phase that depends on where round the middle you sit. A
+         gate that leaves the axis alone is doing nothing.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">ii</div>
+      <h3>Rotations</h3>
+      <p>X is a half turn about the horizontal axis through |0⟩ and |1⟩. H is a half turn
+         about an axis in the middle of those, which is why it turns |0⟩ into something
+         that is neither.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">iii</div>
+      <h3>Measurement</h3>
+      <p>The vertical coordinate decides the odds: the probability of |1⟩ is how far down
+         the vector points. Measure and the vector jumps to one of the poles and stays
+         there, which is why you only get one shot.</p>
+    </div>
+  </section>
+
+  <section class="cells" id="notes">
+    <div class="cell">
+      <div class="fig serif">iv</div>
+      <h3>One qubit each</h3>
+      <p>This bench draws a Bloch vector per wire and rotates it directly, which is exact
+         for single-qubit work. The two-qubit control is a simplification: it reads the
+         wire above and flips this one if that one is down.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">v</div>
+      <h3>Phases</h3>
+      <p>Z flips the phase on |1⟩ and S turns it a quarter step. Neither is visible in the
+         probabilities — only in where the vector sits around the equator, and therefore
+         in what a following gate will do.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">vi</div>
+      <h3>Idempotence</h3>
+      <p>Applying the same half turn twice brings you back. That is the whole reason the
+         X X pair in step 1 and 5 cancels, and why real circuits are written to avoid it.</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>Circuit Bench · three wires, one canvas, no files</span>
+    <span class="mono">8 steps · 9 gates</span>
+  </footer>
+</div>
+<script>
+(function(){
+"use strict";
+var WIRES=3,STEPS=8;
+var gate='H',cells=[],sel=0,runCount=0;
+var wires=document.getElementById('wires');
+
+/* ---------- build the circuit ---------- */
+for(var w=0;w<WIRES;w++){
+  var row=document.createElement('div');row.className='wire';
+  var lbl=document.createElement('div');lbl.className='lbl';
+  lbl.textContent='q'+w;
+  row.appendChild(lbl);
+  var line=document.createElement('div');line.className='line';row.appendChild(line);
+  var arr=[];
+  for(var s=0;s<STEPS;s++){
+    var c=document.createElement('div');c.className='cell';
+    c.addEventListener('click',function(w2,s2){
+      return function(){
+        sel=w2;
+        var cfg=cells[w2][s2];
+        cfg=cfg===gate?null:gate;
+        cells[w2][s2]=cfg;
+        paint();
+      };
+    }(w,s));
+    row.appendChild(c);arr.push(c);
+  }
+  wires.appendChild(row);cells.push(arr);
+}
+function paint(){
+  var total=0;
+  for(var w=0;w<WIRES;w++){
+    for(var s=0;s<STEPS;s++){
+      var g=cells[w][s],el=cells[w][s];
+      el.innerHTML='';el.classList.remove('on');
+      el.className='cell';
+      if(!g)continue;
+      total++;
+      el.classList.add('on');
+      var t=document.createElement('span');
+      t.className='g'+(g==='M'?' meas':'')+(g==='CNOT'?' cnot':'');
+      t.textContent=g;
+      el.appendChild(t);
+    }
+  }
+  document.getElementById('kGates').textContent=total;
+  document.getElementById('kWire').textContent='q'+sel;
+}
+/* ---------- gate palette ---------- */
+var btns=[].slice.call(document.querySelectorAll('.gate'));
+btns.forEach(function(b){
+  b.addEventListener('click',function(){
+    gate=b.getAttribute('data-g');
+    btns.forEach(function(o){o.setAttribute('aria-pressed',String(o===b));});
+  });
+});
+/* ---------- the state: one Bloch vector per wire ---------- */
+var state=[];
+for(var q=0;q<WIRES;q++)state.push({theta:0,phi:0,fixed:false,measured:null});
+function reset(){for(var i=0;i<WIRES;i++){
+  state[i]={theta:0,phi:0,fixed:false,measured:null};}}
+function applyGate(g,q){
+  var st=state[q];
+  if(st.fixed)return;
+  var T=st.theta,P=st.phi;
+  if(g==='X'){st.theta=Math.PI-T;st.phi=-P;}
+  else if(g==='Y'){st.theta=Math.PI-T;st.phi=Math.PI-P;}
+  else if(g==='Z'){st.theta=T;st.phi=P+Math.PI;}
+  else if(g==='H'){st.theta=Math.PI/2;st.phi=(Math.abs(P)<0.01?0:P);}
+  else if(g==='S'){st.phi=P+Math.PI/2;}
+  else if(g==='T'){st.phi=P+Math.PI/4;}
+  else if(g==='R'){st.theta=Math.max(0.001,Math.min(Math.PI-0.001,T+Math.PI/4));}
+  else if(g==='M'){
+    var p1=Math.sin(st.theta/2);
+    p1=Math.max(0,Math.min(1,p1*p1));
+    st.fixed=true;
+    st.measured=Math.random()<p1?'1':'0';
+    st.theta=st.measured==='1'?Math.PI:0;
+  }
+  if(st.phi>Math.PI*2)st.phi-=Math.PI*2;
+  if(st.phi<0)st.phi+=Math.PI*2;
+}
+function p1(q){var s=Math.sin(state[q].theta/2);return s*s;}
+function drawBloch(){
+  var cv=document.getElementById('b'),ctx=cv.getContext('2d');
+  var S=320,C=S/2,R=S*0.36;
+  ctx.clearRect(0,0,S,S);
+  /* the sphere */
+  ctx.strokeStyle='rgba(232,237,251,.18)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.arc(C,C,R,0,6.283);ctx.stroke();
+  ctx.beginPath();ctx.ellipse(C,C,R,R*0.34,0,0,6.283);ctx.stroke();
+  ctx.beginPath();ctx.ellipse(C,C,R*0.34,R,0,0,6.283);ctx.stroke();
+  /* the poles */
+  ctx.fillStyle='#8791ad';ctx.font='11px ui-monospace,Menlo,monospace';
+  ctx.fillText('|0⟩',C-10,C-R-8);ctx.fillText('|1⟩',C-10,C+R+16);
+  ctx.fillText('|+⟩',C+R+6,C+4);ctx.fillText('|-⟩',C-R-22,C+4);
+  /* one vector per wire, brighter for the selected one */
+  for(var q=0;q<WIRES;q++){
+    var st=state[q];
+    /* project: x right, y down along the axis */
+    var x=C+Math.sin(st.theta)*Math.cos(st.phi)*R;
+    var y=C-Math.cos(st.theta)*R*0.92;
+    var col=q===sel?'#7ef0e0':(q===2?'#ff9ad5':'#8fa0c8');
+    ctx.strokeStyle=col;ctx.lineWidth=q===sel?2.4:1.4;
+    ctx.globalAlpha=q===sel?1:0.55;
+    ctx.beginPath();ctx.moveTo(C,C);ctx.lineTo(x,y);ctx.stroke();
+    ctx.fillStyle=col;ctx.beginPath();ctx.arc(x,y,4,0,6.283);ctx.fill();
+    ctx.globalAlpha=1;
+    if(st.fixed){
+      ctx.fillStyle=col;ctx.font='10px ui-monospace,Menlo,monospace';
+      ctx.fillText('measured '+st.measured,x+6,y-6);
+    }
+  }
+}
+var bars=document.getElementById('bars');
+function drawBars(){
+  bars.innerHTML='';
+  for(var q=0;q<WIRES;q++){
+    var p=p1(q),d=document.createElement('div');d.className='bar';
+    var top=document.createElement('div');top.className='top';
+    top.innerHTML='<span>q'+q+(state[q].fixed?' · measured '+state[q].measured:'')+
+      '</span><b>|1⟩ '+(p*100).toFixed(1)+'%</b>';
+    var track=document.createElement('div');track.className='track';
+    var fill=document.createElement('div');fill.className='fill';
+    fill.style.width=(p*100).toFixed(1)+'%';
+    if(state[q].fixed)fill.style.width='100%';
+    track.appendChild(fill);d.appendChild(top);d.appendChild(track);
+    bars.appendChild(d);
+  }
+}
+/* ---------- run ---------- */
+document.getElementById('run').addEventListener('click',function(){
+  reset();
+  for(var s=0;s<STEPS;s++){
+    for(var w=0;w<WIRES;w++){
+      var g=cells[w][s];
+      if(!g)continue;
+      if(g==='CNOT'){
+        /* simplified two-qubit: read the wire above and flip this one if it is down */
+        if(w>0&&Math.sin(state[w-1].theta/2)>0.7)applyGate('X',w);
+      }else applyGate(g,w);
+    }
+  }
+  runCount++;
+  drawBloch();drawBars();
+  document.getElementById('kRun').textContent=runCount+' runs';
+});
+document.getElementById('clear').addEventListener('click',function(){
+  for(var w=0;w<WIRES;w++)for(var s=0;s<STEPS;s++)cells[w][s]=null;
+  reset();paint();drawBloch();drawBars();
+});
+paint();drawBloch();drawBars();
+})();
+</script>
+</body>
+</html>

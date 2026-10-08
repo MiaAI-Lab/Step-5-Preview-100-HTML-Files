@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Chart — parchment, rhumb lines and a route</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:#2b2418;color:#3e3222;
+  font:15px/1.62 ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+.serif{font-family:ui-serif,Georgia,"Times New Roman",serif}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.wrap{width:min(1140px,92vw);margin:0 auto}
+nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0 14px;
+  border-bottom:1px solid rgba(62,50,34,.3)}
+nav .brand{font-family:ui-serif,Georgia,serif;font-size:19px}
+nav .brand i{font-style:italic;color:#a8452c}
+nav ul{display:flex;gap:26px;list-style:none;margin:0;padding:0;font-size:11px;
+  letter-spacing:.24em;text-transform:uppercase;color:#7d6a4c}
+nav a{color:inherit;text-decoration:none}nav a:hover{color:#a8452c}
+@media(max-width:780px){nav ul{display:none}}
+header.hero{padding:56px 0 32px;text-align:center}
+header.hero .kicker{font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:#a8452c;
+  margin:0 0 14px}
+header.hero h1{font-family:ui-serif,Georgia,serif;font-weight:400;
+  font-size:clamp(34px,5.8vw,66px);line-height:1.05;margin:0 0 16px}
+header.hero h1 em{font-style:italic;color:#2f6b6b}
+header.hero p{max-width:58ch;margin:0 auto;color:#6a5a40}
+/* ---------- the chart ---------- */
+.chartwrap{display:grid;grid-template-columns:1fr 270px;gap:24px;align-items:start;
+  border-top:1px solid rgba(62,50,34,.3);border-bottom:1px solid rgba(62,50,34,.3);
+  padding:24px 0 30px;margin-bottom:40px}
+@media(max-width:900px){.chartwrap{grid-template-columns:1fr}}
+.chart{
+  position:relative;border-radius:6px;overflow:hidden;
+  background:
+    radial-gradient(120% 90% at 30% 20%,#f1e4c4,#e0cfa6 55%,#cbb684 100%);
+  box-shadow:0 24px 50px -30px rgba(0,0,0,.8),inset 0 0 80px rgba(120,90,50,.35);
+  border:1px solid rgba(62,50,34,.35)
+}
+.chart svg{display:block;width:100%;height:auto}
+.ink{stroke:#4a3520;fill:none;stroke-linecap:round}
+.coast{fill:#cfe0cf;stroke:#4a3520;stroke-width:2}
+.faint{stroke:#4a3520;opacity:.35}
+.waterline{stroke:#2f6b6b;opacity:.5;fill:none}
+.mount{stroke:#6a4a2c;fill:none;stroke-width:1.4}
+.route{stroke:#a8452c;stroke-width:2.4;fill:none;stroke-dasharray:7 6;opacity:.9;
+  animation:crawl 2.4s linear infinite}
+@keyframes crawl{to{stroke-dashoffset:-52}}
+.place{cursor:pointer}
+.place circle{fill:#a8452c;stroke:#f1e4c4;stroke-width:1.5}
+.place text{font-size:12px;fill:#3e3222;font-family:ui-serif,Georgia,serif;letter-spacing:.04em}
+.place:hover circle{fill:#2f6b6b}
+.place[aria-pressed="true"] circle{fill:#2f6b6b;r:8}
+/* ---------- panel ---------- */
+.panel{border:1px solid rgba(62,50,34,.4);border-radius:10px;padding:18px;
+  background:linear-gradient(#f1e4c4,#e6d6b0)}
+.panel h2{font-family:ui-serif,Georgia,serif;font-weight:400;font-size:23px;margin:0 0 3px}
+.panel .sub{font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:#2f6b6b;
+  margin:0 0 12px}
+.panel p{margin:0 0 12px;font-size:14px;color:#4c3f2a}
+.panel .entry{font-family:ui-serif,Georgia,serif;font-style:italic;font-size:15px;
+  border-left:2px solid #a8452c;padding-left:12px;color:#3e3222}
+.btn{background:#a8452c;color:#fdf6e6;border:0;border-radius:6px;padding:10px 14px;
+  font:inherit;font-size:12px;font-weight:600;letter-spacing:.08em;cursor:pointer;margin:0 6px 6px 0}
+.btn.ghost{background:transparent;color:#4a3520;border:1px solid rgba(74,53,32,.45)}
+.btn:hover{filter:brightness(1.08)}
+label.slider{display:block;font-size:10px;letter-spacing:.26em;text-transform:uppercase;
+  color:#7d6a4c;margin:14px 0 7px}
+input[type=range]{width:100%;accent-color:#a8452c}
+.readout{display:flex;flex-wrap:wrap;gap:12px 30px;margin-bottom:40px;
+  border-top:1px solid rgba(62,50,34,.3);padding-top:16px}
+.readout div{min-width:80px}
+.readout dt{font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:#7d6a4c;margin:0 0 4px}
+.readout dd{margin:0;font-size:21px;font-family:ui-monospace,Menlo,monospace;color:#a8452c}
+.cells{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-bottom:46px}
+@media(max-width:820px){.cells{grid-template-columns:1fr}}
+.cell{border-top:1px solid rgba(62,50,34,.4);padding-top:16px}
+.cell .fig{font-family:ui-serif,Georgia,serif;font-size:38px;color:#2f6b6b;line-height:1;margin-bottom:8px}
+.cell h3{font-family:ui-serif,Georgia,serif;font-weight:400;font-style:italic;font-size:21px;margin:0 0 8px}
+.cell p{margin:0;color:#6a5a40;font-size:14px}
+footer{border-top:1px solid rgba(62,50,34,.3);padding:22px 0 54px;display:flex;
+  justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:11px;letter-spacing:.2em;
+  text-transform:uppercase;color:#7d6a4c}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="brand">The <i>Chart</i></div>
+    <ul>
+      <li><a href="#chart">Chart</a></li>
+      <li><a href="#log">Log</a></li>
+      <li><a href="#notes">Notes</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <p class="kicker">Rhumb lines · 32 points · one route</p>
+    <h1 class="serif">A chart drawn<br>the way they <em>were</em></h1>
+    <p>Not a map of anywhere. It is a map of how maps were made: coastlines inked from a
+       log, a compass rose with sixteen wind names, rhumb lines radiating to the edge of
+       the paper, and a route drawn as a dashed guess.</p>
+  </header>
+
+  <section class="chartwrap" id="chart">
+    <div class="chart">
+      <svg id="c" viewBox="0 0 900 620" role="img" aria-label="A hand-drawn chart of an invented coast"></svg>
+    </div>
+    <aside class="panel" id="log">
+      <h2 id="lName">Cape Verdigris</h2>
+      <p class="sub" id="lSub">headland · first sighted</p>
+      <p>The headland was the first land seen at dawn on the ninth day, and the first
+         thing the master did was name it for the colour it made on the water.</p>
+      <div class="entry" id="lEntry">“The sea turned green before it turned anything else.”</div>
+      <div class="btns" style="margin-top:14px">
+        <button class="btn" id="routeBtn">Chart the route</button>
+        <button class="btn ghost" id="compassBtn">Draw the rose</button>
+      </div>
+      <label class="slider" for="ink">Ink weight</label>
+      <input id="ink" type="range" min="1" max="10" value="5">
+      <label class="slider" for="fade">Faded</label>
+      <input id="fade" type="range" min="0" max="100" value="34">
+    </aside>
+  </section>
+
+  <dl class="readout">
+    <div><dt>Places</dt><dd id="rP">4</dd></div>
+    <div><dt>Rhumb lines</dt><dd id="rR">32</dd></div>
+    <div><dt>Route</dt><dd id="rO">dashed</dd></div>
+    <div><dt>Compass</dt><dd id="rC">rose</dd></div>
+    <div><dt>Ink</dt><dd id="rI">5</dd></div>
+  </dl>
+
+  <section class="cells">
+    <div class="cell">
+      <div class="fig serif">i</div>
+      <h3>The rose</h3>
+      <p>Sixteen points named for winds, not for numbers. North is at the top because
+         the pole star was the only fixed thing available, and every other direction was
+         a name before it was an angle.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">ii</div>
+      <h3>Rhumb lines</h3>
+      <p>Straight lines from the rose to the edge of the paper, one for every point. They
+         are what a navigator actually followed: a constant bearing, drawn as a ruler
+         across the sea.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">iii</div>
+      <h3>The route</h3>
+      <p>A dashed line between the places, crawling along itself. Portolan charts drew
+         courses as dashes, and the length of the dash was a rough measure of a day's
+         sail.</p>
+    </div>
+  </section>
+
+  <section class="cells" id="notes">
+    <div class="cell">
+      <div class="fig serif">iv</div>
+      <h3>Faded</h3>
+      <p>The whole chart is one ink colour whose weight and transparency you set. Faded
+         means the paper has aged where the sun hits it, which is the only difference
+         between a new chart and an old one.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">v</div>
+      <h3>Mountains</h3>
+      <p>Hachures, not contours — short strokes following the slope, so the height is
+         read from the density of the marks rather than from a number.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">vi</div>
+      <h3>The blank</h3>
+      <p>Where the chart stops is not the edge of the world, it is the edge of what
+         anyone had sailed. Old charts left the rest blank and drew a monster in the
+         margin.</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>The Chart · one SVG, no files</span>
+    <span class="mono">parchment · sepia · verdigris</span>
+  </footer>
+</div>
+<script>
+(function(){
+"use strict";
+var NS='http://www.w3.org/2000/svg';
+var svg=document.getElementById('c');
+function E(n,a){var e=document.createElementNS(NS,n);
+  for(var k in a)if(a.hasOwnProperty(k))e.setAttribute(k,a[k]);return e;}
+var W=900,H=620;
+function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;
+  var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;
+  return((t^t>>>14)>>>0)/4294967296;};}
+var rnd=mulberry(88);
+var ink=5,fade=34;
+
+/* ---------- the sea ---------- */
+var inkLayer=E('g',{id:'ink'});
+svg.appendChild(inkLayer);
+/* every stroke remembers its relative weight and its own opacity, so the ink and
+   faded sliders can re-weigh the whole sheet without losing the drawing's hierarchy */
+function inkIt(el,k,o){
+  el.setAttribute('stroke','#4a3520');
+  el.setAttribute('stroke-width',(ink*0.4*(k===undefined?1:k)).toFixed(1));
+  el.dataset.k=String(k===undefined?1:k);
+  el.dataset.o=String(o===undefined?1:o);
+  return el;
+}
+
+/* wavy latitude/longitude hairlines */
+for(var gy=40;gy<H;gy+=52){
+  var d='M0 '+gy;
+  for(var gx=0;gx<=W;gx+=40)d+=' q 20 '+(Math.sin(gx*0.02+gy)*6-3)+' 40 0';
+  inkLayer.appendChild(inkIt(E('path',{d:d,fill:'none',opacity:(1-fade/140)*0.4}),0.6,0.4));
+}
+/* ---------- the coast: one closed path from a smooth random walk ---------- */
+var coastPts=[];
+(function(){
+  var n=54;
+  for(var i=0;i<=n;i++){
+    var t=i/n, a=t*Math.PI*2;
+    var r=200+Math.sin(a*3+1)*52+Math.sin(a*5+.4)*30+rnd()*16;
+    coastPts.push([450+Math.cos(a)*r*1.35, 310+Math.sin(a)*r*0.86]);
+  }
+})();
+function smooth(pts,closed){
+  var d='M'+pts[0][0].toFixed(1)+' '+pts[0][1].toFixed(1);
+  for(var i=0;i<pts.length-1;i++){
+    var p=pts[i],q=pts[i+1];
+    var mx=(p[0]+q[0])/2,my=(p[1]+q[1])/2;
+    d+=' Q'+p[0].toFixed(1)+' '+p[1].toFixed(1)+' '+mx.toFixed(1)+' '+my.toFixed(1);
+  }
+  d+=closed?' Z':'';
+  return d;
+}
+inkLayer.appendChild(E('path',{d:smooth(coastPts,true),fill:'#cfe0cf',
+  stroke:'#4a3520','stroke-width':(ink*0.5).toFixed(1),
+  'stroke-linejoin':'round',opacity:(1-fade/140).toFixed(2)}));
+/* a second, smaller island */
+var isl=[[640,200],[690,180],[730,210],[712,250],[660,246]];
+inkLayer.appendChild(E('path',{d:smooth(isl,true),fill:'#cfe0cf',
+  stroke:'#4a3520','stroke-width':1.6,opacity:(1-fade/140).toFixed(2)}));
+
+/* ---------- mountains as hachures ---------- */
+var mounts=[[300,260],[350,240],[420,300],[250,320],[520,250],[480,330]];
+mounts.forEach(function(m){
+  for(var k=0;k<9;k++){
+    var x=m[0]-30+k*7.5,y=m[1]+Math.abs(k-4)*7;
+    inkLayer.appendChild(inkIt(E('path',{d:'M'+(x)+' '+y+' q 3 -14 6 0',fill:'none'}),0.5,0.75));
+  }
+  var g=E('text',{x:m[0],y:m[1]+26,'text-anchor':'middle','font-size':9,
+    fill:'#4a3520','font-family':'ui-serif,Georgia,serif',opacity:.6});
+  g.textContent='⛰';inkLayer.appendChild(g);
+});
+/* ---------- rivers and forest marks ---------- */
+inkLayer.appendChild(inkIt(E('path',{d:'M300 250 q 30 60 -10 110 q -30 40 20 90 q 30 30 -10 70',
+  class:'waterline',fill:'none'}),0.5,0.85));
+for(var tr=0;tr<26;tr++){
+  var tx=200+rnd()*380,ty=380+rnd()*140;
+  inkLayer.appendChild(inkIt(E('path',{d:'M'+tx+' '+ty+' v -12 M'+(tx-5)+' '+(ty-5)+
+    ' l 5 -7 l 5 7',fill:'none'}),0.4,0.7));
+}
+/* ---------- the compass rose ---------- */
+var rose=E('g',{id:'rose',transform:'translate(150,470)'});
+var RX=100;
+for(var r32=0;r32<32;r32++){
+  var a=r32*11.25*Math.PI/180,l=r32%8===0?RX:(r32%4===0?RX*0.82:RX*0.62);
+  rose.appendChild(inkIt(E('line',{x1:0,y1:0,x2:Math.sin(a)*l,y2:-Math.cos(a)*l,
+    'stroke-width':r32%8===0?1.6:0.7,opacity:(1-fade/140)*(r32%8===0?0.95:0.5)})));
+}
+/* the star of the rose */
+for(var s8=0;s8<8;s8++){
+  var a8=s8*45*Math.PI/180,dir=s8%2?1:-1;
+  var L1=RX,L2=RX*0.62;
+  var x1=Math.sin(a8)*L1,y1=-Math.cos(a8)*L1;
+  var x2=Math.sin(a8+Math.PI/4*dir*0.5)*L2,y2=-Math.cos(a8+Math.PI/4*dir*0.5)*L2;
+  var x3=Math.sin(a8+Math.PI/2)*8,y3=-Math.cos(a8+Math.PI/2)*8;
+  rose.appendChild(E('path',{d:'M'+x1.toFixed(1)+' '+y1.toFixed(1)+' L'+x2.toFixed(1)+' '+y2.toFixed(1)+
+    ' L'+x3.toFixed(1)+' '+y3.toFixed(1)+' Z',fill:s8%2?'#4a3520':'#a8452c',
+    opacity:(1-fade/140).toFixed(2)}));
+}
+rose.appendChild(E('circle',{cx:0,cy:0,r:7,fill:'#f1e4c4',stroke:'#4a3520','stroke-width':1.4}));
+var WINDS=[['N',0],['E',90],['S',180],['W',270]];
+WINDS.forEach(function(w){
+  var aw=w[1]*Math.PI/180;
+  var t=E('text',{x:Math.sin(aw)*(RX+16),y:-Math.cos(aw)*(RX+16)+4,'text-anchor':'middle',
+    'font-size':13,fill:'#4a3520','font-family':'ui-serif,Georgia,serif',
+    opacity:(1-fade/140).toFixed(2)});
+  t.textContent=w[0];rose.appendChild(t);
+});
+/* the sixteen named winds, small */
+var NAMES=['Tramontana','Greco','Levante','Sirocco','Ostro','Libeccio','Ponente','Maestro'];
+NAMES.forEach(function(nm,i){
+  var a2=((i+0.5)*45)*Math.PI/180;
+  var t2=E('text',{x:Math.sin(a2)*(RX*0.42),y:-Math.cos(a2)*(RX*0.42)+3,
+    'text-anchor':'middle','font-size':6.4,fill:'#4a3520','letter-spacing':'.08em',
+    opacity:(1-fade/140)*0.85});
+  t2.textContent=nm.toUpperCase();rose.appendChild(t2);
+});
+rose.setAttribute('opacity',String(1-fade/120));
+svg.appendChild(rose);
+
+/* ---------- rhumb lines: one per point, to the edge of the paper ---------- */
+var rhumbLayer=E('g',{id:'rhumb'});
+for(var r16=0;r16<16;r16++){
+  var a16=r16*22.5*Math.PI/180;
+  var far=Math.max(W,H)*1.2;
+  rhumbLayer.appendChild(E('line',{x1:150,y1:470,
+    x2:(150+Math.sin(a16)*far).toFixed(1),y2:(470-Math.cos(a16)*far).toFixed(1),
+    stroke:'#4a3520','stroke-width':r16%4===0?0.8:0.4,
+    opacity:(1-fade/120)*(r16%4===0?0.55:0.28)}));
+}
+svg.appendChild(rhumbLayer);
+/* ---------- the route: a dashed guess between the places ---------- */
+var routeLayer=E('g',{id:'route'});
+svg.appendChild(routeLayer);
+/* ---------- places, each with a log entry ---------- */
+var PLACES=[
+ {x:150,y:150,n:'Cape Verdigris',s:'headland · first sighted',
+  t:'The headland was the first land seen at dawn on the ninth day, and the first thing '
+    +'the master did was name it for the colour it made on the water.',
+  e:'“The sea turned green before it turned anything else.”'},
+ {x:330,y:300,n:'The Salt Flats',s:'interior · crossed on foot',
+  t:'A white plain two days across, with no water and no shade. The chart records it '
+    +'because the master could not believe it, and wrote it down to be sure.',
+  e:'“We walked on a sea that had forgotten how to move.”'},
+ {x:560,y:400,n:'Harbour Tambour',s:'anchorage · watered',
+  t:'The only safe water for eleven days. The boats filled and the men slept, and the '
+    +'chart was drawn while the ink dried in the heat.',
+  e:'“Two rivers came down to the same beach and neither had a name.”'},
+ {x:700,y:210,n:'Isle of Bells',s:'island · sounded, not landed',
+  t:'Sounded at five fathoms and left alone. Whatever made the sound was never seen, '
+    +'and the entry ends there because the log does.',
+  e:'“A bell, under the water, on the hour.”'},
+ {x:420,y:520,n:'The Meridian',s:'mark · where the chart was drawn',
+  t:'The centre of the rose, and the one place on the paper with no distance to '
+    +'anything. Every bearing on the chart is measured from here.',
+  e:'“All lines begin at a point nobody has stood on.”'}
+];
+var placeLayer=E('g',{});
+PLACES.forEach(function(p,i){
+  var g=E('g',{class:'place'});
+  g.setAttribute('aria-pressed','false');
+  g.appendChild(E('circle',{cx:p.x,cy:p.y,r:6}));
+  var t=E('text',{x:p.x+12,y:p.y+4});
+  t.textContent=p.n;g.appendChild(t);
+  g.addEventListener('click',function(){
+    var on=g.getAttribute('aria-pressed')!=='true';
+    [].slice.call(placeLayer.childNodes).forEach(function(o){
+      o.setAttribute('aria-pressed','false');});
+    g.setAttribute('aria-pressed',String(on));
+    document.getElementById('lName').textContent=p.n;
+    document.getElementById('lSub').textContent=p.s;
+    document.getElementById('lEntry').textContent=p.e;
+    var intro=document.querySelector('#log p');
+    intro.textContent=p.t;
+    document.getElementById('rP').textContent=i+1;
+  });
+  placeLayer.appendChild(g);
+});
+svg.appendChild(placeLayer);
+function drawRoute(){
+  while(routeLayer.firstChild)routeLayer.removeChild(routeLayer.firstChild);
+  var d='';
+  PLACES.forEach(function(p,i){d+=(i?'L':'M')+p.x+' '+p.y+' ';});
+  routeLayer.appendChild(E('path',{d:d,class:'route',fill:'none'}));
+}
+drawRoute();
+/* ---------- the sea monster in the margin ---------- */
+var mon=E('g',{transform:'translate(790,540)'});
+mon.appendChild(E('path',{d:'M0 0 q 18 -22 34 -6 q 12 12 26 2 q -8 16 -26 14 q -16 10 -34 -10 Z',
+  fill:'none',stroke:'#4a3520','stroke-width':1.4,opacity:.65}));
+mon.appendChild(E('path',{d:'M34 -6 q 16 -12 24 2',fill:'none',stroke:'#4a3520',
+  'stroke-width':1.2,opacity:.65}));
+mon.appendChild(E('circle',{cx:12,cy:-8,r:1.6,fill:'#4a3520',opacity:.7}));
+var mn=E('text',{x:0,y:26,'font-size':7.5,fill:'#4a3520',opacity:.55,
+  'letter-spacing':'.14em','font-family':'ui-serif,Georgia,serif'});
+mn.textContent='HIC SVNT DRACONES';mon.appendChild(mn);
+svg.appendChild(mon);
+/* ---------- controls ---------- */
+function reink(){
+  var o=1-fade/140;
+  inkLayer.setAttribute('opacity','1');
+  [].slice.call(inkLayer.childNodes).forEach(function(el){
+    if(el.dataset.k===undefined)return;
+    el.setAttribute('stroke-width',(ink*0.4*(+el.dataset.k)).toFixed(1));
+    el.setAttribute('opacity',(o*(+el.dataset.o)).toFixed(2));
+  });
+  /* the rose keeps its own weight, but fades with the sheet */
+  rose.setAttribute('opacity',Math.min(1,o*1.25).toFixed(2));
+  rhumbLayer.setAttribute('opacity',Math.min(1,o*1.3).toFixed(2));
+  document.getElementById('rI').textContent=ink;
+}
+document.getElementById('ink').addEventListener('input',function(e){
+  ink=+e.target.value;reink();
+});
+document.getElementById('fade').addEventListener('input',function(e){
+  fade=+e.target.value;reink();
+});
+var routeBtn=document.getElementById('routeBtn');
+routeBtn.addEventListener('click',function(){
+  var on=routeLayer.style.display==='none';
+  routeLayer.style.display=on?'':'none';
+  routeBtn.textContent=on?'Chart the route':'Hide the route';
+  document.getElementById('rO').textContent=on?'dashed':'hidden';
+});
+var compassBtn=document.getElementById('compassBtn');
+compassBtn.addEventListener('click',function(){
+  var on=rose.style.display==='none';
+  rose.style.display=on?'':'none';rhumbLayer.style.display=on?'':'none';
+  compassBtn.textContent=on?'Draw the rose':'Hide the rose';
+  document.getElementById('rC').textContent=on?'rose':'hidden';
+});
+reink();
+})();
+</script>
+</body>
+</html>

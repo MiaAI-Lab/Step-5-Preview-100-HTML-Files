@@ -1,0 +1,82 @@
+# THE STUDY — four locks, one exit
+
+## Short title
+Escape Room
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a small, genuinely solvable
+escape room — one room drawn as SVG, three locks in a chain, an inventory, a notebook that
+records every action, and three hints. No external dependencies whatsoever — no CDN, no
+web fonts, no external images, no JS libraries. All CSS and JavaScript inline, works
+offline by double-clicking, responsive, valid HTML5.
+
+Artistic direction: a lamplit study. Ground #14100c, panels #1d1710, hairlines
+rgba(242,234,217,.14), body #f2ead9 with muted #a5957c, lamp-amber #e8b25c as the accent
+and a sage #8fc7a8 for system lines and the escaped state. Serif headings with italic
+accent words, uppercase .2em–.4em kickers, monospace figures.
+
+The room is one SVG on a 980 × 520 viewBox: a wall, a floor with skirting and plank lines,
+a door with a brass escutcheon, a clock stopped at 9:15, a desk with a blotter over a note,
+a desk drawer, a bookshelf with twelve book spines, a wax-sealed envelope and a framed
+photograph of a dog. Every object is a group with a transparent hover outline, so the
+whole room is clickable and the hover state shows what is live.
+
+The chain: the sealed envelope and the dog photograph are red herrings and say so. The note
+under the blotter says to read the clock backwards; the clock says 9:15; backwards that is
+5109, which is the safe code. The drawer sticks until you find the paperclip behind a book
+on the shelf, and the safe dial lives inside the drawer. Entering the code yields a brass
+key, and the brass key opens the door. Three locks, and every step is stated in the
+notebook.
+
+The notebook appends a line for every action, including failed ones and red herrings, and
+keeps the last nine. The keypad is a real twelve-button pad with digits, a clear and an
+enter, and it only appears once the drawer is open. The hint button walks three hints in
+order and records how many have been taken.
+
+Readout: elapsed time since the page opened, locks open out of three, what you are
+carrying, the status, and hints used. Escaping adds a green ring to the room.
+
+Layout: nav, centred hero, the room with its tip line, a two-column dock of notebook and
+side panels, a readout row, then two three-cell note rows on clues, red herrings, the exit,
+the notebook, hints and state, then a footer. One column under 900px, links hidden under
+780px.
+
+Interaction: click around. Read the clock, lift the blotter, find the paperclip, open the
+drawer, enter 5109, take the key, open the door. Failures are as informative as successes
+and everything you do is written down, and there are three hints if you want them.
+
+## One-paragraph description of the intended design
+A playable escape room in one SVG — a wall, a floor, a locked door, a clock stopped at 9:15,
+a desk with a note under the blotter, a sticking drawer, a bookshelf with twelve spines, a
+sealed envelope and a framed dog, all clickable with hover outlines — where the note says
+to read the clock backwards, 9:15 backwards is the safe code, the paperclip hidden in the
+shelf opens the drawer that hides the safe, the safe yields a brass key, and the key opens
+the door, with a notebook that records every action, a real twelve-button keypad and three
+recorded hints.
+
+## Major visual techniques used
+- One SVG room built at load from small object builders, each with a transparent hover
+  outline so live regions are discoverable
+- Clock hands drawn at the real angles for 9:15 rather than an arbitrary picture
+- Book spines as a repeating row with a rotating palette, so the shelf reads as a shelf
+- Red herrings given real, clickable, fully drawn bodies that respond honestly
+- Notebook as a capped log that keeps the last nine lines, one per action including
+  failures, so state is never silent
+- Keypad as a twelve-button pad that only appears once the drawer is open, which is the
+  room's progression made visible
+- Entry display as dashes until digits arrive, so the safe reads as a safe
+- Inventory slots as fixed dashes that become solid bordered cells when filled, so what
+  you are carrying is always visible
+- Locks counted once, in one place, from the three booleans that drive everything
+- Escape as a class on the room that adds a green ring, rather than a separate screen
+- All state in one object that every drawing decision reads from, so the room cannot
+  disagree with the panel
+- Elapsed time from a single timestamp, not an accumulator, so a backgrounded tab cannot
+  drift
+
+## Intended interaction model
+A room to search. Visitors click objects to read them, lift the blotter, take the note,
+find the clip behind a book, pick the drawer, enter the code the clock gives backwards,
+take the key and open the door — and can ask for one of three hints, which are recorded.
+Every action writes a line in the notebook, including the ones that do nothing.

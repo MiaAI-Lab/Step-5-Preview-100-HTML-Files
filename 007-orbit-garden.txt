@@ -1,0 +1,76 @@
+# ORBIT GARDEN — Plant a Body
+
+## Short title
+Orbit Garden
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: an interactive n-body
+gravity sandbox called ORBIT GARDEN. No external dependencies whatsoever — no CDN,
+no web fonts, no external images, no external SVG files, no JavaScript libraries.
+All CSS and JavaScript inline, works offline by double-clicking the file, responsive,
+valid HTML5.
+
+Artistic direction: a quiet, luminous instrument for playing with gravity. Deep
+void background (#04040c → #0b0a1e) painted once into an offscreen canvas, with
+two large soft nebula washes (violet top-left, teal bottom-right) and a sparse
+star field of varying alpha. A warm amber star pulses at the centre with a
+nine-times-radius radial glow. Bodies are little glossy spheres — radial gradients
+offset toward a light source, with an HSL hue each and a thin luminous halo ring —
+and they leave long comet trails: one soft full-length polyline stroke plus a
+brighter short head stroke, both in their own hue.
+
+Physics: a real pairwise n-body integrator. Every body is accelerated by every
+other body and by the central star using G·m/r², positions and velocities are
+integrated once per frame, bodies that touch merge (conserving momentum and mass,
+growing in radius as the cube root of mass), and bodies that fly far off-screen are
+culled. Seeding drops three to five planets at increasing radii with near-circular
+initial velocities.
+
+Layout: a full-bleed canvas with a floating glass control panel pinned to the
+bottom centre, a typographic HUD top-left (a light-weight 200 sans with one
+gradient-clipped word), and a large monospace body count top-right.
+
+Typography: one system sans used at weight 200 for the display line against 9px
+wide-tracked monospace for every label, value and count — the contrast of a huge
+low-contrast headline with tiny mechanical type is the whole typographic idea.
+
+Interaction: press anywhere and drag. While dragging a dashed amber aim line with
+an arrowhead shows the impulse you are about to impart — length equals speed,
+direction equals heading — and a dot marks the release point. Let go and a body is
+born with that velocity; too slow and it spirals into the star, just right and it
+settles into an ellipse, too fast and it escapes forever. Sliders set the new
+body's mass (0.1–4.0), the gravitational constant (0.10–2.60) and the trail
+length in samples. "Seed a system" clears and plants a fresh stable arrangement;
+"Clear" empties the sky. All input is pointer-based with pointer capture, so it
+works identically with touch and mouse. The canvas is DPR-aware and the background
+is repainted on resize.
+
+## One-paragraph description of the intended design
+A dark, glowing gravity toy: a pulsing amber star at the centre of a nebula-washed
+void, into which the visitor flings glossy, hue-coded planets that trace long
+comet tails, merge on contact and obey a real pairwise n-body integration —
+controlled by a single floating glass tray with three sliders and two buttons.
+
+## Major visual techniques used
+- Offscreen background canvas painted once (gradient + nebula washes + star field)
+  and blitted each frame for a cheap, stable backdrop
+- Pairwise n-body gravity with momentum-conserving merges and cube-root radius
+  from mass
+- Comet trails from a flat coordinate array, drawn as one soft full-length stroke
+  plus a brighter short head stroke
+- Glossy spheres from offset radial gradients plus a thin halo ring
+- Nine-times-radius radial star glow with a low-frequency pulse
+- Dashed aim line with a rotated triangular arrowhead showing the drag impulse
+- Floating glass control tray with backdrop-filter blur
+- Extreme typographic contrast: 200-weight display sans vs 9px tracked monospace
+- Gradient-clipped single word inside a light headline (background-clip:text)
+- Pointer events with setPointerCapture for unified mouse/touch dragging
+- DPR-aware canvas sizing with debounced resize rebuild
+
+## Intended interaction model
+A physics toy with a single gesture. The visitor presses, drags to aim, and
+releases to launch; the aim line makes the consequence visible before committing.
+Sliders change the rules for the next launch, and the two buttons offer a preset
+system or an empty sky. Nothing else competes for attention — the page is a
+sandbox that keeps running on its own once seeded.

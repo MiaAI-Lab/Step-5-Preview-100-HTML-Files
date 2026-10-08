@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Bolt — cloth that has a grain</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:#f4f0ea;color:#2b2732;
+  font:15px/1.62 ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+.serif{font-family:ui-serif,Georgia,"Times New Roman",serif}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.wrap{width:min(1120px,92vw);margin:0 auto}
+nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0 14px;
+  border-bottom:1px solid rgba(43,39,50,.18)}
+nav .brand{font-family:ui-serif,Georgia,serif;font-size:19px}
+nav .brand i{font-style:italic;color:#7a4a8c}
+nav ul{display:flex;gap:26px;list-style:none;margin:0;padding:0;font-size:11px;
+  letter-spacing:.24em;text-transform:uppercase;color:#857d8f}
+nav a{color:inherit;text-decoration:none}nav a:hover{color:#7a4a8c}
+@media(max-width:780px){nav ul{display:none}}
+header.hero{padding:54px 0 26px;text-align:center}
+header.hero .kicker{font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:#7a4a8c;
+  margin:0 0 14px}
+header.hero h1{font-family:ui-serif,Georgia,serif;font-weight:400;
+  font-size:clamp(32px,5.6vw,64px);line-height:1.05;margin:0 0 16px}
+header.hero h1 em{font-style:italic;color:#c2894a}
+header.hero p{max-width:60ch;margin:0 auto;color:#6c6474}
+.cloth{position:relative;border:1px solid rgba(43,39,50,.16);border-radius:16px;
+  overflow:hidden;background:#e8e2dc;margin-bottom:18px}
+.cloth canvas{display:block;width:100%;height:auto;touch-action:none;cursor:crosshair}
+.cloth .cap{position:absolute;left:14px;top:12px;font-size:10px;letter-spacing:.26em;
+  text-transform:uppercase;color:rgba(43,39,50,.45);pointer-events:none}
+.dock{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;justify-content:space-between;
+  border-top:1px solid rgba(43,39,50,.18);border-bottom:1px solid rgba(43,39,50,.18);
+  padding:16px 0;margin-bottom:32px}
+.dock label{display:grid;gap:7px;font-size:10px;letter-spacing:.26em;text-transform:uppercase;
+  color:#857d8f;min-width:150px}
+input[type=range]{width:100%;accent-color:#7a4a8c}
+.btn{background:#7a4a8c;color:#f7f2fb;border:0;border-radius:8px;padding:11px 15px;
+  font:inherit;font-size:12px;font-weight:700;letter-spacing:.08em;cursor:pointer;margin:0 6px 6px 0}
+.btn.ghost{background:transparent;color:#2b2732;border:1px solid rgba(43,39,50,.3)}
+.btn:hover{filter:brightness(1.07)}
+.weaves{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.weaves button{background:#fff;border:1px solid rgba(43,39,50,.25);border-radius:999px;
+  padding:8px 14px;font:inherit;font-size:12px;color:#2b2732;cursor:pointer}
+.weaves button[aria-pressed="true"]{background:#7a4a8c;border-color:#7a4a8c;color:#f7f2fb}
+.readout{display:flex;flex-wrap:wrap;gap:12px 26px;margin-bottom:40px;
+  border-top:1px solid rgba(43,39,50,.18);padding-top:16px}
+.readout div{min-width:86px}
+.readout dt{font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:#857d8f;margin:0 0 4px}
+.readout dd{margin:0;font-size:20px;font-family:ui-monospace,Menlo,monospace;color:#7a4a8c}
+.cells{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-bottom:46px}
+@media(max-width:820px){.cells{grid-template-columns:1fr}}
+.cell{border-top:1px solid rgba(43,39,50,.2);padding-top:16px}
+.cell .fig{font-family:ui-serif,Georgia,serif;font-size:38px;color:#c2894a;line-height:1;margin-bottom:8px}
+.cell h3{font-family:ui-serif,Georgia,serif;font-weight:400;font-style:italic;font-size:21px;margin:0 0 8px}
+.cell p{margin:0;color:#6c6474;font-size:14px}
+footer{border-top:1px solid rgba(43,39,50,.18);padding:22px 0 54px;display:flex;
+  justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:11px;letter-spacing:.2em;
+  text-transform:uppercase;color:#857d8f}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="brand">The <i>Bolt</i></div>
+    <ul>
+      <li><a href="#cloth">Bolt</a></li>
+      <li><a href="#dock">Weave</a></li>
+      <li><a href="#notes">Notes</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <p class="kicker">Warp · weft · right and wrong side</p>
+    <h1 class="serif">Cloth has a <em>grain</em>,<br>and it shows</h1>
+    <p>A weave is not a texture, it is two families of yarn crossing on a fixed rule. Change
+       the rule and the same dyed yarn becomes poplin, becomes twill, becomes satin — and
+       catches the light on a completely different axis.</p>
+  </header>
+
+  <section class="cloth" id="cloth">
+    <canvas id="c" width="1000" height="620"></canvas>
+    <p class="cap">warp runs down the bolt · drag to see it catch the light</p>
+  </section>
+
+  <section class="dock" id="dock">
+    <div>
+      <div class="weaves" id="weaves"></div>
+      <div class="weaves" id="colours"></div>
+    </div>
+    <label for="density">Thread count <input id="density" type="range" min="4" max="40" value="16"></label>
+    <label for="slub">Yarn slub <input id="slub" type="range" min="0" max="100" value="22"></label>
+    <label for="sheen">Sheen <input id="sheen" type="range" min="0" max="100" value="58"></label>
+    <div>
+      <button class="btn" id="fold">Fold the bolt</button>
+      <button class="btn ghost" id="drape">Drape it</button>
+    </div>
+  </section>
+
+  <dl class="readout">
+    <div><dt>Weave</dt><dd id="rW">plain</dd></div>
+    <div><dt>Threads</dt><dd id="rT">—</dd></div>
+    <div><dt>Bias</dt><dd id="rB">—</dd></div>
+    <div><dt>Floats</dt><dd id="rF">—</dd></div>
+    <div><dt>Hand</dt><dd id="rH">—</dd></div>
+    <div><dt>Shade</dt><dd id="rC">indigo</dd></div>
+  </dl>
+
+  <section class="cells">
+    <div class="cell">
+      <div class="fig serif">i</div>
+      <h3>Plain weave</h3>
+      <p>One over, one under, both ways. The simplest interlacing there is, and the reason
+         it is the strongest and the dullest: no yarn floats long enough to catch a
+         highlight, so the surface stays matte.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">ii</div>
+      <h3>Twill</h3>
+      <p>One over two, shifted one thread each row, gives a diagonal ridge. The floats lie
+         in one direction and the light follows them, which is why denim fades along its
+         own grain.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">iii</div>
+      <h3>Satin</h3>
+      <p>Four or more over, one under, with the tie points scattered so nothing lines up.
+         The long floats are what make the gloss, and they are also why it snags.</p>
+    </div>
+  </section>
+
+  <section class="cells" id="notes">
+    <div class="cell">
+      <div class="fig serif">iv</div>
+      <h3>The bolt</h3>
+      <p>Thread count is how many threads fit in a square inch. Low is a cheesecloth and high
+         is a handkerchief, and this bolt goes from 24 to 480.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">v</div>
+      <h3>Slub</h3>
+      <p>Real yarn is not a tube. Random thick and thin sections along each thread are the
+         irregularity that makes linen look like linen and cotton look like cotton.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">vi</div>
+      <h3>The fold</h3>
+      <p>Fold the bolt and a cast shadow crosses the cloth; drape it and the whole sheet
+         takes a slow wave. Both are the same picture with the geometry changed.</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>The Bolt · one canvas, no files</span>
+    <span class="mono">plain · twill · satin · basket</span>
+  </footer>
+</div>
+<script>
+(function(){
+"use strict";
+var cv=document.getElementById('c'),ctx=cv.getContext('2d');
+var W=cv.width,H=cv.height;
+var density=16,slub=22,sheen=58,weave=0,drape=0,fold=0,t=0;
+var WEAVES=[
+ {n:'plain',over:1,under:1,shift:0,floats:1},
+ {n:'twill',over:1,under:2,shift:1,floats:3},
+ {n:'satin',over:4,under:1,shift:2,floats:5},
+ {n:'basket',over:2,under:2,shift:2,floats:2},
+ {n:'ribbed',over:1,under:3,shift:0,floats:4}
+];
+var DYES=[
+ {n:'indigo',a:'#3a5a9c',b:'#1e3260'},
+ {n:'madder',a:'#b0422f',b:'#6d2218'},
+ {n:'weld yellow',a:'#d8b23c',b:'#9c7a18'},
+ {n:'walnut',a:'#6b4a2c',b:'#3a2616'},
+ {n:'charcoal',a:'#4a4a52',b:'#22242a'},
+ {n:'raw silk',a:'#e8d8b8',b:'#b89a68'}
+];
+var dye=DYES[0];
+function mix(a,b,k){
+  var A=[parseInt(a.slice(1,3),16),parseInt(a.slice(3,5),16),parseInt(a.slice(5,7),16)];
+  var B=[parseInt(b.slice(1,3),16),parseInt(b.slice(3,5),16),parseInt(b.slice(5,7),16)];
+  return 'rgb('+Math.round(A[0]+(B[0]-A[0])*k)+','+Math.round(A[1]+(B[1]-A[1])*k)+
+    ','+Math.round(A[2]+(B[2]-A[2])*k)+')';
+}
+/* which yarn is on top at a crossing: the interlacing rule for this weave */
+function overAt(i,j,w){
+  /* a unit cell of over+under threads, shifted by the weave's shift each row */
+  var period=w.over+w.under;
+  var p=(i+w.shift*j)%period;
+  return p<w.over;
+}
+/* the bolt: one pass per warp thread, one per weft thread */
+function draw(){
+  /* the base dye, darkened slightly so the crossings can lift off it */
+  ctx.fillStyle=dye.b;
+  ctx.fillRect(0,0,W,H);
+  var n=Math.max(6,Math.round(density*2));
+  var cw=W/n, ch=H/Math.max(4,Math.round(n*0.62));
+  var wv=WEAVES[weave];
+  /* the light direction, which the pointer moves */
+  var lx=lightX, ly=lightY;
+  var i,j;
+  for(j=0;j<Math.ceil(H/ch);j++){
+    for(i=0;i<n;i++){
+      var x=i*cw,y=j*ch;
+      var over=overAt(i,j,wv);
+      /* each thread has its own slub: thick and thin along its length */
+      var phase=(i*7.3+j*3.1);
+      var thick=1+Math.sin(phase+ (over?y:x)*0.06)*(slub/160);
+      /* the shading: a thread on top catches the light and casts a shadow under it */
+      var bend=(x/W-lx)*0.7+(y/H-ly)*0.5;
+      var lit=over?(0.5+bend*0.9):(0.16-bend*0.2);
+      lit=Math.max(-0.4,Math.min(1.2,lit));
+      /* a yarn highlight along the thread's own axis */
+      var along=over?Math.sin((y)*0.4+i)*0.12:Math.sin((x)*0.4+j)*0.12;
+      var col=lit>0?mix(dye.b,dye.a,0.25+lit*0.75):mix(dye.b,'#000000',-lit*0.6);
+      ctx.fillStyle=col;
+      /* the thread as a rounded band along its axis */
+      if(over){
+        var hh=ch*0.72*thick;
+        ctx.fillRect(x,y+ (ch-hh)/2, cw*0.98, hh);
+        /* the highlight, a lighter line down the middle */
+        ctx.fillStyle=mix(col,'#ffffff',0.22+along+sheen/400);
+        ctx.fillRect(x+cw*0.16,y+(ch-hh)/2+hh*0.32,cw*0.68,Math.max(1,hh*0.22));
+      }else{
+        var ww=cw*0.72*thick;
+        ctx.fillRect(x+(cw-ww)/2,y,ww,ch*0.98);
+        ctx.fillStyle=mix(col,'#000000',0.25);
+        ctx.fillRect(x+(cw-ww)/2,y+ch*0.1,ww,ch*0.16);
+      }
+    }
+  }
+  /* the drape: a slow wave across the whole sheet, drawn as light bands */
+  if(drape>0){
+    for(var b=0;b<3;b++){
+      var g=ctx.createLinearGradient(0,0,W,H);
+      g.addColorStop(0,'rgba(0,0,0,0)');
+      g.addColorStop(0.5,'rgba(0,0,0,'+(drape*0.10)+')');
+      g.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=g;
+      ctx.fillRect(0,b*H/3,W,H/3);
+    }
+    /* the folds themselves: soft diagonal shading */
+    ctx.globalCompositeOperation='multiply';
+    for(var f=0;f<5;f++){
+      var fx=W*(f/5)+Math.sin(t*0.3+f)*40;
+      var fg=ctx.createLinearGradient(fx,0,fx+60,0);
+      fg.addColorStop(0,'rgba(0,0,0,'+(drape*0.22)+')');
+      fg.addColorStop(0.5,'rgba(255,255,255,'+(drape*0.10)+')');
+      fg.addColorStop(1,'rgba(0,0,0,'+(drape*0.22)+')');
+      ctx.fillStyle=fg;
+      ctx.fillRect(fx-20,0,90,H);
+    }
+    ctx.globalCompositeOperation='source-over';
+  }
+  /* the fold: one cast shadow across the bolt */
+  if(fold>0){
+    var cx=W*0.5+Math.sin(t*0.2)*W*0.1;
+    var sg=ctx.createLinearGradient(cx-70,0,cx+70,0);
+    sg.addColorStop(0,'rgba(0,0,0,'+(fold*0.30)+')');
+    sg.addColorStop(0.5,'rgba(255,255,255,'+(fold*0.14)+')');
+    sg.addColorStop(1,'rgba(0,0,0,'+(fold*0.30)+')');
+    ctx.fillStyle=sg;
+    ctx.fillRect(cx-70,0,140,H);
+  }
+  /* the selvedge: a woven edge down both sides */
+  ctx.fillStyle=dye.a;ctx.globalAlpha=0.5;
+  ctx.fillRect(0,0,6,H);ctx.fillRect(W-6,0,6,H);
+  ctx.globalAlpha=1;
+}
+
+/* ---------- controls, readout ---------- */
+var wbox=document.getElementById('weaves');
+WEAVES.forEach(function(w,i){
+  var b=document.createElement('button');
+  b.textContent=w.n;
+  b.setAttribute('aria-pressed',String(i===0));
+  b.addEventListener('click',function(){
+    weave=i;
+    [].slice.call(wbox.children).forEach(function(o){
+      o.setAttribute('aria-pressed',String(o===b));});
+  });
+  wbox.appendChild(b);
+});
+var cbox=document.getElementById('colours');
+DYES.forEach(function(d,i){
+  var b=document.createElement('button');
+  b.textContent=d.n;
+  b.setAttribute('aria-pressed',String(i===0));
+  b.addEventListener('click',function(){
+    dye=d;
+    [].slice.call(cbox.children).forEach(function(o){
+      o.setAttribute('aria-pressed',String(o===b));});
+    document.getElementById('rC').textContent=d.n;
+  });
+  cbox.appendChild(b);
+});
+function bind(id,fn){var el=document.getElementById(id);
+  el.addEventListener('input',function(){fn(+el.value);});}
+bind('density',function(v){density=v;});
+bind('slub',function(v){slub=v;});
+bind('sheen',function(v){sheen=v;});
+var foldBtn=document.getElementById('fold');
+var foldOn=false,drapeBtn=document.getElementById('drape'),drapeOn=false;
+foldBtn.addEventListener('click',function(){
+  foldOn=!foldOn;fold=foldOn?1:0;
+  foldBtn.textContent=foldOn?'Unfold the bolt':'Fold the bolt';
+});
+drapeBtn.addEventListener('click',function(){
+  drapeOn=!drapeOn;drape=drapeOn?1:0;
+  drapeBtn.textContent=drapeOn?'Smooth it out':'Drape it';
+});
+/* the light follows the pointer, so the bolt catches as you move across it */
+cv.addEventListener('pointermove',function(e){
+  var r=cv.getBoundingClientRect();
+  var x=(e.clientX-r.left)/r.width, y=(e.clientY-r.top)/r.height;
+  /* stored as a target the light eases toward */
+  targetLx=x;targetLy=y;
+});
+var lightX=0.5,lightY=0.5,targetLx=0.5,targetLy=0.5;
+function readout(){
+  var wv=WEAVES[weave];
+  document.getElementById('rW').textContent=wv.n;
+  document.getElementById('rT').textContent=(density*12*12+18)+' tpi';
+  document.getElementById('rB').textContent=wv.shift?Math.round(Math.atan(wv.shift)*57.3)+'°':'none';
+  document.getElementById('rF').textContent=wv.floats+' yarns';
+  document.getElementById('rH').textContent=
+    wv.floats>=5?'slippery, glossy':wv.floats>=3?'soft, drapes':wv.n==='basket'?'crisp, stable':'firm, matte';
+}
+/* ---------- loop ---------- */
+var last=0;
+function loop(ts){
+  var dt=last?Math.min(.05,(ts-last)/1000):0;last=ts;
+  t+=dt;
+  /* the light eases toward the pointer */
+  lightX+=(targetLx-lightX)*dt*2;
+  lightY+=(targetLy-lightY)*dt*2;
+  requestAnimationFrame(loop);
+}
+draw();readout();
+setInterval(function(){draw();},1000/12);
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

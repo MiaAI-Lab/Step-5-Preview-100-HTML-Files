@@ -1,0 +1,88 @@
+# SUCRÉ — The Cake Builder
+
+## Short title
+Cake Builder Shop
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a patisserie site whose
+centrepiece is a working cake builder, called SUCRÉ. No external dependencies
+whatsoever — no CDN, no web fonts, no external images, no external SVG files, no
+JavaScript libraries. All CSS and JavaScript inline, works offline by
+double-clicking, responsive, valid HTML5.
+
+Artistic direction: soft modern confectionery. Warm cream #fff6f0 ground with two
+large pale radial tints (pink top-left, mint bottom-right) baked into the body
+background, ink-plum text #4a2b38, and a palette of pink #ff7aa8, butter #ffd166
+and mint #5fd6b4. Everything is round: 999px pills, 12–22px radii, circular
+swatches, a circular stage. Typography is a geometric humanist stack (Avenir Next →
+Futura → Century Gothic → system) set tight at 700 weight for display and 600
+uppercase for labels, with a monospace used only for prices and metadata.
+
+The cake itself is built in the DOM from divs. Each tier is a rounded rectangle with
+a vertical two-stop gradient (frosting colour over sponge colour), inset shadows
+both above (white, for the top highlight) and below (brown, for the base shadow),
+plus a soft drop shadow. Tiers stack from the bottom up with a −6px overlap so they
+read as one cake, each tier 5% narrower than the one below it. A wide elliptical
+"plate" sits under the whole stack. Candles are absolutely positioned 6px bars
+topped with a flame — a teardrop made from an asymmetric border-radius with a white
+centre radial gradient, flickering on a 0.28s alternate loop. Tier heights animate
+in with an overshooting cubic-bezier(.34,1.4,.5,1) so the cake visibly grows.
+
+The builder: six sponges (vanilla bean, dark chocolate, pistachio, raspberry rose,
+lemon poppy, Earl grey) and six frostings (Swiss buttercream, cream cheese,
+ganache, pistachio cream, raspberry curd, honey mascarpone), each with a colour and
+a price, chosen from circular swatches. Tier count is a five-step segmented control
+(1–5 layers) and candle count is another (none, 1, 3, 5, a whole pack). Every choice
+rebuilds the cake and recomputes a line-itemised receipt — sponge + frosting +
+tiers + candles + a fixed $6 box and ribbon — with the total in large tabular
+figures.
+
+Layout: a nav with a gradient-sphere logo, three links and a cart pill. A hero split
+between a headline (one word carrying a pink→butter→mint gradient clipped to the
+text) and the cake stage inside a soft white circular glow. The builder section is a
+two-column split: the four decision rows on the left, the white receipt card on the
+right. Then a "counter today" menu grid of six pastries as white cards with colour
+chips and prices that lift on hover, and a dark plum call-to-action block. Finally a
+ruled monospace footer.
+
+Interaction: choosing a sponge or frosting recolours every tier's gradient and
+updates the label; changing tier count adds or removes tiers and animates their
+heights; choosing candles adds or removes flames. The receipt recomputes on every
+change. "Surprise me" randomises all four decisions and re-syncs every control's
+selected state. "Start building" smooth-scrolls to the builder. "Add to order"
+increments the cart, which flashes mint and settles. Clicking a menu card also adds
+to the order. "Find the shop" confirms in place. The hero and builder collapse to
+one column under 880px.
+
+## One-paragraph description of the intended design
+A soft, round, cream-and-pink patisserie with a cake that genuinely builds itself
+in the DOM: pick from six sponges and six frostings, stack one to five tiers and
+spark anything from none to a whole pack of candles, and the tiered cake on the
+hero stage regrows, re-colours and re-prices itself line by line.
+
+## Major visual techniques used
+- DOM-built tiered cake: stacked rounded rectangles with two-stop gradient fills,
+  paired inset shadows (white above, brown below) and soft drop shadows
+- Tapered tiers at −5% width each and −6px overlap for a single solid silhouette
+- Elliptical plate from a 50% border-radius and a linear gradient
+- Flickering candle flames from asymmetric border-radius teardrops with a white
+  centre radial gradient, animated on a 0.28s alternate cycle
+- Overshoot easing (cubic-bezier(.34,1.4,.5,1)) on tier height transitions
+- Gradient text clipped to one headline word across a three-stop pink→butter→mint
+  ramp
+- Circular stage glow from a multi-stop radial gradient
+- Circular colour swatches with a scaling ring focus state
+- Segmented step controls that invert to ink-plum when selected
+- Line-itemised receipt with dashed rules and a large tabular-figure total
+- Cart pill with a transient mint confirmation state
+- Circular radial tints baked into the page background
+- Two-column hero and builder collapsing to one under 880px
+
+## Intended interaction model
+A configurator with immediate visual and financial feedback. Visitors make four
+decisions — sponge, frosting, tiers, candles — and watch the cake and the receipt
+change together, then add it to an order that counts up in the cart. "Surprise me"
+provides a random complete configuration. Everything else on the page is a
+supporting shopfront: menu cards that also add to the order, and a visit block that
+confirms.

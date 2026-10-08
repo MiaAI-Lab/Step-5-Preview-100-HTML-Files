@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Golden Hour — the last twenty minutes</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:#1a0e0a;color:#f6e8dc;
+  font:15px/1.62 ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+.serif{font-family:ui-serif,Georgia,"Times New Roman",serif}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.wrap{width:min(1120px,92vw);margin:0 auto}
+nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0 14px;
+  border-bottom:1px solid rgba(246,232,220,.14)}
+nav .brand{font-family:ui-serif,Georgia,serif;font-size:19px}
+nav .brand i{font-style:italic;color:#ff9c3c}
+nav ul{display:flex;gap:26px;list-style:none;margin:0;padding:0;font-size:11px;
+  letter-spacing:.24em;text-transform:uppercase;color:#9c8878}
+nav a{color:inherit;text-decoration:none}nav a:hover{color:#ff9c3c}
+@media(max-width:780px){nav ul{display:none}}
+header.hero{padding:52px 0 22px;text-align:center}
+header.hero .kicker{font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:#ff9c3c;
+  margin:0 0 14px}
+header.hero h1{font-family:ui-serif,Georgia,serif;font-weight:400;
+  font-size:clamp(32px,5.6vw,62px);line-height:1.05;margin:0 0 16px}
+header.hero h1 em{font-style:italic;color:#e0543c}
+header.hero p{max-width:60ch;margin:0 auto;color:#9c8878}
+.canyon{position:relative;border:1px solid rgba(246,232,220,.16);border-radius:16px;
+  overflow:hidden;background:#0d0608;margin-bottom:18px}
+.canyon canvas{display:block;width:100%;height:auto;touch-action:none;cursor:crosshair}
+.canyon .cap{position:absolute;left:14px;top:12px;font-size:10px;letter-spacing:.26em;
+  text-transform:uppercase;color:rgba(246,232,220,.5);pointer-events:none}
+.dock{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;justify-content:space-between;
+  border-top:1px solid rgba(246,232,220,.14);border-bottom:1px solid rgba(246,232,220,.14);
+  padding:16px 0;margin-bottom:32px}
+.dock label{display:grid;gap:7px;font-size:10px;letter-spacing:.26em;text-transform:uppercase;
+  color:#9c8878;min-width:150px}
+input[type=range]{width:100%;accent-color:#ff9c3c}
+.btn{background:#ff9c3c;color:#2a1004;border:0;border-radius:8px;padding:11px 15px;
+  font:inherit;font-size:12px;font-weight:700;letter-spacing:.08em;cursor:pointer;margin:0 6px 6px 0}
+.btn.ghost{background:transparent;color:#f6e8dc;border:1px solid rgba(246,232,220,.24)}
+.btn:hover{filter:brightness(1.07)}
+.rock{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.rock button{background:#241410;border:1px solid rgba(246,232,220,.16);border-radius:999px;
+  padding:8px 14px;font:inherit;font-size:12px;color:#f6e8dc;cursor:pointer}
+.rock button[aria-pressed="true"]{background:#ff9c3c;border-color:#ff9c3c;color:#2a1004}
+.readout{display:flex;flex-wrap:wrap;gap:12px 24px;margin-bottom:40px;
+  border-top:1px solid rgba(246,232,220,.14);padding-top:16px}
+.readout div{min-width:86px}
+.readout dt{font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:#9c8878;margin:0 0 4px}
+.readout dd{margin:0;font-size:20px;font-family:ui-monospace,Menlo,monospace;color:#ff9c3c}
+.cells{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-bottom:46px}
+@media(max-width:820px){.cells{grid-template-columns:1fr}}
+.cell{border-top:1px solid rgba(246,232,220,.16);padding-top:16px}
+.cell .fig{font-family:ui-serif,Georgia,serif;font-size:38px;color:#e0543c;line-height:1;margin-bottom:8px}
+.cell h3{font-family:ui-serif,Georgia,serif;font-weight:400;font-style:italic;font-size:21px;margin:0 0 8px}
+.cell p{margin:0;color:#9c8878;font-size:14px}
+footer{border-top:1px solid rgba(246,232,220,.14);padding:22px 0 54px;display:flex;
+  justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:11px;letter-spacing:.2em;
+  text-transform:uppercase;color:#7d6858}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="brand">Golden <i>Hour</i></div>
+    <ul>
+      <li><a href="#canyon">Canyon</a></li>
+      <li><a href="#dock">Light</a></li>
+      <li><a href="#notes">Notes</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <p class="kicker">Red shift · long shadows · one point of light</p>
+    <h1 class="serif">The last twenty minutes<br>are worth the whole <em>day</em></h1>
+    <p>When the sun is a few degrees up, its light has a hundred times more air to climb
+       through than at noon, and the air takes the blue out of it. What reaches the canyon
+       wall is red, warm, and almost horizontal.</p>
+  </header>
+
+  <section class="canyon" id="canyon">
+    <canvas id="c" width="1000" height="540"></canvas>
+    <p class="cap">drag the sun · the walls re-light as it drops</p>
+  </section>
+
+  <section class="dock" id="dock">
+    <div>
+      <div class="rock" id="rock"></div>
+      <div class="rock" id="sky"></div>
+    </div>
+    <label for="sun">Sun altitude <input id="sun" type="range" min="0" max="60" value="6"></label>
+    <label for="dust">Atmospheric dust <input id="dust" type="range" min="0" max="100" value="40"></label>
+    <label for="haze">Haze <input id="haze" type="range" min="0" max="100" value="30"></label>
+    <div>
+      <button class="btn" id="set">Let it set</button>
+      <button class="btn ghost" id="noon">Back to noon</button>
+    </div>
+  </section>
+
+  <dl class="readout">
+    <div><dt>Sun altitude</dt><dd id="rA">—</dd></div>
+    <div><dt>Air mass</dt><dd id="rM">—</dd></div>
+    <div><dt>Colour temp</dt><dd id="rC">—</dd></div>
+    <div><dt>Shadow length</dt><dd id="rS">—</dd></div>
+    <div><dt>Wall lit</dt><dd id="rW">—</dd></div>
+    <div><dt>Phase</dt><dd id="rP">—</dd></div>
+  </dl>
+
+  <section class="cells">
+    <div class="cell">
+      <div class="fig serif">i</div>
+      <h3>Air mass</h3>
+      <p>One air mass is exactly the thickness of atmosphere the sun crosses at noon. At
+         six degrees it is nearly ten, and every extra mass takes more blue out of the
+         beam, so the light is redder the lower the sun sits.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">ii</div>
+      <h3>Colour temperature</h3>
+      <p>Noonlight is around 5,500 kelvin. Sunset is around 2,000. The gap is not a filter,
+         it is what the air did to the spectrum on the way through it.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">iii</div>
+      <h3>Shadows</h3>
+      <p>A six-degree sun casts a shadow almost ten times the height of the thing making
+         it. On a canyon wall that means the whole face goes dark except a few lit
+         terraces, which is why the last light is the flattering one.</p>
+    </div>
+  </section>
+
+  <section class="cells" id="notes">
+    <div class="cell">
+      <div class="fig serif">iv</div>
+      <h3>Long shadows</h3>
+      <p>Dust and haze lengthen the path and deepen the red, but they also cut the direct
+         light, so the walls flatten. The best canyon sunsets are the ones after a rain,
+         when there is colour without the haze.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">v</div>
+      <h3>Four rocks</h3>
+      <p>Navajo sandstone is pale and goes rose. Redwall limestone is grey and warms to
+         orange. Chinle shale is violet. Basalt stays dark all day and only glows at the
+         very end.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">vi</div>
+      <h3>Three skies</h3>
+      <p>Clear, high cloud and low cloud each change where the light comes from: clear is
+         one point, high cloud spreads it across a bright band, low cloud makes a red
+         underglow with no sun at all.</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>Golden Hour · one canvas, no files</span>
+    <span class="mono">5500 K → 2000 K · 1 am → 10 am</span>
+  </footer>
+</div>
+<script>
+(function(){
+"use strict";
+var cv=document.getElementById('c'),ctx=cv.getContext('2d');
+var W=cv.width,H=cv.height;
+var sunAlt=6,dust=40,haze=30,t=0;
+var ROCKS=[
+ {n:'navajo',mid:'#d8ac78',dark:'#a87c4c',lit:'#f0c090',glow:1.0},
+ {n:'redwall',mid:'#b07850',dark:'#8a5c3c',lit:'#d89060',glow:0.85},
+ {n:'chinle',mid:'#9c7a8c',dark:'#7a5c6c',lit:'#c098a8',glow:0.8},
+ {n:'basalt',mid:'#3c3836',dark:'#2a2624',lit:'#6a5c52',glow:0.5}
+];
+var rock=ROCKS[0];
+var SKIES=[
+ {n:'clear',band:0,under:0,ext:1.0},
+ {n:'high cloud',band:0.55,under:0.2,ext:1.15},
+ {n:'low cloud',band:0.1,under:0.6,ext:0.8}
+];
+var sky=SKIES[0];
+/* the physics: air mass, its colour temperature, and how long a shadow falls */
+function airMass(){
+  /* Kasten and Young's approximation, in air masses */
+  return 1/(Math.sin(sunAlt*Math.PI/180)+
+    0.50572*Math.pow(sunAlt+6.07995,-1.6364));
+}
+function colourTemp(){
+  /* the sun's spectrum reddens as it passes more air, deeped by dust */
+  var m=airMass();
+  var k=5500-Math.min(3500,m*180+dust*6);
+  return Math.max(1600,k);
+}
+function lightColour(){
+  var k=colourTemp();
+  /* a rough kelvin-to-rgb, which is good enough at this range */
+  var t2=k/100,r,g,b;
+  if(t2<=66){r=255;g=99.47*Math.log(t2)-161.12;}
+  else{r=329.7*Math.pow(t2-60,-0.133);g=288.12*Math.pow(t2-60,-0.0755);}
+  if(t2>=66)b=255;
+  else if(t2<=19)b=0;
+  else b=138.52*Math.log(t2-10)-305.04;
+  return [Math.max(0,Math.min(255,r)),Math.max(0,Math.min(255,g)),Math.max(0,Math.min(255,b))];
+}
+function shadowLen(){
+  return 1/Math.tan(sunAlt*Math.PI/180+0.0001);
+}
+/* ---------- the canyon: three walls of strata ---------- */
+var strata=[];
+function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;
+  var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;
+  return((t^t>>>14)>>>0)/4294967296;};}
+var rnd=mulberry(724);
+var LAYERS=9;
+for(var i=0;i<LAYERS;i++){
+  strata.push({
+    y:H*0.28+i*H*0.078,
+    amp:H*0.05-(i*0.3)*H*0.004,
+    seed:rnd()*6.28
+  });
+}
+function wallY(i,x){
+  return strata[i].y+Math.sin(x*0.004+strata[i].seed)*strata[i].amp+
+    Math.sin(x*0.011+strata[i].seed*2)*strata[i].amp*0.4;
+}
+function draw(){
+  /* the sky: a gradient whose top is set by the light colour */
+  var lc=lightColour();
+  var k=sunAlt/60;
+  var top=[lc[0]*0.5,lc[1]*0.55,lc[2]*0.75];
+  var skyG=ctx.createLinearGradient(0,0,0,H*0.5);
+  skyG.addColorStop(0,'rgb('+Math.round(top[0])+','+Math.round(top[1])+','+Math.round(top[2])+')');
+  skyG.addColorStop(1,'rgb('+Math.round(lc[0]*0.9)+','+Math.round(lc[1]*0.8)+','+Math.round(lc[2]*0.6)+')');
+  ctx.fillStyle=skyG;ctx.fillRect(0,0,W,H*0.55);
+  /* haze: a wash near the horizon that lifts with the haze slider */
+  if(haze>0){
+    var hz=ctx.createLinearGradient(0,H*0.3,0,H*0.55);
+    hz.addColorStop(0,'rgba('+Math.round(lc[0])+','+Math.round(lc[1])+','+Math.round(lc[2])+',0)');
+    hz.addColorStop(1,'rgba('+Math.round(lc[0])+','+Math.round(lc[1])+','+Math.round(lc[2])+','+(haze/160)+')');
+    ctx.fillStyle=hz;ctx.fillRect(0,H*0.3,W,H*0.25);
+  }
+  /* the sun, low on the right */
+  var sx=W*0.78+ (60-sunAlt)*0.6, sy=H*0.5-sunAlt*3.4;
+  var sg=ctx.createRadialGradient(sx,sy,2,sx,sy,180);
+  sg.addColorStop(0,'rgba(255,250,230,.95)');
+  sg.addColorStop(0.08,'rgb('+Math.round(lc[0])+','+Math.round(lc[1])+','+Math.round(lc[2])+',.85)');
+  sg.addColorStop(1,'rgba('+Math.round(lc[0])+','+Math.round(lc[1])+','+Math.round(lc[2])+',0)');
+  ctx.fillStyle=sg;ctx.beginPath();ctx.arc(sx,sy,180,0,6.3);ctx.fill();
+  ctx.fillStyle='rgba(255,252,240,.95)';ctx.beginPath();ctx.arc(sx,sy,9,0,6.3);ctx.fill();
+  /* clouds */
+  if(sky.band>0){
+    ctx.fillStyle='rgb('+Math.round(lc[0]*0.9)+','+Math.round(lc[1]*0.85)+','+Math.round(lc[2]*0.8)+')';
+    for(var c=0;c<7;c++){
+      var cx2=(c*167+t*8)%W, cy2=H*0.14+Math.sin(c)*40;
+      ctx.globalAlpha=sky.band;
+      ctx.beginPath();ctx.ellipse(cx2,cy2,50+Math.sin(c*2)*20,10,0,0,6.3);ctx.fill();
+      ctx.beginPath();ctx.ellipse(cx2+30,cy2+6,36,8,0,0,6.3);ctx.fill();
+      ctx.globalAlpha=1;
+    }
+  }
+  if(sky.under>0){
+    var ug=ctx.createLinearGradient(0,H*0.42,0,H*0.56);
+    ug.addColorStop(0,'rgba('+Math.round(lc[0])+','+Math.round(lc[1])+','+Math.round(lc[2])+',0)');
+    ug.addColorStop(1,'rgba('+Math.round(lc[0]*0.8)+','+Math.round(lc[1]*0.35)+','+Math.round(lc[2]*0.25)+','+sky.under+')');
+    ctx.fillStyle=ug;ctx.fillRect(0,H*0.42,W,H*0.14);
+  }
+  /* the canyon: far wall to near wall, each layer of strata lit by the sun */
+  for(var L=0;L<3;L++){
+    var depth=L/2;
+    for(var i=0;i<LAYERS;i++){
+      /* the lit and dark tones for this rock at this depth */
+      var lit=rock.lit,dark=rock.dark,mid=rock.mid;
+      /* the amount of light a face gets: the left wall faces the sun, the right is in
+         shadow, and the terraces catch it */
+      var faceLit=1-depth*0.45;
+      var shade=faceLit*rock.glow*(1-haze/260);
+      var col=mix3(lit,mid,dark,shade);
+      ctx.fillStyle=col;
+      ctx.beginPath();
+      ctx.moveTo(0,H);
+      for(var x=0;x<=W;x+=14){
+        ctx.lineTo(x,wallY(i,x)+ (L?L*40:0));
+      }
+      ctx.lineTo(W,H);ctx.closePath();ctx.fill();
+      /* the horizontal bedding lines */
+      ctx.strokeStyle='rgba(0,0,0,.12)';ctx.lineWidth=1;
+      ctx.beginPath();
+      for(var x2=0;x2<=W;x2+=14){
+        ctx.lineTo(x2,wallY(i,x2)+(L?L*40:0));
+      }
+      ctx.stroke();
+    }
+  }
+  /* the shadow: a left-to-right multiply band, deeper the lower the sun */
+  var sg2=ctx.createLinearGradient(0,0,W,0);
+  var shadowDepth=Math.min(0.72,0.15+(60-sunAlt)/60*0.6);
+  sg2.addColorStop(0,'rgba(255,255,255,1)');
+  sg2.addColorStop(0.62,'rgba(255,255,255,1)');
+  sg2.addColorStop(1,'rgba('+Math.round(255*(1-shadowDepth))+','+
+    Math.round(255*(1-shadowDepth))+','+Math.round(255*(1-shadowDepth))+',1)');
+  ctx.fillStyle=sg2;
+  ctx.fillRect(0,H*0.3,W,H*0.7);
+  ctx.restore();
+  /* the river at the bottom */
+  var rg=ctx.createLinearGradient(0,H*0.9,0,H);
+  rg.addColorStop(0,'rgba('+Math.round(lc[0]*0.4)+','+Math.round(lc[1]*0.4)+','+Math.round(lc[2]*0.45)+')');
+  rg.addColorStop(1,'rgba(20,16,20,1)');
+  ctx.fillStyle=rg;ctx.fillRect(0,H*0.9,W,H*0.1);
+  /* the sun's reflection on the water */
+  ctx.fillStyle='rgba('+Math.round(lc[0])+','+Math.round(lc[1])+','+Math.round(lc[2])+',.35)';
+  for(var r2=0;r2<14;r2++){
+    var rx=sx+(Math.random()-.5)*r2*6;
+    ctx.fillRect(rx-12,H*0.9+r2*4,24+r2*2,1.6);
+  }
+  /* the layer labels */
+  ctx.fillStyle='rgba(246,232,220,.5)';
+  ctx.font='9px ui-monospace,Menlo,monospace';
+  ctx.textAlign='left';ctx.textBaseline='top';
+  for(var l2=0;l2<4;l2++)ctx.fillText(['kaibab','toroweap','coconino','supai'][l2],12,H*0.34+l2*H*0.075);
+}
+function mix3(a,b,c,k){
+  var A=hex(a),B=hex(b),C=hex(c);
+  var r,g,bl;
+  if(k>0.66){var t=(k-0.66)/0.34;r=A[0]+(B[0]-A[0])*t;g=A[1]+(B[1]-A[1])*t;bl=A[2]+(B[2]-A[2])*t;}
+  else {var t2=k/0.66;r=B[0]+(C[0]-B[0])*t2;g=B[1]+(C[1]-B[1])*t2;bl=B[2]+(C[2]-B[2])*t2;}
+  return 'rgb('+Math.round(Math.max(0,Math.min(255,r)))+','+
+    Math.round(Math.max(0,Math.min(255,g)))+','+
+    Math.round(Math.max(0,Math.min(255,bl)))+')';
+}
+function hex(h){return[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];}
+
+/* ---------- controls, readout, loop ---------- */
+var rbox=document.getElementById('rock');
+ROCKS.forEach(function(r,i){
+  var b=document.createElement('button');
+  b.textContent=r.n;
+  b.setAttribute('aria-pressed',String(i===0));
+  b.addEventListener('click',function(){
+    rock=r;
+    [].slice.call(rbox.children).forEach(function(o){
+      o.setAttribute('aria-pressed',String(o===b));});
+  });
+  rbox.appendChild(b);
+});
+var skbox=document.getElementById('sky');
+SKIES.forEach(function(s,i){
+  var b=document.createElement('button');
+  b.textContent=s.n;
+  b.setAttribute('aria-pressed',String(i===0));
+  b.addEventListener('click',function(){
+    sky=s;
+    [].slice.call(skbox.children).forEach(function(o){
+      o.setAttribute('aria-pressed',String(o===b));});
+  });
+  skbox.appendChild(b);
+});
+function bind(id,fn){var el=document.getElementById(id);
+  el.addEventListener('input',function(){fn(+el.value);});}
+bind('sun',function(v){sunAlt=v;});
+bind('dust',function(v){dust=v;});
+bind('haze',function(v){haze=v;});
+var setting=false;
+document.getElementById('set').addEventListener('click',function(){
+  setting=!setting;
+  this.textContent=setting?'Hold it there':'Let it set';
+});
+document.getElementById('noon').addEventListener('click',function(){
+  sunAlt=60;setting=false;
+  document.getElementById('sun').value=60;
+  document.getElementById('set').textContent='Let it set';
+});
+/* dragging on the canvas moves the sun directly */
+var dragging=false;
+cv.addEventListener('pointerdown',function(e){
+  dragging=true;setting=false;
+  document.getElementById('set').textContent='Let it set';
+  var r=cv.getBoundingClientRect();
+  var y=(e.clientY-r.top)/r.height;
+  sunAlt=Math.max(0,Math.min(60,(0.5-y)*30));
+  document.getElementById('sun').value=sunAlt;
+});
+cv.addEventListener('pointermove',function(e){
+  if(!dragging)return;
+  var r=cv.getBoundingClientRect();
+  var y=(e.clientY-r.top)/r.height;
+  sunAlt=Math.max(0,Math.min(60,(0.5-y)*30));
+  document.getElementById('sun').value=sunAlt;
+});
+function endDrag(){dragging=false;}
+cv.addEventListener('pointerup',endDrag);
+cv.addEventListener('pointercancel',endDrag);
+function readout(){
+  document.getElementById('rA').textContent=sunAlt.toFixed(0)+'°';
+  document.getElementById('rM').textContent=airMass().toFixed(1)+' am';
+  document.getElementById('rC').textContent=colourTemp().toFixed(0)+' K';
+  document.getElementById('rS').textContent=shadowLen().toFixed(1)+'×';
+  /* how much of the canyon face is lit, from the shadow fraction */
+  var litFrac=Math.round(100/(1+shadowLen()*0.12));
+  document.getElementById('rW').textContent=litFrac+'%';
+  document.getElementById('rP').textContent=
+    sunAlt>18?'afternoon':sunAlt>10?'golden hour':sunAlt>3?'last light':'afterglow';
+}
+var last=0;
+function loop(ts){
+  var dt=last?Math.min(.05,(ts-last)/1000):0;last=ts;
+  t+=dt;
+  if(setting)sunAlt=Math.max(0,sunAlt-dt*1.6);
+  draw();readout();
+  requestAnimationFrame(loop);
+}
+draw();readout();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

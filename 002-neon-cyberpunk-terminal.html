@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NEO//TERM — Sector 7 Uplink</title>
+<style>
+  :root{
+    --bg:#07030f;
+    --bg2:#120428;
+    --cy:#22e8ff;
+    --mg:#ff2d95;
+    --yl:#ffe066;
+    --gr:#7dffb2;
+    --dim:rgba(190,225,255,.55);
+    --line:rgba(34,232,255,.22);
+    --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    background:var(--bg);color:#cfe9ff;font-family:var(--mono);
+    overflow:hidden;
+  }
+  #rain{position:fixed;inset:0;z-index:0;opacity:.42}
+  .bggrid{
+    position:fixed;inset:0;z-index:1;pointer-events:none;
+    background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+    background-size:64px 64px;
+    mask-image:radial-gradient(120% 100% at 50% 40%,#000 10%,transparent 78%);
+    -webkit-mask-image:radial-gradient(120% 100% at 50% 40%,#000 10%,transparent 78%);
+    opacity:.5;
+  }
+  .scan{
+    position:fixed;inset:0;z-index:6;pointer-events:none;
+    background:repeating-linear-gradient(180deg,rgba(0,0,0,.34) 0 1px,transparent 1px 3px);
+    mix-blend-mode:multiply;
+  }
+  .flick{
+    position:fixed;inset:0;z-index:7;pointer-events:none;
+    background:radial-gradient(120% 90% at 50% 50%,transparent 55%,rgba(0,0,0,.75));
+    animation:flick 5.5s infinite;
+  }
+  @keyframes flick{0%,100%{opacity:.9}47%{opacity:.9}48%{opacity:.62}49%{opacity:.92}71%{opacity:.8}72%{opacity:.95}}
+  .roll{
+    position:fixed;left:0;right:0;height:120px;z-index:8;pointer-events:none;
+    background:linear-gradient(180deg,transparent,rgba(34,232,255,.07),transparent);
+    animation:roll 7s linear infinite;
+  }
+  @keyframes roll{from{top:-140px}to{top:100%}}
+
+  .shell{position:relative;z-index:5;height:100%;display:grid;grid-template-rows:auto 1fr auto;max-width:1240px;margin:0 auto;padding:0 clamp(14px,3vw,32px)}
+
+  header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .logo{display:flex;align-items:center;gap:12px;font-size:13px;letter-spacing:.34em}
+  .logo b{color:var(--mg);text-shadow:0 0 14px var(--mg)}
+  .beacon{width:9px;height:9px;background:var(--gr);border-radius:50%;box-shadow:0 0 12px var(--gr);animation:bp 1.3s infinite}
+  @keyframes bp{0%,100%{opacity:1}50%{opacity:.15}}
+  .hmeta{display:flex;gap:18px;font-size:10.5px;letter-spacing:.22em;color:var(--dim);flex-wrap:wrap}
+  .hmeta span b{color:var(--cy);font-weight:400}
+
+  .stage{display:grid;grid-template-columns:1.45fr .95fr;gap:clamp(16px,3vw,40px);align-items:start;padding:clamp(18px,4vh,44px) 0;overflow:auto;min-height:0}
+
+  /* glitch title */
+  .glitch{
+    position:relative;font-size:clamp(34px,7.4vw,86px);line-height:.92;letter-spacing:-.04em;
+    color:#fff;margin:0 0 6px;font-weight:700;
+    text-shadow:0 0 24px rgba(34,232,255,.55);
+  }
+  .glitch::before,.glitch::after{
+    content:attr(data-t);position:absolute;left:0;top:0;width:100%;overflow:hidden;
+  }
+  .glitch::before{color:var(--mg);clip-path:inset(0 0 62% 0);animation:g1 3.4s infinite steps(2)}
+  .glitch::after{color:var(--cy);clip-path:inset(58% 0 0 0);animation:g2 2.7s infinite steps(2)}
+  @keyframes g1{0%,92%{transform:none;opacity:.9}93%{transform:translate(-5px,-2px)}96%{transform:translate(4px,1px)}100%{transform:none}}
+  @keyframes g2{0%,88%{transform:none;opacity:.9}89%{transform:translate(5px,2px)}94%{transform:translate(-4px,-1px)}100%{transform:none}}
+  .sub{font-size:11.5px;letter-spacing:.3em;color:var(--dim);margin:0 0 26px}
+  .sub em{color:var(--yl);font-style:normal}
+
+  .node{border:1px solid var(--line);background:linear-gradient(160deg,rgba(34,232,255,.08),rgba(255,45,149,.05));padding:18px 18px 14px;margin-bottom:14px;position:relative}
+  .node h3{margin:0 0 12px;font-size:10.5px;letter-spacing:.28em;color:var(--cy);font-weight:400;text-transform:uppercase}
+  .node h3 span{color:var(--mg)}
+  .corner{position:absolute;width:10px;height:10px;border:1px solid var(--mg)}
+  .c1{top:-1px;left:-1px;border-right:0;border-bottom:0}
+  .c2{top:-1px;right:-1px;border-left:0;border-bottom:0}
+  .c3{bottom:-1px;left:-1px;border-right:0;border-top:0}
+  .c4{bottom:-1px;right:-1px;border-left:0;border-top:0}
+
+  .bar{display:grid;grid-template-columns:96px 1fr 52px;gap:12px;align-items:center;font-size:10.5px;letter-spacing:.14em;margin-bottom:9px;color:var(--dim)}
+  .track{height:8px;background:rgba(255,255,255,.07);position:relative;overflow:hidden}
+  .fill{position:absolute;inset:0 auto 0 0;width:0;background:linear-gradient(90deg,var(--cy),var(--mg));box-shadow:0 0 14px rgba(255,45,149,.6);transition:width 1.1s cubic-bezier(.2,.8,.2,1)}
+  .fill.alt{background:linear-gradient(90deg,var(--yl),var(--gr))}
+  .val{text-align:right;color:#fff}
+
+  /* console */
+  .term{border:1px solid var(--line);background:rgba(4,10,20,.72);display:flex;flex-direction:column;min-height:0;box-shadow:0 0 60px -20px rgba(34,232,255,.35)}
+  .term-top{display:flex;justify-content:space-between;padding:9px 14px;border-bottom:1px solid var(--line);font-size:10px;letter-spacing:.24em;color:var(--dim)}
+  #log{flex:1;overflow:auto;padding:14px;font-size:12px;line-height:1.75;min-height:190px;max-height:44vh}
+  #log div{white-space:pre-wrap;word-break:break-word}
+  .ok{color:var(--gr)} .warn{color:var(--yl)} .bad{color:var(--mg)} .cy{color:var(--cy)} .dm{color:var(--dim)}
+  .prompt{color:var(--mg)}
+  form{display:flex;align-items:center;gap:8px;border-top:1px solid var(--line);padding:10px 14px}
+  form span{color:var(--mg);font-size:12px}
+  input{
+    flex:1;background:none;border:0;outline:0;color:#fff;font-family:var(--mono);font-size:12.5px;caret-color:var(--cy);
+  }
+  input::placeholder{color:rgba(190,225,255,.3)}
+  button.go{background:var(--mg);color:#0a0118;border:0;font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;padding:7px 14px;cursor:pointer;transition:box-shadow .25s,transform .2s}
+  button.go:hover{box-shadow:0 0 22px var(--mg);transform:translateY(-1px)}
+
+  footer{border-top:1px solid var(--line);padding:12px 0 16px;display:flex;justify-content:space-between;gap:14px;font-size:9.5px;letter-spacing:.24em;color:var(--dim);flex-wrap:wrap}
+  .marq{overflow:hidden;flex:1;min-width:0;position:relative;height:14px;mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
+  .marq div{position:absolute;left:0;top:0;white-space:nowrap;animation:marq 22s linear infinite;color:var(--cy)}
+  @keyframes marq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+  @media (max-width:860px){
+    .stage{grid-template-columns:1fr;overflow:visible}
+    #log{max-height:38vh}
+  }
+  @media (prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;transition-duration:.001ms!important}}
+</style>
+</head>
+<body>
+<canvas id="rain" aria-hidden="true"></canvas>
+<div class="bggrid" aria-hidden="true"></div>
+<div class="roll" aria-hidden="true"></div>
+<div class="scan" aria-hidden="true"></div>
+<div class="flick" aria-hidden="true"></div>
+
+<div class="shell">
+  <header>
+    <div class="logo"><span class="beacon"></span>NEO<b>//</b>TERM</div>
+    <div class="hmeta">
+      <span>NODE <b>SECTOR-07</b></span>
+      <span>PING <b id="ping">12ms</b></span>
+      <span>UPTIME <b id="up">00:00:00</b></span>
+      <span id="stamp">--:--:--</span>
+    </div>
+  </header>
+
+  <div class="stage">
+    <div>
+      <h1 class="glitch" data-t="WAKE UP">WAKE UP</h1>
+      <p class="sub">THE CITY HAS BEEN WAITING <em>/</em> UPLINK ESTABLISHED <em>/</em> DO NOT LOG OFF</p>
+
+      <div class="node">
+        <i class="corner c1"></i><i class="corner c2"></i><i class="corner c3"></i><i class="corner c4"></i>
+        <h3>Grid telemetry <span>// live</span></h3>
+        <div class="bar"><span>NEON BUS</span><div class="track"><div class="fill" data-w="82"></div></div><span class="val">82%</span></div>
+        <div class="bar"><span>ICE WALL</span><div class="track"><div class="fill" data-w="64"></div></div><span class="val">64%</span></div>
+        <div class="bar"><span>SUBNET</span><div class="track"><div class="fill alt" data-w="41"></div></div><span class="val">41%</span></div>
+        <div class="bar"><span>CRYO CELLS</span><div class="track"><div class="fill" data-w="93"></div></div><span class="val">93%</span></div>
+        <div class="bar"><span>TRACE RISK</span><div class="track"><div class="fill alt" data-w="17"></div></div><span class="val">17%</span></div>
+      </div>
+
+      <div class="node">
+        <i class="corner c1"></i><i class="corner c2"></i><i class="corner c3"></i><i class="corner c4"></i>
+        <h3>Tonight's broadcast <span>// 2099.10.07</span></h3>
+        <p style="margin:0;font-size:11.5px;line-height:1.85;color:var(--dim)">
+          Rain on the sixty-fourth floor. Three Arasaka couriers never made the
+          maglev. Your handler left a keycard in the pocket of a coat you have not
+          bought yet. <span style="color:var(--yl)">Type a command below.</span>
+        </p>
+      </div>
+    </div>
+
+    <div class="term">
+      <div class="term-top"><span>◆ SESSION / ENCRYPTED</span><span id="cursor">▌</span></div>
+      <div id="log" aria-live="polite"></div>
+      <form id="f" autocomplete="off">
+        <span>guest@sector7:~$</span>
+        <input id="cmd" placeholder="type help" aria-label="command">
+        <button class="go" type="submit">RUN</button>
+      </form>
+    </div>
+  </div>
+
+  <footer>
+    <span>© 2099 NEO//TERM RELAY</span>
+    <div class="marq"><div id="mq">SIGNAL LOST ✦ REBUILDING ✦ DO NOT LOG OFF ✦ THE CITY DREAMS IN NEON ✦ SECTOR 07 ✦ SEGFAULT IN THE RAIN ✦ SIGNAL LOST ✦ REBUILDING ✦ DO NOT LOG OFF ✦ THE CITY DREAMS IN NEON ✦ SECTOR 07 ✦ SEGFAULT IN THE RAIN ✦ </div></div>
+    <span>BUILD 7.0.4</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  /* ---------- digital rain ---------- */
+  var cv=document.getElementById('rain'),c=cv.getContext('2d'),W,H,DPR=Math.min(devicePixelRatio||1,2);
+  var glyphs='ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾎﾏﾐﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ0123456789NEO/TERM$#%&@'.split('');
+  var cols=[],fs=15;
+  function size(){
+    W=innerWidth;H=innerHeight;
+    cv.width=W*DPR;cv.height=H*DPR;cv.style.width=W+'px';cv.style.height=H+'px';
+    c.setTransform(DPR,0,0,DPR,0,0);
+    var n=Math.ceil(W/fs);cols=[];
+    for(var i=0;i<n;i++)cols.push({y:Math.random()*H/fs,s:0.4+Math.random()*0.9});
+  }
+  function rain(){
+    c.fillStyle='rgba(7,3,15,.16)';c.fillRect(0,0,W,H);
+    c.font=fs+'px monospace';c.textBaseline='top';
+    for(var i=0;i<cols.length;i++){
+      var col=cols[i];
+      var x=i*fs, y=col.y*fs;
+      c.fillStyle=Math.random()<0.03?'#fff':'#22e8ff';
+      c.globalAlpha=0.55;
+      c.fillText(glyphs[(Math.random()*glyphs.length)|0],x,y);
+      c.fillStyle='#ff2d95';c.globalAlpha=0.85;
+      c.fillText(glyphs[(Math.random()*glyphs.length)|0],x,y-fs);
+      c.globalAlpha=1;
+      col.y+=col.s;
+      if(col.y*fs>H+fs*6 && Math.random()>0.975) col.y=-Math.random()*40;
+    }
+    requestAnimationFrame(rain);
+  }
+  size();rain();
+  addEventListener('resize',function(){clearTimeout(window.__rt);window.__rt=setTimeout(size,140)});
+
+  /* ---------- bars ---------- */
+  setTimeout(function(){
+    document.querySelectorAll('.fill').forEach(function(f){f.style.width=f.dataset.w+'%'});
+  },260);
+  setInterval(function(){
+    document.querySelectorAll('.fill').forEach(function(f){
+      var base=+f.dataset.w, v=Math.max(6,Math.min(99,base+(Math.random()-.5)*22));
+      f.style.width=v.toFixed(0)+'%';
+      f.parentNode.parentNode.querySelector('.val').textContent=v.toFixed(0)+'%';
+    });
+  },2600);
+
+  /* ---------- clock / uptime ---------- */
+  var t0=Date.now();
+  function p(n){return (n<10?'0':'')+n}
+  setInterval(function(){
+    var d=new Date();
+    document.getElementById('stamp').textContent=p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds());
+    var s=Math.floor((Date.now()-t0)/1000);
+    document.getElementById('up').textContent=p(Math.floor(s/3600))+':'+p(Math.floor(s/60)%60)+':'+p(s%60);
+    document.getElementById('ping').textContent=(8+Math.floor(Math.random()*26))+'ms';
+  },1000);
+
+  /* ---------- console ---------- */
+  var log=document.getElementById('log');
+  function say(html,cls){
+    var d=document.createElement('div');
+    if(cls)d.className=cls;
+    d.innerHTML=html;
+    log.appendChild(d);log.scrollTop=log.scrollHeight;
+  }
+  var boot=[
+    ['<span class="cy">[boot]</span> NEO//TERM relay v7.0.4 — cold start','dm'],
+    ['<span class="ok">[ ok ]</span> neural handshake complete','ok'],
+    ['<span class="warn">[warn]</span> trace daemon listening on :7','warn'],
+    ['<span class="cy">[link]</span> uplink 12.4 Gb/s — sector 7','cy'],
+    ['<span class="dm">type <span class="yl">help</span> for a list of commands</span>','dm']
+  ];
+  var bi=0;
+  function typeLine(){
+    if(bi>=boot.length)return;
+    var line=boot[bi++];
+    var target=line[0],cls=line[1],i=0;
+    var d=document.createElement('div');
+    if(cls)d.className=cls;
+    log.appendChild(d);
+    var iv=setInterval(function(){
+      i+=3;
+      d.innerHTML=target.slice(0,i)+'<span style="opacity:.5">▌</span>';
+      if(i>=target.length){clearInterval(iv);d.innerHTML=target;log.scrollTop=log.scrollHeight;setTimeout(typeLine,110);}
+      log.scrollTop=log.scrollHeight;
+    },12);
+  }
+  setTimeout(typeLine,420);
+
+  var cmds={
+    help:function(){
+      say('<span class="cy">available commands</span>');
+      say('  <span class="yl">help</span>      list commands');
+      say('  <span class="yl">scan</span>      sweep sector 7 for nodes');
+      say('  <span class="yl">nodes</span>     list discovered nodes');
+      say('  <span class="yl">uplink</span>    renegotiate the uplink');
+      say('  <span class="yl">ice</span>       probe the black ICE');
+      say('  <span class="yl">whoami</span>    identify the current user');
+      say('  <span class="yl">neon</span>      flip the palette');
+      say('  <span class="yl">clear</span>     wipe the buffer');
+    },
+    scan:function(){
+      say('<span class="dm">sweeping 128 ports on 10.7.0.0/24 …</span>');
+      var n=4+Math.floor(Math.random()*4),i=0;
+      var iv=setInterval(function(){
+        var names=['MAGLEV-9','ARASAKA-COURIER','CRYO-WING','NIGHT-MARKET','RAIN-BAR','SUBSTATION-4','GHOST-RELAY','SKY-DOCK'];
+        var nm=names[(Math.random()*names.length)|0];
+        var ok=Math.random()>0.22;
+        say('  '+(ok?'<span class="ok">[OPEN]</span>':'<span class="bad">[FILT]</span>')+' 10.7.'+(Math.random()*200|0)+'.'+(Math.random()*200|0)+' : '+(ok?'<span class="cy">'+nm+'</span>':'<span class="dm">no service</span>'));
+        if(ok)nodes.push(nm);
+        if(++i>=n){clearInterval(iv);say('<span class="ok">scan complete — '+n+' host(s) answered</span>');}
+      },260);
+    },
+    nodes:function(){
+      if(!nodes.length){say('<span class="warn">no nodes cached. run <span class="cy">scan</span> first.</span>');return;}
+      nodes.forEach(function(n,i){say('  <span class="dm">'+(i+1)+'.</span> '+n);});
+    },
+    uplink:function(){
+      say('<span class="dm">renegotiating…</span>');
+      var v=(2+Math.random()*11).toFixed(1);
+      setTimeout(function(){say('<span class="ok">uplink now '+v+' Gb/s — trace margin '+(6+Math.random()*30|0)+'%</span>');},700);
+    },
+    ice:function(){
+      say('<span class="bad">!! black ICE detected — synthetic reflex layer</span>');
+      setTimeout(function(){say('<span class="warn">deck integrity '+(30+Math.random()*40|0)+'% — recommend abort</span>');},500);
+      setTimeout(function(){say('<span class="dm">connection held. you are still here.</span>');},1000);
+    },
+    whoami:function(){say('<span class="cy">guest</span> — unregistered handle, sector 7, no history, no name');},
+    neon:function(){
+      var r=document.documentElement;
+      var a=['#22e8ff','#ff2d95'],b=['#7dffb2','#ffe066'];
+      r.style.setProperty(a[0],b[Math.random()*2|0]);
+      r.style.setProperty(a[1],b[Math.random()*2|0]);
+      say('<span class="ok">palette flipped. the city keeps changing.</span>');
+    },
+    clear:function(){log.innerHTML='';}
+  };
+  var nodes=[];
+  document.getElementById('f').addEventListener('submit',function(e){
+    e.preventDefault();
+    var inp=document.getElementById('cmd');
+    var raw=inp.value.trim();
+    if(!raw)return;
+    say('<span class="prompt">guest@sector7:~$</span> '+raw.replace(/</g,'&lt;'));
+    inp.value='';
+    var key=raw.toLowerCase().split(' ')[0];
+    if(cmds[key]){cmds[key]();}
+    else{
+      say('<span class="bad">command not found: '+key.replace(/</g,'&lt;')+'</span>');
+      say('<span class="dm">try <span class="yl">help</span></span>');
+    }
+  });
+  document.getElementById('cmd').focus();
+})();
+</script>
+</body>
+</html>

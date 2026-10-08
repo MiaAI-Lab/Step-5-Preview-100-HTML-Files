@@ -1,0 +1,81 @@
+# SLIPSTREAM — Six Words About Speed
+
+## Short title
+Kinetic Typography
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a scroll-driven kinetic
+typography essay called SLIPSTREAM, made of seven full-viewport sections, each
+demonstrating a different way type can move. No external dependencies — no CDN, no
+web fonts, no external images, no external SVG files, no JavaScript libraries. All
+CSS and JavaScript inline, works offline by double-clicking, responsive, valid HTML5.
+
+Artistic direction: Swiss editorial poster meets motion graphics. Warm paper
+#f2f0ec, true ink #111010, one signal red #e8341c, one cobalt #1538a8, and a grey
+used only for outlined decorative numerals. Every section is exactly one viewport
+tall and contains one enormous word in a condensed display face (Arial Narrow /
+Impact stack) at up to 22vw, plus a small monospace caption and a section index.
+Sections alternate paper and ink and red grounds so the page reads as a sequence of
+printed plates.
+
+The seven movements, each driven by a single normalised value k (how far that
+section is from the centre of the viewport, clamped to −1…1):
+1. SLIP — an outlined word (2px -webkit-text-stroke, transparent fill) that drifts
+   up and skews as you scroll, flanked by two huge outlined grey numerals.
+2. STREAM — the word is split into individual inline-block letters at load, each
+   rising on a 0.14-per-letter delay so the word arrives like a wave, with opacity
+   tied to scroll position.
+3. THE CURRENT CARRIES — three lines, each inside an overflow:hidden clip, sliding
+   up from 115% on a 0.18-per-line delay; the middle line is cobalt.
+4. HALFWAY — the word is split at its midpoint; the left half moves left and the
+   right half moves right, fading as they separate, on a red ground where the two
+   halves are paper and ink.
+5. Slow letters open up under load — a heavy sans sentence whose letter-spacing is
+   animated from −0.05em to +0.01em by scroll, with one word in cobalt and one in
+   outline, so tracking behaves as a stretchable material.
+6. UNDERTOW — the word and a large paper disc both use mix-blend-mode:difference
+   against the ink ground, so the type becomes a hole wherever the disc crosses it;
+   the disc slides sideways with scroll.
+7. A finale that counts 00 → 06 as you scroll into it and scales up, ending with a
+   monospace caption.
+
+Layout furniture: a 3px red progress bar pinned to the top whose width is the
+document scroll fraction; a vertical rail of seven dots on the right that
+highlights the section currently nearest the viewport centre and click-scrolls to
+it; each section carries a monospace index (01 / 07 … 07 / 07) top-right and a
+caption bottom-left. On narrow screens the captions drop below the words, the rail
+hides, and the sections switch to a left-aligned column.
+
+Interaction: pure scroll. A single requestAnimationFrame loop reads the scroll
+position, computes the per-section k values, and writes transforms, opacity and
+letter-spacing directly to the already-split spans — no library, no CSS animation
+for the movement. The rail dots are clickable shortcuts. Nothing else is
+interactive; the page is a filmstrip you wind by hand.
+
+## One-paragraph description of the intended design
+A seven-plate typographic filmstrip on warm paper, ink and signal red, where each
+plate demonstrates one movement — outline drift, per-letter wave arrival, clipped
+line reveals, a word splitting in half, tracking that stretches under load, and
+difference-blend type cut by a sliding disc — all driven by one scroll value and a
+single animation frame loop.
+
+## Major visual techniques used
+- Per-section scroll normalisation (clamped −1…1) feeding one rAF loop
+- Runtime letter splitting into inline-block spans with per-index delay
+- Overflow:hidden clip masks for line-reveal animations
+- Midpoint word splitting with opposite-direction transforms and fade
+- Animated letter-spacing as a material property (−0.05em → +0.01em)
+- Outline display type via -webkit-text-stroke with transparent fill
+- mix-blend-mode:difference on both a disc and a headline to cut holes in type
+- 3px scroll progress bar computed from document scroll fraction
+- Clickable section rail with nearest-section detection and click-to-scroll
+- Alternating paper / ink / red grounds across full-viewport sections
+- Condensed display face at up to 22vw against 8.5px tracked monospace captions
+- Mobile reflow: captions become static, rail hides, sections left-align
+
+## Intended interaction model
+A scroll-only experience. The visitor winds the page by hand and the type responds
+continuously; the seven dots on the right offer a shortcut to any plate. There are
+no buttons, no forms and no hover states on the words themselves — the entire
+interaction vocabulary is scroll position.

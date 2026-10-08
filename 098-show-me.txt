@@ -1,0 +1,44 @@
+## The exact prompt used to generate this HTML file
+
+Generate 100 completely self-contained HTML files. DO NOT LOOK AT ANY OTHER FOLDER.
+ONLY IN THE CURRENT FOLDER. DO THIS AS A NEW AND CLEAN TASK. IGNORE EVERYTHING ELSE
+NOT RELATED TO THE TASK. DO NOT USE A GENERATOR. NEED TO CREATE THESE HTMLS ONE BY ONE,
+OR ONE BY AGENT. The goal is 100 unique, polished, fully self-contained single-file HTML
+pages, each with its own concept, its own visual language, and its own interaction model.
+
+This is file 098 of 100.
+
+# Show Me — when the sound becomes the shape
+
+## Short title
+Show Me — when the sound becomes the shape
+
+## One-paragraph description of the intended design
+A warm paper stage where sound is drawn as it is heard: live audio from the microphone is
+sampled with the Web Audio API, its spectrum is read frame by frame, and every measured
+feature drives a visible one. Amplitude is radius, so loud is large. The spectral centroid
+— the weighted mean of the spectrum — is hue, so a bright sound is bright in colour. Pitch
+is angle, mapped onto the circle of fifths, so a note's place on the staff and its place in
+the drawing are the same place. Timbre is texture: overtones drive bristle count, edge
+roughness and grain, so a clarinet and a flute of the same pitch never look alike. One,
+two or twelve channels can be drawn at once from the same analysis, each a different
+projection of the same measurement. A built-in sequence plays so the page makes sound
+without any permission, and a seed of deterministic noise keeps the grain from flickering.
+The type is a quiet old-style serif on paper with one ink accent; the notes column explains
+what a centroid is.
+
+## Major visual techniques used
+- Web Audio AnalyserNode: FFT spectrum, RMS amplitude, spectral centroid, zero-crossing
+- Pitch tracked by harmonic product spectrum and mapped to angle on the circle of fifths
+- Amplitude mapped to radius, centroid to hue, overtones to bristle and grain
+- A deterministic noise field so grain is stable frame to frame
+- Multi-channel rendering: one, two or twelve projections of the same measurement
+- Canvas 2D with additive strokes and paper-toned compositing, DPR-aware
+- Built-in oscillator sequence so the page is self-sufficient without a microphone
+
+## Intended interaction model
+A microphone button asks for the input and switches the analysis to live sound; a sequence
+button plays the built-in phrases for the same analysis. Chips choose how many channels
+are drawn and which shape grows; sliders drive detail, length, speed and bristle. The
+drawing responds continuously — nothing is a replay. A readout reports pitch, note,
+centroid, channels and frame rate, and the notes column names the mapping in words.

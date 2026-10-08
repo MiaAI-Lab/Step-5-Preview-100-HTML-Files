@@ -1,0 +1,84 @@
+# NORDLYS — Northern Lights Observatory
+
+## Short title
+Aurora Glass Skyline
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained, single-file HTML page for a fictional Arctic
+aurora observatory called "NORDLYS". The page must have no external dependencies
+whatsoever — no CDNs, no web fonts, no external images, no external SVG files,
+no JavaScript libraries — and must work offline by simply opening the file in a
+browser. All CSS and all JavaScript must be inline. It must be responsive and
+validate as standard HTML5.
+
+Artistic direction: premium glassmorphism over a living night sky. The background
+is a full-viewport canvas animation of a real aurora: layered vertical "curtain
+ribbons" of additive light in teal (hue 162), violet (268), rose (318) and
+ice-blue (186), each ribbon wobbling along layered sine waves so the sheets fold
+and breathe like real auroral curtains. Behind them a dense field of twinkling
+stars, and in front a slow fall of snow. A vignette plus an animated film-grain
+overlay (an inline SVG turbulence data-URI, no external file) sit on top to give
+the whole thing a photographed, cinematic quality.
+
+Layout: a sticky frosted glass navigation bar with an animated conic-gradient logo
+mark and underline-reveal links; a hero with a pulsing live-status pill, a huge
+serif display headline whose italic word carries a teal→violet→rose gradient clipped
+to the text; a three-card "The Field" grid where each card tilts in 3D on pointer
+move and catches a moving specular highlight that follows the cursor; a "Readings"
+glass panel containing a live canvas sparkline chart of a fake magnetometer
+(KP index, Bz, wind speed, cloud cover, visibility) that updates every frame and a
+running UTC clock; a four-tile gallery of pure CSS radial-gradient "long exposure"
+art that zooms on hover; a gradient "Reserve a night" call-to-action block; and a
+minimal mono footer.
+
+Typography: a high-contrast serif ("Iowan Old Style" / Palatino / Georgia fallback
+stack) for display text, a system sans for body copy, and a monospace
+(ui-monospace / SF Mono / Menlo / Consolas) for all labels, metadata and buttons —
+so every label reads as instrument engraving. Everything is fluid via clamp().
+
+Colour palette: deep midnight ink #070b1a → #0d1430, teal #4ff0d0, violet #9b7bff,
+rose #ff77c8, off-white text #eaf2ff, and translucent white glass layers.
+
+Interactions: "Wake the aurora" smoothly doubles the aurora intensity, "Calm the
+sky" drops it to a whisper, both animated with eased interpolation; the reserve
+button smooth-scrolls to the visit block; the booking button confirms with a
+state change; a burger menu collapses the nav on narrow screens; scroll-reveal via
+IntersectionObserver fades sections up as they enter the viewport; pointer
+position is tracked for a subtle parallax feel. The whole page honours
+prefers-reduced-motion.
+
+## One-paragraph description of the intended design
+A cinematic, glass-and-midnight observatory landing page where a live canvas
+aurora — built from additive-light ribbons of layered sine waves — glows behind
+frosted translucent panels. Serif display type, monospace instrument labels and a
+teal/violet/rose palette give it the feel of a luxury travel magazine spread about
+a scientific instrument, while the tilt-reactive cards, live sparkline and intensity
+controls make the sky feel genuinely touchable.
+
+## Major visual techniques used
+- Canvas 2D animation: layered sinusoidal "aurora ribbon" strokes with additive
+  (`globalCompositeOperation = 'lighter'`) blending and vertical alpha gradients
+- Twinkling star field and parallax snowfall particle systems
+- Fixed full-viewport canvas background behind a CSS vignette and animated
+  film-grain overlay built from an inline SVG feTurbulence data-URI
+- Glassmorphism: translucent gradient layers, 1px light borders, inset highlight
+  shadows, backdrop-filter blur and saturation
+- Gradient text via background-clip:text on the italic headline word
+- 3D pointer-tilt cards (rotateX/rotateY + perspective) with a cursor-tracked
+  radial specular highlight driven by CSS custom properties
+- Live canvas sparkline area chart with gradient fill and glowing head dot
+- CSS-only "long exposure" artwork tiles using stacked radial gradients
+- Sticky header, hover underline reveal, scroll-reveal via IntersectionObserver
+- Fluid type/spacing with clamp(), single-column collapse under 900px,
+  collapsing nav under 760px, prefers-reduced-motion support
+- Device-pixel-ratio aware canvas sizing
+
+## Intended interaction model
+Primarily an ambient, read-mostly landing page. The visitor scrolls to reveal
+sections, hovers cards to tilt them and pull light across their surface, hovers
+gallery tiles to zoom the gradient artwork, and uses two hero buttons to push the
+aurora from calm to storm — the background intensity easing between the two states.
+A secondary layer of "instrument" micro-interactions (live clock, streaming
+readouts) rewards lingering. Touch and keyboard users get the same content with the
+tilt effects degrading gracefully.

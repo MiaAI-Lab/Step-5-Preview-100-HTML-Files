@@ -1,0 +1,75 @@
+# NEBULA — Paint a Sky Nobody Has Seen
+
+## Short title
+Nebula Painter
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: an interactive deep-space
+painting tool called NEBULA. No external dependencies whatsoever — no CDN, no web
+fonts, no external images, no external SVG files, no JavaScript libraries. All CSS
+and JavaScript inline, works offline by double-clicking, responsive, valid HTML5.
+
+Artistic direction: an astronomical long-exposure. The ground is a vertical
+near-black gradient (#03030a → #06040f → #020208) crossed by a faint diagonal
+"milky band" at 5% blue-violet alpha. Everything painted on top of it uses
+globalCompositeOperation 'screen', so gas and starlight add together the way real
+exposures do.
+
+The paint model: each press or drag plants a "cloud nursery". A cloud is 14–24
+individual puffs placed on an ellipse around the press point — each puff a
+three-stop HSL radial gradient (bright core at 68% lightness, a mid tone at 52%,
+fading to zero alpha) whose alpha is scaled by the Gas slider. Puffs drift on slow
+independent sine phases and breathe ±6% in radius, so a planted cloud never stops
+moving. Each plant also scatters 6–18 stars inside the cloud's radius, with radii
+drawn from a 2.6-power distribution so faint stars vastly outnumber bright ones;
+each star is a white core with a soft halo and, if bright enough, four diffraction
+spike lines. Clouds and stars are kept as data and redrawn from scratch whenever a
+control changes, so Gas and Hue affect the whole picture retroactively rather than
+only the next stroke.
+
+Layout: a full-viewport canvas with a floating UI overlay whose pointer-events pass
+through except on the controls. Top-left is a monospace survey label above an
+italic serif headline with one line in violet, plus a short paragraph. Top-right is
+a monospace stats stack showing live cloud count, star count and a running
+"exposure" timer in tenths of a second. Bottom is a glass tray with three sliders —
+Gas (cloud opacity), Spread (cloud and star-field radius) and Hue (0–360) — plus
+Seed a field, Clear and Save buttons, and a monospace hint.
+
+Interaction: click or drag anywhere on the sky to plant a nursery; drags plant a new
+one whenever the pointer has moved more than 1.4× the spread value, so a stroke
+becomes a chain of overlapping clouds. "Seed a field" drops nine clouds at random
+positions for an instant composition. "Clear" empties the arrays and repaints the
+ground. "Save" composites the canvas to a PNG and downloads it — entirely offline,
+no server. The three sliders retune the existing artwork live. On narrow screens the
+paragraph, stats and hint hide so the sky fills the device.
+
+## One-paragraph description of the intended design
+An astronomical paint box: every press plants a nursery of coloured gas puffs —
+radial-gradient blobs in screen blend that drift and breathe on their own phases —
+plus a power-law scatter of haloed stars with diffraction spikes, all retunable
+after the fact through Gas, Spread and Hue sliders and exportable as a PNG.
+
+## Major visual techniques used
+- Additive compositing with globalCompositeOperation 'screen' for gas and starlight
+- Multi-puff cloud construction on an ellipse, each puff a three-stop HSL radial
+  gradient with alpha scaled by a slider
+- Per-puff sine-phase drift and ±6% radius breathing so clouds never sit still
+- Power-law (^2.6) star radius distribution for a realistic faint-star population
+- Star halos from radial gradients plus four-line diffraction spikes above a
+  radius threshold
+- Data-driven redraw: clouds and stars kept as objects and re-composited from the
+  ground whenever Gas or Hue changes, so controls affect existing art
+- Distance-threshold drag painting (new plant every 1.4× spread)
+- Live counters for clouds, stars and exposure time
+- Offline PNG export via toDataURL and a synthetic anchor click
+- Faint diagonal "milky band" from a linear gradient at 5% alpha
+- Italic serif headline against 8.5–9px tracked monospace labels and stats
+- Floating glass tray with backdrop-filter blur; extras hidden under 760px
+
+## Intended interaction model
+A paint tool with a scientific face. Visitors click and drag to compose a sky, use
+Gas, Spread and Hue to retune the whole picture even after painting it, drop a ready
+composition with "Seed a field", wipe it with "Clear", and keep a good one with
+"Save". The drifts continue whether or not anyone is painting, so the sky is always
+slightly alive.

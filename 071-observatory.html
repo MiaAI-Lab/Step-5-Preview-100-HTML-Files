@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Dome — an eyepiece you can aim</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:#0b0a12;color:#f2ecf5;
+  font:15px/1.62 ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+.serif{font-family:ui-serif,Georgia,"Times New Roman",serif}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.wrap{width:min(1120px,92vw);margin:0 auto}
+nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0 14px;
+  border-bottom:1px solid rgba(242,236,245,.14)}
+nav .brand{font-family:ui-serif,Georgia,serif;font-size:19px}
+nav .brand i{font-style:italic;color:#e0533f}
+nav ul{display:flex;gap:26px;list-style:none;margin:0;padding:0;font-size:11px;
+  letter-spacing:.24em;text-transform:uppercase;color:#968d9c}
+nav a{color:inherit;text-decoration:none}nav a:hover{color:#e0533f}
+@media(max-width:780px){nav ul{display:none}}
+header.hero{padding:54px 0 28px;text-align:center}
+header.hero .kicker{font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:#e0533f;
+  margin:0 0 14px}
+header.hero h1{font-family:ui-serif,Georgia,serif;font-weight:400;
+  font-size:clamp(32px,5.6vw,64px);line-height:1.05;margin:0 0 16px}
+header.hero h1 em{font-style:italic;color:#e8c46a}
+header.hero p{max-width:60ch;margin:0 auto;color:#a79caa}
+/* ---------- the eyepiece ---------- */
+.eye{position:relative;border:1px solid rgba(242,236,245,.16);border-radius:16px;
+  overflow:hidden;background:#05050c;margin-bottom:18px}
+.eye canvas{display:block;width:100%;height:auto;touch-action:none;cursor:crosshair}
+.eye .cap{position:absolute;left:14px;top:12px;font-size:10px;letter-spacing:.26em;
+  text-transform:uppercase;color:rgba(242,236,245,.5);pointer-events:none}
+.eye .radec{position:absolute;right:14px;top:12px;font-family:ui-monospace,Menlo,monospace;
+  font-size:11px;color:rgba(232,196,106,.85);text-align:right;pointer-events:none;line-height:1.7}
+/* ---------- dock ---------- */
+.dock{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;justify-content:space-between;
+  border-top:1px solid rgba(242,236,245,.14);border-bottom:1px solid rgba(242,236,245,.14);
+  padding:16px 0;margin-bottom:32px}
+.dock label{display:grid;gap:7px;font-size:10px;letter-spacing:.26em;text-transform:uppercase;
+  color:#968d9c;min-width:150px}
+input[type=range]{width:100%;accent-color:#e8c46a}
+.btn{background:#e0533f;color:#2a0603;border:0;border-radius:8px;padding:11px 15px;
+  font:inherit;font-size:12px;font-weight:700;letter-spacing:.08em;cursor:pointer;margin:0 6px 6px 0}
+.btn.ghost{background:transparent;color:#f2ecf5;border:1px solid rgba(242,236,245,.24)}
+.btn:hover{filter:brightness(1.07)}
+.readout{display:flex;flex-wrap:wrap;gap:12px 28px;margin-bottom:40px;
+  border-top:1px solid rgba(242,236,245,.14);padding-top:16px}
+.readout div{min-width:84px}
+.readout dt{font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:#968d9c;margin:0 0 4px}
+.readout dd{margin:0;font-size:20px;font-family:ui-monospace,Menlo,monospace;color:#e8c46a}
+/* ---------- catalogue ---------- */
+.cat{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:40px}
+@media(max-width:900px){.cat{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.cat{grid-template-columns:1fr}}
+.obj{text-align:left;background:#0f0d18;border:1px solid rgba(242,236,245,.14);border-radius:10px;
+  padding:12px;cursor:pointer;color:#f2ecf5;font:inherit}
+.obj:hover{border-color:rgba(232,196,106,.6)}
+.obj[aria-pressed="true"]{border-color:#e8c46a;background:#191326}
+.obj b{display:block;font-family:ui-serif,Georgia,serif;font-weight:400;font-size:17px;margin-bottom:3px}
+.obj small{display:block;color:#a79caa;font-size:11px;line-height:1.5}
+.cells{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-bottom:46px}
+@media(max-width:820px){.cells{grid-template-columns:1fr}}
+.cell{border-top:1px solid rgba(242,236,245,.14);padding-top:16px}
+.cell .fig{font-family:ui-serif,Georgia,serif;font-size:38px;color:#e8c46a;line-height:1;margin-bottom:8px}
+.cell h3{font-family:ui-serif,Georgia,serif;font-weight:400;font-style:italic;font-size:21px;margin:0 0 8px}
+.cell p{margin:0;color:#a79caa;font-size:14px}
+footer{border-top:1px solid rgba(242,236,245,.14);padding:22px 0 54px;display:flex;
+  justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:11px;letter-spacing:.2em;
+  text-transform:uppercase;color:#756c7b}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="brand">The <i>Dome</i></div>
+    <ul>
+      <li><a href="#eye">Eyepiece</a></li>
+      <li><a href="#catalogue">Catalogue</a></li>
+      <li><a href="#notes">Notes</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <p class="kicker">Right ascension · declination · field</p>
+    <h1 class="serif">An eyepiece<br>you have to <em>aim</em></h1>
+    <p>The sky turns whether you are looking or not, and the object you want will not wait
+       at the crosshair. Pick a target, slew to it, and watch the altitude climb or fall as
+       the field drifts through the meridian.</p>
+  </header>
+
+  <section class="eye" id="eye">
+    <canvas id="c" width="900" height="520"></canvas>
+    <p class="cap">field · north up · east left</p>
+    <div class="radec" id="radec"></div>
+  </section>
+
+  <section class="dock" id="dock">
+    <label for="lat">Latitude <input id="lat" type="range" min="0" max="70" value="34"></label>
+    <label for="ha">Hour angle <input id="ha" type="range" min="0" max="360" value="40"></label>
+    <label for="fov">Field of view <input id="fov" type="range" min="0" max="3" value="2"></label>
+    <div>
+      <button class="btn" id="track">Track the sky</button>
+      <button class="btn ghost" id="nearest">Nearest object</button>
+    </div>
+  </section>
+
+  <section class="cat" id="catalogue"></section>
+
+  <dl class="readout">
+    <div><dt>Target</dt><dd id="rT">—</dd></div>
+    <div><dt>Altitude</dt><dd id="rA">—</dd></div>
+    <div><dt>Azimuth</dt><dd id="rZ">—</dd></div>
+    <div><dt>Field</dt><dd id="rF">—</dd></div>
+    <div><dt>Magnitude</dt><dd id="rM">—</dd></div>
+  </dl>
+
+  <section class="cells">
+    <div class="cell">
+      <div class="fig serif">i</div>
+      <h3>The field</h3>
+      <p>Everything in the eyepiece is a projection: right ascension across, declination
+         up, with the whole sheet turning as the earth does. Slew and the field slides
+         underneath the fixed reticle.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">ii</div>
+      <h3>Altitude</h3>
+      <p>How high a target sits depends on where you are and what time it is. Cross the
+         meridian and you get the best view you will get that night; lose it below the
+         horizon and you wait for the next one.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">iii</div>
+      <h3>Field of view</h3>
+      <p>A wide field finds things and shows context. A narrow one resolves them but makes
+         you hunt. The frame drawn in the eyepiece is the real field at the magnification
+         you chose.</p>
+    </div>
+  </section>
+
+  <section class="cells" id="notes">
+    <div class="cell">
+      <div class="fig serif">iv</div>
+      <h3>Magnitude</h3>
+      <p>Each step is about two and a half times brighter, and the scale is backwards, so
+         magnitude six is roughly a hundred times fainter than magnitude one. The stars in
+         the field are drawn at their real relative brightness.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">v</div>
+      <h3>Tracking</h3>
+      <p>Track the sky and the mount follows the field rate on its polar axis, which is
+         why a long exposure is possible at all. Stop tracking and the sky goes streaky —
+         here it goes streaky by blur.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">vi</div>
+      <h3>Red light</h3>
+      <p>The whole page is dark because dark adaptation is real: it takes half an hour to
+         get and one white light to lose, which is why observatories are lit in red.</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>The Dome · one canvas, no files</span>
+    <span class="mono">RA · Dec · Alt · Az</span>
+  </footer>
+</div>
+<script>
+(function(){
+"use strict";
+var cv=document.getElementById('c'),ctx=cv.getContext('2d');
+var W=cv.width,H=cv.height;
+var lat=34,ha=40,tracking=false,fovIdx=2;
+var FOVS=[{n:'naked eye',deg:60,mag:5},{n:'binoculars',deg:5,mag:8},
+          {n:'wide field',deg:1.2,mag:10},{n:'high power',deg:0.25,mag:13}];
+/* the field centre, in degrees */
+var view={ra:0,dec:0},target=null;
+/* the mount slews toward a target rather than jumping */
+var slewTo=null;
+
+/* ---------- the catalogue: real-ish coordinates ---------- */
+var CAT=[
+ {n:'M42 · Orion Nebula',ra:5.59,dec:-5.4,mag:4,note:'emission nebula · 24 ly across'},
+ {n:'M31 · Andromeda',ra:0.71,dec:41.3,mag:3.4,note:'spiral · 2.5 million ly'},
+ {n:'M13 · Hercules',ra:16.41,dec:36.5,mag:5.8,note:'globular cluster · 300,000 stars'},
+ {n:'M45 · Pleiades',ra:3.79,dec:24.1,mag:1.6,note:'open cluster · blue and near'},
+ {n:'Albireo',ra:19.51,dec:27.9,mag:3.1,note:'double star · gold and blue'},
+ {n:'NGC 7000 · North America',ra:20.98,dec:44.3,mag:4,note:'emission nebula · faint, wide'},
+ {n:'M51 · Whirlpool',ra:13.29,dec:47.2,mag:8.4,note:'spiral · face on'},
+ {n:'Saturn',ra:0,dec:-5,mag:0.5,note:'planet · rings at 50×'}
+];
+function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;
+  var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;
+  return((t^t>>>14)>>>0)/4294967296;};}
+var rnd=mulberry(31337);
+/* ---------- a field of stars, seeded once ---------- */
+var STARS=[];
+for(var i=0;i<900;i++){
+  STARS.push({ra:(rnd()*24),dec:(rnd()*160-80),
+    mag:1+rnd()*5.5,ph:rnd()*6.28});
+}
+/* ---------- the catalogue buttons ---------- */
+var cat=document.getElementById('catalogue');
+CAT.forEach(function(o,idx){
+  var b=document.createElement('button');
+  b.className='obj';b.setAttribute('aria-pressed','false');
+  b.innerHTML='<b>'+o.n+'</b><small>RA '+fmtRA(o.ra)+' · Dec '+fmtDec(o.dec)+
+    '<br>mag '+o.mag.toFixed(1)+'<br>'+o.note+'</small>';
+  b.addEventListener('click',function(){
+    select(idx);
+  });
+  cat.appendChild(b);o.btn=b;
+});
+function select(idx){
+  CAT.forEach(function(o,j){o.btn.setAttribute('aria-pressed',String(j===idx));});
+  target=CAT[idx];
+  slewTo={ra:target.ra*15,dec:target.dec};
+  document.getElementById('rT').textContent=target.n.split(' · ')[0];
+  document.getElementById('rM').textContent=target.mag.toFixed(1);
+}
+document.getElementById('nearest').addEventListener('click',function(){
+  var best=0,bd=1e9;
+  CAT.forEach(function(o,idx){
+    var dra=Math.min(Math.abs(o.ra*15-view.ra),360-Math.abs(o.ra*15-view.ra));
+    var d=Math.sqrt(dra*dra+(o.dec-view.dec)*(o.dec-view.dec));
+    if(d<bd){bd=d;best=idx;}
+  });
+  select(best);
+});
+/* ---------- altitude and azimuth from latitude and hour angle ---------- */
+function altAz(dec,haDeg){
+  var d=dec*Math.PI/180,L=lat*Math.PI/180,h=haDeg*Math.PI/180;
+  var s=Math.sin(d)*Math.sin(L)+Math.cos(d)*Math.cos(L)*Math.cos(h);
+  var alt=Math.asin(Math.max(-1,Math.min(1,s)));
+  var y=-Math.cos(d)*Math.cos(L)*Math.sin(h);
+  var x=Math.sin(d)-Math.sin(L)*Math.sin(alt);
+  var az=Math.atan2(y,x);
+  return {alt:alt,az:az};
+}
+/* ---------- drawing ---------- */
+function draw(t){
+  var fov=FOVS[fovIdx],half=fov.deg/2;
+  /* the sky */
+  ctx.fillStyle='#05050c';ctx.fillRect(0,0,W,H);
+  /* scale: half the field height covers `half` degrees of declination */
+  var scale=(H/2)/Math.max(0.05,half);
+  var cx=W/2,cy=H/2;
+  /* the sky rotates about the pole, so shift right ascension by the hour angle */
+  ctx.save();
+  ctx.translate(cx,cy);
+  /* untracked: the field is blurred, because the earth keeps moving */
+  if(!tracking){ctx.filter='blur(1.6px)';}
+  /* stars */
+  for(var i2=0;i2<STARS.length;i2++){
+    var s=STARS[i2];
+    var raDeg=s.ra*15-ha;
+    while(raDeg>180)raDeg-=360;
+    while(raDeg<-180)raDeg+=360;
+    var dy=(s.dec-view.dec)*scale;
+    if(Math.abs(dy)>H/2+8)continue;
+    var dx=raDeg*scale*Math.cos(view.dec*Math.PI/180);
+    if(Math.abs(dx)>W/2+8)continue;
+    if(s.mag>fov.mag)continue;
+    var size=Math.max(0.5,(fov.mag+1-s.mag)*0.55);
+    ctx.globalAlpha=Math.max(.18,1-(s.mag/fov.mag)*0.55);
+    ctx.fillStyle=s.ph>5.9?'#cfe4ff':'#ffffff';
+    ctx.beginPath();ctx.arc(dx,dy,size,0,6.283);ctx.fill();
+  }
+  ctx.globalAlpha=1;
+  ctx.filter='none';
+  /* the target, if it is in the field */
+  if(target){
+    var tra=target.ra*15-ha;
+    while(tra>180)tra-=360;while(tra<-180)tra+=360;
+    var tdx=tra*scale*Math.cos(view.dec*Math.PI/180);
+    var tdy=(target.dec-view.dec)*scale;
+    if(Math.abs(tdx)<W/2&&Math.abs(tdy)<H/2){
+      /* deep-sky objects: a soft glow the size of their real field */
+      var glow=target.mag<2?46:target.mag<5?30:22;
+      var g=ctx.createRadialGradient(tdx,tdy,1,tdx,tdy,glow);
+      g.addColorStop(0,'rgba(200,220,255,.5)');
+      g.addColorStop(.4,'rgba(160,190,255,.18)');
+      g.addColorStop(1,'rgba(160,190,255,0)');
+      ctx.fillStyle=g;ctx.beginPath();ctx.arc(tdx,tdy,glow,0,6.283);ctx.fill();
+    }
+  }
+  ctx.restore();
+  /* the reticle, fixed to the eyepiece */
+  ctx.strokeStyle='rgba(232,196,106,.55)';ctx.lineWidth=1;
+  ctx.beginPath();
+  ctx.moveTo(cx-30,cy);ctx.lineTo(cx-8,cy);
+  ctx.moveTo(cx+8,cy);ctx.lineTo(cx+30,cy);
+  ctx.moveTo(cx,cy-30);ctx.lineTo(cx,cy-8);
+  ctx.moveTo(cx,cy+8);ctx.lineTo(cx,cy+30);
+  ctx.stroke();
+  ctx.beginPath();ctx.arc(cx,cy,7,0,6.283);ctx.stroke();
+  /* the field stop: the real circle of the eyepiece */
+  ctx.strokeStyle='rgba(242,236,245,.16)';
+  ctx.setLineDash([4,6]);
+  ctx.beginPath();ctx.arc(cx,cy,H/2-4,0,6.283);ctx.stroke();
+  ctx.setLineDash([]);
+  /* a scale bar in the corner */
+  var barDeg=fov.deg/4,barPx=barDeg*scale;
+  if(barPx>10&&barPx<W*0.4){
+    ctx.strokeStyle='rgba(232,196,106,.7)';ctx.lineWidth=1.4;
+    ctx.beginPath();ctx.moveTo(24,H-24);ctx.lineTo(24+barPx,H-24);ctx.stroke();
+    ctx.fillStyle='rgba(232,196,106,.7)';
+    ctx.font='10px ui-monospace,Menlo,monospace';
+    ctx.fillText((barDeg<1?(barDeg*60).toFixed(0)+"'":barDeg.toFixed(1)+'°'),24,H-32);
+  }
+}
+
+/* ---------- controls, slewing, readout ---------- */
+function fmtRA(h){
+  var hh=Math.floor(h),mm=Math.floor((h-hh)*60),ss=Math.round((((h-hh)*60)-mm)*60);
+  return (hh<10?'0':'')+hh+'h '+(mm<10?'0':'')+mm+'m '+(ss<10?'0':'')+ss+'s';
+}
+function fmtDec(d){
+  var sign=d<0?'-':'+',a=Math.abs(d),dd=Math.floor(a),mm=Math.floor((a-dd)*60);
+  return sign+(dd<10?'0':'')+dd+'° '+(mm<10?'0':'')+mm+"'";
+}
+document.getElementById('lat').addEventListener('input',function(e){lat=+e.target.value;});
+document.getElementById('ha').addEventListener('input',function(e){ha=+e.target.value;});
+document.getElementById('fov').addEventListener('input',function(e){
+  fovIdx=+e.target.value;
+  document.getElementById('rF').textContent=FOVS[fovIdx].n+' · '+FOVS[fovIdx].deg+'°';
+});
+var trackBtn=document.getElementById('track');
+trackBtn.addEventListener('click',function(){
+  tracking=!tracking;
+  trackBtn.textContent=tracking?'Stop tracking':'Track the sky';
+});
+/* dragging the field slews the mount */
+var dragging=false,dragLast=null;
+cv.addEventListener('pointerdown',function(e){
+  dragging=true;dragLast={x:e.clientX,y:e.clientY};
+  cv.setPointerCapture(e.pointerId);
+});
+cv.addEventListener('pointermove',function(e){
+  if(!dragging)return;
+  var fov=FOVS[fovIdx],scale=(H/2)/Math.max(0.05,fov.deg/2);
+  var dx=e.clientX-dragLast.x,dy=e.clientY-dragLast.y;
+  view.dec=Math.max(-80,Math.min(80,view.dec+dy/scale));
+  view.ra=((view.ra-dx/scale/Math.max(0.2,Math.cos(view.dec*Math.PI/180)))+360)%360;
+  dragLast={x:e.clientX,y:e.clientY};
+  slewTo=null;
+});
+function endDrag(){dragging=false;}
+cv.addEventListener('pointerup',endDrag);
+cv.addEventListener('pointercancel',endDrag);
+
+var last=0;
+function loop(ts){
+  var dt=last?Math.min(.05,(ts-last)/1000):0;last=ts;
+  /* tracking follows the field rate: 15 degrees of sky an hour */
+  if(tracking&&!dragging)ha=(ha+dt*15/60)%360;
+  /* slewing: the mount moves at a fixed rate toward the target */
+  if(slewTo){
+    var r1=slewTo.ra,s1=slewTo.dec,rate=6; /* degrees of sky a second */
+    var dra=r1-view.ra;
+    while(dra>180)dra-=360;while(dra<-180)dra+=360;
+    var step=dra*Math.min(1,dt*rate/15);
+    var ddec=(s1-view.dec)*Math.min(1,dt*rate/15);
+    view.ra=((view.ra+step)+360)%360;
+    view.dec=Math.max(-80,Math.min(80,view.dec+ddec));
+    if(Math.abs(dra)<0.2&&Math.abs(s1-view.dec)<0.2)slewTo=null;
+    var el=document.getElementById('ha');
+    el.value=Math.round(((ha+360)%360)/1);
+  }
+  draw(ts);
+  /* the readout, written from the same numbers the picture uses */
+  var ra=document.getElementById('radec');
+  ra.innerHTML='RA '+fmtRA(view.ra/15)+'<br>Dec '+fmtDec(view.dec);
+  var aa=target?altAz(target.dec,(target.ra*15-ha+360)%360):null;
+  document.getElementById('rA').textContent=aa?(aa.alt*57.3).toFixed(0)+'°':'—';
+  document.getElementById('rZ').textContent=aa?((aa.az*57.3+360)%360).toFixed(0)+'°':'—';
+  requestAnimationFrame(loop);
+}
+document.getElementById('rF').textContent=FOVS[fovIdx].n+' · '+FOVS[fovIdx].deg+'°';
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

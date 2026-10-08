@@ -1,0 +1,81 @@
+# THE ROOM — a chart, a set, a solo
+
+## Short title
+Jazz Club
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a jazz club at night, where four
+players sit under one moving spotlight and a solo is generated over a fixed twelve-bar
+blues, written onto a staff as it goes. No external dependencies whatsoever — no CDN, no
+web fonts, no external images, no JS libraries. All CSS and JavaScript inline, works
+offline by double-clicking, responsive, valid HTML5.
+
+Artistic direction: a warm dark room. Ground #0a0806, hairlines rgba(240,230,214,.14, body
+#f0e6d6 with muted #a2937c, amber #e8b25c for the light and the chart and sage #8fc7a8 for
+in-scale notes, with pink #ff9ecb for the ones that are not. Serif headings with italic
+accent words, uppercase .2em–.4em kickers, monospace figures.
+
+The room is one canvas at 1000 × 440: a warm vertical gradient, three stage lights behind
+the band, seventy blobs of smoke drifting upward that brighten inside the beam, a cone of
+light from a stand to a pool on the floor, and four silhouettes with rim light — three
+behind and the soloist, larger, in the beam with a horn whose bell catches the light.
+
+The chart is fixed: twelve bars of a blues in B flat — I, IV, I, I, IV, I, V, IV, I, IV, I,
+V — printed in the corner with the current bar marked. The solo is generated from a scale
+walk: a step or a leap in the mixolydian set of a seventh chord, with the chromatic slider
+raising the chance of an off-scale step. Every note is classed by whether its semitone
+position is the root, third, fifth or flat seventh, and the in-scale ones are drawn green on
+the staff and the others pink.
+
+The staff is a second canvas with five ruled lines, twelve bar lines, a highlighted bar at
+the current position, and each note written at its bar and beat. Take a chorus resets the
+chorus, clears the staff and shifts the spotlight.
+
+Controls: tempo, notes per bar, chromatic, Start the set and Take a chorus. Readout: tempo,
+key, bar, current chord, the interval of the last note, and choruses taken.
+
+Layout: nav, centred hero, the scene with the chart overlay, the staff, a dock of three
+sliders and two buttons, a readout row, then two three-cell note rows on the changes,
+tension, chromatic, the spotlight, the staff and a chorus, then a footer.
+
+Interaction: press Start the set and the room begins: the solo walks up and down the scale,
+the bar marker moves across the staff, the chart marks the chord underneath, and the
+spotlight drifts with the phrasing. Visitors set the tempo, thin or thicken the notes, push
+the chromatic up to make the line lean hard against the changes, and take another chorus for
+a fresh start.
+
+## One-paragraph description of the intended design
+A jazz club on canvas where four silhouettes sit under a cone of light through drifting
+smoke, and a solo is generated over a fixed twelve-bar blues in B flat — a scale walk over
+the mixolydian set of a seventh chord whose off-scale notes are marked pink and in-scale
+ones green — written onto a ruled staff as the bar marker crosses it, with tempo, density
+and chromatic sliders and a chorus button that clears the staff and shifts the spotlight.
+
+## Major visual techniques used
+- Room as a warm vertical gradient with three stage lights behind, so the space reads as
+  lit rather than dark
+- Smoke as seventy drifting radial blobs whose alpha rises inside the beam, which is what
+  makes a small drawing read as air
+- Beam as a cone from a stand to a pool on the floor, with a radial pool gradient at the
+  base
+- Figures as filled silhouettes with a single rim-light stroke on the beam side, so depth
+  comes from one edge rather than shading
+- The soloist drawn larger with a horn whose bell is the brightest thing in the frame
+- Chart printed as HTML in the corner with the current bar marked, from the same array
+  the clock uses
+- Solo generated as a walk over the mixolydian set of a seventh chord, with leap and
+  chromatic probabilities from the sliders
+- Notes classed by semitone position, in-scale drawn green and off-scale pink, so tension
+  is visible
+- Staff drawn from the same note array as the scene, with bar lines and a highlighted bar
+- Sub-beat clock with a catch-up guard, so a slow tempo and a fast one both work
+- Beam drift tracked by easing the spotlight toward a target that moves per chorus
+- Interval readout derived from the last note's semitone position, so the readout is a
+  property of the line
+
+## Intended interaction model
+A room you run. Visitors press Start the set, then set the tempo, thin or thicken the notes,
+and push the chromatic slider to make the line lean against the chord underneath — watching
+the staff fill green where it is safe and pink where it is not — and take another chorus to
+clear the staff and move the light.

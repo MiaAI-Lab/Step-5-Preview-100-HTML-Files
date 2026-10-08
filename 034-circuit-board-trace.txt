@@ -1,0 +1,83 @@
+# TRACE — Board Rev C, Signal Flow
+
+## Short title
+Circuit Board Trace
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: an animated printed
+circuit board called TRACE, board revision C. No external dependencies whatsoever
+— no CDN, no web fonts, no external images, no external SVG files, no JavaScript
+libraries. All CSS and JavaScript inline, works offline by double-clicking, responsive,
+valid HTML5.
+
+Artistic direction: a macro photograph of a PCB. Soldermask green — a diagonal
+gradient from #062a14 through #041a0e to #03120a — with a 26px silkscreen grid at
+4.5% white, copper traces in warm brown (#c87b3a body, #e0a366 highlight), gold
+pads (#e8c88a), near-black chip bodies with pale pins, mint-green signal highlights
+(#57e0a0) and a second signal colour in pale blue (#8fe0ff). Type is a serif for
+headline and figures, and 8.5–9.5px wide-tracked monospace for all metadata.
+
+The board is generated procedurally. Nine chip packages are placed at random
+positions and sizes, each drawn as a rounded rectangle with a dark linear-gradient
+body, a hairline stroke, pins running along both long sides, a pin-1 dot and a
+silscreen reference like "U3". Twenty-six traces are manhattan paths: each starts
+at a random point and takes three to six segments, alternating horizontal and
+vertical, clamping to the board edges; the total manhattan length is precomputed.
+Thirty-four vias are drawn as copper rings with a dark hole. Eighteen
+through-hole pads are annular rings — a radial gradient from transparent at the
+centre out to a bright gold rim and back — with a drilled hole.
+
+The animation: each trace has a pulse with its own offset and speed. Every frame a
+fraction f is walked along the trace's precomputed length (an `at()` helper
+interpolates along the segments) and a 16-pixel radial highlight is drawn there in
+'lighter' blend — white core, signal-colour mid, transparent edge — plus a small
+white dot and a short trailing wake stroke back along the path. A third of the
+traces use the pale-blue signal colour, the rest mint green, so the board reads as
+two different nets. A final 300-rect speckle at 5% alpha gives the soldermask its
+texture.
+
+Layout: a nav with a monospace brand. A two-column hero: an eyebrow, a serif
+headline with one italic signal-green line, and a paragraph about signals taking
+the long way round. Then a 16:10 board panel inset in a dark frame with an inner
+shadow. Then a four-cell spec strip built from 1px gaps with large pad-gold serif
+figures (4 layers, 0.2mm trace width, 312 components, 1.6mm substrate). Then a
+ruled monospace footer.
+
+Interaction: none beyond the running animation. The board regenerates itself on
+resize and re-seeds a fresh layout each time the viewport changes, so the page
+never looks the same twice. The hero and specs collapse to one and two columns
+respectively under 880px.
+
+## One-paragraph description of the intended design
+A generated PCB seen under magnification: nine dark chip packages with pins and
+silscreen labels, twenty-six manhattan copper traces carrying glowing signal pulses
+that walk their precomputed lengths with trailing wakes, thirty-four copper vias,
+eighteen annular through-hole pads, and a speckled green soldermask — in copper,
+gold, mint and pale blue.
+
+## Major visual techniques used
+- Procedural board generation: chips, manhattan traces, vias and pads, re-seeded on
+  resize
+- Manhattan path tracing with horizontal/vertical segment alternation and edge
+  clamping
+- Precomputed manhattan path length with an interpolating `at(f)` walker for pulses
+- Signal pulses as 16px radial gradients in 'lighter' blend, plus a white dot and a
+  short trailing wake stroke
+- Two-colour signal system (mint green / pale blue) split across the traces
+- Rounded-rectangle chip packages from eight path segments with quadratic corners
+- Chip pins drawn as small rectangles along both long sides, plus a pin-1 dot
+- Copper traces as two stacked strokes (wide dark body, narrow bright highlight)
+- Vias as copper rings with a dark drilled hole
+- Annular through-hole pads from a radial gradient that goes dark → bright → dark
+- Dark chip bodies from diagonal linear gradients with a hairline stroke
+- 26px silkscreen grid at 4.5% white over a diagonal soldermask gradient
+- 300-rectangle speckle at 5% alpha for soldermask texture
+- Inset-shadow board frame in a 16:10 panel
+- Serif headline with one signal-green italic line against 8.5px tracked monospace
+- Hero and spec collapse under 880px
+
+## Intended interaction model
+A generated artefact. Visitors watch the signals travel; there is nothing to
+operate. Resizing the window regenerates the entire board from scratch, which is the
+page's only real interaction — the layout is never the same twice.

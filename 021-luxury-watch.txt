@@ -1,0 +1,90 @@
+# CALIBRE 09 — A Hand-Wound Chronometer
+
+## Short title
+Luxury Watch
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a luxury watch product
+page, "CALIBRE 09" by the fictional Maison Vaurin. No external dependencies
+whatsoever — no CDN, no web fonts, no external images, no external SVG files, no
+JavaScript libraries. All CSS and JavaScript inline, works offline by
+double-clicking, responsive, valid HTML5.
+
+Artistic direction: precious-metal minimalism. Near-black #0a0a0b ground, warm gold
+#d6c49f and a darker gold #8f7f5c, off-white #efece5, and hairline gold rules at
+18% alpha used to separate everything. No colour other than gold and the dial's
+deep blue-black appears anywhere. Type is a high-contrast serif for display and
+numbers, a monospace at 8.5–9.5px with 0.2–0.34em tracking for every label, and a
+system sans only for one or two paragraphs.
+
+The watch is built in CSS, not drawn. The case is a circle whose background is a
+radial highlight over a conic sweep of greys, so it reads as brushed steel catching
+light at the top-left. The bezel is a 12-stop conic gradient that alternates
+dark and bright gold in an irregular rhythm, giving a fluted, machined look. The
+dial is an inset circle of deep blue-black with a fine guilloché — a
+repeating-radial-gradient of 1px white lines every 7px — and holds sixty indices
+generated in JavaScript (every fifth one bigger and wider), three hands (gold
+gradients, the second hand carrying a counterweight tail), a bevelled centre cap,
+and two lines of tiny text. Two lugs and two leather-coloured bands with an inner
+shadow complete the silhouette. Moving the pointer tilts the whole watch in 3D with
+rotateY/rotateX driven by normalised pointer position. The hands are driven by the
+real wall clock at animation-frame resolution, including milliseconds, so the
+sweep is genuinely smooth.
+
+Below, a second canvas renders the exposed movement. On a dark plate it draws
+Côtes de Genève as sixteen concentric engraved rings; twenty-four ruby jewels, each
+a radial gradient from pink-white through crimson to near-black, seeded around the
+outer ring; and five mechanisms at their true relative speeds — a mainspring barrel
+whose spring is an Archimedean spiral of five turns and which rotates slowest, a
+centre wheel with six spokes and twenty-eight teeth, a third wheel, a fast
+fifteen-spoke escape wheel, and a balance wheel with a four-turn hairspring that
+oscillates on a sine rather than rotating, its rim carrying four timing screws. A
+bevelled bridge sweeps across the plate with a thick and a thin stroke.
+
+Layout: a sticky nav with the maison name at 0.42em tracking, three links and a
+gold "Enquire" button. The hero is a two-column split — reference line, serif
+headline with one italic gold word, lede, a six-cell specification grid built from
+1px gaps over gold (movement, power reserve, case, crystal, water resistance,
+frequency), a large price, and a secondary CTA — against the watch on its stage
+inside a soft gold halo. Then the movement section as a mirrored two-column split
+with a four-row spec list. Then a four-cell strip of large gold serif numerals
+(39.0, 72, 218, 88). Then a ruled monospace footer.
+
+Interaction: the watch tilts toward the pointer, its hands keep real time, the
+movement keeps running beneath it, and the two gold buttons confirm in place when
+pressed. There are no other controls — the page's whole argument is restraint, and
+the only motion is either mechanical (the hands, the wheels) or the tilt.
+
+## One-paragraph description of the intended design
+A precious-metal product page: a CSS-built chronometer — conic-gradient fluted
+bezel, guilloché dial, sixty indices and three gold hands keeping genuinely smooth
+real time — tilting toward your pointer, above a canvas movement where a spiral
+mainspring, three toothed wheels, an escape wheel and an oscillating balance all
+turn at their true relative rates, in nothing but gold on near-black.
+
+## Major visual techniques used
+- Brushed-steel case from a radial highlight over a conic grey sweep with paired
+  inset shadows
+- Fluted bezel from an irregular 12-stop conic gradient alternating dark/bright gold
+- Guilloché dial from a repeating-radial-gradient of hairlines
+- Sixty dial indices generated in JS, every fifth enlarged, rotated into place
+- Real-time hands driven at animation-frame resolution including milliseconds
+- 3D tilt with rotateY/rotateX from normalised pointer position
+- Canvas movement: sixteen concentric Côtes de Genève rings, twenty-four ruby jewels
+  as three-stop radial gradients, and a bevelled bridge in two stroke weights
+- Archimedean-spiral mainspring (five turns) drawn as a single path
+- Toothed wheels from spoke lines plus a ring plus 28 tick marks
+- Oscillating balance wheel: four-turn hairspring spiral, rim, two arms and four
+  timing screws, rotating on a sine instead of a linear rate
+- Spec and stat grids built from 1px gaps over a gold-coloured background
+- Extreme typographic restraint: serif display + 8.5px tracked monospace labels
+- Sticky nav with backdrop blur; hero and movement collapse to one column under
+  880px
+
+## Intended interaction model
+An object to be admired. Moving the pointer tilts the watch and reveals its depth;
+everything else is already running — real time on the dial, the movement turning
+beneath it. The two gold enquiry buttons are the only actions and both simply
+confirm. The page has no other interaction because a product at this price is
+presented by standing back.

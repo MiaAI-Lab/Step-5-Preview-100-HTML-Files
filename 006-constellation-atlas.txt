@@ -1,0 +1,82 @@
+# ATLAS MINOR — An Engraved Sky, Generated
+
+## Short title
+Constellation Atlas
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a generated celestial
+atlas called ATLAS MINOR. Absolutely no external dependencies — no CDN, no web
+fonts, no external images, no external SVG files, no JavaScript libraries. All CSS
+and JavaScript inline, works offline from a double-click, responsive, valid HTML5.
+
+Artistic direction: antique copperplate engraving meets modern generative art. The
+sky is not a photograph, it is a drawing: deep indigo ground (#070c1c → #0a1024 →
+#131c3a diagonal gradient), soft blue nebula dust as large low-alpha radial
+gradients, and a star field whose sizes follow a cubic power distribution so tiny
+stars vastly outnumber bright ones. Every bright star gets a hand-drawn diffraction
+cross. Constellations are drawn as double lines — a wide, very faint gold halo
+under a tight cream stroke — the way an engraved plate has a burr around each
+line, and the polylines snap to real stars in the field so the geometry never
+floats.
+
+Layout: a full-bleed canvas with a gold hairline frame inset 14px and two 16px
+corner brackets, plus a radial vignette. HUD corners hold small monospace
+metadata (plate number, coordinates, figure count). Top-left: an italic serif
+title "Sky of Small Things" with a paragraph of instructions. Top-right: a
+glass detail card that fades and slides in when a constellation is hovered,
+showing its fake right-ascension/declination, its invented name in italic serif, a
+one-sentence provenance story, its magnitude and its star count. Bottom-left: a
+row of engraved tool buttons — "Re-roll the sky", "Names", "Grid".
+
+Typography: italic serif for constellation names and the title; a 9–9.5px
+wide-tracked monospace in gold for every label and coordinate; a system sans for
+one short paragraph.
+
+Colour palette: midnight indigo grounds, cream #f0e6d2 line work, gold #d9b26a
+accents, blue-white and warm-white stars. Nothing is saturated.
+
+Interaction: pointer movement parallaxes the whole plate — stars, grid and
+constellations shift together by up to 16px with easing — while a hit test on the
+constellation vertices highlights that figure: its lines brighten from 30% to 95%
+alpha, its nodes swell, its label grows and turns gold, and the detail card
+populates with its name, coordinates and story. "Re-roll the sky" regenerates
+everything — a new star field, a new set of invented constellations drawn from a
+list of forty-one homely names (Lantern, Kettle, Thimble, Plumb Line…) and nine
+provenance sentences, and a new plate numeral in Roman numerals. "Names" and
+"Grid" toggle the engraving layers. All canvas work is DPR-aware and rebuilt on
+resize.
+
+## One-paragraph description of the intended design
+A generative star chart that behaves like an antique plate: a cubic-distributed
+star field with diffraction crosses and drifting nebula dust, constellations drawn
+as double gold-and-cream engraved lines snapped to real stars, invented names in
+italic serif with leader lines, and a hover card that tells you the fake
+provenance of whichever figure you point at — all parallaxing gently under the
+cursor and re-rollable at will.
+
+## Major visual techniques used
+- Canvas generative star field with a cubic power-law magnitude distribution and
+  per-star twinkle phase/speed
+- Hand-drawn diffraction crosses on stars above a radius threshold
+- Double-stroke "engraving" (wide faint halo + tight bright line) via two passes
+  with different lineWidth/alpha
+- Constellation polylines snapped to the nearest real stars so lines never float
+- Large soft nebula dust from many low-alpha radial gradients
+- Eased parallax across stars, grid and constellations driven by one pointer value
+- Faint coordinate grid plus a dashed ecliptic arc drawn with setLineDash
+- Leader-line labels in italic serif with a 6px stem tick
+- Hover hit-test on vertices with eased highlight (lerp) driving alpha, node size,
+  label size and colour
+- Glass detail card fading/sliding in from the top-right
+- Procedural content from curated word/tale lists, re-rolled on demand
+- Gold hairline frame with corner brackets and radial vignette overlay
+- DPR-aware canvas sizing with rebuild on resize; corner HUD positions step in
+  under 760px
+
+## Intended interaction model
+An ambient generative artwork with one core gesture. Visitors move the pointer to
+parallax the plate and hover constellations to read about them; a click is never
+required. Three buttons offer the whole of the page's agency — re-roll for a new
+sky, and two layer toggles for names and grid. The detail card disappears when the
+pointer leaves, leaving the plate clean again.

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SWELL — Nine Hours of Open Water</title>
+<style>
+  :root{
+    --deep:#04141f;
+    --mid:#0a3a52;
+    --shallow:#12788f;
+    --foam:#e8f6f4;
+    --sun:#ffd08a;
+    --text:#e6f4f2;
+    --muted:rgba(230,244,242,.6);
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --serif:"Iowan Old Style",Palatino,Georgia,serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden}
+  body{background:var(--deep);color:var(--text);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+  #sea{position:fixed;inset:0;z-index:0;display:block}
+
+  .ui{position:fixed;inset:0;z-index:2;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(16px,3vw,34px)}
+  .top{display:flex;justify-content:space-between;align-items:flex-start;gap:18px}
+  .k{font-family:var(--mono);font-size:9px;letter-spacing:.34em;text-transform:uppercase;color:var(--sun)}
+  h1{font-family:var(--serif);font-weight:400;font-style:italic;font-size:clamp(28px,5vw,58px);line-height:.98;letter-spacing:-.02em;margin:10px 0 0}
+  h1 b{font-style:normal;font-weight:400;color:var(--foam)}
+  .top p{margin:12px 0 0;font-size:12px;line-height:1.75;max-width:32ch;color:var(--muted)}
+  .gauges{text-align:right;font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);line-height:2.4}
+  .gauges b{display:block;font-size:15px;color:var(--foam);font-weight:400;letter-spacing:.02em}
+
+  .bottom{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+  .tray{
+    pointer-events:auto;display:flex;gap:clamp(8px,1.3vw,16px);flex-wrap:wrap;align-items:center;
+    background:rgba(4,20,31,.6);border:1px solid rgba(232,246,244,.16);border-radius:16px;
+    padding:11px clamp(12px,1.8vw,20px);backdrop-filter:blur(14px)
+  }
+  .g{display:flex;align-items:center;gap:8px}
+  .kk{font-family:var(--mono);font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+  .vv{font-family:var(--mono);font-size:9.5px;color:var(--sun);min-width:26px;font-variant-numeric:tabular-nums}
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;width:66px;height:14px;background:transparent;cursor:pointer
+  }
+  input[type=range]::-webkit-slider-runnable-track{height:2px;background:rgba(232,246,244,.24);border-radius:2px}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;border-radius:50%;background:var(--sun);margin-top:-5px;border:0;box-shadow:0 0 10px rgba(255,208,138,.7)}
+  input[type=range]::-moz-range-track{height:2px;background:rgba(232,246,244,.24);border-radius:2px}
+  input[type=range]::-moz-range-thumb{width:11px;height:11px;border:0;border-radius:50%;background:var(--sun)}
+  button{
+    pointer-events:auto;font-family:var(--mono);font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;
+    background:rgba(255,208,138,.14);border:1px solid rgba(255,208,138,.4);color:var(--text);
+    padding:9px 13px;border-radius:999px;cursor:pointer;transition:background .2s,color .2s
+  }
+  button:hover{background:var(--sun);color:#3a2a10}
+  button.on{background:var(--sun);color:#3a2a10}
+  .hint{font-family:var(--mono);font-size:8.5px;letter-spacing:.22em;text-transform:uppercase;color:rgba(230,244,242,.4);pointer-events:none}
+
+  @media (max-width:760px){.top p,.gauges,.hint{display:none}.ui{padding:14px}}
+</style>
+</head>
+<body>
+<canvas id="sea"></canvas>
+
+<div class="ui">
+  <div class="top">
+    <div>
+      <div class="k">Station Bravo-7 · mid Atlantic</div>
+      <h1>Nine hours of<br><b>open water.</b></h1>
+      <p>A buoy-driven swell model. Cross swells from two directions, a wind chop
+      on top, and a tide that will not be hurried.</p>
+    </div>
+    <div class="gauges">
+      Significant height<b id="gHs">2.4 m</b>
+      Period<b id="gT">8.1 s</b>
+      Wind<b id="gW">SW 14 kt</b>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <div class="tray">
+      <div class="g"><span class="kk">Swell</span><input type="range" id="hs" min="5" max="100" value="42" aria-label="Swell height"><span class="vv" id="hsV">42</span></div>
+      <div class="g"><span class="kk">Period</span><input type="range" id="per" min="3" max="24" value="8" aria-label="Swell period"><span class="vv" id="perV">8.1</span></div>
+      <div class="g"><span class="kk">Chop</span><input type="range" id="chop" min="0" max="100" value="38" aria-label="Wind chop"><span class="vv" id="chopV">38</span></div>
+      <div class="g"><span class="kk">Tide</span><input type="range" id="tide" min="0" max="100" value="30" aria-label="Tide"><span class="vv" id="tideV">30</span></div>
+      <button id="storm">Storm</button>
+      <button id="calm">Calm</button>
+    </div>
+    <div class="hint">Drag to steer the swell direction</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var cv=document.getElementById('sea'),c=cv.getContext('2d');
+  var W,H,DPR=Math.min(devicePixelRatio||1,2);
+  var hs=42,per=8,chop=38,tide=30;
+  var dir=0.6;              /* swell direction in radians */
+  var dirT=0.6;
+  var drag=false,lx=0;
+  var t=0;
+
+  function resize(){
+    W=innerWidth;H=innerHeight;
+    cv.width=W*DPR;cv.height=H*DPR;cv.style.width=W+'px';cv.style.height=H+'px';
+    c.setTransform(DPR,0,0,DPR,0,0);
+  }
+
+  function sky(){
+    var g=c.createLinearGradient(0,0,0,H*0.62);
+    g.addColorStop(0,'#062b3d');
+    g.addColorStop(.42,'#0c4a63');
+    g.addColorStop(.78,'#2a7f92');
+    g.addColorStop(1,'#e0a86a');
+    c.fillStyle=g;c.fillRect(0,0,W,H*0.62);
+    /* sun low on the horizon */
+    var sx=W*0.74, sy=H*0.5;
+    var sg=c.createRadialGradient(sx,sy,0,sx,sy,Math.max(W,H)*0.34);
+    sg.addColorStop(0,'rgba(255,220,160,.85)');
+    sg.addColorStop(.10,'rgba(255,190,110,.45)');
+    sg.addColorStop(1,'rgba(255,170,90,0)');
+    c.fillStyle=sg;c.fillRect(0,0,W,H*0.62);
+    c.fillStyle='rgba(255,244,220,.95)';
+    c.beginPath();c.arc(sx,sy,Math.max(14,H*0.026),0,6.283);c.fill();
+  }
+
+  /* one wave layer: a sum of sines travelling along `dir` */
+  function layer(opts){
+    var amp=(hs/100)*opts.amp*H*0.09;
+    var k=6.283/opts.wl;
+    var spd=(2*Math.PI)/per*opts.sp;
+    c.beginPath();
+    c.moveTo(0,H+10);
+    var x,y,first=true;
+    for(x=-20;x<=W+20;x+=6){
+      /* project x onto the travel direction */
+      var px=x*Math.cos(dir);
+      y=H*opts.y
+        + Math.sin(px*k + t*spd + opts.ph)*amp
+        + Math.sin(px*k*1.9 + t*spd*1.4 + opts.ph*2)*amp*0.34
+        + Math.sin(px*k*3.7 + t*spd*2.1)*amp*(chop/100)*0.22*opts.chopMul;
+      if(first){c.lineTo(x,y);first=false;}
+      else c.lineTo(x,y);
+    }
+    c.lineTo(W+20,H+10);
+    c.closePath();
+    var g=c.createLinearGradient(0,H*opts.y-amp,0,H);
+    g.addColorStop(0,opts.c1);
+    g.addColorStop(1,opts.c2);
+    c.fillStyle=g;
+    c.fill();
+    /* crest highlight */
+    c.strokeStyle=opts.rim;c.lineWidth=opts.rimW;
+    c.beginPath();
+    first=true;
+    for(x=-20;x<=W+20;x+=6){
+      var px2=x*Math.cos(dir);
+      y=H*opts.y
+        + Math.sin(px2*k + t*spd + opts.ph)*amp
+        + Math.sin(px2*k*1.9 + t*spd*1.4 + opts.ph*2)*amp*0.34
+        + Math.sin(px2*k*3.7 + t*spd*2.1)*amp*(chop/100)*0.22*opts.chopMul;
+      if(first){c.moveTo(x,y);first=false;} else c.lineTo(x,y);
+    }
+    c.stroke();
+  }
+
+  var LAYERS=[
+    {y:0.60,wl:520,amp:1.0,sp:0.55,ph:0.0, c1:'rgba(18,120,143,.55)',c2:'rgba(6,44,64,.9)',  rim:'rgba(232,246,244,.30)',rimW:1.4,chopMul:1},
+    {y:0.66,wl:400,amp:0.9,sp:0.70,ph:1.4, c1:'rgba(20,140,158,.7)', c2:'rgba(5,50,72,.95)', rim:'rgba(232,246,244,.40)',rimW:1.5,chopMul:1},
+    {y:0.73,wl:300,amp:0.8,sp:0.85,ph:2.6, c1:'rgba(24,160,172,.75)',c2:'rgba(4,40,60,.98)',  rim:'rgba(232,246,244,.5)', rimW:1.6,chopMul:1.2},
+    {y:0.81,wl:230,amp:0.7,sp:1.05,ph:0.7, c1:'rgba(30,178,186,.8)', c2:'rgba(3,32,50,1)',    rim:'rgba(232,246,244,.6)', rimW:1.8,chopMul:1.3},
+    {y:0.90,wl:170,amp:0.6,sp:1.30,ph:3.3, c1:'rgba(40,196,204,.85)',c2:'rgba(2,24,40,1)',    rim:'rgba(232,246,244,.75)',rimW:2.0,chopMul:1.5},
+    {y:1.00,wl:120,amp:0.5,sp:1.60,ph:1.1, c1:'rgba(60,214,220,.9)', c2:'rgba(1,16,30,1)',    rim:'rgba(232,246,244,.9)', rimW:2.2,chopMul:1.8}
+  ];
+
+  var spray=[];
+  for(var i=0;i<40;i++)spray.push({x:Math.random(),y:Math.random(),r:Math.random()*2+.6,sp:Math.random()*.6+.2,ph:Math.random()*6.283});
+
+  function draw(){
+    c.setTransform(DPR,0,0,DPR,0,0);
+    c.clearRect(0,0,W,H);
+    sky();
+    dir+=(dirT-dir)*0.04;
+
+    var tideOff=(tide-30)/100*H*0.05;
+    for(var l=0;l<LAYERS.length;l++){
+      var L=LAYERS[l];
+      var opts={y:L.y+tideOff/H,wl:L.wl,amp:L.amp,sp:L.sp,ph:L.ph,
+        c1:L.c1,c2:L.c2,rim:L.rim,rimW:L.rimW,chopMul:L.chopMul};
+      layer(opts);
+    }
+
+    /* sun glitter path */
+    c.save();
+    c.globalCompositeOperation='screen';
+    for(var s=0;s<spray.length;s++){
+      var p=spray[s];
+      p.ph+=0.02*p.sp;
+      var gx=W*0.74+(p.x-0.5)*W*0.5+Math.sin(p.ph)*18;
+      var gy=H*0.62+(p.y)*H*0.36;
+      c.fillStyle='rgba(255,225,180,'+(0.10+0.5*Math.abs(Math.sin(p.ph))).toFixed(3)+')';
+      c.beginPath();c.ellipse(gx,gy,p.r*3.4,p.r,0,0,6.283);c.fill();
+    }
+    c.restore();
+
+    t+=0.016;
+
+    /* gauges */
+    var Hs=(0.4+hs/100*6.2).toFixed(1);
+    var T=(0.8+per*1.05).toFixed(1);
+    document.getElementById('gHs').textContent=Hs+' m';
+    document.getElementById('gT').textContent=T+' s';
+    document.getElementById('gW').textContent='SW '+Math.round(4+chop/100*26)+' kt';
+    requestAnimationFrame(draw);
+  }
+
+  cv.addEventListener('pointerdown',function(e){drag=true;lx=e.clientX;cv.setPointerCapture(e.pointerId);});
+  cv.addEventListener('pointermove',function(e){
+    if(!drag)return;
+    dirT+= (e.clientX-lx)*0.004;
+    if(dirT>1.7)dirT=1.7; if(dirT<-1.7)dirT=-1.7;
+    lx=e.clientX;
+  });
+  ['pointerup','pointercancel'].forEach(function(t2){cv.addEventListener(t2,function(){drag=false;});});
+
+  function apply(id,key,fmt){
+    document.getElementById(id).addEventListener('input',function(){
+      window[key]=+this.value;
+      document.getElementById(id+'V').textContent=fmt?fmt(this.value):this.value;
+    });
+  }
+  apply('hs','hs');
+  apply('per','per',function(v){return (+v).toFixed(1)});
+  apply('chop','chop');
+  apply('tide','tide');
+  function preset(h,p2,ch,ti,on){
+    ['hs','per','chop','tide'].forEach(function(id){
+      var el=document.getElementById(id);
+      el.value={'hs':h,'per':p2,'chop':ch,'tide':ti}[id];
+      el.dispatchEvent(new Event('input'));
+    });
+    document.getElementById('storm').classList.toggle('on',on==='storm');
+    document.getElementById('calm').classList.toggle('on',on==='calm');
+  }
+  document.getElementById('storm').addEventListener('click',function(){preset(88,12,82,62,'storm');});
+  document.getElementById('calm').addEventListener('click',function(){preset(18,6,12,22,'calm');});
+
+  addEventListener('resize',function(){clearTimeout(window.__r);window.__r=setTimeout(resize,140)});
+  resize();
+  requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>

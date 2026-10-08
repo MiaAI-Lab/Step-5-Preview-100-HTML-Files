@@ -1,0 +1,9 @@
+# --- keep the workspace scratch dir out of the repo ---
+.simplex/
+.chk/
+.m/
+raw/
+_shoot.sh
+shots.sh
+probe.sh
+*.log

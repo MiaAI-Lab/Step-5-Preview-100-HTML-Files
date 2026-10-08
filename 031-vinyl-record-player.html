@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LACQUER — Side A, Take One</title>
+<style>
+  :root{
+    --bg:#14100f;
+    --bg2:#1e1815;
+    --paper:#efe9dd;
+    --ink:#1a1613;
+    --dim:rgba(239,233,221,.55);
+    --line:rgba(239,233,221,.14);
+    --groove:#0b0908;
+    --gold:#c9a227;
+    --red:#b8342a;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --serif:"Iowan Old Style",Palatino,Georgia,serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--bg);color:var(--paper);font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;
+    background-image:radial-gradient(70% 50% at 20% 0%,#241c18,#14100f 70%);
+  }
+
+  .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(16px,4vw,44px)}
+
+  nav{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:24px 0 0;border-bottom:1px solid var(--line)}
+  .brand{font-family:var(--mono);font-size:10px;letter-spacing:.3em;text-transform:uppercase}
+  .brand b{color:var(--red);font-weight:400}
+  nav ul{display:flex;gap:clamp(12px,2.2vw,28px);list-style:none;margin:0;padding:0}
+  nav a{color:var(--dim);text-decoration:none;font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;transition:color .2s}
+  nav a:hover{color:var(--paper)}
+
+  .deck{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,5vw,64px);align-items:center;padding:clamp(28px,6vw,80px) 0}
+  .plate{position:relative;aspect-ratio:1;display:grid;place-items:center}
+  .platter{
+    position:relative;width:88%;aspect-ratio:1;border-radius:50%;
+    background:
+      radial-gradient(circle at 36% 30%,#2b2521,#171311 55%,#0c0a09);
+    box-shadow:
+      inset 0 2px 3px rgba(255,220,180,.10),
+      inset 0 -4px 8px rgba(0,0,0,.8),
+      0 40px 70px -34px rgba(0,0,0,.95);
+    display:grid;place-items:center;
+  }
+  .disc{
+    position:relative;width:94%;aspect-ratio:1;border-radius:50%;
+    background:#0a0808;
+    box-shadow:0 0 0 1px rgba(255,255,255,.04),inset 0 0 40px rgba(0,0,0,.9);
+    animation:spin 1.8s linear infinite;animation-play-state:paused;
+  }
+  .disc.on{animation-play-state:running}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  /* grooves: fine concentric rings */
+  .disc::before{
+    content:"";position:absolute;inset:0;border-radius:50%;
+    background:repeating-radial-gradient(circle at 50% 50%,
+      rgba(255,255,255,.035) 0 1px, transparent 1px 4px);
+  }
+  /* light sweep across the dead wax */
+  .disc::after{
+    content:"";position:absolute;inset:0;border-radius:50%;
+    background:conic-gradient(from 210deg,
+      transparent 0deg, rgba(255,235,200,.07) 22deg, transparent 48deg,
+      transparent 180deg, rgba(255,235,200,.05) 202deg, transparent 228deg);
+  }
+  .label{
+    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:34%;aspect-ratio:1;border-radius:50%;
+    background:radial-gradient(circle at 38% 32%,#d8cbb0,#a89b80 60%,#7d7260);
+    display:grid;place-items:center;text-align:center;
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,.3),0 0 0 1px rgba(255,255,255,.06);
+  }
+  .label b{
+    display:block;font-family:var(--serif);font-size:clamp(11px,1.5vw,16px);
+    letter-spacing:.1em;color:#241c14;line-height:1.5
+  }
+  .label b i{font-style:italic;display:block;color:var(--red);font-size:.8em;margin-top:4px}
+  .label span{
+    position:absolute;bottom:16%;font-family:var(--mono);font-size:7px;
+    letter-spacing:.2em;color:rgba(36,28,20,.55)
+  }
+  .spindle{
+    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:9px;height:9px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#fff,#8a8278);
+    z-index:2
+  }
+  .arm{
+    position:absolute;right:4%;top:8%;width:46%;height:8px;z-index:4;
+    transform-origin:92% 50%;
+    transform:rotate(-24deg);
+    transition:transform 1.4s cubic-bezier(.4,0,.3,1);
+  }
+  .arm.on{transform:rotate(6deg)}
+  .arm .shaft{
+    position:absolute;inset:0;border-radius:4px;
+    background:linear-gradient(180deg,#cfc6b4,#8d8578 60%,#6b6459);
+    box-shadow:0 3px 8px rgba(0,0,0,.7)
+  }
+  .arm .pivot{
+    position:absolute;right:-14px;top:50%;transform:translateY(-50%);
+    width:30px;height:30px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#e2dac8,#8d8578 60%,#5f594f);
+    box-shadow:0 4px 12px rgba(0,0,0,.8)
+  }
+  .arm .head{
+    position:absolute;left:-6px;top:50%;transform:translateY(-50%);
+    width:26px;height:14px;border-radius:2px;
+    background:linear-gradient(180deg,#3b352f,#1a1613);
+    box-shadow:0 3px 8px rgba(0,0,0,.8)
+  }
+  .arm .head::after{
+    content:"";position:absolute;left:1px;bottom:-3px;width:2px;height:4px;background:var(--gold)
+  }
+
+  .info .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.34em;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:20px}
+  .info h2{font-family:var(--serif);font-weight:400;font-size:clamp(26px,4.6vw,54px);line-height:1;letter-spacing:-.025em;margin:0 0 20px}
+  .info h2 i{font-style:italic;color:var(--gold)}
+  .info p{font-size:13.5px;line-height:1.85;color:var(--dim);margin:0 0 26px;max-width:44ch}
+  .tracklist{list-style:none;margin:0 0 28px;padding:0;border-top:1px solid var(--line)}
+  .tracklist li{
+    display:grid;grid-template-columns:26px 1fr auto;gap:14px;align-items:baseline;
+    padding:12px 0;border-bottom:1px solid var(--line);font-size:13px;cursor:pointer;
+    transition:color .25s
+  }
+  .tracklist li:hover{color:#fff}
+  .tracklist li.now{color:var(--gold)}
+  .tracklist .n{font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:.1em}
+  .tracklist .d{font-family:var(--mono);font-size:10px;color:var(--dim)}
+  .transport{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  button{
+    font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;
+    background:rgba(201,162,39,.14);border:1px solid rgba(201,162,39,.4);color:var(--paper);
+    padding:12px 20px;border-radius:999px;cursor:pointer;transition:background .2s,color .2s
+  }
+  button:hover{background:var(--gold);color:#1a1408}
+  .speed{
+    font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--dim);display:flex;align-items:center;gap:10px
+  }
+  .speed b{color:var(--paper);font-weight:400}
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;width:78px;height:14px;background:transparent;cursor:pointer
+  }
+  input[type=range]::-webkit-slider-runnable-track{height:2px;background:var(--line);border-radius:2px}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;border-radius:50%;background:var(--gold);margin-top:-5px;border:0}
+  input[type=range]::-moz-range-track{height:2px;background:var(--line);border-radius:2px}
+  input[type=range]::-moz-range-thumb{width:11px;height:11px;border:0;border-radius:50%;background:var(--gold)}
+
+  .specs{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin:clamp(20px,4vw,48px) 0}
+  .specs div{background:var(--bg);padding:24px 22px}
+  .specs b{display:block;font-family:var(--serif);font-weight:400;font-size:30px;color:var(--gold);line-height:1;margin-bottom:8px}
+  .specs span{font-family:var(--mono);font-size:8.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
+
+  footer{border-top:1px solid var(--line);padding:26px 0 48px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
+
+  @media (max-width:880px){.deck{grid-template-columns:1fr}.specs{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="brand">Lacquer Records · <b>LQ-014</b></div>
+    <ul>
+      <li><a href="#deck">The record</a></li>
+      <li><a href="#specs">Pressing</a></li>
+    </ul>
+  </nav>
+
+  <section class="deck" id="deck">
+    <div class="plate">
+      <div class="platter">
+        <div class="disc" id="disc">
+          <div class="label">
+            <b>Slow Fields<i>Lacquer LQ-014</i></b>
+            <span>33⅓ RPM · STEREO</span>
+          </div>
+        </div>
+        <div class="spindle"></div>
+        <div class="arm" id="arm">
+          <div class="shaft"></div><div class="head"></div><div class="pivot"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info">
+      <span class="k">Side A · cut at 45 ips</span>
+      <h2>Six pieces for<br>a <i>long evening.</i></h2>
+      <p>Recorded in one room over three nights, onto two inches of tape and then to
+      lacquer. Nothing was repaired afterwards. Pick a track; the arm swings in and
+      the platter turns.</p>
+      <ul class="tracklist" id="tracks"></ul>
+      <div class="transport">
+        <button id="play">▶ Drop the needle</button>
+        <button id="lift" class="ghost" style="background:transparent;border:1px solid var(--line);color:var(--paper)">Lift the arm</button>
+        <span class="speed">Speed <b id="rpm">33⅓</b>
+          <input type="range" id="speed" min="0" max="3" value="1" aria-label="Turntable speed">
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <section class="specs" id="specs">
+    <div><b>180g</b><span>pressing weight</span></div>
+    <div><b>33⅓</b><span>rpm, 12 inch</span></div>
+    <div><b>3</b><span>nights, one room</span></div>
+    <div><b>600</b><span>copies, numbered</span></div>
+  </section>
+
+  <footer>
+    <span>© Lacquer Records</span>
+    <span>Cut by hand · no digital repair</span>
+    <span>Play it once before you file it</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var TRACKS=[
+    {t:'Slow Fields',d:'6:12'},
+    {t:'Two Rooms, One Light',d:'4:48'},
+    {t:'Cassette Weather',d:'7:03'},
+    {t:'The Long Way Down',d:'5:31'},
+    {t:'Tape Hiss at 3am',d:'8:26'},
+    {t:'Side Ends',d:'3:14'}
+  ];
+  var RPM=[0,33.3333,45,78];
+  var RPML=['stopped','33⅓','45','78'];
+  var host=document.getElementById('tracks');
+  var disc=document.getElementById('disc'),arm=document.getElementById('arm');
+  var cur=-1,playing=false,speedIdx=1;
+
+  TRACKS.forEach(function(tr,i){
+    var li=document.createElement('li');
+    li.innerHTML='<span class="n">'+String(i+1).padStart(2,'0')+'</span>'+
+      '<span>'+tr.t+'</span><span class="d">'+tr.d+'</span>';
+    li.addEventListener('click',function(){pick(i)});
+    host.appendChild(li);
+  });
+  var items=[].slice.call(host.children);
+
+  function pick(i){
+    cur=i;
+    items.forEach(function(li,idx){li.classList.toggle('now',idx===i)});
+    start();
+  }
+  function start(){
+    playing=true;
+    disc.classList.add('on');
+    arm.classList.add('on');
+    disc.style.animationDuration=(60/RPM[speedIdx]).toFixed(3)+'s';
+    document.getElementById('play').textContent='❚❚ Pause';
+  }
+  function stop(){
+    playing=false;
+    disc.classList.remove('on');
+    arm.classList.remove('on');
+    document.getElementById('play').textContent='▶ Drop the needle';
+  }
+  document.getElementById('play').addEventListener('click',function(){
+    if(playing){stop();return;}
+    if(cur<0)pick(0); else start();
+  });
+  document.getElementById('lift').addEventListener('click',stop);
+  document.getElementById('speed').addEventListener('input',function(){
+    speedIdx=+this.value;
+    document.getElementById('rpm').textContent=RPML[speedIdx];
+    if(playing&&speedIdx>0)disc.style.animationDuration=(60/RPM[speedIdx]).toFixed(3)+'s';
+    if(speedIdx===0){
+      disc.classList.remove('on');
+    }else if(playing){
+      disc.classList.add('on');
+    }
+  });
+  /* keyboard: space toggles */
+  document.addEventListener('keydown',function(e){
+    if(e.code==='Space'){
+      e.preventDefault();
+      if(playing)stop(); else pick(cur<0?0:cur);
+    }
+  });
+})();
+</script>
+</body>
+</html>

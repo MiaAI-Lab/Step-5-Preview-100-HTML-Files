@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Interpreter's Circle — harmony you can see</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:#f6f2ea;color:#20180f;
+  font:15px/1.62 ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+.serif{font-family:ui-serif,Georgia,"Times New Roman",serif}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.wrap{width:min(1200px,94vw);margin:0 auto}
+nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0 14px;
+  border-bottom:1px solid rgba(32,24,15,.16)
+}
+nav .brand{font-family:ui-serif,Georgia,serif;font-size:19px}
+nav .brand i{font-style:italic;color:#8c5a1e}
+nav ul{display:flex;gap:26px;list-style:none;margin:0;padding:0;font-size:11px;
+  letter-spacing:.22em;text-transform:uppercase;color:#6b5c48}
+nav a{color:inherit;text-decoration:none}nav a:hover{color:#8c5a1e}
+@media(max-width:820px){nav ul{display:none}}
+header.hero{padding:60px 0 18px;text-align:center}
+header.hero .kicker{font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:#8c5a1e;
+  margin:0 0 14px}
+header.hero h1{font-family:ui-serif,Georgia,serif;font-weight:400;
+  font-size:clamp(34px,5.8vw,64px);line-height:1.05;margin:0 0 16px}
+header.hero h1 em{font-style:italic;color:#8c5a1e}
+header.hero p{max-width:62ch;margin:0 auto;color:#5c5040}
+.grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:40px;
+  align-items:start;margin:26px 0 20px}
+@media(max-width:960px){.grid{grid-template-columns:1fr}}
+.panel{border:1px solid rgba(32,24,15,.18);background:#fffdf7;border-radius:6px;overflow:hidden}
+.panel .cap{display:flex;justify-content:space-between;gap:12px;padding:14px 18px;
+  border-bottom:1px solid rgba(32,24,15,.14);font-size:10px;letter-spacing:.26em;
+  text-transform:uppercase;color:#6b5c48}
+.panel .cap b{color:#8c5a1e;font-weight:600}
+#stage{display:block;width:100%;height:auto;touch-action:none}
+.side{display:grid;gap:26px}
+h2{font-family:ui-serif,Georgia,serif;font-weight:400;font-size:25px;margin:0 0 12px}
+h2 em{font-style:italic;color:#8c5a1e}
+p.lead{color:#5c5040;margin:0 0 18px}
+.rows{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.rows button{background:#f2ece0;border:1px solid rgba(32,24,15,.2);border-radius:999px;
+  padding:8px 13px;font:inherit;font-size:12px;color:#20180f;cursor:pointer}
+.rows button[aria-pressed="true"]{background:#20180f;border-color:#20180f;color:#f6f2ea}
+label.slider{display:grid;gap:7px;font-size:10px;letter-spacing:.24em;
+  text-transform:uppercase;color:#6b5c48;margin-bottom:12px}
+input[type=range]{width:100%;accent-color:#8c5a1e}
+.btn{background:#8c5a1e;color:#fffdf7;border:0;border-radius:4px;padding:11px 15px;
+  font:inherit;font-size:12px;font-weight:700;letter-spacing:.08em;cursor:pointer;margin:0 8px 8px 0}
+.btn.ghost{background:transparent;color:#20180f;border:1px solid rgba(32,24,15,.24)}
+.btn:hover{filter:brightness(1.06)}
+dl.readout{display:flex;flex-wrap:wrap;gap:14px 26px;margin:0;border-top:1px solid rgba(32,24,15,.16);
+  padding-top:16px}
+dl.readout div{min-width:92px}
+dl.readout dt{font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:#6b5c48;margin:0 0 4px}
+dl.readout dd{margin:0;font-size:21px;font-family:ui-monospace,Menlo,monospace;color:#8c5a1e}
+.cells{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;margin:46px 0}
+@media(max-width:900px){.cells{grid-template-columns:1fr}}
+.cell{border-top:1px solid rgba(32,24,15,.16);padding-top:16px}
+.cell .fig{font-family:ui-serif,Georgia,serif;font-size:38px;color:#8c5a1e;line-height:1}
+.cell h3{font-family:ui-serif,Georgia,serif;font-weight:400;font-style:italic;font-size:21px;margin:8px 0 8px}
+.cell p{margin:0;color:#5c5040;font-size:14px}
+footer{border-top:1px solid rgba(32,24,15,.16);padding:22px 0 60px;display:flex;
+  justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:11px;letter-spacing:.2em;
+  text-transform:uppercase;color:#6b5c48}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="brand">The Interpreter's <i>Circle</i></div>
+    <ul>
+      <li><a href="#stage-panel">Stage</a></li>
+      <li><a href="#dock">Score</a></li>
+      <li><a href="#notes">Notes</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <p class="kicker">Hindemith · interval root · harmonic tension · additive timbre</p>
+    <h1 class="serif">A chord is a vector.<br>Its name is <em>where it lands</em></h1>
+    <p>Paul Hindemith put the twelve notes on a circle ordered by the closeness of their
+       interval to the root, so a chord has a direction and a pull — and ends up resting
+       on the player it can relax into. Every instrument here is drawn, and its timbre is
+       built from real partials.</p>
+  </header>
+
+  <div class="grid">
+    <section class="panel" id="stage-panel">
+      <div class="cap"><span>The stage</span><b id="cap-name">C major</b></div>
+      <canvas id="stage" width="660" height="660" aria-label="The interpreter's circle"></canvas>
+    </section>
+
+    <div class="side" id="dock">
+      <div>
+        <h2>Choose <em>a chord</em></h2>
+        <p class="lead">Pick a chord and watch the notes light up, the vector swing round
+           the circle, and the ensemble settle on the voice it resolves to.</p>
+        <div class="rows" id="chords"></div>
+      </div>
+      <div>
+        <h2>Choose <em>an instrument</em></h2>
+        <p class="lead">The timbre is built from real partial amplitudes — a clarinet has
+           almost no even harmonics, a violin is rich above the octave, an oboe is
+           reedy and hollow.</p>
+        <div class="rows" id="instruments"></div>
+      </div>
+      <label class="slider" for="tension">Tension <input id="tension" type="range" min="0" max="100" value="46"></label>
+      <label class="slider" for="vol">Volume <input id="vol" type="range" min="0" max="100" value="62"></label>
+      <label class="slider" for="bright">Reed weight <input id="bright" type="range" min="0" max="100" value="50"></label>
+      <div>
+        <button class="btn" id="resolve">Resolve it</button>
+        <button class="btn ghost" id="circle">Circle of fifths</button>
+      </div>
+      <dl class="readout">
+        <div><dt>Chord</dt><dd id="rC">—</dd></div>
+        <div><dt>Root</dt><dd id="rR">—</dd></div>
+        <div><dt>Tension</dt><dd id="rT">0%</dd></div>
+        <div><dt>Vector</dt><dd id="rV">—</dd></div>
+        <div><dt>Resolves to</dt><dd id="rS">—</dd></div>
+      </dl>
+    </div>
+  </div>
+
+  <section class="cells" id="notes">
+    <div class="cell">
+      <div class="fig serif">i</div>
+      <h3>Ordered by interval</h3>
+      <p>Hindemith starts at the root and walks out by the intervals that sit closest to
+         it — fifth, major third, minor third, then the further ones — so distance on the
+         circle is how far a note is from home.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">ii</div>
+      <h3>A chord has a vector</h3>
+      <p>Sum where each note sits on the circle and you get a direction. A major chord
+         points one way, a dominant seventh another, and the direction is the pull the
+         chord has.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">iii</div>
+      <h3>Additive timbre</h3>
+      <p>Every instrument here is a stack of partials. A clarinet's even harmonics are
+         almost silent, which is the hollow sound; a flute has almost nothing above the
+         second harmonic, which is the pure one.</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>The Interpreter's Circle · one canvas, no files</span>
+    <span class="mono">12 notes · 4 instruments · 8 chords</span>
+  </footer>
+</div>
+<script>
+(function(){
+"use strict";
+var cv=document.getElementById('stage'),ctx=cv.getContext('2d');
+var W=cv.width,H=cv.height,CX=W/2,CY=H/2,R=W*0.335;
+
+/* ---- pitch ---- */
+var NAMES=['C','C♯','D','D♯','E','F','F♯','G','G♯','A','A♯','B'];
+function nm(i){return NAMES[((i%12)+12)%12];}
+function hz(i){return 130.81*Math.pow(2,i/12);}
+
+/* Hindemith's circle: rooted at C, ordered by interval to the root */
+var HINDEMITH=[0,7,4,3,10,2,9,5,8,11,6,1];
+var HIDX={};HINDEMITH.forEach(function(n,i){HIDX[n]=i;});
+function hpos(n){return HIDX[((n%12)+12)%12];}
+
+/* ---- chords, by semitone offsets from the root ---- */
+var CHORDS=[
+ {n:'Major',i:[0,4,7]},
+ {n:'Minor',i:[0,3,7]},
+ {n:'Diminished',i:[0,3,6]},
+ {n:'Augmented',i:[0,4,8]},
+ {n:'Sus 4',i:[0,5,7]},
+ {n:'Dominant 7',i:[0,4,7,10]},
+ {n:'Major 7',i:[0,4,7,11]},
+ {n:'Minor 7',i:[0,3,7,10]},
+ {n:'Dim 7',i:[0,3,6,9]},
+ {n:'Neapolitan',i:[0,5,10,11,2]}
+];
+var chord=CHORDS[5];
+
+/* the chord's vector: sum of the notes' positions on Hindemith's circle */
+function chordVector(){
+  var x=0,y=0;
+  chord.i.forEach(function(iv){
+    var a=hpos((chord.i[0]+iv)%12)/12*Math.PI*2-Math.PI/2;
+    x+=Math.cos(a);y+=Math.sin(a);
+  });
+  return {x:x,y:y};
+}
+/* the pull: the note the vector is pointing at */
+function resolve(){
+  var v=chordVector();
+  var ang=Math.atan2(v.y,v.x);
+  var steps=Math.round(ang/(Math.PI*2)*12+12)%12;
+  /* the resolution root is the vector's angle read as a step round the circle */
+  var target=(HINDEMITH[steps]+12)%12;
+  return {target:target,mag:Math.sqrt(v.x*v.x+v.y*v.y)};
+}
+/* harmonic tension: how far the chord's notes sit from the root on the circle */
+function tension(){
+  var s=0;
+  chord.i.forEach(function(iv){s+=hpos((chord.i[0]+iv)%12);});
+  return s/(chord.i.length*11);
+}
+
+/* ---- instruments: real partial amplitudes above the fundamental ---- */
+function drawClarinet(x,y,s,col){
+  ctx.save();ctx.translate(x,y);ctx.rotate(-0.4);ctx.scale(s,s);
+  ctx.fillStyle=col;ctx.strokeStyle='rgba(32,24,15,.5)';ctx.lineWidth=1.2;
+  ctx.beginPath();ctx.rect(-3,-24,6,48);ctx.fill();ctx.stroke();
+  ctx.beginPath();ctx.ellipse(0,-25,3.6,2.4,0,0,6.3);ctx.fill();ctx.stroke();
+  ctx.beginPath();ctx.ellipse(0,24,3.6,2.2,0,0,6.3);ctx.fill();ctx.stroke();
+  ctx.beginPath();ctx.arc(0,-22,1.4,0,6.3);ctx.fillStyle='rgba(32,24,15,.6)';ctx.fill();
+  ctx.restore();
+}
+function drawViolin(x,y,s,col){
+  ctx.save();ctx.translate(x,y);ctx.scale(s,s);
+  ctx.fillStyle=col;ctx.strokeStyle='rgba(32,24,15,.5)';ctx.lineWidth=1.2;
+  ctx.beginPath();
+  ctx.moveTo(0,-26);
+  ctx.bezierCurveTo(6,-24,6,-16,3,-10);
+  ctx.bezierCurveTo(9,-4,9,8,3,16);
+  ctx.bezierCurveTo(6,22,6,26,0,26);
+  ctx.bezierCurveTo(-6,26,-6,22,-3,16);
+  ctx.bezierCurveTo(-9,8,-9,-4,-3,-10);
+  ctx.bezierCurveTo(-6,-16,-6,-24,0,-26);
+  ctx.closePath();ctx.fill();ctx.stroke();
+  ctx.beginPath();ctx.moveTo(0,-18);ctx.lineTo(0,14);
+  ctx.strokeStyle='rgba(32,24,15,.35)';ctx.stroke();
+  ctx.restore();
+}
+function drawOboe(x,y,s,col){
+  ctx.save();ctx.translate(x,y);ctx.scale(s,s);
+  ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=3.4;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(0,-24);ctx.lineTo(0,14);ctx.stroke();
+  ctx.lineWidth=2.2;
+  ctx.beginPath();ctx.moveTo(0,14);ctx.quadraticCurveTo(4,20,2,25);ctx.stroke();
+  ctx.beginPath();ctx.arc(0,-16,1.7,0,6.3);ctx.fill();
+  ctx.lineWidth=1.8;
+  ctx.beginPath();ctx.moveTo(-2,-8);ctx.lineTo(2,-8);
+  ctx.moveTo(-2,-2);ctx.lineTo(2,-2);
+  ctx.moveTo(-2,4);ctx.lineTo(2,4);ctx.stroke();
+  ctx.restore();
+}
+function drawFlute(x,y,s,col){
+  ctx.save();ctx.translate(x,y);ctx.scale(s,s);
+  ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=2.6;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(-2,-22);ctx.lineTo(-2,20);ctx.stroke();
+  ctx.lineWidth=1.2;
+  for(var i=0;i<7;i++){ctx.beginPath();
+    ctx.moveTo(-5,-16+i*5);ctx.lineTo(0,-16+i*5);ctx.stroke();}
+  ctx.restore();
+}
+var INSTS=[
+ {n:'Clarinet',partials:[1,.02,.55,.03,.22,.02,.13,.01,.08,0,.05,0,0],reed:0.35,draw:drawClarinet},
+ {n:'Violin',partials:[1,.42,.36,.28,.22,.18,.14,.11,.09,.07,.06,.05,.04],reed:0.2,draw:drawViolin},
+ {n:'Oboe',partials:[1,.05,.38,.12,.3,.2,.22,.24,.16,.12,.1,.09,.07],reed:0.8,draw:drawOboe},
+ {n:'Flute',partials:[1,.25,.06,.02,.04,0,.01,0,0,0,0,0,0],reed:0.05,draw:drawFlute}
+];
+var inst=INSTS[0];
+
+/* ---- state ---- */
+var t=0,last=0,glow=0,tensionSlider=46,volSlider=62,reedSlider=50;
+var fifthsMode=false;
+var noteHit=[];for(var i=0;i<12;i++)noteHit.push(0);
+
+/* ---- audio: one oscillator per partial ---- */
+var ac=null,master=null,live=[];
+function audio(){
+  if(ac)return ac;
+  var AC=window.AudioContext||window.webkitAudioContext;
+  if(!AC)return null;
+  ac=new AC();
+  master=ac.createGain();master.gain.value=0;master.connect(ac.destination);
+  return ac;
+}
+function stopAudio(){
+  live.forEach(function(o){try{o.osc.stop();}catch(e){}});
+  live=[];
+}
+function playChord(){
+  if(!audio())return;
+  if(ac.state==='suspended')ac.resume();
+  stopAudio();
+  var v=volSlider/100;
+  master.gain.cancelScheduledValues(ac.currentTime);
+  master.gain.linearRampToValueAtTime(v*0.22,ac.currentTime+0.25);
+  var rootN=chord.i[0];
+  chord.i.forEach(function(iv,noteIdx){
+    var n=(rootN+iv)%12;
+    var f=hz(n);
+    inst.partials.forEach(function(amp,pIdx){
+      if(amp<=0.01)return;
+      var osc=ac.createOscillator();osc.type='sine';
+      osc.frequency.value=f*(pIdx+1);
+      var g=ac.createGain();g.gain.value=amp/(pIdx*0.7+1);
+      /* a touch of vibrato so the voice breathes */
+      var lfo=ac.createOscillator();lfo.frequency.value=4.6+pIdx*0.3;
+      var lg=ac.createGain();lg.gain.value=2.2;
+      lfo.connect(lg);lg.connect(osc.frequency);
+      osc.connect(g);g.connect(master);
+      osc.start();lfo.start();
+      live.push({osc:osc,lfo:lfo});
+    });
+  });
+}
+function silence(){
+  if(ac&&master)master.gain.linearRampToValueAtTime(0,ac.currentTime+0.4);
+}
+
+/* ---------- the picture ---------- */
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  var g=ctx.createRadialGradient(CX,CY,20,CX,CY,W*0.62);
+  g.addColorStop(0,'#fffdf3');g.addColorStop(1,'#f2ece0');
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+
+  ctx.save();ctx.translate(CX,CY);
+  /* the ring and its echoes */
+  ctx.lineWidth=1.4;ctx.strokeStyle='rgba(32,24,15,.3)';
+  ctx.beginPath();ctx.arc(0,0,R,0,6.3);ctx.stroke();
+  ctx.setLineDash([2,6]);ctx.lineWidth=1;ctx.strokeStyle='rgba(32,24,15,.16)';
+  ctx.beginPath();ctx.arc(0,0,R*0.5,0,6.3);ctx.stroke();
+  ctx.beginPath();ctx.arc(0,0,R*1.13,0,6.3);ctx.stroke();
+  ctx.setLineDash([]);
+
+  var root=chord.i[0];
+  var set={};chord.i.forEach(function(iv){set[(root+iv)%12]=iv;});
+
+  for(var i=0;i<12;i++){
+    /* the note at this position on the ring */
+    var idx=fifthsMode?(i*7)%12:hpos(i);
+    var a=idx/12*Math.PI*2-Math.PI/2;
+    var x=Math.cos(a)*R,y=Math.sin(a)*R;
+    var on=set[i]!==undefined;
+    var hit=noteHit[i];
+    var tickFrom=R-8,tickTo=R+8;
+    ctx.beginPath();
+    ctx.moveTo(Math.cos(a)*tickFrom,Math.sin(a)*tickFrom);
+    ctx.lineTo(Math.cos(a)*tickTo,Math.sin(a)*tickTo);
+    ctx.strokeStyle=on?'#8c5a1e':'rgba(32,24,15,.24)';
+    ctx.lineWidth=on?2.4:1;ctx.stroke();
+    ctx.font=(on?'600 ':'400 ')+Math.round(W*0.021)+'px ui-serif,Georgia,serif';
+    ctx.fillStyle=on?'#20180f':'rgba(32,24,15,.45)';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(nm(i),Math.cos(a)*(R+24),Math.sin(a)*(R+24));
+    if(on){
+      /* the glow */
+      var gg=ctx.createRadialGradient(x,y,1,x,y,28+hit*14);
+      gg.addColorStop(0,'rgba(140,90,30,'+(0.42+hit*0.5)+')');
+      gg.addColorStop(1,'rgba(140,90,30,0)');
+      ctx.fillStyle=gg;ctx.beginPath();ctx.arc(x,y,28+hit*14,0,6.3);ctx.fill();
+      ctx.beginPath();ctx.arc(x,y,4.4+hit*2,0,6.3);
+      ctx.fillStyle='#8c5a1e';ctx.fill();
+      /* the wave around the note: more lobes for higher notes */
+      strokeWave(x,y,i,set[i],hit);
+    }
+  }
+
+  /* the chord's vector: its direction and its pull */
+  var v=chordVector();
+  var vlen=Math.sqrt(v.x*v.x+v.y*v.y);
+  if(vlen>0.002){
+    ctx.save();
+    ctx.rotate(Math.atan2(v.y,v.x));
+    var lg=ctx.createLinearGradient(0,0,R*Math.min(1,vlen*0.95),0);
+    lg.addColorStop(0,'rgba(140,90,30,.8)');
+    lg.addColorStop(1,'rgba(140,90,30,.04)');
+    ctx.strokeStyle=lg;ctx.lineWidth=2.6;ctx.lineCap='round';
+    ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(R*Math.min(1,vlen*0.95),0);ctx.stroke();
+    var ax=R*Math.min(1,vlen*0.95);
+    ctx.beginPath();
+    ctx.moveTo(ax+10,0);ctx.lineTo(ax-6,5);ctx.moveTo(ax-6,-5);ctx.lineTo(ax+10,0);
+    ctx.fillStyle='rgba(140,90,30,.85)';ctx.fill();
+    ctx.restore();
+  }
+
+  /* the resolution wave, when it has just resolved */
+  if(glow>0.01){
+    ctx.strokeStyle='rgba(140,90,30,'+(glow*0.75)+')';
+    ctx.lineWidth=1.5+glow*4;
+    ctx.beginPath();ctx.arc(0,0,R*(1-glow*0.9),0,6.3);ctx.stroke();
+  }
+
+  /* the instrument, at the foot of the circle */
+  ctx.save();ctx.translate(0,R*0.44);
+  inst.draw(0,0,W*0.0042,'#c99a5c');
+  ctx.restore();
+  /* its name */
+  ctx.font=Math.round(W*0.02)+'px ui-serif,Georgia,serif';
+  ctx.fillStyle='rgba(32,24,15,.55)';ctx.textAlign='center';
+  ctx.fillText(inst.n,0,R*0.44+W*0.052);
+
+  /* the timbre strip: the partial amplitudes, scaled by the reed weight */
+  drawPartials();
+  ctx.restore();
+}
+function strokeWave(x,y,n,iv,hit){
+  var p=inst.partials[iv]||0;
+  if(p<=0)return;
+  var lobes=2+n;
+  ctx.save();ctx.translate(x,y);
+  ctx.strokeStyle='rgba(32,24,15,'+(0.3*p)+')';ctx.lineWidth=1.2;
+  ctx.beginPath();
+  for(var i=0;i<=48;i++){
+    var a=i/48*6.28;
+    var r=9+(1+Math.sin(a*lobes+t*3.4+x*0.04))*3.4*p*(0.5+hit);
+    var px=Math.cos(a)*r,py=Math.sin(a)*r;
+    if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);
+  }
+  ctx.closePath();ctx.stroke();ctx.restore();
+}
+function drawPartials(){
+  var y=H*0.885,bw=W*0.052;
+  var reeds=0.45+reedSlider/100*1.3;
+  inst.partials.forEach(function(p,i){
+    var x=-W*0.235+i*bw;
+    var h=p*bw*0.5*reeds;
+    ctx.fillStyle=i===0?'rgba(140,90,30,.6)':'rgba(32,24,15,'+(0.1+p*0.45)+')';
+    ctx.fillRect(x,y-h,bw*0.5,h);
+    ctx.strokeStyle='rgba(32,24,15,.3)';ctx.lineWidth=0.7;
+    ctx.beginPath();ctx.moveTo(x,y+3);ctx.lineTo(x+bw*0.5,y+3);ctx.stroke();
+  });
+  ctx.font=Math.round(W*0.016)+'px ui-monospace,Menlo,monospace';
+  ctx.fillStyle='rgba(32,24,15,.45)';ctx.textAlign='left';ctx.textBaseline='top';
+  ctx.fillText('partials · '+inst.n,-W*0.235,y+8);
+}
+/* ---------- controls, readout, loop ---------- */
+var cbox=document.getElementById('chords');
+CHORDS.forEach(function(c,i){
+  var b=document.createElement('button');
+  b.textContent=c.n;
+  b.setAttribute('aria-pressed',String(c===chord));
+  b.addEventListener('click',function(){
+    chord=c;
+    [].slice.call(cbox.children).forEach(function(o){
+      o.setAttribute('aria-pressed',String(o===b));});
+    document.getElementById('cap-name').textContent='C '+c.n.toLowerCase();
+    playChord();
+  });
+  cbox.appendChild(b);
+});
+var ibox=document.getElementById('instruments');
+INSTS.forEach(function(v,i){
+  var b=document.createElement('button');
+  b.textContent=v.n;
+  b.setAttribute('aria-pressed',String(v===inst));
+  b.addEventListener('click',function(){
+    inst=v;
+    [].slice.call(ibox.children).forEach(function(o){
+      o.setAttribute('aria-pressed',String(o===b));});
+    playChord();
+  });
+  ibox.appendChild(b);
+});
+function bind(id,fn){var el=document.getElementById(id);
+  el.addEventListener('input',function(){fn(+el.value);});}
+bind('tension',function(v){tensionSlider=v;});
+bind('vol',function(v){volSlider=v;});
+bind('bright',function(v){reedSlider=v;});
+document.getElementById('resolve').addEventListener('click',function(){
+  glow=1;playChord();
+});
+var cf=document.getElementById('circle');
+cf.addEventListener('click',function(){
+  fifthsMode=!fifthsMode;
+  cf.textContent=fifthsMode?'Hindemith order':'Circle of fifths';
+  cf.setAttribute('aria-pressed',String(fifthsMode));
+});
+/* touching a note lights it */
+function noteAt(e){
+  var r=cv.getBoundingClientRect();
+  var x=(e.clientX-r.left)*(W/r.width)-CX,y=(e.clientY-r.top)*(H/r.height)-CY;
+  var d=Math.sqrt(x*x+y*y);
+  if(Math.abs(d-R)>34)return -1;
+  var a=Math.atan2(y,x)+Math.PI/2;
+  if(a<0)a+=6.28;if(a>=6.28)a-=6.28;
+  var slot=Math.round(a/6.28*12)%12;
+  /* find the note whose ring position is this slot */
+  for(var i=0;i<12;i++){
+    var idx=fifthsMode?(i*7)%12:hpos(i);
+    if(idx===slot)return i;
+  }
+  return -1;
+}
+cv.addEventListener('pointermove',function(e){
+  var n=noteAt(e);
+  if(n>=0)noteHit[n]=1;
+});
+cv.addEventListener('pointerdown',function(e){
+  var n=noteAt(e);
+  if(n>=0){noteHit[n]=1;playChord();}
+});
+function readout(){
+  var r=resolve();
+  document.getElementById('rC').textContent='C '+chord.n.toLowerCase();
+  document.getElementById('rR').textContent='C';
+  var tn=tension();
+  document.getElementById('rT').textContent=Math.round((tn*0.6+tensionSlider/100*0.4)*100)+'%';
+  var ang=Math.atan2(chordVector().y,chordVector().x)*180/Math.PI;
+  document.getElementById('rV').textContent=(ang<0?ang+360:ang).toFixed(0)+'°';
+  document.getElementById('rS').textContent=nm(r.target)+' major';
+}
+function loop(ts){
+  var dt=last?Math.min(.05,(ts-last)/1000):0;last=ts;
+  t+=dt;
+  for(var i=0;i<12;i++)noteHit[i]=Math.max(0,noteHit[i]-dt*1.6);
+  glow=Math.max(0,glow-dt*0.7);
+  draw();readout();
+  requestAnimationFrame(loop);
+}
+draw();readout();requestAnimationFrame(loop);
+})();
+
+</script>
+</body>
+</html>

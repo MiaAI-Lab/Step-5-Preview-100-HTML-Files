@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>THE GEODE — A Chamber of Slow Light</title>
+<style>
+  :root{
+    --deep:#0a0713;
+    --deep2:#150c26;
+    --violet:#8b5cf6;
+    --teal:#2dd4bf;
+    --rose:#fb7185;
+    --gold:#fbbf24;
+    --paper:#f5f0ff;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    --sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden}
+  body{background:var(--deep);color:var(--paper);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+  #cv{position:fixed;inset:0;z-index:0;display:block;touch-action:none}
+  .vig{position:fixed;inset:0;z-index:1;pointer-events:none;
+    background:radial-gradient(110% 90% at 50% 55%,transparent 40%,rgba(4,2,10,.9))}
+
+  .ui{position:fixed;inset:0;z-index:2;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(18px,3.4vw,40px)}
+  .top{display:flex;justify-content:space-between;align-items:flex-start;gap:18px}
+  .k{font-family:var(--mono);font-size:9px;letter-spacing:.36em;text-transform:uppercase;color:rgba(245,240,255,.55)}
+  h1{
+    font-family:var(--serif);font-weight:400;font-style:italic;
+    font-size:clamp(28px,5.4vw,64px);line-height:.98;letter-spacing:-.02em;margin:10px 0 0
+  }
+  h1 b{font-style:normal;font-weight:400;background:linear-gradient(100deg,var(--teal),var(--violet) 55%,var(--rose));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .top p{margin:14px 0 0;font-size:12.5px;line-height:1.75;max-width:34ch;color:rgba(245,240,255,.6)}
+  .legend{text-align:right;font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:rgba(245,240,255,.5);line-height:2.4}
+  .legend b{display:block;font-size:15px;color:var(--gold);font-weight:400;letter-spacing:.04em}
+
+  .bottom{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+  .tray{
+    pointer-events:auto;display:flex;gap:clamp(8px,1.4vw,18px);flex-wrap:wrap;align-items:center;
+    background:rgba(20,12,38,.55);border:1px solid rgba(245,240,255,.14);border-radius:16px;
+    padding:11px clamp(12px,1.8vw,20px);backdrop-filter:blur(14px)
+  }
+  .g{display:flex;align-items:center;gap:8px}
+  .kk{font-family:var(--mono);font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;color:rgba(245,240,255,.55)}
+  .vv{font-family:var(--mono);font-size:9.5px;color:var(--teal);min-width:26px;font-variant-numeric:tabular-nums}
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;width:70px;height:14px;background:transparent;cursor:pointer
+  }
+  input[type=range]::-webkit-slider-runnable-track{height:2px;background:rgba(245,240,255,.24);border-radius:2px}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;border-radius:50%;background:var(--gold);margin-top:-5px;border:0;box-shadow:0 0 10px rgba(251,191,36,.7)}
+  input[type=range]::-moz-range-track{height:2px;background:rgba(245,240,255,.24);border-radius:2px}
+  input[type=range]::-moz-range-thumb{width:11px;height:11px;border:0;border-radius:50%;background:var(--gold)}
+  button{
+    pointer-events:auto;font-family:var(--mono);font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;
+    background:rgba(45,212,191,.14);border:1px solid rgba(45,212,191,.4);color:var(--paper);
+    padding:9px 14px;border-radius:999px;cursor:pointer;transition:background .2s,color .2s
+  }
+  button:hover{background:var(--teal);color:#04211d}
+  .hint{
+    font-family:var(--mono);font-size:8.5px;letter-spacing:.22em;text-transform:uppercase;
+    color:rgba(245,240,255,.4);pointer-events:none
+  }
+
+  @media (max-width:760px){
+    .top p{display:none}
+    .legend{display:none}
+    .hint{display:none}
+    .ui{padding:16px}
+  }
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+<div class="vig"></div>
+
+<div class="ui">
+  <div class="top">
+    <div>
+      <div class="k">Chamber 04 · the geode</div>
+      <h1>Slow light,<br><b>held in stone.</b></h1>
+      <p>Move the pointer to look around the chamber. Every facet answers with its
+      own delay, the way a real crystal does.</p>
+    </div>
+    <div class="legend">
+      Facets<b id="nFac">0</b>
+      Depth<b id="nDep">0.0</b>
+      Light<b id="nLit">0%</b>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <div class="tray">
+      <div class="g"><span class="kk">Depth</span><input type="range" id="depth" min="0" max="100" value="46" aria-label="Depth"><span class="vv" id="depthV">46</span></div>
+      <div class="g"><span class="kk">Light</span><input type="range" id="light" min="0" max="100" value="62" aria-label="Light"><span class="vv" id="lightV">62</span></div>
+      <div class="g"><span class="kk">Drift</span><input type="range" id="drift" min="0" max="100" value="34" aria-label="Drift"><span class="vv" id="driftV">34</span></div>
+      <button id="regen">New chamber</button>
+    </div>
+    <div class="hint">Drag to turn · scroll to push in</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var cv=document.getElementById('cv'),c=cv.getContext('2d');
+  var W,H,DPR=Math.min(devicePixelRatio||1,2);
+  var facets=[],motes=[];
+  var depth=46,light=62,drift=34;
+  var mx=0.5,my=0.5,px=0.5,py=0.5;
+  var push=1,pushT=1;
+  var drag=false,dx0=0,dy0=0,rot=0,rotT=0;
+
+  var HUES=[268,172,344,42,200];
+
+  function rnd(a,b){return a+Math.random()*(b-a)}
+
+  function build(){
+    facets=[];
+    var n=16+((Math.random()*10)|0);
+    for(var i=0;i<n;i++){
+      var layer=i/n;
+      facets.push({
+        x:rnd(0.08,0.92),y:rnd(0.12,0.88),
+        w:rnd(0.05,0.16)*(1-layer*0.4),
+        h:rnd(0.16,0.62)*(1-layer*0.25),
+        hue:HUES[(Math.random()*HUES.length)|0],
+        layer:layer,
+        rot:rnd(-0.5,0.5),
+        lag:layer*0.9+0.15,
+        ph:Math.random()*6.283,
+        sp:rnd(0.3,1.1),
+        sat:rnd(55,90),
+        lum:rnd(48,72)
+      });
+    }
+    /* sort so far layers draw first */
+    facets.sort(function(a,b){return a.layer-b.layer});
+    motes=[];
+    for(var m=0;m<90;m++){
+      motes.push({x:Math.random(),y:Math.random(),r:rnd(0.4,1.9),
+        sp:rnd(0.1,0.7),ph:Math.random()*6.283,layer:Math.random()});
+    }
+    document.getElementById('nFac').textContent=facets.length;
+  }
+
+  function resize(){
+    W=innerWidth;H=innerHeight;
+    cv.width=W*DPR;cv.height=H*DPR;cv.style.width=W+'px';cv.style.height=H+'px';
+    c.setTransform(DPR,0,0,DPR,0,0);
+  }
+
+  function draw(t){
+    c.setTransform(DPR,0,0,DPR,0,0);
+    /* cave ground */
+    var g=c.createRadialGradient(W*0.5,H*0.55,0,W*0.5,H*0.55,Math.max(W,H)*0.85);
+    g.addColorStop(0,'#1a1030');g.addColorStop(.5,'#0d0819');g.addColorStop(1,'#04020a');
+    c.fillStyle=g;c.fillRect(0,0,W,H);
+
+    px+=(mx-px)*0.055; py+=(my-py)*0.055;
+    push+=(pushT-push)*0.06;
+    rot+=(rotT-rot)*0.06;
+
+    var ox=(px-0.5)*-70*push, oy=(py-0.5)*-46*push;
+    var lit=light/100;
+    var dpt=depth/100;
+    var dr=drift/100;
+
+    /* motes behind */
+    for(var i=0;i<motes.length;i++){
+      var mo=motes[i];
+      mo.ph+=0.004*mo.sp*(0.4+dr);
+      var mxx=mo.x*W+ox*(0.3+mo.layer*0.7)+Math.sin(mo.ph)*10*dr;
+      var myy=mo.y*H+oy*(0.3+mo.layer*0.7)+Math.cos(mo.ph*0.8)*8*dr;
+      c.globalAlpha=0.12+mo.layer*0.4;
+      c.fillStyle='#f5f0ff';
+      c.beginPath();c.arc(mxx,myy,mo.r*(0.6+mo.layer*0.8),0,6.283);c.fill();
+    }
+    c.globalAlpha=1;
+
+    /* facets */
+    for(var f=0;f<facets.length;f++){
+      var fa=facets[f];
+      var lag=fa.lag;
+      var fx=fa.x*W+ox*lag+Math.sin(t*0.0002*fa.sp+fa.ph)*14*dr;
+      var fy=fa.y*H+oy*lag+Math.cos(t*0.00017*fa.sp+fa.ph)*10*dr;
+      var sc=(0.55+fa.layer*0.85)*push;
+      var w=fa.w*W*sc, h=fa.h*H*sc;
+
+      c.save();
+      c.translate(fx,fy);
+      c.rotate(fa.rot+rot*0.12*fa.layer);
+      /* the shard: a tall hexagonal prism */
+      c.beginPath();
+      c.moveTo(0,-h/2);
+      c.lineTo(w/2,-h/2+h*0.16);
+      c.lineTo(w/2,h/2-h*0.1);
+      c.lineTo(0,h/2);
+      c.lineTo(-w/2,h/2-h*0.1);
+      c.lineTo(-w/2,-h/2+h*0.16);
+      c.closePath();
+
+      /* body gradient: bright on the lit side */
+      var bg=c.createLinearGradient(-w/2,-h/2,w/2,h/2);
+      var a1=0.10+lit*0.42*(1-fa.layer*0.5);
+      var a2=0.03+lit*0.16;
+      bg.addColorStop(0,'hsla('+fa.hue+','+fa.sat+'%,'+fa.lum+'%,'+a1.toFixed(3)+')');
+      bg.addColorStop(0.5,'hsla('+(fa.hue+18)+','+fa.sat+'%,'+(fa.lum-14)+'%,'+a2.toFixed(3)+')');
+      bg.addColorStop(1,'hsla('+fa.hue+','+fa.sat+'%,'+fa.lum+'%,'+(a1*0.35).toFixed(3)+')');
+      c.fillStyle=bg;
+      c.fill();
+
+      /* facet edge */
+      c.strokeStyle='hsla('+fa.hue+',95%,82%,'+(0.10+lit*0.5*(1-fa.layer*0.4)).toFixed(3)+')';
+      c.lineWidth=Math.max(0.6,1.4-fa.layer);
+      c.stroke();
+
+      /* internal cleavage lines */
+      c.globalAlpha=0.10+lit*0.3;
+      c.strokeStyle='hsla('+fa.hue+',100%,90%,1)';
+      c.lineWidth=0.7;
+      c.beginPath();
+      c.moveTo(-w/2,-h/2+h*0.16);c.lineTo(0,-h/2+h*0.02);c.lineTo(w/2,-h/2+h*0.16);
+      c.moveTo(-w/2,h/2-h*0.1);c.lineTo(0,h/2-h*0.02);c.lineTo(w/2,h/2-h*0.1);
+      c.moveTo(0,-h/2);c.lineTo(0,h/2);
+      c.stroke();
+      c.globalAlpha=1;
+
+      /* a bright specular pip near the top */
+      var pg=c.createRadialGradient(0,-h*0.28,0,0,-h*0.28,w*0.5);
+      pg.addColorStop(0,'hsla('+fa.hue+',100%,92%,'+(0.10+lit*0.55).toFixed(3)+')');
+      pg.addColorStop(1,'hsla('+fa.hue+',100%,92%,0)');
+      c.fillStyle=pg;
+      c.beginPath();c.arc(0,-h*0.28,w*0.5,0,6.283);c.fill();
+
+      c.restore();
+    }
+
+    /* depth haze: darker as depth rises */
+    if(dpt>0){
+      c.fillStyle='rgba(4,2,10,'+(dpt*0.55).toFixed(3)+')';
+      c.fillRect(0,0,W,H);
+    }
+    /* light bloom */
+    if(lit>0.4){
+      var lg=c.createRadialGradient(W*0.5,H*0.5,0,W*0.5,H*0.5,Math.max(W,H)*0.6);
+      lg.addColorStop(0,'rgba(139,92,246,'+((lit-0.4)*0.16).toFixed(3)+')');
+      lg.addColorStop(1,'rgba(139,92,246,0)');
+      c.fillStyle=lg;c.fillRect(0,0,W,H);
+    }
+
+    document.getElementById('nDep').textContent=dpt.toFixed(2);
+    document.getElementById('nLit').textContent=Math.round(lit*100)+'%';
+    requestAnimationFrame(draw);
+  }
+
+  addEventListener('pointermove',function(e){
+    mx=e.clientX/innerWidth;my=e.clientY/innerHeight;
+    if(drag){
+      rotT+=(e.clientX-dx0)*0.002;
+      dx0=e.clientX;dy0=e.clientY;
+    }
+  });
+  cv.addEventListener('pointerdown',function(e){
+    drag=true;dx0=e.clientX;dy0=e.clientY;cv.setPointerCapture(e.pointerId);
+  });
+  addEventListener('pointerup',function(){drag=false;});
+  addEventListener('wheel',function(e){
+    pushT*= (e.deltaY<0)?1.06:0.94;
+    pushT=Math.max(0.5,Math.min(2.4,pushT));
+  },{passive:false});
+
+  document.getElementById('depth').addEventListener('input',function(){
+    depth=+this.value;document.getElementById('depthV').textContent=depth;
+  });
+  document.getElementById('light').addEventListener('input',function(){
+    light=+this.value;document.getElementById('lightV').textContent=light;
+  });
+  document.getElementById('drift').addEventListener('input',function(){
+    drift=+this.value;document.getElementById('driftV').textContent=drift;
+  });
+  document.getElementById('regen').addEventListener('click',build);
+
+  addEventListener('resize',function(){clearTimeout(window.__r);window.__r=setTimeout(resize,140)});
+  resize();build();
+  requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+# FRAMED — Nine Works, One Room
+
+## Short title
+Museum Gallery Frames
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: an exhibition page for a
+fictional gallery hang called FRAMED — nine works in one room. No external
+dependencies whatsoever — no CDN, no web fonts, no external images, no external SVG
+files, no JavaScript libraries. All CSS and JavaScript inline, works offline by
+double-clicking, responsive, valid HTML5.
+
+Artistic direction: a museum wall seen under a single light. The page ground is wall
+paint #e9e4da into #ddd6c9; the gallery wall panel is the same paint with a white
+radial light from the top and a diagonal gradient, bounded by a hairline. Frames are
+gilt — a gradient from light gold #d8b877 through #a8823c into dark #7d5f27 — with
+an inner hairline of warm cream, a soft drop shadow and a 2px cream lip at the top
+so each frame catches the light. Inside each frame, the artwork is a 4:5 panel with
+an inner shadow and a faint diagonal canvas-weave texture. Below each artwork a white
+plaque with a hairline border carries the title in serif, the medium in 8px
+monospace, and the pigment in gilt. A wide soft light patch falls over the top third
+of the wall in screen blend, and a thin painted rail runs across the top of the
+panel.
+
+The nine artworks are CSS-only compositions, one per pigment, each a genuinely
+different piece: a raw-umber vertical stripe field; an indigo sky over a sand
+horizon; three cinnabar circles on linen at three radii; a green 45° diagonal
+weave; a grey radial wash; a madder radial; a horizontal ochre stack; a two-field
+hard edge with a dark seam; and a cadmium radial sun with three hard colour rings.
+Each is written as a stack of gradients in a data model and injected into the DOM on
+load, so the gallery is generated from a list rather than hand-written nine times.
+
+Layout: a nav with a serif brand at 0.3em tracking and two links. A centred hero
+with a gilt eyebrow, a serif headline with one italic gilt word, and a paragraph
+about hang height. Then the gallery wall with its light patch, rail and a
+3-column grid of nine framed works. Then a two-column detail section: a curator's
+note with two paragraphs, beside a six-row monospace metadata table (room, works,
+pigments, hang height, catalogue, entry). Then a ruled monospace footer.
+
+Interaction: the only gesture is selection — clicking a frame gives it a 2px gilt
+outline at 6px offset, and clicking another moves the outline, so a visitor can mark
+the piece they are standing in front of. Hovering lifts a frame 8px and deepens its
+shadow, which reads as the work catching more light as you approach. The grid drops
+3 → 2 → 1 columns.
+
+## One-paragraph description of the intended design
+A gallery wall lit from above: nine gilt-framed works — each a genuinely different
+CSS-only composition in its own pigment, from a raw-umber stripe field to a cadmium
+radial sun — each with a white plaque carrying title, medium and pigment, hung on a
+wall panel with a soft light patch, a painted rail and a diagonal paint gradient,
+and selectable by click.
+
+## Major visual techniques used
+- Gilt frames from a three-stop diagonal gradient with an inner warm-cream hairline,
+  a soft drop shadow and a 2px cream lip
+- Artwork panels with an inset shadow and a faint diagonal weave texture (::after
+  repeating-linear-gradient at 5% white)
+- Nine distinct CSS-only compositions from repeating-linear-gradient, hard-stop
+  linear-gradient splits, stacked radial gradients and hard-ringed radial gradients
+- Works generated from a data model injected into the DOM, not hand-written
+- White museum plaques with a hairline inset border, serif title, 8px monospace
+  medium and gilt pigment line
+- Soft light patch over the top third of the wall in screen blend
+- Painted rail along the top of the wall panel
+- Hover lift of 8px with a deepened shadow, reading as light catching the work
+- Click selection as a 2px gilt outline at 6px offset, mutually exclusive
+- Wall panel as layered radial white light over a diagonal paint gradient
+- Curator's note beside a six-row monospace metadata table with dashed rules
+- Serif display with one italic gilt word against 8–9.5px tracked monospace
+- Wall-paint palette with a single gilt accent
+- 3 → 2 → 1 responsive column collapse
+
+## Intended interaction model
+A hang to be walked. Visitors hover works to see them lift toward the light and
+click to mark one as the piece they are looking at; the selection outline moves
+between works. Everything else is static wall, plaque and curator's note — the page
+models a gallery rather than an interface.

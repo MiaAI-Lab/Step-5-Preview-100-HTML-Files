@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>THE LONG NOW — Issue 14: Slowness</title>
+<style>
+  :root{
+    --paper:#faf7f1;
+    --ink:#141210;
+    --dim:rgba(20,18,16,.58);
+    --line:rgba(20,18,16,.16);
+    --red:#c4342b;
+    --blue:#1c3f8f;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    --sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);font-family:var(--serif);
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--red);color:var(--paper)}
+
+  .bar{position:fixed;top:0;left:0;height:3px;background:var(--red);z-index:99;width:0}
+
+  .masthead{
+    border-bottom:2px solid var(--ink);padding:clamp(20px,4vw,38px) clamp(16px,4vw,44px);
+    display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap
+  }
+  .masthead h1{font-size:clamp(20px,3.2vw,34px);font-weight:400;letter-spacing:.02em;margin:0}
+  .masthead h1 i{font-style:italic;color:var(--red)}
+  .masthead .meta{font-family:var(--mono);font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--dim)}
+
+  .wrap{max-width:1240px;margin:0 auto;padding:0 clamp(16px,4vw,44px)}
+
+  /* hero */
+  .hero{padding:clamp(28px,6vw,80px) 0 clamp(20px,4vw,40px);text-align:center;position:relative}
+  .hero .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.34em;text-transform:uppercase;color:var(--red);display:block;margin-bottom:24px}
+  .hero h2{
+    font-size:clamp(38px,8.6vw,124px);line-height:.92;letter-spacing:-.032em;margin:0;font-weight:400
+  }
+  .hero h2 em{font-style:italic;color:var(--blue)}
+  .hero .standfirst{
+    font-size:clamp(15px,2.2vw,22px);line-height:1.62;max-width:44ch;margin:clamp(24px,4vw,40px) auto 0;
+    color:var(--dim)
+  }
+  .hero .byline{
+    font-family:var(--mono);font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;
+    margin-top:26px;color:var(--dim)
+  }
+
+  /* rule ornament */
+  .orn{display:flex;align-items:center;justify-content:center;gap:14px;padding:clamp(26px,5vw,56px) 0}
+  .orn i{width:6px;height:6px;background:var(--ink);transform:rotate(45deg);display:block}
+  .orn span{flex:1;max-width:220px;height:1px;background:var(--line)}
+
+  /* asymmetric article */
+  .article{display:grid;grid-template-columns:repeat(12,1fr);gap:clamp(14px,2vw,28px);padding:clamp(20px,4vw,44px) 0}
+  .article .drop::first-letter{
+    font-size:4.6em;line-height:.82;float:left;padding:.06em .12em 0 0;color:var(--red);font-style:italic
+  }
+  .article p{font-size:clamp(14.5px,1.5vw,17px);line-height:1.72;margin:0 0 1.1em;color:rgba(20,18,16,.86)}
+  .article h3{
+    font-size:clamp(19px,2.4vw,28px);font-weight:400;font-style:italic;line-height:1.2;
+    margin:0 0 .7em;letter-spacing:-.01em
+  }
+  .col-wide{grid-column:span 7}
+  .col-narrow{grid-column:span 4;grid-column-start:9}
+  .col-full{grid-column:span 12}
+  .pull{
+    border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);
+    padding:clamp(20px,3vw,34px) 0;margin:clamp(16px,3vw,32px) 0
+  }
+  .pull p{font-size:clamp(19px,3vw,34px);line-height:1.24;font-style:italic;margin:0;letter-spacing:-.015em;color:var(--ink)}
+  .pull cite{display:block;font-family:var(--mono);font-size:9px;letter-spacing:.24em;text-transform:uppercase;color:var(--red);margin-top:18px;font-style:normal}
+
+  .figure{margin:0 0 clamp(16px,3vw,30px)}
+  .figure .art{
+    aspect-ratio:4/3;position:relative;overflow:hidden;
+    background:
+      repeating-conic-gradient(from 22deg at 34% 62%,rgba(28,63,143,.5) 0deg 6deg,transparent 6deg 16deg),
+      radial-gradient(60% 50% at 30% 60%,rgba(196,52,43,.5),transparent 70%),
+      linear-gradient(160deg,#e9e2d4,#f6f1e6);
+  }
+  .figure figcaption{
+    font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--dim);margin-top:12px;line-height:1.9;border-top:1px solid var(--line);padding-top:10px
+  }
+
+  .research{
+    border:1px solid var(--line);padding:clamp(18px,3vw,30px);background:rgba(255,255,255,.55)
+  }
+  .research h4{font-family:var(--mono);font-size:9px;letter-spacing:.24em;text-transform:uppercase;margin:0 0 16px;color:var(--red)}
+  .research table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11px}
+  .research td{padding:9px 0;border-bottom:1px dashed var(--line)}
+  .research td:last-child{text-align:right;color:var(--blue)}
+  .research tr:last-child td{border-bottom:0}
+
+  .quote-block{
+    text-align:center;padding:clamp(34px,7vw,90px) clamp(16px,4vw,60px);
+    border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:clamp(20px,4vw,44px) 0
+  }
+  .quote-block blockquote{
+    font-size:clamp(19px,3.2vw,38px);line-height:1.32;font-style:italic;margin:0;
+    letter-spacing:-.015em;max-width:26ch;margin-inline:auto
+  }
+  .quote-block cite{display:block;font-family:var(--mono);font-size:9px;letter-spacing:.26em;text-transform:uppercase;color:var(--dim);margin-top:26px;font-style:normal}
+
+  /* index */
+  .index{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin:clamp(20px,4vw,44px) 0}
+  .index article{background:var(--paper);padding:clamp(20px,3vw,32px)}
+  .index .n{font-family:var(--mono);font-size:9px;letter-spacing:.22em;color:var(--red)}
+  .index h3{font-size:clamp(17px,2.2vw,24px);font-weight:400;font-style:italic;line-height:1.18;margin:12px 0 12px;letter-spacing:-.01em}
+  .index p{font-size:12.5px;line-height:1.78;color:var(--dim);margin:0}
+  .index .by{font-family:var(--mono);font-size:8.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-top:16px;display:block}
+
+  footer{border-top:2px solid var(--ink);padding:26px 0 52px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--dim)}
+
+  @media (max-width:900px){
+    .col-wide,.col-narrow,.col-full{grid-column:span 12}
+    .index{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div class="bar" id="bar"></div>
+
+<header class="masthead">
+  <h1>The Long <i>Now</i></h1>
+  <div class="meta">Issue 14 · Slowness · Winter 2026</div>
+</header>
+
+<div class="wrap">
+  <section class="hero">
+    <span class="k">Essay · 4,200 words</span>
+    <h2>The case for<br>doing <em>less,</em><br>more slowly.</h2>
+    <p class="standfirst">Every generation has believed itself the busiest that ever
+    lived. This one may be right — and that is precisely why the argument for
+    slowness has to be made again, and made differently.</p>
+    <div class="byline">Words by Ines Okonkwo · Photography by R. Halloran</div>
+  </section>
+
+  <div class="orn"><span></span><i></i><span></span></div>
+
+  <article class="article">
+    <div class="col-wide">
+      <p class="drop">There is a particular quality to the light in a workshop at
+      four in the afternoon, when the work has been going badly all day and nobody
+      has said so. The bench is warm. The tools have been picked up and put down
+      enough times that their handles have taken the shape of one pair of hands, and
+      the noise of the street has become a kind of weather rather than an event.</p>
+      <p>What is happening in the room looks, from the outside, like nothing. That
+      is the difficulty and the whole argument at once. Slowness is invisible in the
+      way that health is invisible: you notice it only when it has gone.</p>
+      <h3>Against the tyranny of the visible</h3>
+      <p>We have built an entire economy of signals — the reply, the reaction, the
+      story — and every one of them rewards speed. Nothing in the system pays for the
+      thing that only a long afternoon can produce, because the long afternoon
+      produces exactly nothing that can be shown.</p>
+    </div>
+
+    <aside class="col-narrow">
+      <div class="research">
+        <h4>Field notes</h4>
+        <table>
+          <tbody>
+            <tr><td>Workshops visited</td><td>11</td></tr>
+            <tr><td>Median hours to first cut</td><td>4.5</td></tr>
+            <tr><td>Interruptions per hour</td><td>2.8</td></tr>
+            <tr><td>Tasks abandoned</td><td>37</td></tr>
+            <tr><td>Tasks finished</td><td>19</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <figure class="figure" style="margin-top:clamp(18px,3vw,32px)">
+        <div class="art"></div>
+        <figcaption>A joiner's bench in Setúbal, photographed over ninety minutes
+        with a fixed aperture. Nothing in the frame moved.</figcaption>
+      </figure>
+    </aside>
+
+    <div class="col-full">
+      <div class="pull">
+        <p>A thing made quickly is a thing that was decided in advance. A thing made
+        slowly is a thing that was still being decided at four in the afternoon.</p>
+        <cite>— from the essay</cite>
+      </div>
+    </div>
+
+    <div class="col-narrow">
+      <h3>The economics</h3>
+      <p>An hour of attention withdrawn from a screen is an hour of attention
+      withdrawn from a market. This is why slowness is not merely unfashionable; it
+      is structurally punished.</p>
+      <p>And yet the market has no answer to the question of who is willing to spend
+      eleven days finishing a movement for a watch that eighty people will buy. The
+      answer is: someone who has decided that the eleven days are the product.</p>
+    </div>
+
+    <div class="col-wide">
+      <h3>What slowness is not</h3>
+      <p>It is not leisure, which is its own kind of consumption. It is not
+      nostalgia. It is certainly not the romantic poverty of people who have simply
+      not been offered anything better.</p>
+      <p>Slowness is a technical decision about the order in which things are
+      allowed to happen. It is the willingness to leave a sentence wrong for a week,
+      to let a joint dry before it is cut, to hold a disagreement for a month instead
+      of settling it badly in an evening.</p>
+      <p>Every craftsperson describes this the same way: the work tells you what it
+      wants, but only if you are still in the room when it does. The room has to be
+      slow enough that the telling is possible.</p>
+    </div>
+  </article>
+
+  <section class="quote-block">
+    <blockquote>The fastest way to do something well is to be willing to do it
+      badly for a long time first.</blockquote>
+    <cite>Marguerite Adeyemi, potter, in conversation</cite>
+  </section>
+
+  <section class="index">
+    <article>
+      <span class="n">01</span>
+      <h3>Eleven days on one movement</h3>
+      <p>A watchmaker in the Vallée de Joux on the parts of the job no certificate
+      recognises, and the ones she refuses to explain.</p>
+      <span class="by">Photography · 2,400 words</span>
+    </article>
+    <article>
+      <span class="n">02</span>
+      <h3>The archive of unfinished letters</h3>
+      <p>A library in Bologna holds 40,000 drafts. What the cataloguers learned
+      about hesitation from the shape of a crossed-out clause.</p>
+      <span class="by">Reportage · 3,100 words</span>
+    </article>
+    <article>
+      <span class="n">03</span>
+      <h3>Six years of one field</h3>
+      <p>An agriculturalist's notebooks from a single hectare in Norfolk, read end
+      to end, in order, without skipping the boring years.</p>
+      <span class="by">Essay · 1,800 words</span>
+    </article>
+  </section>
+</div>
+
+<footer>
+  <span>© The Long Now</span>
+  <span>Set in Iowan Old Style &amp; system mono</span>
+  <span>Printed quarterly · read slowly</span>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var bar=document.getElementById('bar');
+  function p(){
+    var v=window.pageYOffset||document.documentElement.scrollTop;
+    var max=document.documentElement.scrollHeight-window.innerHeight;
+    bar.style.width=(max>0?v/max*100:0).toFixed(2)+'%';
+    requestAnimationFrame(p);
+  }
+  requestAnimationFrame(p);
+  /* reveal */
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(es){
+      es.forEach(function(e){
+        if(!e.isIntersecting)return;
+        e.target.style.opacity='1';
+        e.target.style.transform='none';
+        io.unobserve(e.target);
+      });
+    },{threshold:.1});
+    document.querySelectorAll('.article p,.article h3,.pull,.figure,.research,.index article,.quote-block blockquote').forEach(function(el,i){
+      el.style.opacity='0';
+      el.style.transform='translateY(18px)';
+      el.style.transition='opacity .85s cubic-bezier(.2,.8,.2,1) '+((i%3)*70)+'ms,transform .85s cubic-bezier(.2,.8,.2,1) '+((i%3)*70)+'ms';
+      io.observe(el);
+    });
+  }
+})();
+</script>
+</body>
+</html>

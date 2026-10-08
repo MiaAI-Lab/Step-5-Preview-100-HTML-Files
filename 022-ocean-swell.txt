@@ -1,0 +1,76 @@
+# SWELL — Nine Hours of Open Water
+
+## Short title
+Ocean Swell
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: an interactive ocean
+swell model called SWELL, framed as a mid-Atlantic weather station readout. No
+external dependencies whatsoever — no CDN, no web fonts, no external images, no
+external SVG files, no JavaScript libraries. All CSS and JavaScript inline, works
+offline by double-clicking, responsive, valid HTML5.
+
+Artistic direction: a low sun over open water. The sky is a vertical gradient from
+teal-navy #062b3d through #0c4a63 and #2a7f92 into a warm horizon band of #e0a86a,
+with the sun as a disc near the horizon at x=0.74 wrapped in a wide warm radial
+glow. Below the horizon, six wave layers stack from 60% to 100% of the viewport
+height, each a different wavelength, amplitude, speed and phase; the far layers are
+translucent teal and the near ones are almost opaque deep blue, each drawn with a
+vertical gradient fill and a rim stroke in foam white whose alpha and width increase
+toward the viewer. On top of the water, forty elliptical glitter flecks twinkle in
+screen blend along a glitter path under the sun.
+
+The physics-ish model: each layer's surface is a sum of three sines — a primary at
+the layer's wavelength, a secondary at 1.9× the frequency and 34% of the amplitude,
+and a wind-chop term at 3.7× the frequency scaled by the Chop slider and multiplied
+by a per-layer coefficient so near waves get choppier. The whole pattern travels
+along a direction angle (dir), applied by projecting the screen x-coordinate onto
+that direction with cos(dir) — so changing the angle changes the apparent wavelength
+and travel direction of every layer at once. Amplitude scales with the Swell
+slider, speed with the Period slider, and the whole stack lifts or drops with the
+Tide slider.
+
+Layout: a full-viewport canvas with a floating UI overlay whose pointer-events pass
+through except on the controls. Top-left is a monospace station label above an
+italic serif headline with one line in foam white, plus a short paragraph.
+Top-right is a monospace gauge stack — significant wave height in metres, period in
+seconds, and wind in knots — all computed live from the sliders. Bottom is a glass
+tray with four sliders (Swell, Period, Chop, Tide) plus Storm and Calm preset
+buttons, and a monospace hint.
+
+Interaction: dragging horizontally steers the swell direction, easing toward the
+drag with a 0.04 lerp so changing heading feels like a ship coming round. The four
+sliders retune the running model live, and Storm and Calm write complete
+configurations into all four sliders at once. The gauges recompute every frame.
+On narrow screens the paragraph, gauges and hint hide.
+
+## One-paragraph description of the intended design
+A station readout for a sea that behaves like a sea: six stacked wave layers of
+triple-sine cross swells travelling along a steerable heading, wind chop that
+raises the near layers more than the far ones, a low sun with a glitter path of
+twinkling flecks, and four sliders plus Storm and Calm presets that reshape the
+whole ocean live.
+
+## Major visual techniques used
+- Layered wave surfaces from a sum of three sines at 1×, 1.9× and 3.7× frequency
+  with decreasing amplitude
+- Directional travel by projecting screen x onto cos(dir), so one angle changes
+  heading and apparent wavelength for every layer at once
+- Six depth layers with increasing opacity, rim brightness and rim width toward the
+  viewer
+- Vertical gradient fills plus rim strokes for translucent water
+- Low sun as a disc wrapped in a wide warm radial glow over a five-stop sky
+- Forty elliptical glitter flecks twinkling in screen blend along a sun path
+- Eased direction steering (0.04 lerp) from horizontal drag
+- Live gauge computation (significant height, period, wind) from slider values
+- Storm and Calm presets that write all four sliders via synthetic input events
+- Tide as a global vertical offset on the whole wave stack
+- Italic serif headline against 8.5–9px tracked monospace labels and gauges
+- Floating glass tray with backdrop-filter blur; extras hidden under 760px
+
+## Intended interaction model
+A weather instrument with a wheel. Visitors drag to change the swell heading and
+use four sliders — height, period, chop, tide — to set the sea, or press Storm or
+Calm for a complete configuration in one tap. The gauges report what the model is
+currently doing, so the page reads like a real station feed rather than a toy.

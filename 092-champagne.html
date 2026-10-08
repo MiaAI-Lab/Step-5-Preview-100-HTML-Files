@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Flute — bubbles that are not round</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:#0f0c06;color:#f4eada;
+  font:15px/1.62 ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+.serif{font-family:ui-serif,Georgia,"Times New Roman",serif}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.wrap{width:min(1100px,92vw);margin:0 auto}
+nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0 14px;
+  border-bottom:1px solid rgba(244,234,218,.14)}
+nav .brand{font-family:ui-serif,Georgia,serif;font-size:19px}
+nav .brand i{font-style:italic;color:#e8cf8a}
+nav ul{display:flex;gap:26px;list-style:none;margin:0;padding:0;font-size:11px;
+  letter-spacing:.24em;text-transform:uppercase;color:#968c78}
+nav a{color:inherit;text-decoration:none}nav a:hover{color:#e8cf8a}
+@media(max-width:780px){nav ul{display:none}}
+header.hero{padding:50px 0 20px;text-align:center}
+header.hero .kicker{font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:#e8cf8a;
+  margin:0 0 14px}
+header.hero h1{font-family:ui-serif,Georgia,serif;font-weight:400;
+  font-size:clamp(32px,5.6vw,62px);line-height:1.05;margin:0 0 16px}
+header.hero h1 em{font-style:italic;color:#e0b060}
+header.hero p{max-width:60ch;margin:0 auto;color:#9c927c}
+.flute{position:relative;border:1px solid rgba(244,234,218,.16);border-radius:16px;
+  overflow:hidden;background:#060604;margin-bottom:18px}
+.flute canvas{display:block;width:100%;height:auto}
+.flute .cap{position:absolute;left:14px;top:12px;font-size:10px;letter-spacing:.26em;
+  text-transform:uppercase;color:rgba(244,234,218,.5);pointer-events:none}
+.dock{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;justify-content:space-between;
+  border-top:1px solid rgba(244,234,218,.14);border-bottom:1px solid rgba(244,234,218,.14);
+  padding:16px 0;margin-bottom:32px}
+.dock label{display:grid;gap:7px;font-size:10px;letter-spacing:.26em;text-transform:uppercase;
+  color:#968c78;min-width:150px}
+input[type=range]{width:100%;accent-color:#e8cf8a}
+.btn{background:#e8cf8a;color:#241d06;border:0;border-radius:8px;padding:11px 15px;
+  font:inherit;font-size:12px;font-weight:700;letter-spacing:.08em;cursor:pointer;margin:0 6px 6px 0}
+.btn.ghost{background:transparent;color:#f4eada;border:1px solid rgba(244,234,218,.24)}
+.btn:hover{filter:brightness(1.07)}
+.cuv{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.cuv button{background:#1a1408;border:1px solid rgba(244,234,218,.16);border-radius:999px;
+  padding:8px 14px;font:inherit;font-size:12px;color:#f4eada;cursor:pointer}
+.cuv button[aria-pressed="true"]{background:#e8cf8a;border-color:#e8cf8a;color:#241d06}
+.readout{display:flex;flex-wrap:wrap;gap:12px 24px;margin-bottom:40px;
+  border-top:1px solid rgba(244,234,218,.14);padding-top:16px}
+.readout div{min-width:88px}
+.readout dt{font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:#968c78;margin:0 0 4px}
+.readout dd{margin:0;font-size:20px;font-family:ui-monospace,Menlo,monospace;color:#e8cf8a}
+.cells{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-bottom:46px}
+@media(max-width:820px){.cells{grid-template-columns:1fr}}
+.cell{border-top:1px solid rgba(244,234,218,.16);padding-top:16px}
+.cell .fig{font-family:ui-serif,Georgia,serif;font-size:38px;color:#e0b060;line-height:1;margin-bottom:8px}
+.cell h3{font-family:ui-serif,Georgia,serif;font-weight:400;font-style:italic;font-size:21px;margin:0 0 8px}
+.cell p{margin:0;color:#9c927c;font-size:14px}
+footer{border-top:1px solid rgba(244,234,218,.14);padding:22px 0 54px;display:flex;
+  justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:11px;letter-spacing:.2em;
+  text-transform:uppercase;color:#6f6756}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="brand">The <i>Flute</i></div>
+    <ul>
+      <li><a href="#flute">Glass</a></li>
+      <li><a href="#dock">Cuvée</a></li>
+      <li><a href="#notes">Notes</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <p class="kicker">Nucleation · Reynolds · one second in the mouth</p>
+    <h1 class="serif">A bubble is never<br><em>round</em> on the way</h1>
+    <p>Left alone a gas bubble in water is a sphere. Rising five centimetres in a tenth of
+       a second is not left alone: the drag pulls it into a wobbling ellipse, and the
+       bigger it is the more it wobbles.</p>
+  </header>
+
+  <section class="flute" id="flute">
+    <canvas id="c" width="980" height="560"></canvas>
+    <p class="cap">bubbles carry a wake · the chain feeds from the etched point</p>
+  </section>
+
+  <section class="dock" id="dock">
+    <div>
+      <div class="cuv" id="cuv"></div>
+      <div class="cuv" id="glass"></div>
+    </div>
+    <label for="pour">Effervescence <input id="pour" type="range" min="0" max="100" value="58"></label>
+    <label for="temp">Temperature <input id="temp" type="range" min="0" max="40" value="11"></label>
+    <label for="etch">Etched points <input id="etch" type="range" min="1" max="40" value="18"></label>
+    <div>
+      <button class="btn" id="top">Top up</button>
+      <button class="btn ghost" id="flat">Let it go flat</button>
+    </div>
+  </section>
+
+  <dl class="readout">
+    <div><dt>Rising</dt><dd id="rR">0</dd></div>
+    <div><dt>Bubble size</dt><dd id="rS">—</dd></div>
+    <div><dt>Reynolds</dt><dd id="rRe">—</dd></div>
+    <div><dt>Dissolved</dt><dd id="rV">—</dd></div>
+    <div><dt>State</dt><dd id="rG">fizzing</dd></div>
+    <div><dt>Pressure</dt><dd id="rP">6.0 bar</dd></div>
+  </dl>
+
+  <section class="cells">
+    <div class="cell">
+      <div class="fig serif">i</div>
+      <h3>Nucleation</h3>
+      <p>A bubble will not start in smooth liquid, because a surface takes energy to open.
+         It starts on a scratch, a speck of cellulose or a fibre left by the cloth — which
+         is why the chain always comes from the etched point.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">ii</div>
+      <h3>The wobble</h3>
+      <p>Drag flattens the leading face, and past a certain size the whole thing starts to
+         oscillate, shedding a wake. That wake is what leaves the little trail of tiny
+         bubbles under every big one.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">iii</div>
+      <h3>Pressure</h3>
+      <p>A bottle holds about six atmospheres, most of it carbon dioxide that only stays
+         dissolved while there is nowhere for it to go. Open it and the pressure goes to
+         one, and the gas starts leaving.</p>
+    </div>
+  </section>
+
+  <section class="cells" id="notes">
+    <div class="cell">
+      <div class="fig serif">iv</div>
+      <h3>The flute</h3>
+      <p>A narrow glass keeps the bubbles in a column and gives the carbon dioxide nowhere
+         to escape sideways, so the pour lasts longer than in a coupe. Shape is physics.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">v</div>
+      <h3>Temperature</h3>
+      <p>Cold dissolves more and releases it more slowly, which is why a chilled flute
+         fizzes steadily for minutes and a warm one is over in seconds.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">vi</div>
+      <h3>Flat</h3>
+      <p>Let it go flat and the CO₂ leaves the solution entirely: the wake thins out, the
+         chains stop and the glass is only wine. Nothing is wrong; the gas has simply left.</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>The Flute · one canvas, no files</span>
+    <span class="mono">6 bar · Re 10²–10³ · 0.1 s</span>
+  </footer>
+</div>
+<script>
+(function(){
+"use strict";
+var cv=document.getElementById('c'),ctx=cv.getContext('2d');
+var W=cv.width,H=cv.height;
+var pour=58,temp=11,etch=18,t=0,flat=0;
+var CUVEES=[
+ {n:'blanc de blancs',eff:0.9,bub:[],hue:'#f4e2a0'},
+ {n:'brut rosé',eff:0.75,bub:[],hue:'#f0b090'},
+ {n:'blanc de noirs',eff:1.0,bub:[],hue:'#f0d8a8'},
+ {n:'extra brut',eff:0.6,bub:[],hue:'#f4ecc8'},
+ {n:'cuvée prestige',eff:1.15,bub:[],hue:'#f8ecc0'}
+];
+var cuvee=CUVEES[0];
+var GLASSES=[
+ {n:'flute',top:46,bot:52,slope:0.55,h:340},
+ {n:'coupe',top:118,bot:14,slope:0.2,h:120},
+ {n:'tulip',top:70,bot:30,slope:0.35,h:250},
+ {n:'white wine',top:96,bot:20,slope:0.5,h:200}
+];
+var glass=GLASSES[0];
+var bubbles=[],wake=[];
+var GX=W*0.44,GY=H*0.10;
+function level(){return glass.h*(1-flat*0.35);}
+/* the glass outline at a height */
+function halfW(f){
+  return glass.bot+(glass.top-glass.bot)*Math.min(1,f);
+}
+/* ---------- the bubbles ---------- */
+function spawn(x,y,r){
+  bubbles.push({
+    x:x,y:y,r:r,
+    wob:Math.random()*6.28,
+    wobRate:1.2+(r-3)*0.5
+  });
+}
+function step(dt){
+  var eff=(pour/100)*cuvee.eff;
+  var rate=(etch*eff*0.35)*(1-temp/40);
+  var lv=level();
+  /* the chains form at the etched points */
+  if(Math.random()<rate*dt*22&&lv>20){
+    var ex=GX+(Math.random()-0.5)*halfW(1)*1.6;
+    spawn(ex,GY+lv*0.92,1.6+Math.random()*3.6);
+  }
+  for(var i=bubbles.length-1;i>=0;i--){
+    var b=bubbles[i];
+    /* a rising bubble's terminal velocity follows its radius squared */
+    var v=(b.r*b.r)*0.055+0.4;
+    b.y-=v*dt*60;
+    b.wob+=dt*b.wobRate*(b.r/6);
+    /* drag flattens the leading face, and past a size it oscillates */
+    b.wobbleAmp=Math.min(0.45,b.r*0.09);
+    if(b.y<GY+2){
+      /* at the surface it pops and its gas joins the headspace */
+      bubbles.splice(i,1);continue;
+    }
+    /* the wake: a trail of small bubbles under a big one */
+    if(b.r>3.2&&Math.random()<0.03+b.r*0.012){
+      wake.push({x:b.x+(Math.random()-.5)*b.r*0.6,y:b.y+b.r*0.5,r:0.6+Math.random()*1.1,life:1});
+    }
+  }
+  for(var k=wake.length-1;k>=0;k--){
+    var w=wake[k];
+    w.y-=(w.r*w.r*0.02+0.2)*dt*60;
+    w.life-=dt*0.7;
+    if(w.life<=0)wake.splice(k,1);
+  }
+}
+/* ---------- the Reynolds number ---------- */
+function reynolds(r){
+  /* r in pixels -> radius in mm, v in cm/s */
+  var R=r*0.11, vv=(r*r*0.055+0.4)*6.2;
+  var nu=temp<5?1.52:temp<15?1.14:temp<25?0.89:0.69;
+  return (R*vv*10)/nu;
+}
+/* ---------- drawing ---------- */
+function draw(){
+  /* the room */
+  var g=ctx.createRadialGradient(W*0.5,H*0.2,20,W*0.5,H*0.5,W*0.8);
+  g.addColorStop(0,'#1a1408');g.addColorStop(1,'#060604');
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  /* the wine, behind the glass: a trapezoid from the rim down to the surface */
+  var lv=level();
+  var wine=ctx.createLinearGradient(GX-halfW(1),0,GX+halfW(1),0);
+  wine.addColorStop(0,'#c8a860');wine.addColorStop(0.4,cuvee.hue);
+  wine.addColorStop(1,'#a8803c');
+  ctx.fillStyle=wine;
+  ctx.beginPath();
+  ctx.moveTo(GX-halfW(1),GY+4);
+  ctx.lineTo(GX+halfW(1),GY+4);
+  ctx.lineTo(GX+halfW((GY+lv-GY)/glass.h),GY+lv);
+  ctx.lineTo(GX-halfW((GY+lv-GY)/glass.h),GY+lv);
+  ctx.closePath();ctx.fill();
+  /* the glass body: a thick translucent stroke down the outline */
+  ctx.beginPath();
+  ctx.moveTo(GX-halfW(1),GY);
+  ctx.lineTo(GX-halfW((GY+lv-GY)/glass.h),GY+lv);
+  ctx.lineTo(GX+halfW((GY+lv-GY)/glass.h),GY+lv);
+  ctx.lineTo(GX+halfW(1),GY);
+  ctx.strokeStyle='rgba(230,240,250,.18)';ctx.lineWidth=3;ctx.stroke();
+  /* the bowl above the wine, empty */
+  ctx.beginPath();
+  ctx.moveTo(GX-halfW(1),GY);
+  ctx.lineTo(GX-halfW(1),GY);
+  ctx.strokeStyle='rgba(230,240,250,.10)';ctx.lineWidth=3;ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(GX-halfW(1),GY+lv);
+  ctx.lineTo(GX-halfW(1),GY);
+  ctx.lineTo(GX+halfW(1),GY);
+  ctx.lineTo(GX+halfW(1),GY+lv);
+  ctx.strokeStyle='rgba(230,240,250,.14)';ctx.lineWidth=2.5;ctx.stroke();
+  /* the stem and foot */
+  ctx.beginPath();
+  ctx.moveTo(GX-4,GY+lv);ctx.lineTo(GX-5,GY+glass.h+56);
+  ctx.lineTo(GX+5,GY+glass.h+56);ctx.lineTo(GX+4,GY+lv);
+  ctx.strokeStyle='rgba(230,240,250,.16)';ctx.lineWidth=3;ctx.stroke();
+  ctx.beginPath();ctx.ellipse(GX,GY+glass.h+58,34,7,0,0,6.3);
+  ctx.stroke();
+  /* the headspace glow */
+  ctx.fillStyle='rgba(244,234,218,.04)';ctx.fillRect(0,0,W,H);
+  /* the wake bubbles first, so the big ones sit on top */
+  ctx.fillStyle='rgba(255,250,235,'+(0.5*cuvee.eff)+')';
+  wake.forEach(function(w){
+    ctx.beginPath();ctx.arc(w.x,w.y,w.r,0,6.3);ctx.fill();
+  });
+  /* the bubbles: an ellipse squashed by the wobble, brighter on the leading edge */
+  bubbles.forEach(function(b){
+    var squash=1-b.wobbleAmp*Math.abs(Math.sin(b.wob));
+    var rx=b.r*(1+b.wobbleAmp*0.5*Math.abs(Math.cos(b.wob)));
+    ctx.save();
+    ctx.translate(b.x,b.y);
+    ctx.rotate(b.wob*0.4);
+    ctx.beginPath();ctx.ellipse(0,0,rx,b.r*squash,0,0,6.3);
+    ctx.fillStyle='rgba(255,252,240,.30)';ctx.fill();
+    /* the highlight on the leading face */
+    ctx.beginPath();ctx.arc(-rx*0.28,-b.r*0.28,b.r*0.3,0,6.3);
+    ctx.fillStyle='rgba(255,255,255,.75)';ctx.fill();
+    ctx.restore();
+  });
+  /* the etched points, where every chain starts */
+  ctx.fillStyle='rgba(244,234,218,.4)';
+  for(var e=0;e<etch;e++){
+    var ex=GX+(Math.sin(e*2.4)*0.5)*halfW(1)*1.5;
+    var ey=GY+lv*0.9;
+    ctx.beginPath();ctx.arc(ex,ey,1.4,0,6.3);ctx.fill();
+  }
+  /* the label */
+  ctx.fillStyle='rgba(244,234,218,.6)';
+  ctx.font='11px ui-monospace,Menlo,monospace';
+  ctx.textAlign='center';ctx.textBaseline='top';
+  ctx.fillText(cuvee.n,GX,GY+glass.h+74);
+  ctx.fillText(temp.toFixed(0)+'°C',GX,GY+glass.h+88);
+}
+
+/* ---------- controls, readout, loop ---------- */
+var cbox=document.getElementById('cuv');
+CUVEES.forEach(function(c,i){
+  var b=document.createElement('button');
+  b.textContent=c.n;
+  b.setAttribute('aria-pressed',String(i===0));
+  b.addEventListener('click',function(){
+    cuvee=c;
+    [].slice.call(cbox.children).forEach(function(o){
+      o.setAttribute('aria-pressed',String(o===b));});
+  });
+  cbox.appendChild(b);
+});
+var gbox=document.getElementById('glass');
+GLASSES.forEach(function(gr,i){
+  var b=document.createElement('button');
+  b.textContent=gr.n;
+  b.setAttribute('aria-pressed',String(i===0));
+  b.addEventListener('click',function(){
+    glass=gr;
+    [].slice.call(gbox.children).forEach(function(o){
+      o.setAttribute('aria-pressed',String(o===b));});
+  });
+  gbox.appendChild(b);
+});
+function bind(id,fn){var el=document.getElementById(id);
+  el.addEventListener('input',function(){fn(+el.value);});}
+bind('pour',function(v){pour=v;});
+bind('temp',function(v){temp=v;});
+bind('etch',function(v){etch=v;});
+document.getElementById('top').addEventListener('click',function(){
+  flat=0;
+  /* a fresh pour resets the gas and lifts the level */
+  pour=Math.min(100,pour+18);
+  document.getElementById('pour').value=pour;
+  wake=[];bubbles=[];
+  for(var i=0;i<40;i++)spawn(GX+(Math.random()-.5)*halfW(1)*1.4,
+    GY+Math.random()*level(),1.4+Math.random()*3.2);
+});
+document.getElementById('flat').addEventListener('click',function(){
+  flat=1;bubbles=[];wake=[];
+});
+function readout(){
+  document.getElementById('rR').textContent=bubbles.length;
+  /* the mean bubble is what the size and Reynolds readouts report */
+  var sum=0;
+  bubbles.forEach(function(b){sum+=b.r;});
+  var mean=bubbles.length?sum/bubbles.length:0;
+  document.getElementById('rS').textContent=mean.toFixed(1)+' px';
+  document.getElementById('rRe').textContent=mean?reynolds(mean).toFixed(0):'—';
+  /* dissolved CO2 volume, in litres of gas per litre of wine */
+  var vol=(pour/100)*cuvee.eff*(1-flat)*3.8;
+  document.getElementById('rV').textContent=vol.toFixed(1)+' L/L';
+  document.getElementById('rG').textContent=flat>0.5?'flat':pour>70?'fizzing':'still';
+  document.getElementById('rP').textContent=flat>0.5?'1.0 bar':(1+5*pour/100).toFixed(1)+' bar';
+}
+var last=0;
+function loop(ts){
+  var dt=last?Math.min(.05,(ts-last)/1000):0;last=ts;
+  t+=dt;step(dt);draw();readout();
+  requestAnimationFrame(loop);
+}
+draw();readout();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

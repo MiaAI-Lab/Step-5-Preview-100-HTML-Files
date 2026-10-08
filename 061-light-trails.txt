@@ -1,0 +1,88 @@
+# LONG EXPOSURE — paint the dark with light
+
+## Short title
+Light Trails
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a dark room where the visitor
+draws with light on a canvas that behaves like an open shutter — never cleared, only
+slowly forgotten. No external dependencies whatsoever — no CDN, no web fonts, no
+external images, no JS libraries. All CSS and JavaScript inline, works offline by
+double-clicking, responsive, valid HTML5.
+
+Artistic direction: a black room. Ground #06060a, panel #0e0e18, hairlines
+rgba(236,234,247,.13), body #eceaf7 with muted #a3a0bd, pink #ff9de2 and cyan #8ef0ff
+as the two accents with a warm #ffe98a reserved for the spark tool. Serif headings with
+italic accent words, uppercase .2em–.4em kickers, monospace readouts.
+
+The canvas is a fixed 960 × 560 surface scaled to its container. It is never cleared.
+Every frame lays down a wash of near-black whose alpha is derived from the decay slider
+— alpha zero means the shutter stays open forever and the frame saturates, and the top
+of the range means strokes die almost immediately. A lantern of its own wanders a
+Lissajous path so the room is never empty, leaving a faint additive trail.
+
+Four tools: Ribbon (a wide soft stamp with a bright core), Wire (a thin, hard, quicker
+stamp), Spark (emits short-lived particles with gravity and drag as you draw, so a
+stroke gains a comet's tail), and Matte (the only tool that works in reverse, cutting
+light out of the frame with destination-out so carved detail can be recovered from an
+over-exposed picture).
+
+Four sliders: Symmetry (1 to 8 folds), Width, Decay (the shutter) and Drift (how far
+the whole frame slides each third of a second, the way an unlocked camera does over a
+long exposure). Every point a stroke makes is drawn once per fold — rotated around the
+centre and then mirrored back — so a wobble in the hand becomes a rosette.
+
+Readout: strokes, points, light added, the fold multiplier, and whether the shutter is
+open or held. Keys: 1–4 pick a tool, S holds or opens the shutter, C clears the frame
+hard.
+
+Layout: nav with serif brand, centred hero with pink kicker and cyan italic, the room
+as a bordered canvas, a four-up dock of tools, a row of four sliders, a readout row,
+then two three-cell rows of notes on the fade, the fold, the drift, light, matte and
+sparks, then a footer. Two-up dock under 820px, links hidden under 780px.
+
+Interaction: drag to paint, and the frame accumulates. Switch tools to change the
+character of what you leave behind, raise the symmetry to turn anything into a
+kaleidoscope, drop the decay to zero and watch the strokes build into a saturated
+picture, hold the shutter with S to freeze an exposure, and press C to start a new
+frame. Everything works with a finger on a touch screen.
+
+## One-paragraph description of the intended design
+A black room where a canvas is never cleared, only washed with a near-black fade whose
+strength is a slider, and where every stroke you drag is stamped in several rotations
+and a mirror fold so a hand tremor becomes a rosette — with four tools (a soft ribbon,
+a thin wire, a spark emitter, and one that subtracts light), a lantern of its own
+wandering over everything, and a drift slider that slides the whole frame a fraction of
+a pixel at a time the way an unlocked camera does.
+
+## Major visual techniques used
+- Nothing is ever cleared: the persistence comes from a translucent black wash whose
+  alpha is a slider, so the same code covers "trail dies at once" and "accumulates"
+- Additive drawing with globalCompositeOperation 'lighter', so overlapping hues add
+  the way light does instead of occluding
+- Two-layer stamp: a saturated core plus a brighter, wider halo, which is what gives a
+  stroke its bloom
+- Mirror fold computed in the same pass as the rotation, so a fold of one is a plain
+  line and everything above it is symmetric
+- Drift as drawImage from the canvas onto itself with a sub-pixel offset, a camera
+  artefact reproduced exactly
+- destination-out used by one tool only, so "erasing" is the inverse of painting
+  rather than a white overlay
+- Sparks as particles with gravity and multiplicative drag, drawn additive with a
+  radius proportional to remaining life
+- Pointer capture plus coordinate rescaling, so drawing continues outside the canvas
+  and works on touch
+- A Lissajous lantern driven off the frame counter, so the page is alive before anyone
+  touches it
+- Keyboard shortcuts 1–4 that simply click the tool buttons, so the two input paths
+  cannot diverge
+- Fixed internal canvas resolution with CSS scaling, which keeps the shading and the
+  wash stable at every width without a resize handler
+
+## Intended interaction model
+A dark room to draw in. Visitors drag to paint light onto a surface that only slowly
+forgets, choose a tool to change the character of what they leave, and use the sliders
+to change the physics of the room: how many folds the light is mirrored into, how wide
+the brush is, how long the shutter stays open, and how far the frame drifts. The
+keyboard is a shortcut, not a requirement.

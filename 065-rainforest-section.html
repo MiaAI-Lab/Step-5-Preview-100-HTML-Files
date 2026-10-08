@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rainforest Section — four floors of light</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:#0a1310;color:#e6f2ea;
+  font:15px/1.62 ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.serif{font-family:ui-serif,Georgia,"Times New Roman",serif}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.wrap{width:min(1120px,92vw);margin:0 auto}
+nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0 14px;
+  border-bottom:1px solid rgba(230,242,234,.14)}
+nav .brand{font-family:ui-serif,Georgia,serif;font-size:19px}
+nav .brand i{font-style:italic;color:#8fd694}
+nav ul{display:flex;gap:26px;list-style:none;margin:0;padding:0;font-size:11px;
+  letter-spacing:.24em;text-transform:uppercase;color:#8a9d92}
+nav a{color:inherit;text-decoration:none}nav a:hover{color:#8fd694}
+@media(max-width:780px){nav ul{display:none}}
+header.hero{padding:60px 0 34px;text-align:center}
+header.hero .kicker{font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:#8fd694;
+  margin:0 0 14px}
+header.hero h1{font-family:ui-serif,Georgia,serif;font-weight:400;
+  font-size:clamp(34px,5.8vw,68px);line-height:1.05;margin:0 0 16px}
+header.hero h1 em{font-style:italic;color:#ffd166}
+header.hero p{max-width:58ch;margin:0 auto;color:#93a89c}
+/* ---------- section ---------- */
+.section{position:relative;border:1px solid rgba(230,242,234,.16);border-radius:16px;
+  overflow:hidden;background:#08110d;margin-bottom:18px}
+.section svg{display:block;width:100%;height:auto}
+.section canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.hot{position:absolute;width:26px;height:26px;border-radius:50%;border:1px solid rgba(255,255,255,.7);
+  background:rgba(255,209,102,.18);cursor:pointer;transform:translate(-50%,-50%);
+  transition:transform .18s,background .18s}
+.hot:hover,.hot[aria-pressed="true"]{transform:translate(-50%,-50%) scale(1.25);
+  background:rgba(255,209,102,.5)}
+.card{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);
+  width:min(420px,86%);background:rgba(8,17,13,.88);border:1px solid rgba(230,242,234,.2);
+  border-radius:10px;padding:14px 16px;backdrop-filter:blur(3px);pointer-events:none}
+.card h3{font-family:ui-serif,Georgia,serif;font-weight:400;font-size:19px;margin:0 0 4px;color:#ffd166}
+.card .lat{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#8fd694;margin:0 0 8px}
+.card p{margin:0;font-size:13px;color:#b9cbbf}
+/* ---------- dock ---------- */
+.dock{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;
+  border-top:1px solid rgba(230,242,234,.14);border-bottom:1px solid rgba(230,242,234,.14);
+  padding:16px 0;margin-bottom:36px}
+.dock label{display:grid;gap:7px;font-size:10px;letter-spacing:.26em;text-transform:uppercase;
+  color:#8a9d92;min-width:170px}
+input[type=range]{width:100%;accent-color:#8fd694}
+.btn{background:#8fd694;color:#06231a;border:0;border-radius:9px;padding:11px 16px;
+  font:inherit;font-size:12px;font-weight:700;letter-spacing:.08em;cursor:pointer}
+.btn.ghost{background:transparent;color:#dcefe2;border:1px solid rgba(230,242,234,.22)}
+.btn:hover{filter:brightness(1.07)}
+.readout{display:flex;flex-wrap:wrap;gap:12px 30px;margin-bottom:42px;
+  border-top:1px solid rgba(230,242,234,.14);padding-top:16px}
+.readout div{min-width:78px}
+.readout dt{font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:#8a9d92;margin:0 0 4px}
+.readout dd{margin:0;font-size:21px;font-family:ui-monospace,Menlo,monospace;color:#ffd166}
+.cells{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-bottom:46px}
+@media(max-width:820px){.cells{grid-template-columns:1fr}}
+.cell{border-top:1px solid rgba(230,242,234,.16);padding-top:16px}
+.cell .fig{font-family:ui-serif,Georgia,serif;font-size:38px;color:#8fd694;line-height:1;margin-bottom:8px}
+.cell h3{font-family:ui-serif,Georgia,serif;font-weight:400;font-style:italic;font-size:21px;margin:0 0 8px}
+.cell p{margin:0;color:#93a89c;font-size:14px}
+footer{border-top:1px solid rgba(230,242,234,.14);padding:22px 0 54px;display:flex;
+  justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:11px;letter-spacing:.2em;
+  text-transform:uppercase;color:#6c8177}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="brand">Rainforest <i>Section</i></div>
+    <ul>
+      <li><a href="#section">Section</a></li>
+      <li><a href="#dock">Light</a></li>
+      <li><a href="#notes">Notes</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <p class="kicker">Emergent · canopy · understory · floor</p>
+    <h1 class="serif">Four floors<br>of the same <em>light</em></h1>
+    <p>Almost none of the sun reaches the floor. By the time it gets there it has been
+       taken apart by leaves, and what lands is a green shadow. Drag the hour and watch
+       the section change colour as the light does.</p>
+  </header>
+
+  <div class="section" id="section">
+    <svg id="sect" viewBox="0 0 1000 620" role="img" aria-label="A rainforest cross section in four strata"></svg>
+    <canvas id="rain"></canvas>
+    <div class="card" id="card">
+      <h3 id="cName">Three-toed sloth</h3>
+      <p class="lat" id="cLat">Bradypus variegatus · canopy</p>
+      <p id="cNote">Moves so slowly that algae grows in its fur, which is also why it is
+         almost invisible from below.</p>
+    </div>
+  </div>
+
+  <section class="dock" id="dock">
+    <label for="hour">Hour of day <input id="hour" type="range" min="0" max="24" value="13"></label>
+    <label for="wet">Rainfall <input id="wet" type="range" min="0" max="100" value="30"></label>
+    <button class="btn" id="rainBtn">Start the rain</button>
+    <button class="btn ghost" id="mistBtn">Mist</button>
+    <button class="btn ghost" id="rayBtn">Light shafts</button>
+  </section>
+
+  <dl class="readout">
+    <div><dt>Hour</dt><dd id="rH">13:00</dd></div>
+    <div><dt>Light on the floor</dt><dd id="rL">—</dd></div>
+    <div><dt>Rain</dt><dd id="rR">still</dd></div>
+    <div><dt>Air</dt><dd id="rA">—</dd></div>
+  </dl>
+
+  <section class="cells">
+    <div class="cell">
+      <div class="fig serif">i</div>
+      <h3>Emergent</h3>
+      <p>Two trees in every hectare break the canopy and take full sun. They also take the
+         wind, which is why emergent leaves are small and stiff rather than broad.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">ii</div>
+      <h3>Canopy</h3>
+      <p>The roof, and where almost everything lives. It is a nearly continuous surface,
+         so an animal can cross the forest without touching the ground.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">iii</div>
+      <h3>Understory</h3>
+      <p>Two percent of the light. Leaves down here are wide and dark to catch what is
+         left, and they drip all night so the floor stays wet.</p>
+    </div>
+  </section>
+
+  <section class="cells" id="notes">
+    <div class="cell">
+      <div class="fig serif">iv</div>
+      <h3>Forest floor</h3>
+      <p>A half-percent of the light and no wind at all. A leaf that falls takes weeks to
+         rot, because the decomposers are waiting for warmth they never get.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">v</div>
+      <h3>The hour</h3>
+      <p>Drag the hour and the whole section is re-lit: dawn is cold and flat, noon is
+         hard and white, dusk is amber through the dust, and night is close to black.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">vi</div>
+      <h3>The rain</h3>
+      <p>Rain falls on a canvas laid over the section and is caught by the leaves, so the
+         number that matters is not how hard it falls but how much gets through.</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>Rainforest Section · SVG strata, canvas weather</span>
+    <span class="mono">four floors</span>
+  </footer>
+</div>
+<script>
+(function(){
+"use strict";
+var NS='http://www.w3.org/2000/svg';
+var svg=document.getElementById('sect'),cv=document.getElementById('rain'),
+    ctx=cv.getContext('2d');
+var W=1000,H=620;
+function E(n,a){var e=document.createElementNS(NS,n);
+  for(var k in a)if(a.hasOwnProperty(k))e.setAttribute(k,a[k]);return e;}
+var strata=[
+  {name:'emergent',y:0,h:120,tone:'#2f5b3c'},
+  {name:'canopy',y:120,h:150,tone:'#24502f'},
+  {name:'understory',y:270,h:150,tone:'#1b4025'},
+  {name:'floor',y:420,h:200,tone:'#122b1a'}
+];
+/* ---------- the section itself ---------- */
+function wave(y,amp,step){
+  var d='M0 '+y;
+  for(var x=0;x<=W;x+=step)d+=' Q '+(x-step/2)+' '+(y+amp)+' '+x+' '+y;
+  return d;
+}
+var sky=E('linearGradient',{id:'sky',x1:'0',y1:'0',x2:'0',y2:'1'});
+var skyA=E('stop',{offset:'0','stop-color':'#9fd4e4'});
+var skyB=E('stop',{offset:'1','stop-color':'#e8f3d9'});
+sky.appendChild(skyA);sky.appendChild(skyB);
+var defs=E('defs');defs.appendChild(sky);svg.appendChild(defs);
+svg.appendChild(E('rect',{x:0,y:0,width:W,height:H,fill:'url(#sky)'}));
+strata.forEach(function(s,i){
+  svg.appendChild(E('path',{d:wave(s.y,6-i*1.5,120)+' L '+W+' '+H+' L 0 '+H+' Z',
+    fill:s.tone}));
+});
+/* trunks and crowns, generated from one seed so the section is stable */
+function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;
+  var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;
+  return((t^t>>>14)>>>0)/4294967296;};}
+var rnd=mulberry(20240607);
+var g=E('g',{});
+/* emergent: two trees that break the roof */
+for(var e=0;e<2;e++){
+  var tx=180+e*620;
+  g.appendChild(E('path',{d:'M '+tx+' 300 L '+(tx-16)+' 90 L '+(tx+16)+' 90 Z',fill:'#3a2c1e'}));
+  for(var c=0;c<7;c++){
+    g.appendChild(E('ellipse',{cx:tx+(rnd()-.5)*150,cy:60+rnd()*70,rx:rnd()*70+40,
+      ry:rnd()*36+22,fill:c%2?'#2b5233':'#33613a'}));
+  }
+}
+/* canopy crowns */
+for(var c2=0;c2<16;c2++){
+  var cx=rnd()*W;
+  g.appendChild(E('ellipse',{cx:cx,cy:120+rnd()*40,rx:rnd()*90+50,ry:rnd()*26+14,
+    fill:c2%3?'#24502f':'#2c5c36'}));
+}
+/* understory: broad leaves and slim trunks */
+for(var u=0;u<22;u++){
+  var ux=rnd()*W;
+  g.appendChild(E('rect',{x:ux,y:270,width:3,height:150,fill:'#1c3520'}));
+  var leaf=E('path',{d:'M '+ux+' 300 q -26 -14 -34 6 q 22 20 34 -6 Z',
+    fill:u%2?'#256b34':'#2f7a3b'});
+  leaf.setAttribute('transform','translate('+ux+',0) scale('+(0.7+rnd()*0.9).toFixed(2)+',1) rotate('+((rnd()-.5)*40).toFixed(0)+')');
+  g.appendChild(leaf);
+}
+/* floor: ferns and litter */
+for(var f=0;f<30;f++){
+  var fx=rnd()*W;
+  var fern=E('path',{d:'M '+fx+' 620 q -18 -50 '+(rnd()-.5)*60+' -70 q 14 60 '+(rnd()-.5)*60+' 70 Z',
+    fill:f%2?'#1b3d22':'#234a29'});
+  g.appendChild(fern);
+}
+svg.appendChild(g);
+/* light shafts */
+var rays=E('g',{id:'rays'});
+for(var r=0;r<4;r++){
+  var rx=120+r*260;
+  var shaft=E('path',{d:'M '+rx+' 150 L '+(rx+54)+' 150 L '+(rx+210)+' 620 L '+(rx+40)+' 620 Z',
+    fill:'#fff8d8'});
+  shaft.setAttribute('opacity','0');
+  rays.appendChild(shaft);
+}
+svg.appendChild(rays);
+/* ---------- species hotspots ---------- */
+var SPECIES=[
+  {x:.14,y:.09,name:'Harpy eagle',lat:'Harpia harpyja · emergent',
+   note:'The only raptor big enough to hunt in the canopy, and the reason small monkeys '
+        +'never leave the middle of the crown.'},
+  {x:.62,y:.22,name:'Three-toed sloth',lat:'Bradypus variegatus · canopy',
+   note:'Moves so slowly that algae grows in its fur, which is also why it is almost '
+        +'invisible from below.'},
+  {x:.4,y:.24,name:'Blue morpho',lat:'Morpho peleides · canopy',
+   note:'Flashes blue on the upper wing and brown beneath, so it disappears the moment '
+        +'it closes its wings in shade.'},
+  {x:.3,y:.55,name:'Poison dart frog',lat:'Dendrobates tinctorius · understory',
+   note:'Its warning colour works because a predator that eats one does not eat another, '
+        +'so the whole population benefits.'},
+  {x:.78,y:.62,name:'Toucan',lat:'Ramphastos toco · understory',
+   note:'The bill is a radiator: it dumps heat in the morning and conserves it at night.'},
+  {x:.55,y:.9,name:'Leafcutter ant',lat:'Atta cephalotes · forest floor',
+   note:'Does not eat leaves. It farms a fungus on them, in a colony that has been '
+        +'tended longer than any city has stood.'}
+];
+var box=document.getElementById('section');
+SPECIES.forEach(function(s){
+  var b=document.createElement('button');
+  b.className='hot';b.setAttribute('aria-pressed','false');
+  b.style.left=(s.x*100)+'%';b.style.top=(s.y*100)+'%';
+  b.title=s.name;
+  b.addEventListener('click',function(){
+    var on=b.getAttribute('aria-pressed')!=='true';
+    [].slice.call(box.querySelectorAll('.hot')).forEach(function(o){
+      o.setAttribute('aria-pressed','false');});
+    b.setAttribute('aria-pressed',String(on));
+    document.getElementById('cName').textContent=s.name;
+    document.getElementById('cLat').textContent=s.lat;
+    document.getElementById('cNote').textContent=s.note;
+  });
+  box.appendChild(b);
+});
+/* ---------- the hour re-lights the section ---------- */
+var hour=13,raysOn=false,mistOn=false,raining=false,wet=30;
+/* key hours: night, dawn, morning, noon, afternoon, dusk, night */
+var KEYS=[
+  [0,[16,26,38],[20,34,48]],[5,[40,60,80],[70,100,120]],
+  [7,[120,170,200],[200,220,220]],[11,[150,200,225],[220,235,240]],
+  [13,[140,200,235],[225,240,245]],[17,[180,150,130],[240,205,165]],
+  [19,[70,80,110],[130,120,140]],[24,[16,26,38],[20,34,48]]
+];
+function atHour(h){
+  for(var i=0;i<KEYS.length-1;i++){
+    if(h>=KEYS[i][0]&&h<=KEYS[i+1][0]){
+      var a=KEYS[i],b=KEYS[i+1],t=(h-a[0])/(b[0]-a[0]||1);
+      var A=a[1],B=b[1],C=a[2],D=b[2];
+      return[A[0]+(B[0]-A[0])*t,A[1]+(B[1]-A[1])*t,A[2]+(B[2]-A[2])*t,
+             C[0]+(D[0]-C[0])*t,C[1]+(D[1]-C[1])*t,C[2]+(D[2]-C[2])*t];
+    }
+  }
+  return[KEYS[0][1][0],KEYS[0][1][1],KEYS[0][1][2],
+         KEYS[0][2][0],KEYS[0][2][1],KEYS[0][2][2]];
+}
+function relight(){
+  var c=atHour(hour);
+  skyA.setAttribute('stop-color','rgb('+c[0]+','+c[1]+','+c[2]+')');
+  skyB.setAttribute('stop-color','rgb('+c[3]+','+c[4]+','+c[5]+')');
+  /* the strata are darkened by how deep they are, and by how much of the sky is left */
+  var lift=Math.max(0,1-Math.abs(hour-13)/13);
+  svg.style.filter='brightness('+(0.35+lift*0.85).toFixed(2)+') saturate('+
+    (0.8+lift*0.5).toFixed(2)+')';
+  var floorLux=(0.5*lift*100).toFixed(1);
+  document.getElementById('rL').textContent=floorLux+' %';
+  var hh=Math.floor(hour),mm=Math.floor((hour-hh)*60);
+  document.getElementById('rH').textContent=(hh<10?'0':'')+hh+':'+(mm<10?'0':'')+mm;
+}
+/* ---------- weather ---------- */
+var drops=[],leaves=[],mist=[];
+function sizeCanvas(){
+  var r=cv.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,2);
+  cv.width=Math.max(200,Math.round(r.width*dpr));
+  cv.height=Math.max(120,Math.round(r.height*dpr));
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  cv._w=r.width;cv._h=r.height;
+}
+function canopyY(){return cv._h*0.24;}
+function weather(){
+  var w=cv._w,h=cv._h;
+  ctx.clearRect(0,0,w,h);
+  if(mistOn){
+    for(var i=0;i<mist.length;i++){
+      var m=mist[i];m.x+=m.v;
+      if(m.x>w+120)m.x=-120;
+      var g=ctx.createRadialGradient(m.x,m.y,4,m.x,m.y,m.r);
+      g.addColorStop(0,'rgba(220,240,230,.16)');
+      g.addColorStop(1,'rgba(220,240,230,0)');
+      ctx.fillStyle=g;ctx.beginPath();ctx.arc(m.x,m.y,m.r,0,6.3);ctx.fill();
+    }
+  }
+  if(raining){
+    var rate=wet*0.35;
+    for(var i2=0;i2<rate;i2++){
+      drops.push({x:Math.random()*w,y:-10,v:6+Math.random()*7,len:10+Math.random()*16});
+    }
+    ctx.strokeStyle='rgba(200,230,255,.55)';ctx.lineWidth=1;
+    for(var d=drops.length-1;d>=0;d--){
+      var s=drops[d];
+      s.y+=s.v;s.x+=1.2;
+      ctx.beginPath();ctx.moveTo(s.x,s.y);ctx.lineTo(s.x-3,s.y+s.len);ctx.stroke();
+      /* most of it is caught by the roof; the rest reaches the floor slowly */
+      if(s.y>canopyY()){
+        if(Math.random()>wet/120){drops.splice(d,1);continue;}
+        s.v=3+Math.random()*2;s.len=6;
+      }
+      if(s.y>h){drops.splice(d,1);}
+    }
+  }
+  /* leaves drifting down, whichever the weather */
+  for(var l=leaves.length-1;l>=0;l--){
+    var lf=leaves[l];
+    lf.a+=lf.spin;lf.y+=lf.v;lf.x+=Math.sin(lf.a)*1.6;
+    ctx.save();ctx.translate(lf.x,lf.y);ctx.rotate(lf.a);
+    ctx.fillStyle='rgba(60,120,70,.75)';
+    ctx.beginPath();ctx.ellipse(0,0,6,2.6,0,0,6.3);ctx.fill();ctx.restore();
+    if(lf.y>h+10){lf.y=-10;lf.x=Math.random()*w;}
+  }
+}
+
+/* ---------------- controls ---------------- */
+document.getElementById('hour').addEventListener('input',function(e){
+  hour=+e.target.value;relight();
+});
+document.getElementById('wet').addEventListener('input',function(e){
+  wet=+e.target.value;
+  document.getElementById('rR').textContent=raining?Math.round(wet)+' mm/h':'still';
+});
+var rainBtn=document.getElementById('rainBtn');
+rainBtn.addEventListener('click',function(){
+  raining=!raining;drops=[];
+  rainBtn.textContent=raining?'Stop the rain':'Start the rain';
+  document.getElementById('rR').textContent=raining?Math.round(wet)+' mm/h':'still';
+});
+var mistBtn=document.getElementById('mistBtn');
+mistBtn.addEventListener('click',function(){
+  mistOn=!mistOn;mist=[];
+  mistBtn.setAttribute('aria-pressed',String(mistOn));
+  for(var i=0;i<7;i++)mist.push({x:Math.random()*cv._w,y:cv._h*(0.3+Math.random()*0.6),
+    r:60+Math.random()*90,v:0.15+Math.random()*0.35});
+  document.getElementById('rA').textContent=mistOn?'wet · 96%':'humid · 88%';
+});
+var rayBtn=document.getElementById('rayBtn');
+rayBtn.addEventListener('click',function(){
+  raysOn=!raysOn;rayBtn.setAttribute('aria-pressed',String(raysOn));
+  var shafts=rays.childNodes;
+  for(var s=0;s<shafts.length;s++){
+    shafts[s].setAttribute('opacity',raysOn?(0.05+s*0.02).toFixed(2):'0');
+  }
+});
+
+/* ---------------- loop ---------------- */
+var t=0;
+function loop(){
+  t+=0.016;
+  /* the shafts flicker, the way light through leaves does */
+  if(raysOn){
+    var shafts=rays.childNodes;
+    for(var s=0;s<shafts.length;s++){
+      shafts[s].setAttribute('opacity',(0.04+Math.abs(Math.sin(t*0.7+s))*0.07).toFixed(3));
+    }
+  }
+  /* leaves fall whether or not it is raining */
+  if(leaves.length<10&&Math.random()<0.02){
+    leaves.push({x:Math.random()*cv._w,y:-10,a:Math.random()*6,v:0.4+Math.random()*0.7,
+      spin:(Math.random()-.5)*0.06});
+  }
+  weather();
+  requestAnimationFrame(loop);
+}
+sizeCanvas();relight();
+for(var l0=0;l0<8;l0++)leaves.push({x:Math.random()*800,y:Math.random()*600,
+  a:Math.random()*6,v:0.4+Math.random()*0.7,spin:(Math.random()-.5)*0.06});
+document.getElementById('rA').textContent='humid · 88%';
+requestAnimationFrame(loop);
+window.addEventListener('resize',function(){sizeCanvas();});
+})();
+</script>
+</body>
+</html>

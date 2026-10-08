@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DESCENT — Abyssal Diver, 4 200 m</title>
+<style>
+  :root{
+    --bg:#01060a;
+    --panel:#071018;
+    --line:rgba(160,220,235,.14);
+    --text:#cfeaf2;
+    --muted:rgba(207,234,242,.5);
+    --cy:#5fe0ff;
+    --cy2:#a8f0ff;
+    --amber:#ffc45c;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --serif:"Iowan Old Style",Palatino,Georgia,serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+  .sea{
+    position:fixed;inset:0;z-index:0;
+    background:
+      radial-gradient(60% 40% at 50% 0%,rgba(30,120,160,.22),transparent 68%),
+      linear-gradient(180deg,#03222f 0%,#021a26 30%,#01121c 62%,#010a11 100%);
+    transition:filter .6s linear
+  }
+  #cv{position:fixed;inset:0;z-index:1;display:block}
+
+  .ui{position:fixed;inset:0;z-index:3;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(18px,3.4vw,40px)}
+  .top{display:flex;justify-content:space-between;align-items:flex-start;gap:18px}
+  .k{font-family:var(--mono);font-size:9px;letter-spacing:.34em;text-transform:uppercase;color:var(--cy)}
+  h1{font-family:var(--serif);font-weight:400;font-style:italic;font-size:clamp(28px,5.2vw,62px);line-height:.98;letter-spacing:-.02em;margin:10px 0 0}
+  h1 b{font-style:normal;font-weight:400;color:var(--cy2)}
+  .top p{margin:12px 0 0;font-size:12px;line-height:1.75;max-width:32ch;color:var(--muted)}
+  .gauges{text-align:right;font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);line-height:2.4}
+  .gauges b{display:block;font-size:15px;color:var(--cy2);font-weight:400;letter-spacing:.02em}
+
+  .bottom{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+  .tray{
+    pointer-events:auto;display:flex;gap:clamp(8px,1.3vw,16px);flex-wrap:wrap;align-items:center;
+    background:rgba(4,18,26,.62);border:1px solid var(--line);border-radius:16px;
+    padding:11px clamp(12px,1.8vw,20px);backdrop-filter:blur(14px)
+  }
+  .g{display:flex;align-items:center;gap:8px}
+  .kk{font-family:var(--mono);font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+  .vv{font-family:var(--mono);font-size:9.5px;color:var(--cy2);min-width:34px;font-variant-numeric:tabular-nums}
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;width:64px;height:14px;background:transparent;cursor:pointer
+  }
+  input[type=range]::-webkit-slider-runnable-track{height:2px;background:var(--line);border-radius:2px}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;border-radius:50%;background:var(--cy);margin-top:-5px;border:0;box-shadow:0 0 10px rgba(95,224,255,.7)}
+  input[type=range]::-moz-range-track{height:2px;background:var(--line);border-radius:2px}
+  input[type=range]::-moz-range-thumb{width:11px;height:11px;border:0;border-radius:50%;background:var(--cy)}
+  button{
+    pointer-events:auto;font-family:var(--mono);font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;
+    background:rgba(95,224,255,.12);border:1px solid rgba(95,224,255,.36);color:var(--text);
+    padding:9px 13px;border-radius:999px;cursor:pointer;transition:background .2s,color .2s
+  }
+  button:hover{background:var(--cy);color:#04202b}
+  button.on{background:var(--cy);color:#04202b}
+  .hint{font-family:var(--mono);font-size:8.5px;letter-spacing:.22em;text-transform:uppercase;color:rgba(207,234,242,.4);pointer-events:none}
+
+  /* the submersible */
+  .sub{
+    position:fixed;left:50%;bottom:22%;transform:translateX(-50%);z-index:2;
+    width:clamp(120px,18vw,210px);aspect-ratio:2.1/1;
+    transition:bottom .3s linear
+  }
+  .sub .hull{
+    position:absolute;inset:0;border-radius:50%/46%;
+    background:radial-gradient(60% 70% at 36% 30%,#d8e8ee,#8ea6b0 55%,#4a5a64);
+    box-shadow:inset -10px -8px 20px rgba(0,0,0,.4),0 20px 40px -18px rgba(0,0,0,.9)
+  }
+  .sub .hull::after{
+    content:"";position:absolute;inset:0;opacity:.35;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='k'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='6'/></filter><rect width='140' height='140' filter='url(%23k)' opacity='.3'/></svg>");
+    border-radius:inherit
+  }
+  .sub .view{
+    position:absolute;left:8%;top:26%;width:20%;height:44%;border-radius:50%;
+    background:radial-gradient(circle at 38% 32%,#0d2a35,#04121a 70%,#020a10);
+    box-shadow:inset 0 0 8px rgba(0,0,0,.9),0 0 0 3px rgba(216,232,238,.5)
+  }
+  .sub .manip{
+    position:absolute;right:2%;top:36%;width:22%;height:28%;
+    background:linear-gradient(180deg,#c8d8de,#7a8a94);border-radius:3px;
+    box-shadow:2px 2px 0 rgba(0,0,0,.3)
+  }
+  .sub .skid{
+    position:absolute;left:12%;right:12%;bottom:-8px;height:5px;border-radius:3px;
+    background:linear-gradient(180deg,#9aa8b0,#5a666e)
+  }
+  .sub .light{
+    position:absolute;left:50%;bottom:12%;transform:translateX(-50%);width:0;height:0;
+    border-left:8px solid transparent;border-right:8px solid transparent;
+    border-bottom:14px solid var(--amber);
+    filter:drop-shadow(0 0 10px rgba(255,196,92,.9))
+  }
+  .beam{
+    position:fixed;left:50%;bottom:22%;transform:translateX(-50%);z-index:1;
+    width:0;height:0;border-left:120px solid transparent;border-right:120px solid transparent;
+    border-top:min(46vh,420px) solid rgba(255,214,150,.10);
+    filter:blur(6px);transition:opacity .5s;pointer-events:none
+  }
+  .sub .prop{
+    position:absolute;left:6%;top:38%;width:12px;height:24%;
+    background:radial-gradient(circle at 50% 50%,#6a7a84,#2a343a);
+    border-radius:3px
+  }
+
+  @media (max-width:760px){.top p,.gauges,.hint{display:none}.ui{padding:14px}.beam{display:none}}
+</style>
+</head>
+<body>
+<div class="sea" id="sea"></div>
+<canvas id="cv"></canvas>
+<div class="beam" id="beam"></div>
+
+<div class="sub" id="sub">
+  <div class="hull"></div>
+  <div class="view"></div>
+  <div class="prop"></div>
+  <div class="manip"></div>
+  <div class="light"></div>
+  <div class="skid"></div>
+</div>
+
+<div class="ui">
+  <div class="top">
+    <div>
+      <div class="k">Abyssal diver · Nautilus VII</div>
+      <h1>Down, past the<br><b>last of the light.</b></h1>
+      <p>At 200 metres the blue goes. At 1 000 the pressure is one hundred
+      atmospheres. At 4 200 there is nothing but the animals that make their own.</p>
+    </div>
+    <div class="gauges">
+      Depth<b id="mD">0 m</b>
+      Pressure<b id="mP">1.0 MPa</b>
+      Temp<b id="mT">18.4 °C</b>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <div class="tray">
+      <div class="g"><span class="kk">Descent</span><input type="range" id="dsc" min="0" max="100" value="0" aria-label="Descent rate"><span class="vv" id="dscV">0</span></div>
+      <div class="g"><span class="kk">Lights</span><input type="range" id="lts" min="0" max="100" value="80" aria-label="Lamp output"><span class="vv" id="ltsV">80</span></div>
+      <div class="g"><span class="kk">Marine snow</span><input type="range" id="snw" min="0" max="100" value="52" aria-label="Marine snow"><span class="vv" id="snwV">52</span></div>
+      <button id="dive" class="on">Dive</button>
+      <button id="surface">Surface</button>
+    </div>
+    <div class="hint">Drag sideways to thrust the submersible</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var cv=document.getElementById('cv'),c=cv.getContext('2d');
+  var W,H,DPR=Math.min(devicePixelRatio||1,2);
+  var depth=0,diveRate=0,lamp=80,snow=52;
+  var sx=0.5,sxT=0.5,vx=0;
+  var dscIn=document.getElementById('dsc'),
+      dscOut=document.getElementById('dscV'),
+      diveBtn=document.getElementById('dive'),
+      surfBtn=document.getElementById('surface');
+  var life=[];   /* bioluminescent creatures */
+  var motes=[];  /* marine snow */
+  var t=0;
+
+  function resize(){
+    W=innerWidth;H=innerHeight;
+    cv.width=W*DPR;cv.height=H*DPR;cv.style.width=W+'px';cv.style.height=H+'px';
+    c.setTransform(DPR,0,0,DPR,0,0);
+    buildLife();buildMotes();
+  }
+  function buildLife(){
+    life=[];
+    var n=18;
+    for(var i=0;i<n;i++)life.push(mkLife(Math.random()*W,Math.random()*H));
+  }
+  function mkLife(x,y){
+    return {x:x,y:y,vx:(Math.random()-.5)*0.5,vy:(Math.random()-.5)*0.3,
+      r:2+Math.random()*4,ph:Math.random()*6.283,sp:0.4+Math.random(),
+      hue:Math.random()<0.5?190:290,burst:0};
+  }
+  function buildMotes(){
+    motes=[];
+    for(var i=0;i<160;i++){
+      motes.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.6+.4,
+        vy:Math.random()*.25+.06,ph:Math.random()*6.283});
+    }
+  }
+
+  function draw(){
+    t+=0.016;
+    if(diveRate>0){
+      depth=Math.min(4200,depth+diveRate*0.02);
+      if(depth>=4200){
+        diveRate=0;
+        dscIn.value=0;dscOut.textContent='0';
+        diveBtn.classList.remove('on');
+      }
+    }else if(depth>0){
+      depth=Math.max(0,depth-0.28);
+      if(depth===0)surfBtn.classList.remove('on');
+    }
+    var d=depth/4200;
+
+    c.setTransform(DPR,0,0,DPR,0,0);
+    c.clearRect(0,0,W,H);
+
+    /* the light dies with depth */
+    var amb=Math.max(0,1-d*1.25);
+    var lg=c.createLinearGradient(0,0,0,H);
+    lg.addColorStop(0,'rgba(3,34,47,'+(0.55*amb).toFixed(3)+')');
+    lg.addColorStop(1,'rgba(1,10,17,'+(0.85*amb+0.12).toFixed(3)+')');
+    c.fillStyle=lg;c.fillRect(0,0,W,H);
+    document.getElementById('sea').style.filter='brightness('+(0.25+amb*0.75).toFixed(2)+')';
+
+    /* sway the submersible */
+    sx+=(sxT-sx)*0.04;vx+=(sxT-sx)*0.0006;vx*=0.94;sx+=vx;
+    var subX=sx*W, subY=H*0.78+Math.sin(t*0.6)*6;
+    var subEl=document.getElementById('sub');
+    subEl.style.left=subX+'px';
+    subEl.style.bottom=(H*0.22-Math.sin(t*0.6)*6)+'px';
+    /* pitch the hull with the thrust */
+    subEl.style.transform='translateX(-50%) rotate('+(vx*220).toFixed(2)+'deg)';
+
+    /* the lamp cone in world space */
+    var lampF=lamp/100;
+    var beamR=Math.max(120,W*0.55*lampF);
+    var beam=c.createRadialGradient(subX,subY-40,0,subX,subY-40,beamR);
+    beam.addColorStop(0,'rgba(255,220,160,'+(0.20*lampF).toFixed(3)+')');
+    beam.addColorStop(.45,'rgba(255,200,130,'+(0.07*lampF).toFixed(3)+')');
+    beam.addColorStop(1,'rgba(255,190,120,0)');
+    c.fillStyle=beam;c.fillRect(0,0,W,H);
+
+    /* marine snow: particles drifting up as we descend */
+    var snowF=snow/100;
+    c.save();
+    c.globalCompositeOperation='lighter';
+    for(var i=0;i<motes.length;i++){
+      var m=motes[i];
+      m.y-=diveRate*0.02*m.vy*40;
+      m.x+=Math.sin(t*0.4+m.ph)*0.12;
+      if(m.y<-10){m.y=H+10;m.x=Math.random()*W;}
+      if(m.y>H+10)m.y=-10;
+      c.fillStyle='rgba(200,230,245,'+(0.05+snowF*0.22).toFixed(3)+')';
+      c.beginPath();c.arc(m.x,m.y,m.r,0,6.283);c.fill();
+    }
+    c.restore();
+
+    /* bioluminescent life, only in the dark part */
+    c.save();
+    c.globalCompositeOperation='lighter';
+    for(var l=0;l<life.length;l++){
+      var a=life[l];
+      a.x+=a.vx+Math.sin(t*0.5+a.ph)*0.2;
+      a.y+=a.vy+(diveRate*0.9);
+      if(a.y>H+20){a.y=-20;a.x=Math.random()*W;}
+      if(a.y<-20)a.y=H+20;
+      if(a.x<-20)a.x=W+20;
+      if(a.x>W+20)a.x=-20;
+      /* a burst: a brief flare that fades */
+      if(Math.random()<0.0025)a.burst=1;
+      a.burst*=0.94;
+      var lit=(1-amb)*0.9;     /* only visible in the dark */
+      /* the animal itself */
+      var glow=a.r*(1+a.burst*5);
+      var g2=c.createRadialGradient(a.x,a.y,0,a.x,a.y,glow*4);
+      var hue=a.hue;
+      var alpha=(0.10+a.burst*0.7)*lit;
+      g2.addColorStop(0,'hsla('+hue+',100%,85%,'+alpha.toFixed(3)+')');
+      g2.addColorStop(.25,'hsla('+hue+',100%,70%,'+(alpha*0.4).toFixed(3)+')');
+      g2.addColorStop(1,'hsla('+hue+',100%,60%,0)');
+      c.fillStyle=g2;
+      c.beginPath();c.arc(a.x,a.y,glow*4,0,6.283);c.fill();
+      c.fillStyle='hsla('+hue+',100%,90%,'+(0.25*a.burst*lit).toFixed(3)+')';
+      c.beginPath();c.arc(a.x,a.y,Math.max(0.6,a.r*0.4),0,6.283);c.fill();
+    }
+    c.restore();
+
+    /* pressure marks on the hull */
+    c.globalAlpha=0.9;
+    c.fillStyle='rgba(207,234,242,.5)';
+    c.font='9px ui-monospace,monospace';c.textAlign='left';
+
+    /* gauges */
+    document.getElementById('mD').textContent=Math.round(depth).toLocaleString()+' m';
+    document.getElementById('mP').textContent=(0.1+depth*0.0102).toFixed(1)+' MPa';
+    document.getElementById('mT').textContent=(18.4-depth*0.0042).toFixed(1)+' °C';
+    requestAnimationFrame(draw);
+  }
+
+  var dragging=false,lx=0;
+  addEventListener('pointerdown',function(e){
+    if(e.target.tagName==='INPUT'||e.target.tagName==='BUTTON')return;
+    dragging=true;lx=e.clientX;
+  });
+  addEventListener('pointermove',function(e){
+    if(!dragging)return;
+    sxT+=(e.clientX-lx)*0.0022;
+    sxT=Math.max(0.06,Math.min(0.94,sxT));
+    lx=e.clientX;
+  });
+  addEventListener('pointerup',function(){dragging=false;});
+
+  function bind(id,fn){
+    document.getElementById(id).addEventListener('input',fn);
+  }
+  bind('dsc',function(){diveRate=+this.value;document.getElementById('dscV').textContent=diveRate;});
+  bind('lts',function(){lamp=+this.value;document.getElementById('ltsV').textContent=lamp;
+    document.getElementById('beam').style.opacity=(lamp/100).toFixed(2);});
+  bind('snw',function(){snow=+this.value;document.getElementById('snwV').textContent=snow;});
+
+  var db=document.getElementById('dive'),sb=document.getElementById('surface');
+  db.addEventListener('click',function(){
+    if(diveRate>0)return;
+    diveRate=100;dsc.value=100;dscV.textContent='100';
+    db.classList.add('on');sb.classList.remove('on');
+  });
+  sb.addEventListener('click',function(){
+    diveRate=0;dsc.value=0;dscV.textContent='0';
+    sb.classList.add('on');db.classList.remove('on');
+    sb.textContent='Surfacing';
+  });
+
+  addEventListener('resize',function(){clearTimeout(window.__r);window.__r=setTimeout(resize,140)});
+  resize();
+  requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>

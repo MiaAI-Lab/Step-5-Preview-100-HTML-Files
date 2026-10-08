@@ -1,0 +1,82 @@
+# THE SCALE — one cone, five flavours, one scoop
+
+## Short title
+Ice Cream Counter
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a gelato counter where a scoop is
+a foam with a real overrun, dragged out of a tub onto a digital scale that reads its actual
+weight in grams. No external dependencies whatsoever — no CDN, no web fonts, no external
+images, no JS libraries. All CSS and JavaScript inline, works offline by double-clicking,
+responsive, valid HTML5.
+
+Artistic direction: a warm counter. Ground #fff6ee, hairlines rgba(58,42,42,.18), ink
+#3a2a2a with muted #7a6660, terracotta #e0654a as the accent and a teal #4a7a8c for the
+figures. Serif headings with italic accent words, uppercase .2em–.4em kickers, monospace
+figures.
+
+The counter is one canvas: a cream gradient, a stainless tub with a rolled rim holding the
+flavour, a digital scale with a dark display, a vertical freezer thermometer, and the scoop
+itself. The scoop is a hemisphere with a curl across it — a radial-gradient body, a flat
+band, a highlight ellipse, chips and ten air bubbles on the surface — and it can be dragged
+out of the tub, with its position deciding how far out it is.
+
+Eight flavours, each with a light tone, a dark tone, an optional chip colour and the mix's
+real fat, sugar and protein per hundred grams. Four cone types, each drawn as a triangle
+with a lattice and a rolled rim.
+
+The physics is the overrun. Volume is the hemisphere's volume; mix volume is that divided
+by one plus the overrun percentage; air volume is the remainder; and weight is mix volume
+times the base density of 1.1 grams per millilitre. So the same scoop really does get
+lighter as you whip more air into it, and the ticket and the scale both say so.
+
+Controls: eight flavours, four cone types, scoop size, overrun, freezer temperature, Scoop
+it and Onto a cone. Readout: flavour, weight, volume, overrun, temperature and cones
+served. The ticket lists weight, volume, mix, air, overrun and price; the nutrition panel
+shows fat, sugar and protein of the mix, which does not move with the overrun because it
+is the mix's, not the foam's.
+
+Layout: nav, centred hero, the counter canvas with its caption, a dock of two chip rows,
+three sliders and two buttons, a two-column ticket and nutrition row, a readout row, then
+two three-cell note rows on overrun, freezing, the scoop, the ticket, nutrition and cones,
+then a footer.
+
+Interaction: pick a flavour and the tub, the scoop and the bubbles all change; drag the
+scoop out of the tub and watch the scale read it; set the overrun and watch the same scoop
+weigh less and less; set the freezer colder than minus sixteen and the display turns amber
+to say it is a brick; and drop it onto a cone to serve one.
+
+## One-paragraph description of the intended design
+A gelato counter on canvas where a hemisphere scoop with a curl, chips and visible air
+bubbles sits in a stainless tub of one of eight flavours and drags out onto a digital scale
+— with volume from the hemisphere, mix volume from the overrun, weight from mix volume
+times the base density, and a ticket and nutrition panel computed from the same numbers, a
+freezer thermometer that turns the display amber past minus sixteen, and four cone types
+drawn with a lattice and rolled rim.
+
+## Major visual techniques used
+- Scoop as a radial-gradient hemisphere with a flat curl band and a highlight ellipse,
+  which is what a scoop actually looks like from above
+- Air bubbles drawn on the surface, so the foam is visible rather than described
+- Chips as a golden-angle scatter clipped to the surface, per flavour that has them
+- Overrun as a real division: mix volume is total volume over one plus overrun, so
+  weight and the ticket follow from one number
+- Nutrition bars driven by the mix's composition, which deliberately does not change with
+  the overrun — only the weight does
+- Digital scale as a dark display with a monospace readout that turns amber when the
+  freezer is too cold to scoop
+- Freezer thermometer as a vertical column with the scoopable band marked in green
+- Tub as concentric ellipses with a rolled rim, and a flavour label on the front
+- Cone as a triangle with two families of lattice strokes converging and a rolled rim
+- Drag state derived from the scoop's distance from the tub centre, so picking it up is a
+  continuous quantity rather than a toggle
+- Scoop radius eased toward the slider, so changing size is smooth
+- Eight palettes as light/dark pairs so a flavour change repaints the scoop, the tub and
+  the chips from one switch
+
+## Intended interaction model
+A counter to work. Visitors choose a flavour and a cone, drag the scoop out of the tub,
+set the overrun and watch the same volume weigh less, push the freezer down until the
+display says it is a brick, and drop it onto a cone to serve one. The ticket and the
+nutrition panel are computed from the same two numbers that move the drawing.

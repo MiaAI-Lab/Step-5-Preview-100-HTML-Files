@@ -1,0 +1,81 @@
+# ORIGAMI — Eight Folds to a Crane
+
+## Short title
+Origami Folding Studio
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: an origami instruction
+studio called ORIGAMI. No external dependencies whatsoever — no CDN, no web fonts,
+no external images, no external SVG files, no JavaScript libraries. All CSS and
+JavaScript inline, works offline by double-clicking, responsive, valid HTML5.
+
+Artistic direction: a bright workshop table. Warm paper #f5f2e8 with a slightly
+deeper paper #e6e0cf, true ink #1e1c18, hairline rules at 16% ink, and one proof
+red #b8342a used for the step numbers, one italic word in the headline and the
+large figures in the facts row. Type is a high-contrast serif for headings and
+instructions, a system sans for paragraphs, and a 9–9.5px wide-tracked monospace
+for all labels and metadata.
+
+The model: a square "sheet" in a 1400px perspective stage, built from two faces —
+a front and a back rotated 180° — each carrying a crease pattern drawn purely with
+four overlapping linear-gradients (a vertical crease at 50%, a horizontal one, and
+two diagonals) in ink at 12–22% alpha. The front face holds four triangular flaps,
+one per quadrant, each with its own transform-origin at the appropriate corner so
+it hinges on the right edge. As the sequence advances, the whole sheet tilts
+(rotateX from 0° down to 10°, rotateY from 0° to −64°) while the front face spins
+(rotateY 0° to 180°), and the flaps fold in one by one — each becoming visible at
+the step where it is first folded and rotating to flat. Every transition runs for
+1.1 seconds on a slow cubic-bezier(.5, 0, .3, 1) so the motion reads as paper
+hinging rather than an element animating.
+
+The sequence: nine steps from square to crane — square, fold in half, fold again,
+preliminary base, petals in, narrow and repeat, neck and tail, head, the crane —
+each with an instruction sentence and its own sheet rotation, face rotation and
+flap list. The current step is highlighted by an italic shift and a padding-left
+nudge; completed steps have their numbers turn from red to ink.
+
+Layout: a nav with a serif brand at 0.28em tracking and two links. A centred hero
+with a red eyebrow, a serif headline with one italic red word, and a paragraph. Then
+a studio section, a 1.2fr/1fr split between the perspective stage and the numbered
+step list. Then a tray of three buttons — Previous fold, Next fold and Fold for me.
+Then a three-cell facts row built from 1px gaps, with large red serif figures. Then
+a ruled monospace footer.
+
+Interaction: the step list is clickable — choose any step and the sheet turns to
+match it, folding every flap up to and including that step. Previous and Next walk
+the sequence one step at a time. "Fold for me" auto-advances every 2.4 seconds until
+it reaches the crane, then stops and returns its label to "Fold for me" (pressing
+it again pauses). All animation honours prefers-reduced-motion by collapsing the
+transition duration. The studio and facts collapse to one column under 880px.
+
+## One-paragraph description of the intended design
+An instruction studio where the paper really moves: a CSS-3D square with a
+gradient-drawn crease pattern and four hinged triangular flaps, tilting and turning
+through nine steps from square to crane, each step folding another flap flat over
+1.1 seconds of slow paper-hinging motion, driven by a clickable step list, prev/next
+buttons or a self-running "fold for me".
+
+## Major visual techniques used
+- CSS 3D: a perspective stage, a preserve-3d sheet, a back face rotated 180°, and a
+  front face rotating through 180 degrees
+- Crease pattern drawn from four overlapping linear-gradients (vertical, horizontal
+  and two diagonal hairlines) at 12–22% ink alpha — no images
+- Four triangular flaps with per-corner transform-origins so each hinges correctly
+- Staged fold-in: flaps become visible and rotate flat at their step
+- Slow 1.1s cubic-bezier(.5,0,.3,1) transitions so motion reads as paper
+- Sheet rotation choreographed across the sequence (rotateX 0°→10°, rotateY 0°→−64°)
+- Soft elliptical contact shadow under the sheet via a radial-gradient ::after
+- Clickable step list with current-step italic emphasis and completed-step number
+  recolouring
+- Auto-advance interval that stops at the end and restores its label
+- Warm paper palette with hairline rules and a single proof-red accent
+- Serif display with 0.28em tracking against 9px tracked monospace labels
+- 1px-gap facts grid; 1.2fr/1fr studio split collapsing under 880px
+- prefers-reduced-motion collapsing all fold transitions
+
+## Intended interaction model
+An instruction manual you can operate. Visitors step forward and back through the
+folds, jump straight to any step by clicking it, or let the page fold for itself at
+a walking pace. The paper responds to every step with a single slow turn, and the
+list keeps track of where you are; there is nothing else to do but fold.

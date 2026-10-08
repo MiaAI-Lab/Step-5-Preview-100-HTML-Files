@@ -1,0 +1,84 @@
+# FROST ON GLASS — circles of confusion
+
+## Short title
+Bokeh Frost
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a dark street of lights behind a
+frosted window, where every out-of-focus point of light is drawn as the polygon silhouette
+of a real camera diaphragm, sized by a real circle of confusion. No external dependencies
+whatsoever — no CDN, no web fonts, no external images, no JS libraries. All CSS and
+JavaScript inline, works offline by double-clicking, responsive, valid HTML5.
+
+Artistic direction: a cold, blue-black night. Ground #0c1014, hairlines rgba(232,240,246,.14),
+body #e8f0f6 with muted #93a4b2, frost blue #9fd8f0 as the accent and warm white #ffd8a0
+for the figures. Serif headings with italic accent words, uppercase .2em–.4em kickers,
+monospace figures.
+
+Behind the glass are five kinds of light. Streetlights, warm orange. Neon, pink. Car
+lights, near-white. Candles, deep amber. Phosphor, cyan. Each kind has its own count,
+colour and size range.
+
+The optics are real. The aperture slider runs f/1.4 to f/22 logarithmically, and a lens's
+fastest stop lengthens with its focal length, so an 85 mm lens cannot open to f/1.4. The
+circle of confusion is computed from a 0.05 mm diameter of confusion on a 44 mm vertical
+frame. The hyperfocal distance is f²/(Nc) + f, and the depth of field near and far limits
+follow from it. Each light is filled as a polygon with as many sides as the diaphragm has
+blades — five, six, seven, nine or eleven — so the bokeh is the silhouette of the aperture
+itself.
+
+The frost is 120 hexagonal plates, largest first, each with a rim and three to five
+dendrite branches with side spurs, because ice's crystal structure is hexagonal. Haze and
+depth shading follow the sun of the picture, and the plane of focus is a faint band across
+the canvas at the focus distance.
+
+Dragging the canvas wipes the frost away in the width of the drag, and the rings behind
+the wipe come back. Controls: five blades, five light kinds, focal length, aperture,
+focus distance, Re-frost the glass, Wipe a patch. Readout: lights, circle of confusion
+radius, blades, effective aperture, hyperfocal distance, depth of field.
+
+Layout: nav, centred hero, the glass canvas with its caption, a dock of two chip rows,
+three sliders and two buttons, a readout row, then two three-cell note rows on the circle
+of confusion, the shape of the hole, frost, diffraction, depth of field and wiping, then
+a footer.
+
+Interaction: the lights are already smeared into big rings. Visitors pull the aperture
+down to f/22 and watch them turn into pentagons and hexagons, lengthen the focal length
+and watch the lens refuse to open past its own fastest stop, drag across the glass to wipe
+the frost and see the rings sharpen in the wiped path, switch the light kind, and press
+Wipe a patch to clear the whole thing.
+
+## One-paragraph description of the intended design
+A dark street of lights behind a frost-blue window on canvas, where each out-of-focus
+point is filled as a polygon with as many sides as the diaphragm has blades — five, six,
+seven, nine or eleven — and sized by a circle of confusion computed from a 0.05 mm
+diameter on a 44 mm frame, under an aperture that runs f/1.4 to f/22 and a lens whose
+fastest stop lengthens with its focal length — while 120 hexagonal frost plates with
+dendrite branches sit over the top, and dragging the canvas wipes them clear.
+
+## Major visual techniques used
+- Aperture slider mapped f/1.4 to f/22 logarithmically
+- A lens whose fastest stop lengthens with focal length, so the wide end closes up as you
+  zoom in
+- Circle of confusion from a 0.05 mm diameter of confusion on a 44 mm vertical frame
+- Hyperfocal distance as f²/(Nc) + f, with the depth of field limits derived from it
+- Each light filled as a polygon with as many sides as the diaphragm has blades, so five
+  blades give a pentagon and eleven a near-circle
+- A radial gradient from white through the light's colour to a bright rim, which is the
+  edge of the blades
+- A diffraction ring around any bokeh larger than four pixels
+- Frost as 120 hexagonal plates, largest first, with a rim and dendrites with side spurs,
+  because ice's crystal structure is hexagonal
+- The plane of focus drawn as a faint band at the focus distance
+- Capillary wipe: a soft clip along the drag path clears the frost there
+- Five light kinds — streetlights, neon, car lights, candles, phosphor — each with its own
+  count, colour and size range
+- Parallax drift on the lights so the picture is never static
+
+## Intended interaction model
+A window at night. Visitors stop down the aperture and watch the rings contract into
+polygons; switch blades and see the silhouette change shape; lengthen the focal length and
+watch the lens refuse to open past its own fastest stop; drag across the glass to wipe the
+frost and see the rings sharpen in exactly the path they wiped; switch the light kind; and
+press Wipe a patch to see the whole street at once.

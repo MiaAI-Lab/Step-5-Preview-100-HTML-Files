@@ -1,0 +1,85 @@
+# BROAD NIB — pressure, angle, and one line of ink
+
+## Short title
+Calligraphy Studio
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a calligraphy sheet where every
+stroke is drawn by a broad-nib rule — a chisel at an angle whose width depends on the
+direction of travel — over real guidelines, with a second sheet that spells out the ductus.
+No external dependencies whatsoever — no CDN, no web fonts, no external images, no JS
+libraries. All CSS and JavaScript inline, works offline by double-clicking, responsive,
+valid HTML5.
+
+Artistic direction: a desk with paper on it. Ground #f2efe6, sheet #fbf9f2, hairlines
+rgba(42,38,32,.2), ink #2a2620 with muted #645c4e, navy #1f3f6b as the accent and
+vermilion #8c3a2c for the ductus. Serif headings with italic accent words, uppercase
+.2em–.4em kickers, monospace figures.
+
+The stroke geometry is the whole page. A broad nib is a rectangle at an angle. Tracing it
+along a path gives a width that is the full nib width when the travel runs across the
+nib's edge and thins toward nothing when the travel runs along its axis, so drawing down
+at a given angle is thick and drawing up is thin, automatically. The nib width function is
+one line and the whole ductus falls out of it.
+
+Six historical nibs, each setting an angle: foundational at 30, uncial and carolingian at
+40, italic at 45, blackletter at 0 and copperplate at 52. Six inks — iron gall, walnut,
+sepia, gouache, red lead, ultramarine — each its own colour and coverage. The nib itself is
+drawn at the live pointer position, as the actual rectangle at the actual angle.
+
+The sheet carries four guidelines — waist, x-height, base and descender — with the spacing
+marks set by the nib width, because the pen you choose decides the size you write at.
+Beneath the desk is a ductus sheet: six letters with their strokes drawn in order, and the
+thick/thin rule drawn with the same nib function, so the demonstration and the drawing
+share one arithmetic.
+
+Controls: six nibs, six inks, nib width, nib angle, pressure, Guidelines and New sheet.
+Readout: strokes, path length in millimetres, the family, the nib setting, the ink and the
+ductus note.
+
+Layout: nav, centred hero, the desk canvas with its caption, a dock of two chip rows,
+three sliders and two buttons, the ductus sheet, a readout row, then two three-cell note
+rows on three scripts, the ductus, pressure, guidelines, ink and fresh sheet, then a
+footer.
+
+Interaction: pick a nib and the angle changes, so the same drag writes a different script.
+Draw on the sheet and watch the thick stroke go down and the thin stroke go up; move the
+nib width and the guidelines re-space themselves; press harder to spread the nib; switch
+ink to change the coverage; turn the guidelines off; and take a new sheet.
+
+## One-paragraph description of the intended design
+A calligraphy desk where every stroke is drawn by a broad-nib rule — a rectangle at an
+angle whose width is the full nib across the direction of travel and thins to nothing
+along it — over four real guidelines whose spacing is set by the nib width, with six
+historical nibs from 30 to 52 degrees, six inks, a pressure that spreads the nib, the nib
+drawn live at the pointer, and a second sheet that spells out the ductus of six letters and
+the thick/thin rule using the same width function as the drawing.
+
+## Major visual techniques used
+- Broad nib as one function: width is the nib times one minus the absolute dot product
+  of travel and nib axis, so thick and thin are geometry, not a style
+- Nib angle as the single parameter that produces six historical scripts from one code
+  path
+- Nib drawn live at the pointer as the actual rotated rectangle, so the instrument is
+  visible while you work
+- Guidelines whose spacing is derived from the nib width, which is the real rule
+- Ductus sheet drawn from the same width function as the desk, so the demonstration and
+  the drawing cannot disagree
+- Pressure multiplying the nib width, so a second route to the thick stroke exists
+- Six inks as distinct colours and coverages, from opaque gouache to fugitive sepia
+- Path length accumulated in pixels and reported in millimetres at 3.78 pixels per
+  millimetre, so the number is a real measurement
+- Point capture on the sheet so a stroke continues outside it
+- Minimum travel distance of two pixels, so a stroke is not a forest of segments
+- Strokes stored as point lists and re-rendered every frame, so the nib, angle and
+  pressure apply retroactively to what you have already drawn
+- New sheet clearing the writing and leaving the guidelines, because guides are not part
+  of the text
+
+## Intended interaction model
+A sheet to write on. Visitors pick a nib, an ink and a width, draw on the sheet, and watch
+the thick and thin strokes appear from the direction of travel alone — and can go back and
+change the angle, the width or the pressure after drawing and watch every stroke already
+on the sheet re-draw with it, because the writing is stored as points and rendered from
+the nib's geometry every frame.

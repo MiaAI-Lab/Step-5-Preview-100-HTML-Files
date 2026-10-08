@@ -1,0 +1,80 @@
+# LUMEN — Sunrise Console
+
+## Short title
+Neumorphic Sunrise Console
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a soft-UI
+(neumorphic) control console for a fictional sunrise lamp called "LUMEN". No
+external dependencies at all — no CDN, no web fonts, no external images, no
+external SVG files, no JavaScript libraries. All CSS and JavaScript inline, works
+offline by opening the file, responsive, valid HTML5.
+
+Artistic direction: soft clay. Every surface is the same warm sand colour as the
+page background so nothing reads as a separate object; instead depth comes
+entirely from paired shadows — a soft dark shadow down-right and a bright white
+shadow up-left — plus inset versions that "press" elements into the material.
+Nothing has a border. Nothing is pure white or pure black. The palette is warm
+and organic: sand #e7e2d8, terracotta accent #c9784f, sage #8aa39b, warm ink
+#3a342b.
+
+Layout: a centred 920px column. Header with a soft extruded orb logo (a
+concentric neumorphic sphere with a glowing terracotta pupil) and a pill-shaped
+status readout with a breathing dot. Below, a two-column board. Left column: a
+large circular dial card. The dial is a conic-gradient arc of terracotta progress
+over a pressed-in inner plate, ringed with 24 tick marks, carrying a soft
+extruded knob that rides the circumference; its centre shows a large thin
+time readout, a phase label, and a small "sun" disc that rises and grows as the
+value increases. Under the dial, three soft pill preset buttons (Dawn / Early /
+Late). Right column: two stacked cards — a "Light ramp" card with two custom
+neumorphic range sliders (duration, peak brightness) and a pressed-in recessed
+readout that writes out the resulting schedule in prose, and a "Comfort" card
+with a chime toggle, a temperature slider, and a terracotta gradient save button
+that raises a floating soft toast.
+
+Typography: one system sans stack throughout, differentiated only by weight and
+tracking — 300-weight very large numerals with tabular figures for the time,
+600-weight wide-tracked uppercase at 9–11px for every label. Nothing decorative.
+
+Interaction: the dial is genuinely draggable — pointer events map the angle
+between the cursor and the dial centre onto a 12-hour span (04:00 → 16:00),
+updating the conic arc, knob rotation, time text, phase label, sun height and the
+prose readout live; it is also keyboard operable with the arrow keys and exposes
+role="slider" with aria values. The presets animate the dial to fixed times. The
+sliders reformat their own labels and rewrite the prose readout. The chime pill
+presses in and out. Saving raises a toast that fades itself after two seconds.
+Everything re-lays out on resize and the two columns stack under 820px.
+prefers-reduced-motion is honoured.
+
+## One-paragraph description of the intended design
+A calm, tactile instrument panel carved out of soft clay: one large draggable
+neumorphic dial whose terracotta arc, orbiting knob, rising sun and live prose
+readout all respond to a single value, surrounded by pressed-in sliders, extruded
+pill toggles and a warm sand palette where depth is made only from paired light
+and dark shadows.
+
+## Major visual techniques used
+- Neumorphism: paired offset shadows (dark down-right, white up-left) with
+  background-matched surfaces and zero borders
+- Extruded vs. pressed states — inset shadows flip buttons from raised to recessed
+- Conic-gradient progress arc driven by a CSS custom property (--p) updated in JS
+- 24 radial tick marks placed with rotate() + translateY() around the dial centre
+- Draggable radial control using pointer capture, atan2 angle mapping and a
+  12-hour normalisation
+- Concentric neumorphic sphere logo using layered gradients and inset rings
+- Soft glow via small-radius box-shadow rather than blur filters
+- Custom-styled range inputs with ::webkit-slider-runnable-track / thumb and
+  ::moz equivalents
+- Pressed-in "display" panel using inset shadows
+- Thin 300-weight tabular-figure typography against 600-weight wide-tracked
+  uppercase labels
+- Floating soft toast with opacity + translate transition and auto-dismiss
+- Two-column board collapsing to one under 820px; prefers-reduced-motion honoured
+
+## Intended interaction model
+A single-purpose control surface. The visitor drags (or arrows) the dial to choose
+a wake time, nudges the ramp sliders, toggles chimes, and reads the machine
+translate those choices into an English sentence describing the light schedule.
+Presets offer one-tap shortcuts. Saving is a confirmation gesture only. The whole
+thing is meant to feel like turning a physical dial on a warm ceramic object.

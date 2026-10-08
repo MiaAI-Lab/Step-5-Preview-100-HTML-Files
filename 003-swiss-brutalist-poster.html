@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>INDEX 99 — A Concrete Exhibition of Typography</title>
+<style>
+  :root{
+    --paper:#efede6;
+    --ink:#12100e;
+    --red:#ff3b1f;
+    --blue:#0b3cff;
+    --grey:#b9b5aa;
+    --gap:clamp(10px,1.6vw,20px);
+    --head:"Arial Narrow","Helvetica Neue Condensed",Impact,"Haettenschweiler","Franklin Gothic Bold",sans-serif;
+    --sans:Helvetica,"Helvetica Neue",Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--paper);color:var(--ink);font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;
+    background-image:linear-gradient(90deg,rgba(0,0,0,.045) 1px,transparent 1px);
+    background-size:calc(100%/12) 100%;
+  }
+  ::selection{background:var(--red);color:var(--paper)}
+
+  .rule{height:2px;background:var(--ink);width:100%}
+  .thin{height:1px;background:var(--ink);opacity:.55}
+
+  .wrap{padding:0 var(--gap)}
+
+  /* ---------- top bar ---------- */
+  .top{
+    position:sticky;top:0;z-index:40;background:var(--paper);
+    border-bottom:2px solid var(--ink);display:flex;align-items:stretch;justify-content:space-between;
+    font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  }
+  .top .cell{padding:10px 14px;border-right:2px solid var(--ink);display:flex;align-items:center;gap:8px}
+  .top .cell:last-child{border-right:0}
+  .sq{width:11px;height:11px;background:var(--red);display:inline-block}
+  .sq.b{background:var(--blue)}
+  .top nav{display:flex;flex:1;justify-content:flex-end}
+  .top nav a{padding:10px 14px;border-left:2px solid var(--ink);color:var(--ink);text-decoration:none;transition:background .12s,color .12s}
+  .top nav a:hover{background:var(--ink);color:var(--paper)}
+
+  /* ---------- hero ---------- */
+  .hero{padding:clamp(18px,4vw,42px) 0 0}
+  .hero h1{
+    font-family:var(--head);font-weight:700;text-transform:uppercase;
+    font-size:clamp(52px,14.5vw,210px);line-height:.82;letter-spacing:-.02em;margin:0;
+    font-stretch:condensed;
+  }
+  .hero h1 .out{-webkit-text-stroke:2px var(--ink);color:transparent}
+  .hero h1 .red{color:var(--red)}
+  .hero h1 .strike{position:relative;display:inline-block}
+  .hero h1 .strike::after{
+    content:"";position:absolute;left:-2%;right:-2%;top:52%;height:clamp(5px,.9vw,14px);
+    background:var(--red);transform:rotate(-2.4deg)
+  }
+  .hero-meta{
+    display:grid;grid-template-columns:2fr 1fr 1fr;gap:0;border-top:2px solid var(--ink);margin-top:clamp(14px,2.6vw,30px)
+  }
+  .hero-meta div{padding:16px 14px;border-right:2px solid var(--ink);font-size:13px;line-height:1.5}
+  .hero-meta div:first-child{border-left:0}
+  .hero-meta div:last-child{border-right:0}
+  .hero-meta b{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--red);margin-bottom:8px}
+  .hero-meta .big{font-family:var(--head);font-size:clamp(18px,2.4vw,32px);text-transform:uppercase;line-height:1.05}
+
+  /* ---------- marquee ---------- */
+  .band{
+    background:var(--ink);color:var(--paper);overflow:hidden;white-space:nowrap;
+    border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);margin-top:clamp(18px,3vw,38px)
+  }
+  .band div{display:inline-block;animation:band 26s linear infinite;font-family:var(--head);text-transform:uppercase;font-size:clamp(26px,4.6vw,64px);line-height:1.32;letter-spacing:.01em}
+  .band em{color:var(--red);font-style:normal}
+  .band .o{-webkit-text-stroke:1.5px var(--paper);color:transparent}
+  @keyframes band{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+  /* ---------- poster grid ---------- */
+  .sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:clamp(24px,4vw,54px) 0 16px}
+  .sec-head h2{font-family:var(--head);text-transform:uppercase;font-size:clamp(26px,4.2vw,56px);margin:0;line-height:.95;letter-spacing:-.01em}
+  .filters{display:flex;gap:8px;flex-wrap:wrap}
+  .filters button{
+    font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+    background:var(--paper);border:2px solid var(--ink);padding:8px 12px;cursor:pointer;transition:background .12s,color .12s
+  }
+  .filters button:hover{background:var(--ink);color:var(--paper)}
+  .filters button.on{background:var(--red);border-color:var(--red);color:var(--paper)}
+
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:var(--ink);border:2px solid var(--ink)}
+  .poster{
+    position:relative;aspect-ratio:3/4;background:var(--paper);overflow:hidden;cursor:pointer;
+    display:flex;flex-direction:column;justify-content:space-between;padding:14px;
+    transition:background .35s,color .35s;
+  }
+  .poster .n{font-family:var(--mono);font-size:10px;letter-spacing:.2em}
+  .poster .art{position:absolute;inset:0;opacity:.9;transition:transform .6s cubic-bezier(.2,.8,.2,1),opacity .35s}
+  .poster:hover .art{transform:scale(1.07) rotate(.6deg)}
+  .poster .ttl{position:relative;font-family:var(--head);text-transform:uppercase;font-size:clamp(16px,2.1vw,30px);line-height:.94;letter-spacing:-.01em;mix-blend-mode:exclusion;color:#fff}
+  .poster .cat{position:relative;font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;mix-blend-mode:exclusion;color:#fff}
+  .poster.flip{background:var(--ink)}
+  .poster.flip .ttl,.poster.flip .cat{mix-blend-mode:normal;color:var(--paper)}
+  .poster.flip .n{color:var(--red)}
+  .poster.expand{grid-column:span 2;grid-row:span 2;aspect-ratio:auto}
+
+  /* ---------- table ---------- */
+  table{width:100%;border-collapse:collapse;margin-top:8px}
+  th,td{border:2px solid var(--ink);padding:12px 14px;text-align:left;font-size:13px;vertical-align:top}
+  th{font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;background:var(--ink);color:var(--paper)}
+  td.d{font-family:var(--mono);font-size:12px;white-space:nowrap}
+  tr:hover td{background:var(--ink);color:var(--paper)}
+  tr:hover td.d{color:var(--red)}
+  .tbl-scroll{overflow-x:auto}
+
+  footer{border-top:2px solid var(--ink);margin-top:clamp(24px,4vw,56px);padding:18px 0 40px}
+  .foot{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase}
+  .foot a{color:var(--ink)}
+
+  @media (max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}.hero-meta{grid-template-columns:1fr}}
+  @media (max-width:560px){
+    .grid{grid-template-columns:1fr}
+    .top{font-size:9px}
+    .top .cell.hide{display:none}
+    .top nav a{padding:10px 9px}
+  }
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="cell"><span class="sq"></span>INDEX 99</div>
+  <div class="cell hide">Kunsthalle Basel</div>
+  <div class="cell hide">07.10 → 14.12</div>
+  <nav>
+    <a href="#works">Works</a>
+    <a href="#program">Program</a>
+    <a href="#about">About</a>
+  </nav>
+</div>
+
+<main class="wrap">
+  <section class="hero">
+    <h1>
+      <span class="out">CONCRETE</span><br>
+      <span class="strike">TYPE</span><br>
+      <span class="red">INDEX</span> 99
+    </h1>
+    <div class="hero-meta">
+      <div>
+        <b>The premise</b>
+        <span class="big">Ninety-nine posters, one material truth.</span><br>
+        Set in lead, printed in one colour, and hung on bare plaster until the
+        plaster gives up and becomes part of the message.
+      </div>
+      <div>
+        <b>Where</b>
+        Kunsthalle Basel<br>Halle 3 &amp; the stairwell<br>Free entry
+      </div>
+      <div>
+        <b>Typefaces</b>
+        Arial Narrow<br>Helvetica<br>Mono, 9–10pt
+      </div>
+    </div>
+  </section>
+
+  <div class="band" aria-hidden="true">
+    <div>
+      <em>NO GRADIENTS</em> · NO SHADOWS · <span class="o">NO APOLOGIES</span> · <em>ONE INK</em> · ONE GRID · TWELVE COLUMNS · <em>NO GRADIENTS</em> · NO SHADOWS · <span class="o">NO APOLOGIES</span> · <em>ONE INK</em> · ONE GRID · TWELVE COLUMNS ·
+    </div>
+  </div>
+
+  <section id="works">
+    <div class="sec-head">
+      <h2>Selected works<br>01 — 99</h2>
+      <div class="filters" id="filters">
+        <button class="on" data-f="all">All</button>
+        <button data-f="grid">Grid</button>
+        <button data-f="type">Type</button>
+        <button data-f="object">Object</button>
+      </div>
+    </div>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <section id="program">
+    <div class="sec-head"><h2>Programme</h2><span style="font-family:var(--mono);font-size:10px;letter-spacing:.16em">ALL DATES 2026</span></div>
+    <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>Date</th><th>Time</th><th>Event</th><th>Room</th></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="about">
+    <div class="sec-head"><h2>About</h2></div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap);border-top:2px solid var(--ink);padding-top:20px">
+      <p style="margin:0;font-size:14px;line-height:1.62"><b style="font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;display:block;color:var(--red);margin-bottom:8px">MATERIAL</b>
+      Ninety-nine sheets of 400gsm uncoated board, printed letterpress in a single
+      ink on a 1948 Heidelberg. The impression is visible. That is the point.</p>
+      <p style="margin:0;font-size:14px;line-height:1.62"><b style="font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;display:block;color:var(--blue);margin-bottom:8px">METHOD</b>
+      Every poster is generated from one rule: divide the sheet, fill one field,
+      leave the rest alone. Ninety-nine artists were given the same rule and no
+      other instruction.</p>
+      <p style="margin:0;font-size:14px;line-height:1.62"><b style="font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;display:block;margin-bottom:8px">VISIT</b>
+      Tuesday to Sunday, 11:00 — 18:00. Thursday until 21:00. The stairwell
+      installation is best viewed from the landing, looking up.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap">
+  <div class="foot">
+    <span>© Index 99</span>
+    <span>Kunsthalle Basel · Steinenberg 7</span>
+    <span><a href="#works">↑ Back to works</a></span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  /* ---------- posters ---------- */
+  var palettes=[
+    ['linear-gradient(135deg,#ff3b1f 0 50%,#efede6 50% 100%)','GRID'],
+    ['repeating-linear-gradient(0deg,#12100e 0 8px,transparent 8px 16px)','TYPE'],
+    ['radial-gradient(circle at 30% 30%,#0b3cff 0 22%,transparent 22%),radial-gradient(circle at 70% 70%,#ff3b1f 0 30%,transparent 30%),#efede6','OBJECT'],
+    ['conic-gradient(from 45deg,#12100e 0 25%,#efede6 0 50%,#12100e 0 75%,#efede6 0)','GRID'],
+    ['linear-gradient(0deg,#12100e 0 33%,#ff3b1f 0 66%,#efede6 0)','TYPE'],
+    ['repeating-linear-gradient(90deg,#0b3cff 0 6px,#efede6 6px 22px)','GRID'],
+    ['radial-gradient(ellipse at 50% 120%,#12100e 0 45%,transparent 45%),#ff3b1f','OBJECT'],
+    ['linear-gradient(45deg,#efede6 0 45%,#12100e 0 55%,#ff3b1f 0)','TYPE']
+  ];
+  var words=['RASTER','ZEILE','FELD','SCHRIFT','KÖRPER','BLICK','ORDNUNG','LEERE','TAFEL','DRUCK','FORM','WEISS'];
+  var grid=document.getElementById('grid');
+  var made=[];
+  for(var i=0;i<12;i++){
+    var p=palettes[i%palettes.length];
+    var el=document.createElement('article');
+    el.className='poster';
+    el.dataset.cat=p[1].toLowerCase();
+    el.innerHTML=
+      '<span class="n">'+String(i+1).padStart(2,'0')+' / 99</span>'+
+      '<div class="art" style="background:'+p[0]+'"></div>'+
+      '<div class="ttl">'+words[i%words.length]+'<br>№'+(i+1)+'</div>'+
+      '<div class="cat">'+p[1]+' · 700×1000mm</div>';
+    el.addEventListener('click',function(){this.classList.toggle('flip');});
+    grid.appendChild(el);
+    made.push(el);
+  }
+  /* ---------- filters ---------- */
+  document.getElementById('filters').addEventListener('click',function(e){
+    var b=e.target.closest('button'); if(!b)return;
+    this.querySelectorAll('button').forEach(function(x){x.classList.remove('on')});
+    b.classList.add('on');
+    var f=b.dataset.f;
+    made.forEach(function(el){
+      var show = f==='all' || el.dataset.cat===f;
+      el.style.display = show?'':'none';
+    });
+  });
+
+  /* ---------- programme ---------- */
+  var ev=[
+    ['07.10','18:00','Opening — the rule, read aloud in three languages','Halle 3'],
+    ['14.10','19:30','Press check: pulling one sheet by hand','Workshop'],
+    ['22.10','20:00','Panel — who owns a grid?','Halle 3'],
+    ['05.11','18:30','Reading — Ninety-nine rules, ninety-nine refusals','Stairwell'],
+    ['19.11','19:00','Live typesetting, 90 minutes, no undo','Halle 3'],
+    ['03.12','21:00','Late night — the exhibition without labels','Halle 3']
+  ];
+  var tb=document.getElementById('tbody');
+  ev.forEach(function(r){
+    var tr=document.createElement('tr');
+    tr.innerHTML='<td class="d">'+r[0]+'</td><td class="d">'+r[1]+'</td><td>'+r[2]+'</td><td class="d">'+r[3]+'</td>';
+    tb.appendChild(tr);
+  });
+
+  /* ---------- keyboard: G to flip all ---------- */
+  document.addEventListener('keydown',function(e){
+    if(e.key==='g'||e.key==='G'){
+      made.forEach(function(el,i){setTimeout(function(){el.classList.toggle('flip')},i*45)});
+    }
+  });
+})();
+</script>
+</body>
+</html>

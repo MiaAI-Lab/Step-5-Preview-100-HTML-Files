@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ENDGAME — Study No. 14, White to Play</title>
+<style>
+  :root{
+    --paper:#e9e2d2;
+    --ink:#1c1a16;
+    --dim:rgba(28,26,22,.58);
+    --line:rgba(28,26,22,.18);
+    --light:#f0e9d8;
+    --dark:#8a7f68;
+    --red:#a8321f;
+    --blue:#1c3f8f;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --serif:"Iowan Old Style",Palatino,Georgia,serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--paper);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  ::selection{background:var(--red);color:var(--paper)}
+
+  .wrap{max-width:1100px;margin:0 auto;padding:0 clamp(16px,4vw,44px)}
+  nav{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:24px 0 0}
+  .brand{font-family:var(--serif);font-size:19px;letter-spacing:.3em;text-transform:uppercase}
+  nav ul{display:flex;gap:clamp(12px,2.2vw,28px);list-style:none;margin:0;padding:0}
+  nav a{color:var(--dim);text-decoration:none;font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;transition:color .2s}
+  nav a:hover{color:var(--ink)}
+
+  .hero{text-align:center;padding:clamp(26px,6vw,68px) 0 clamp(14px,3vw,24px)}
+  .hero .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.3em;text-transform:uppercase;color:var(--red);display:block;margin-bottom:22px}
+  .hero h1{font-family:var(--serif);font-weight:400;font-size:clamp(30px,6.4vw,78px);line-height:.96;letter-spacing:-.03em;margin:0 0 20px}
+  .hero h1 i{font-style:italic;color:var(--red)}
+  .hero p{font-size:14px;line-height:1.8;color:var(--dim);max-width:48ch;margin:0 auto}
+
+  .table{display:grid;grid-template-columns:auto 1fr;gap:clamp(20px,4vw,48px);align-items:start;padding:clamp(18px,4vw,44px) 0}
+  .boardwrap{position:relative}
+  .board{
+    display:grid;grid-template-columns:repeat(8,1fr);
+    width:min(70vw,440px);aspect-ratio:1;
+    border:clamp(8px,1.6vw,14px) solid #5a4a34;
+    box-shadow:0 30px 60px -30px rgba(28,26,22,.6);
+    user-select:none;touch-action:manipulation
+  }
+  .sq{
+    position:relative;display:grid;place-items:center;cursor:pointer;
+    font-size:clamp(20px,4.4vw,32px);line-height:1;
+    transition:box-shadow .18s,filter .18s
+  }
+  .sq.l{background:var(--light)}
+  .sq.d{background:var(--dark)}
+  .sq.sel{box-shadow:inset 0 0 0 3px var(--blue)}
+  .sq.last{box-shadow:inset 0 0 0 3px rgba(168,50,31,.5)}
+  .sq.move::after{
+    content:"";position:absolute;width:26%;height:26%;border-radius:50%;
+    background:rgba(28,63,143,.42)
+  }
+  .sq.take::after{
+    content:"";position:absolute;inset:6%;border-radius:50%;
+    border:3px solid rgba(168,50,31,.55);background:transparent;width:auto;height:auto
+  }
+  .sq:hover{filter:brightness(1.07)}
+  .sq .p{filter:drop-shadow(0 2px 2px rgba(28,26,22,.4))}
+  .files{display:grid;grid-template-columns:repeat(8,1fr);width:min(70vw,440px);margin-top:6px;
+    font-family:var(--mono);font-size:8px;text-align:center;color:var(--dim);letter-spacing:.08em}
+  .ranks{display:grid;grid-template-rows:repeat(8,1fr);width:min(70vw,440px);aspect-ratio:1;
+    font-family:var(--mono);font-size:8px;align-items:center;color:var(--dim)}
+
+  .side{display:grid;gap:clamp(14px,2.4vw,22px)}
+  .card{border:1px solid var(--line);padding:clamp(16px,2.4vw,24px);background:rgba(255,255,255,.4)}
+  .card h3{font-family:var(--mono);font-size:9px;letter-spacing:.24em;text-transform:uppercase;margin:0 0 14px;color:var(--red)}
+  .move-list{font-family:var(--mono);font-size:12.5px;line-height:2;min-height:88px}
+  .move-list span{color:var(--blue);margin-right:8px}
+  .plys{font-family:var(--mono);font-size:11px;line-height:2.1;max-height:150px;overflow-y:auto}
+  .plys div{display:grid;grid-template-columns:26px 1fr 1fr;gap:8px}
+  .plys b{color:var(--dim);font-weight:400}
+  .status{
+    font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+    padding:11px 14px;border:1px solid var(--line);background:rgba(255,255,255,.6)
+  }
+  .status b{color:var(--red);font-weight:400}
+  .tools{display:flex;gap:8px;flex-wrap:wrap}
+  button{
+    font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;
+    background:var(--ink);color:var(--paper);border:0;padding:12px 18px;cursor:pointer;
+    transition:opacity .2s,transform .2s
+  }
+  button:hover{opacity:.84;transform:translateY(-1px)}
+  button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+  button.ghost:hover{border-color:var(--ink);opacity:1}
+
+  footer{border-top:1px solid var(--line);padding:26px 0 48px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
+
+  @media (max-width:820px){.table{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="brand">Endgame</div>
+    <ul>
+      <li><a href="#board">Position</a></li>
+      <li><a href="#notes">Notes</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <span class="k">Study no. 14 · composed 1921</span>
+    <h1>Three moves.<br>That is <i>all</i> you get.</h1>
+    <p>White to play and win against a lone king and rook. The pieces move by the
+    rules; the study is yours to find. Click a piece to see where it may go.</p>
+  </header>
+
+  <section class="table" id="board">
+    <div class="boardwrap">
+      <div class="board" id="b"></div>
+      <div class="files" id="f"></div>
+    </div>
+    <div class="side">
+      <div class="status">To move <b id="turn">White</b></div>
+      <div class="card">
+        <h3>The line so far</h3>
+        <div class="plys" id="plies"></div>
+      </div>
+      <div class="card">
+        <h3>Position</h3>
+        <div class="move-list" id="info">FEN: 8/8/8/4k3/8/8/R7/4K3 w - - 0 1</div>
+      </div>
+      <div class="tools">
+        <button id="reset" class="ghost">Reset</button>
+        <button id="flip">Flip board</button>
+        <button id="hint">Hint</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="hero" id="notes">
+    <span class="k">On the three</span>
+    <h1 style="font-size:clamp(22px,3.4vw,42px)">The rook does all the work.</h1>
+    <p>White has a king and a rook against a lone king, which is a win in every
+    textbook — but only if the king is driven to an edge and held there. A rook
+    alone cannot deliver it, because the rook is never adjacent to the enemy king.
+    The white king has to do the cutting.</p>
+  </section>
+
+  <footer>
+    <span>Pieces are text, board is CSS</span>
+    <span>Unicode chess glyphs · no fonts loaded</span>
+    <span>White to play and win</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var GL={
+    wK:'\u2654',wQ:'\u2655',wR:'\u2656',wB:'\u2657',wN:'\u2658',wP:'\u2659',
+    bK:'\u265A',bQ:'\u265B',bR:'\u265C',bB:'\u265D',bN:'\u265E',bP:'\u265F'
+  };
+  var files='abcdefgh';
+  var board=[];
+  var sel=null,turn='w',plies=[],flipped=false;
+
+  function init(){
+    board=[];
+    for(var r=0;r<8;r++){board.push(new Array(8).fill(null));}
+    board[0][0]='wR';
+    board[0][4]='wK';
+    board[4][4]='bK';
+    board[4][0]='bR';
+  }
+  function inside(r,f){return r>=0&&r<8&&f>=0&&f<8}
+
+  /* legal-ish move generation (no check testing, which is fine for a study) */
+  function moves(r,f){
+    var p=board[r][f];
+    if(!p)return [];
+    var out=[];
+    var kind=p[1],w=p[0]==='w';
+    function push(rr,ff){
+      if(!inside(rr,ff))return;
+      var q=board[rr][ff];
+      if(!q){out.push([rr,ff]);return;}
+      if(q[0]!==p[0])out.push([rr,ff]);
+    }
+    function slide(dr,df){
+      var rr=r+dr,ff=f+df;
+      while(inside(rr,ff)){
+        if(!board[rr][ff]){out.push([rr,ff]);}
+        else{
+          if(board[rr][ff][0]!==p[0])out.push([rr,ff]);
+          break;
+        }
+        rr+=dr;ff+=df;
+      }
+    }
+    if(kind==='K'){
+      for(var a=-1;a<=1;a++)for(var b=-1;b<=1;b++){
+        if(a||b)push(r+a,f+b);
+      }
+    }else if(kind==='R'){
+      slide(-1,0);slide(1,0);slide(0,-1);slide(0,1);
+    }else if(kind==='Q'){
+      slide(-1,0);slide(1,0);slide(0,-1);slide(0,1);
+      slide(-1,-1);slide(-1,1);slide(1,-1);slide(1,1);
+    }else if(kind==='B'){
+      slide(-1,-1);slide(-1,1);slide(1,-1);slide(1,1);
+    }else if(kind==='N'){
+      [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]].forEach(function(d){push(r+d[0],f+d[1])});
+    }else if(kind==='P'){
+      var dir=w?-1:1;
+      var one=r+dir;
+      if(inside(one,f)&&!board[one][f])out.push([one,f]);
+      var start=w?6:1;
+      if(r===start&&!board[r+dir][f]&&inside(r+2*dir,f)&&!board[r+2*dir][f])out.push([r+2*dir,f]);
+      for(var s=-1;s<=1;s+=2){
+        var ff2=f+s;
+        if(inside(one,ff2)&&board[one][ff2]&&board[one][ff2][0]!==p[0])out.push([one,ff2]);
+      }
+    }
+    return out;
+  }
+
+  var host=document.getElementById('b'),filesEl=document.getElementById('f');
+  function order(i){return flipped?7-i:i}
+
+  function render(){
+    host.innerHTML='';
+    for(var rr=0;rr<8;rr++){
+      for(var ff=0;ff<8;ff++){
+        var r=order(rr),f=order(ff);
+        var sq=document.createElement('div');
+        var light=(r+f)%2===0;
+        sq.className='sq '+(light?'l':'d');
+        sq.dataset.r=r;sq.dataset.f=f;
+        var p=board[r][f];
+        if(p){
+          sq.innerHTML='<span class="p" style="color:'+(p[0]==='w'?'#fffaf0':'#1a1613')+'">'+GL[p]+'</span>';
+        }
+        if(sel&&sel[0]===r&&sel[1]===f)sq.classList.add('sel');
+        if(plies.length){
+          var last=plies[plies.length-1];
+          if(last[0]===r&&last[1]===f)sq.classList.add('last');
+        }
+        if(sel){
+          var mv=moves(sel[0],sel[1]);
+          for(var i=0;i<mv.length;i++){
+            if(mv[i][0]===r&&mv[i][1]===f){
+              sq.classList.add(board[r][f]?'take':'move');
+            }
+          }
+        }
+        host.appendChild(sq);
+      }
+    }
+    filesEl.innerHTML='';
+    for(var f2=0;f2<8;f2++){
+      var s=document.createElement('div');
+      s.textContent=files[order(f2)];
+      filesEl.appendChild(s);
+    }
+    document.getElementById('turn').textContent=turn==='w'?'White':'Black';
+    renderPlies();
+  }
+
+  function renderPlies(){
+    var h=document.getElementById('plies');
+    h.innerHTML='';
+    if(!plies.length){h.innerHTML='<b style="color:var(--dim)">No moves yet. White to play.</b>';return;}
+    for(var i=0;i<plies.length;i+=2){
+      var d=document.createElement('div');
+      var n=Math.floor(i/2)+1;
+      d.innerHTML='<b>'+n+'.</b><span>'+sqName(plies[i])+'</span><span>'+(plies[i+1]?sqName(plies[i+1]):'')+'</span>';
+      h.appendChild(d);
+    }
+    h.scrollTop=h.scrollHeight;
+  }
+  function sqName(m){
+    /* m is [fromRow, fromFile, toRow, toFile]; show the destination square */
+    return files[m[3]]+(8-m[2]);
+  }
+
+  host.addEventListener('click',function(e){
+    var sq=e.target.closest('.sq');
+    if(!sq)return;
+    var r=+sq.dataset.r,f=+sq.dataset.f;
+    if(sel){
+      var mv=moves(sel[0],sel[1]);
+      for(var i=0;i<mv.length;i++){
+        if(mv[i][0]===r&&mv[i][1]===f){
+          var piece=board[sel[0]][sel[1]];
+          board[r][f]=piece;
+          board[sel[0]][sel[1]]=null;
+          plies.push([sel[0],sel[1],r,f]);
+          sel=null;
+          turn=turn==='w'?'b':'w';
+          render();
+          return;
+        }
+      }
+    }
+    if(board[r][f]&&board[r][f][0]===turn){
+      sel=[r,f];
+    }else{
+      sel=null;
+    }
+    render();
+  });
+
+  document.getElementById('reset').addEventListener('click',function(){
+    init();sel=null;turn='w';plies=[];render();
+  });
+  document.getElementById('flip').addEventListener('click',function(){
+    flipped=!flipped;render();
+  });
+  document.getElementById('hint').addEventListener('click',function(){
+    /* the study's key idea: bring the white king up to cut the board */
+    var hint=document.getElementById('info');
+    var h=document.createElement('div');
+    h.textContent='Hint: 1.Kd2! — the king does the cutting, the rook holds the line.';
+    hint.appendChild(h);
+    this.disabled=true;
+  });
+
+  init();render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,82 @@
+# LABYRINTH LAB — mazes that grow and solve themselves
+
+## Short title
+Labyrinth Lab
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a maze bench where the maze
+is carved on screen by a real algorithm and then solved by another, and where the
+visitor can put the solver aside and walk it themselves. No external dependencies
+whatsoever — no CDN, no web fonts, no external images, no JS libraries. All CSS and
+JavaScript inline, works offline by double-clicking, responsive, valid HTML5.
+
+Artistic direction: a violet-on-ink lab. Ground #0a0a12, panel #101020, lab #0d0d17,
+hairlines rgba(232,230,245,.13), body #e8e6f5 with muted #a3a0bd, violet #8f7bff for
+walls and amber #ffcf5c for the solution, white for the visitor. Serif headings with
+roman numerals, uppercase .2em–.4em kickers, monospace figures.
+
+The maze is a typed-array grid of bitmasked cells: each cell keeps four bits for north,
+east, south and west, so carving a passage is a bitwise clear against the opposite bit
+in the neighbour, and one spare bit is used as a visited flag during generation. Three
+carvers: the recursive backtracker (a stack — take the newest, carve into a random
+unvisited neighbour, pop when stuck, which is what produces long corridors), Prim
+(a frontier list scanned from a random index, which grows as a bush), and Braid (carve a
+full maze, list its dead ends once, then open one wall per dead end so loops appear).
+
+Two solvers: a plain breadth-first queue, and the same queue with a Manhattan-distance
+heuristic that picks the best-looking frontier cell at each pop. Both run as animated
+state machines, drawing the visited cells in violet and the reconstructed path in amber
+as they go, with the current head of the queue marked white.
+
+The visitor can also walk: the arrow keys or WASD move a white dot when the wall bits
+allow it, a tap in a quadrant of the canvas does the same on touch, and your trail is
+drawn faintly behind you.
+
+Panel: three carve chips, two solve chips, Carve a maze, Solve it, Walk it yourself, a
+speed slider, and five live figures (cells, carved this run, cells visited, path length,
+dead ends). Layout: nav, centred hero, two-column bench of canvas and panel, then two
+three-cell rows on the carvers and the solvers, then a footer. One column under 900px,
+links hidden under 780px.
+
+Interaction: pick a carver and the maze rebuilds itself in front of you, cell by cell;
+pick a solver and press Solve it to watch the search spread; press Walk it yourself and
+use the keys or taps to find the exit, whose visited count, path length and dead-end
+count all update live.
+
+## One-paragraph description of the intended design
+A maze bench on canvas where each maze is carved cell by cell by a chosen algorithm —
+recursive backtracker, Prim or braid — as a bitmask grid, then solved live by either a
+breadth-first queue or a Manhattan-heuristic variant whose visited cells and found path
+are drawn as they are found, with the visitor free to ignore both and walk the maze
+themselves with the arrow keys or by tapping quadrants, and live figures for cells,
+carving steps, visited cells, path length and dead ends.
+
+## Major visual techniques used
+- Walls as a per-cell bitmask rather than four booleans, so carving is a bitwise clear
+  and the whole maze is a flat typed array
+- A spare bit in the same word used as the visited flag during generation, so carving
+  and recording need one pass
+- Recursive backtracker as an explicit stack, which is what forces corridors
+- Prim's frontier grown from a random index rather than the end, giving a different
+  topology from the same wall bits
+- Braid built by listing dead ends once when carving finishes, then opening one per
+  step — instead of rescanning the grid for a dead end every step
+- Breadth-first as an index into a growing array rather than a shifting queue, so
+  draining it is free
+- Heuristic solver as the same queue with a best-of-frontier selection, so the two
+  solvers share one code path and only the pop rule differs
+- Path reconstruction by walking the came-from array backwards from the exit
+- Walls drawn as one path with all four sides appended, so a maze is a single stroke
+- Visited cells drawn under the walls, path over them, trail over that, visitor on top
+- Arrow keys plus WASD mapped to the same direction table, and a quadrant tap for touch
+- Live dead-end count recomputed from the wall bits, so it is a property of the maze
+  rather than a counter that can drift
+- Canvas re-laid out on resize, which regenerates the maze at the new cell count
+
+## Intended interaction model
+A bench you run. Visitors choose how the maze is carved and watch it happen, choose how
+it is solved and watch the search spread cell by cell, or walk it themselves with the
+keys or by tapping toward the direction they want to go. The speed slider sets how many
+algorithm steps happen per frame, so the carving and the solving can be watched slowly
+or all at once, and every number in the panel is counted from the grid itself.

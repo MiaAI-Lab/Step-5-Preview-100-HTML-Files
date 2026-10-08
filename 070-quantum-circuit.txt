@@ -1,0 +1,84 @@
+# CIRCUIT BENCH — three wires, one Bloch sphere
+
+## Short title
+Quantum Circuit
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a small quantum circuit bench
+where gates are placed on three wires across eight steps and the resulting state is drawn
+as a Bloch vector per wire. No external dependencies whatsoever — no CDN, no web fonts, no
+external images, no JS libraries. All CSS and JavaScript inline, works offline by
+double-clicking, responsive, valid HTML5.
+
+Artistic direction: a dark instrument. Ground #080b14, panel #0b1020, hairlines
+rgba(232,237,251,.14), body #e8edfb with muted #98a1bd, mint #7ef0e0 for the selected wire
+and gate marks, pink #ff9ad5 for measurement, and amber #ffd166 for the probability
+figures. Serif headings with italic accent words, uppercase .2em–.4em kickers, monospace
+figures and ket notation.
+
+The bench: three wires of eight cells each, built in the DOM at load. Pick a gate from the
+palette — X, Y, Z, H, S, T, R (a forty-five degree rotation), CNOT (drawn as +) and M —
+and click a cell to place it; click the same cell again to remove it. Clicking a wire also
+selects it, which is what the Bloch sphere highlights.
+
+Every gate is implemented as a rotation of a Bloch vector rather than as a matrix, which is
+exact for single-qubit work: X and Y reflect the vector to the antipode, Z and S and T turn
+it about the vertical axis, H drops it onto the equator, R tilts it forty-five degrees, and
+M collapses it — the probability of |1⟩ is the square of the sine of half the polar angle,
+and the vector then jumps to a pole and stays there.
+
+Run walks the eight steps in order and applies every gate on every wire, respecting
+measurement: once a wire has been measured it is frozen. The Bloch sphere is drawn on
+canvas — a circle plus two flattened ellipses for the equator and meridian, the poles
+labelled |0⟩ and |1⟩ and the equator's ends labelled |+⟩ and |-⟩ — with one vector per
+wire, the selected one drawn brighter and heavier, and measured wires annotated with the
+outcome. Beside it, one probability bar per wire with the live |1⟩ percentage.
+
+The two-qubit control is a simplification and says so on the page: a CNOT reads the wire
+above it and flips this one when that one is mostly pointing down.
+
+Layout: nav, centred hero, a two-column bench of circuit and gate panel, a two-column row
+of Bloch sphere and probability bars, then two three-cell note rows on the sphere,
+rotations, measurement, the one-qubit simplification, phases and idempotence, then a
+footer. One column under 900px, links hidden under 780px.
+
+Interaction: place gates and press Run. Visitors can build the textbook X X pair and watch
+it cancel, build H S H and see the phase come back, put an M on a wire and freeze it, and
+use CNOT to read one wire and flip the next. Clear the bench returns every vector to the
+north pole.
+
+## One-paragraph description of the intended design
+A circuit bench with three wires of eight cells where gates chosen from a palette of X, Y,
+Z, H, S, T, R, CNOT and M are placed on steps and applied in order as rotations of a Bloch
+vector per wire — with measurement collapsing a wire to a pole and freezing it — drawn on a
+canvas sphere with the poles and the equator's ends labelled, one vector per wire with the
+selected one brighter, and a live |1⟩ probability bar for each.
+
+## Major visual techniques used
+- Gates as rotations of a Bloch vector rather than matrix multiplication, which is exact
+  for the single-qubit gates and visibly maps each gate onto the sphere
+- Polar angle and azimuth as the whole state, with the |1⟩ probability derived as the
+  square of the sine of half the polar angle
+- Measurement as a probabilistic collapse followed by a freeze, so later gates cannot
+  reach a measured wire
+- CNOT simplified honestly: it reads the wire above and flips this one if that one is
+  mostly down, and the page says that is what it does
+- Bloch sphere drawn as a circle plus two flattened ellipses, which reads as a sphere in
+  two dimensions with no projection maths
+- Vector projection from the same polar angle and azimuth used for the physics, so the
+  picture and the simulator cannot disagree
+- Selected wire highlighted by both weight and colour, with the other two dimmed
+- Measured wires annotated with the outcome at the vector's tip
+- Circuit cells as a flex row per wire with a shared line element, so the grid is real
+  DOM and scrolls on narrow screens
+- Clicking the same cell with the same gate removes it, and clicking another cell with a
+  different gate replaces it
+- Probability bars with a CSS transition on width, so a run animates into its result
+- Gate palette using aria-pressed for the single selected state
+
+## Intended interaction model
+A bench to run. Visitors pick a gate, click cells along the three wires, and press Run to
+see every vector move at once; measurement freezes a wire, CNOT reads the one above it,
+and Clear resets the bench to three vectors at the north pole. Everything on screen is
+computed from the gates placed, with no animation of its own.

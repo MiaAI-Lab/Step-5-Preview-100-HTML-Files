@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Cloud Base — an alpine valley that fills</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:#101418;color:#e9eef2;
+  font:15px/1.62 ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+.serif{font-family:ui-serif,Georgia,"Times New Roman",serif}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.wrap{width:min(1120px,92vw);margin:0 auto}
+nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0 14px;
+  border-bottom:1px solid rgba(233,238,242,.14)}
+nav .brand{font-family:ui-serif,Georgia,serif;font-size:19px}
+nav .brand i{font-style:italic;color:#9fd0e8}
+nav ul{display:flex;gap:26px;list-style:none;margin:0;padding:0;font-size:11px;
+  letter-spacing:.24em;text-transform:uppercase;color:#8494a0}
+nav a{color:inherit;text-decoration:none}nav a:hover{color:#9fd0e8}
+@media(max-width:780px){nav ul{display:none}}
+header.hero{padding:52px 0 24px;text-align:center}
+header.hero .kicker{font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:#9fd0e8;
+  margin:0 0 14px}
+header.hero h1{font-family:ui-serif,Georgia,serif;font-weight:400;
+  font-size:clamp(32px,5.6vw,64px);line-height:1.05;margin:0 0 16px}
+header.hero h1 em{font-style:italic;color:#ffd9a0}
+header.hero p{max-width:60ch;margin:0 auto;color:#93a3ad}
+.valley{position:relative;border:1px solid rgba(233,238,242,.16);border-radius:16px;
+  overflow:hidden;background:#0d1216;margin-bottom:18px}
+.valley canvas{display:block;width:100%;height:auto}
+.valley .cap{position:absolute;left:14px;top:12px;font-size:10px;letter-spacing:.26em;
+  text-transform:uppercase;color:rgba(233,238,242,.5);pointer-events:none}
+.valley .tag{position:absolute;right:14px;top:12px;font-family:ui-monospace,Menlo,monospace;
+  font-size:11px;color:rgba(255,217,160,.9);text-align:right;pointer-events:none;line-height:1.8}
+.dock{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;justify-content:space-between;
+  border-top:1px solid rgba(233,238,242,.14);border-bottom:1px solid rgba(233,238,242,.14);
+  padding:16px 0;margin-bottom:32px}
+.dock label{display:grid;gap:7px;font-size:10px;letter-spacing:.26em;text-transform:uppercase;
+  color:#8494a0;min-width:160px}
+input[type=range]{width:100%;accent-color:#9fd0e8}
+.btn{background:#9fd0e8;color:#06222c;border:0;border-radius:8px;padding:11px 15px;
+  font:inherit;font-size:12px;font-weight:700;letter-spacing:.08em;cursor:pointer;margin:0 6px 6px 0}
+.btn.ghost{background:transparent;color:#e9eef2;border:1px solid rgba(233,238,242,.24)}
+.btn:hover{filter:brightness(1.07)}
+.readout{display:flex;flex-wrap:wrap;gap:12px 26px;margin-bottom:40px;
+  border-top:1px solid rgba(233,238,242,.14);padding-top:16px}
+.readout div{min-width:84px}
+.readout dt{font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:#8494a0;margin:0 0 4px}
+.readout dd{margin:0;font-size:20px;font-family:ui-monospace,Menlo,monospace;color:#ffd9a0}
+.cells{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-bottom:46px}
+@media(max-width:820px){.cells{grid-template-columns:1fr}}
+.cell{border-top:1px solid rgba(233,238,242,.14);padding-top:16px}
+.cell .fig{font-family:ui-serif,Georgia,serif;font-size:38px;color:#9fd0e8;line-height:1;margin-bottom:8px}
+.cell h3{font-family:ui-serif,Georgia,serif;font-weight:400;font-style:italic;font-size:21px;margin:0 0 8px}
+.cell p{margin:0;color:#93a3ad;font-size:14px}
+footer{border-top:1px solid rgba(233,238,242,.14);padding:22px 0 54px;display:flex;
+  justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:11px;letter-spacing:.2em;
+  text-transform:uppercase;color:#66757f}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="brand">The Cloud <i>Base</i></div>
+    <ul>
+      <li><a href="#valley">Valley</a></li>
+      <li><a href="#dock">Weather</a></li>
+      <li><a href="#notes">Notes</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <p class="kicker">Lapse rate · snow line · inversion</p>
+    <h1 class="serif">The valley fills<br>from the <em>bottom</em></h1>
+    <p>Fog in a mountain valley is not cloud coming down. It is cloud that never lifted,
+       sitting in the cold air that drains off the slopes overnight — and the height it
+       reaches is exactly the height where the air stops being cold enough to hold it.</p>
+  </header>
+
+  <section class="valley" id="valley">
+    <canvas id="c" width="1000" height="560"></canvas>
+    <p class="cap">five ridges · valley fog · snow line</p>
+    <div class="tag" id="tag"></div>
+  </section>
+
+  <section class="dock" id="dock">
+    <label for="base">Cloud base <input id="base" type="range" min="0" max="100" value="42"></label>
+    <label for="sun">Sun angle <input id="sun" type="range" min="0" max="180" value="118"></label>
+    <label for="wind">Wind <input id="wind" type="range" min="0" max="100" value="34"></label>
+    <div>
+      <button class="btn" id="lift">Let it lift</button>
+      <button class="btn ghost" id="night">Turn to night</button>
+    </div>
+  </section>
+
+  <dl class="readout">
+    <div><dt>Cloud base</dt><dd id="rB">—</dd></div>
+    <div><dt>Valley air</dt><dd id="rV">—</dd></div>
+    <div><dt>Summit air</dt><dd id="rS">—</dd></div>
+    <div><dt>Snow line</dt><dd id="rN">—</dd></div>
+    <div><dt>Visibility</dt><dd id="rI">—</dd></div>
+    <div><dt>Ridges clear</dt><dd id="rR">—</dd></div>
+  </dl>
+
+  <section class="cells">
+    <div class="cell">
+      <div class="fig serif">i</div>
+      <h3>The lapse rate</h3>
+      <p>Temperature falls about 6.5 degrees for every kilometre you climb. That single
+         number is why the valley can be in fog while the ridge above it is in sun, and
+         why the snow line sits at a predictable height.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">ii</div>
+      <h3>The inversion</h3>
+      <p>Fog means the coldest air is at the bottom, which is the opposite of the normal
+         arrangement and the reason the whole thing inverts: warm air is sitting on top of
+         cold air that has nowhere to go.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">iii</div>
+      <h3>The snow line</h3>
+      <p>Snow survives above the height where the air stays at or below freezing. Drag the
+         cloud base down and you will see it: the same peaks, the same snow, and the fog
+         simply not reaching them.</p>
+    </div>
+  </section>
+
+  <section class="cells" id="notes">
+    <div class="cell">
+      <div class="fig serif">iv</div>
+      <h3>Clear ridges</h3>
+      <p>The number in the corner is how many of the five ridges are visible above the
+         fog, which is a real measure of a day on the hill and the first thing a forecast
+         tells you.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">v</div>
+      <h3>Sun angle</h3>
+      <p>Light from the left rakes across the ridges and leaves them in shadow on the
+         right. Move the sun and the whole picture re-lights, including the fog, which
+         brightens from the side the light is coming from.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">vi</div>
+      <h3>Wind</h3>
+      <p>Wind tears the top off the fog and pushes it through the gaps, which is the one
+         thing that reliably clears a valley: not warmth, but movement.</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>The Cloud Base · one canvas, no files</span>
+    <span class="mono">−6.5 °C per km</span>
+  </footer>
+</div>
+<script>
+(function(){
+"use strict";
+var cv=document.getElementById('c'),ctx=cv.getContext('2d');
+var W=cv.width,H=cv.height;
+var base=42,sun=118,wind=34,night=0,t=0;
+function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;
+  var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;
+  return((t^t>>>14)>>>0)/4294967296;};}
+var rnd=mulberry(90210);
+/* five ridges, each a seeded walk, back to front */
+var RIDGES=[];
+for(var r=0;r<5;r++){
+  var pts=[],n=26,amp=60-r*8,y0=H*(0.16+r*0.085);
+  for(var i=0;i<=n;i++){
+    var x=i/n;
+    var y=y0+Math.sin(x*7+r*2)*amp*0.4+Math.sin(x*3.1+r)*amp*0.5+(rnd()-.5)*amp*0.5;
+    pts.push({x:x*W,y:y});
+  }
+  RIDGES.push({pts:pts,tone:r});
+}
+/* the valley floor line and the summit height in metres: the altitude of any point
+   is a linear map from its height on the canvas */
+var VALLEY_M=900,SUMMIT_M=3100;
+var VLINE=H*0.84;
+var TOPY=0;
+RIDGES.forEach(function(rg){
+  rg.pts.forEach(function(p){if(TOPY===0||p.y<TOPY)TOPY=p.y;});
+});
+TOPY-=18;
+function altAt(y){return VALLEY_M+(VLINE-y)/(VLINE-TOPY)*(SUMMIT_M-VALLEY_M);}
+function yForAlt(a){return VLINE-(a-VALLEY_M)/(SUMMIT_M-VALLEY_M)*(VLINE-TOPY);}
+function cloudBaseM(){
+  /* the slider maps the fog top from the valley floor up past the highest summit */
+  var y=VLINE-(base/100)*(VLINE-TOPY+60);
+  return Math.round(altAt(y));
+}
+function temp(a){return 14-6.5*(a/1000);}     /* lapse rate */
+function drawRidge(rg){
+  var p=rg.pts;
+  /* the rock: a gradient from sunlit to shaded, plus snow above the freezing level */
+  var shade=0.35+((5-rg.tone)/5)*0.5;
+  var g=ctx.createLinearGradient(0,H*0.1,0,VLINE);
+  var light=night>0.5?0.25:1;
+  g.addColorStop(0,'rgb('+Math.round(120*shade*light)+','+Math.round(130*shade*light)+
+    ','+Math.round(140*shade*light)+')');
+  g.addColorStop(0.5,'rgb('+Math.round(74*shade*light)+','+Math.round(84*shade*light)+
+    ','+Math.round(88*shade*light)+')');
+  g.addColorStop(1,'rgb('+Math.round(40*shade*light)+','+Math.round(48*shade*light)+
+    ','+Math.round(52*shade*light)+')');
+  ctx.fillStyle=g;
+  ctx.beginPath();
+  for(var j=0;j<p.length;j++){if(j===0)ctx.moveTo(0,p[j].y);else ctx.lineTo(p[j].x,p[j].y);}
+  ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.closePath();ctx.fill();
+  /* snow on the upper faces, using the freezing level */
+  var snowY=yForAlt(0);
+  ctx.save();ctx.clip();
+  ctx.fillStyle='rgba(240,246,250,'+(night>0.5?0.55:0.9)+')';
+  ctx.beginPath();
+  for(var k=0;k<p.length;k++){
+    var sn=p[k].y+(snowY-p[k].y)*0.35;
+    if(k===0)ctx.moveTo(0,sn);else ctx.lineTo(p[k].x,sn);
+  }
+  ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.closePath();ctx.fill();
+  /* the ridge line itself, lit from the left */
+  ctx.strokeStyle=night>0.5?'rgba(180,200,220,.35)':'rgba(240,248,255,.75)';
+  ctx.lineWidth=1.6;ctx.stroke();
+  ctx.restore();
+  /* a sunlit shoulder and a shadowed flank */
+  var lit=ctx.createLinearGradient(0,0,W,0);
+  lit.addColorStop(0,'rgba(255,238,200,'+(night>0.5?0.0:0.16)+')');
+  lit.addColorStop(0.5,'rgba(255,238,200,0)');
+  lit.addColorStop(1,'rgba(10,16,22,.45)');
+  ctx.fillStyle=lit;
+  ctx.beginPath();
+  for(var m=0;m<p.length;m++){if(m===0)ctx.moveTo(0,p[m].y);else ctx.lineTo(p[m].x,p[m].y);}
+  ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.closePath();ctx.fill();
+}
+/* ---------- the fog: bands of the cold air that never lifted ---------- */
+function drawFog(){
+  var top=yForAlt(cloudBaseM());
+  if(top>VLINE)return;
+  /* bands between the cloud base and the valley floor, denser lower down */
+  for(var b=0;b<7;b++){
+    var f=b/7;
+    var y=top+(VLINE-top)*f;
+    var a=(0.05+f*0.14)*(wind>60?0.7:1);
+    ctx.fillStyle='rgba(226,234,240,'+a.toFixed(3)+')';
+    ctx.beginPath();
+    ctx.moveTo(0,y);
+    for(var x=0;x<=W;x+=20){
+      ctx.lineTo(x,y+Math.sin(x*0.01+t*0.3+b)*6+Math.sin(x*0.023-t*0.2+b)*3);
+    }
+    ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.closePath();ctx.fill();
+  }
+  /* the top edge: a soft lip where the fog is being torn by the wind */
+  var g=ctx.createLinearGradient(0,top-14,0,top+18);
+  g.addColorStop(0,'rgba(226,234,240,0)');
+  g.addColorStop(0.5,'rgba(236,244,248,'+(wind>55?0.5:0.75)+')');
+  g.addColorStop(1,'rgba(236,244,248,0)');
+  ctx.fillStyle=g;ctx.fillRect(0,top-14,W,32);
+}
+/* ---------- the sun ---------- */
+function drawSky(){
+  var g=ctx.createLinearGradient(0,0,0,H*0.55);
+  var k=night>0.5?0.25:1;
+  g.addColorStop(0,'rgb('+Math.round(70*k)+','+Math.round(105*k)+','+Math.round(140*k)+')');
+  g.addColorStop(1,'rgb('+Math.round(190*k)+','+Math.round(205*k)+','+Math.round(215*k)+')');
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H*0.6);
+  /* the sun, low when the angle is near 0 or 180 */
+  var a=sun*Math.PI/180;
+  var sx=W*0.5+Math.cos(Math.PI-a)*W*0.42;
+  var sy=H*0.42-Math.sin(a)*H*0.36;
+  var sg=ctx.createRadialGradient(sx,sy,2,sx,sy,120);
+  sg.addColorStop(0,'rgba(255,246,220,'+(night>0.5?0.15:0.9)+')');
+  sg.addColorStop(1,'rgba(255,240,200,0)');
+  ctx.fillStyle=sg;ctx.beginPath();ctx.arc(sx,sy,120,0,6.3);ctx.fill();
+}
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  drawSky();
+  for(var i=0;i<RIDGES.length;i++)drawRidge(RIDGES[i]);
+  drawFog();
+  /* the valley floor: a meadow that is only visible when the fog lifts */
+  var top=yForAlt(cloudBaseM());
+  if(top<VLINE){
+    var g=ctx.createLinearGradient(0,VLINE-30,0,H);
+    g.addColorStop(0,'rgba(58,84,54,0.7)');
+    g.addColorStop(1,'rgba(34,52,36,0.9)');
+    ctx.fillStyle=g;ctx.fillRect(0,VLINE-30,W,H);
+  }
+}
+
+/* ---------- controls, readout ---------- */
+function bind(id,fn){var el=document.getElementById(id);
+  el.addEventListener('input',function(){fn(+el.value);});}
+bind('base',function(v){base=v;});
+bind('sun',function(v){sun=v;});
+bind('wind',function(v){wind=v;});
+document.getElementById('lift').addEventListener('click',function(){
+  base=Math.min(100,base+22);
+  document.getElementById('base').value=base;
+});
+var nightBtn=document.getElementById('night');
+nightBtn.addEventListener('click',function(){
+  night=night>0.5?0:1;
+  nightBtn.textContent=night>0.5?'Turn to day':'Turn to night';
+});
+function readout(){
+  var cb=cloudBaseM();
+  document.getElementById('rB').textContent=cb+' m';
+  document.getElementById('rV').textContent=temp(VALLEY_M).toFixed(1)+' °C';
+  document.getElementById('rS').textContent=temp(SUMMIT_M).toFixed(1)+' °C';
+  /* the snow line is the altitude where the temperature reaches freezing */
+  var snow=Math.round((14/6.5)*1000);
+  document.getElementById('rN').textContent=snow+' m';
+  var vis=wind>70?18:wind>50?8:wind>30?3:1;
+  document.getElementById('rI').textContent=vis+' km';
+  var clear=0;
+  RIDGES.forEach(function(rg){
+    var top=1e9;rg.pts.forEach(function(p){if(p.y<top)top=p.y;});
+    if(yForAlt(cb)<top)clear++;
+  });
+  document.getElementById('rR').textContent=clear+' / 5';
+  document.getElementById('tag').innerHTML='cloud base '+cb+' m<br>'+
+    (night>0.5?'night':'day')+' · wind '+wind+'%';
+}
+/* ---------- loop ---------- */
+var last=0,frames=0;
+function loop(ts){
+  var dt=last?Math.min(.05,(ts-last)/1000):0;last=ts;
+  t+=dt;draw();
+  if(++frames%10===0)readout();
+  requestAnimationFrame(loop);
+}
+if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+  t=0;
+}
+readout();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SLIPSTREAM — Six Words About Speed</title>
+<style>
+  :root{
+    --paper:#f2f0ec;
+    --ink:#111010;
+    --red:#e8341c;
+    --blue:#1538c8;
+    --grey:#a5a29b;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:"Helvetica Neue",Helvetica,Arial,"Segoe UI",sans-serif;
+    --cond:"Arial Narrow","Helvetica Neue Condensed",Impact,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--red);color:var(--paper)}
+
+  .bar{
+    position:fixed;top:0;left:0;height:3px;background:var(--red);z-index:99;width:0;
+  }
+  .rail{
+    position:fixed;right:clamp(12px,2vw,28px);top:50%;transform:translateY(-50%);z-index:98;
+    display:flex;flex-direction:column;gap:9px
+  }
+  .rail i{width:7px;height:7px;border:1px solid var(--ink);border-radius:50%;opacity:.3;display:block;transition:all .3s}
+  .rail i.on{background:var(--red);border-color:var(--red);opacity:1;transform:scale(1.25)}
+
+  section{
+    min-height:100vh;display:flex;align-items:center;justify-content:center;
+    padding:clamp(30px,7vw,80px) clamp(18px,5vw,60px);position:relative;overflow:hidden
+  }
+  .word{
+    font-family:var(--cond);font-weight:700;text-transform:uppercase;
+    font-size:clamp(70px,22vw,300px);line-height:.78;letter-spacing:-.045em;
+    margin:0;text-align:center;white-space:nowrap;will-change:transform,letter-spacing
+  }
+  .word span{display:inline-block}
+  .meta{
+    position:absolute;left:clamp(18px,5vw,60px);bottom:clamp(22px,4vw,44px);
+    font-family:var(--mono);font-size:9.5px;letter-spacing:.26em;text-transform:uppercase;
+    color:var(--ink);opacity:.5;max-width:36ch;line-height:2
+  }
+  .idx{
+    position:absolute;right:clamp(18px,5vw,60px);top:clamp(22px,4vw,44px);
+    font-family:var(--mono);font-size:9.5px;letter-spacing:.26em;opacity:.45
+  }
+  .big{
+    position:absolute;font-family:var(--mono);font-size:clamp(30px,7vw,90px);
+    color:transparent;-webkit-text-stroke:1px var(--grey);opacity:.55;user-select:none
+  }
+
+  /* 01 outline */
+  #s1{background:var(--paper)}
+  #s1 .word{-webkit-text-stroke:2px var(--ink);color:transparent}
+  #s1 .b1{left:6%;top:14%}
+  #s1 .b2{right:8%;bottom:18%;-webkit-text-stroke:1px var(--red);opacity:.8}
+
+  /* 02 red inversion */
+  #s2{background:var(--ink);color:var(--paper)}
+  #s2 .word{color:var(--paper)}
+  #s2 .word .e{color:var(--red)}
+  #s2 .meta{color:var(--paper);opacity:.5}
+  #s2 .idx{color:var(--paper)}
+  #s2 .big{-webkit-text-stroke:1px #3a3838}
+
+  /* 03 stacked cond */
+  #s3{background:var(--paper)}
+  #s3 .wrap3{text-align:center}
+  #s3 .l{display:block;overflow:hidden}
+  #s3 .l .word{display:block;overflow:hidden;line-height:.86}
+  #s3 .l span{display:block;will-change:transform}
+  #s3 .l:nth-child(2){color:var(--blue)}
+
+  /* 04 split */
+  #s4{background:var(--red);color:var(--paper)}
+  #s4 .word{font-size:clamp(60px,17vw,230px)}
+  #s4 .word .h{color:var(--paper)}
+  #s4 .word .m{color:var(--ink)}
+
+  /* 05 letterspacing breathe */
+  #s5{background:var(--paper);justify-content:flex-start;align-items:flex-start;flex-direction:column;justify-content:center}
+  #s5 .word{text-align:left;font-family:var(--sans);font-weight:800;letter-spacing:-.05em;
+    font-size:clamp(50px,13vw,180px);white-space:normal;max-width:14ch}
+  #s5 .word i{font-style:normal;color:var(--blue)}
+  #s5 .word u{text-decoration:none;-webkit-text-stroke:2px var(--ink);color:transparent}
+
+  /* 06 clorox */
+  #s6{background:var(--ink)}
+  #s6 .word{color:var(--paper);mix-blend-mode:difference}
+  #s6 .disc{
+    position:absolute;width:clamp(160px,32vw,420px);aspect-ratio:1;border-radius:50%;
+    background:var(--paper);left:50%;top:50%;transform:translate(-50%,-50%);
+    mix-blend-mode:difference
+  }
+
+  /* 07 number finale */
+  #s7{background:var(--paper);flex-direction:column;gap:0}
+  #s7 .huge{
+    font-family:var(--cond);font-weight:700;font-size:clamp(90px,26vw,340px);line-height:.8;
+    letter-spacing:-.05em;margin:0
+  }
+  #s7 .huge b{color:var(--red)}
+  #s7 .cap{
+    font-family:var(--mono);font-size:clamp(9px,1.4vw,12px);letter-spacing:.4em;text-transform:uppercase;
+    margin:26px 0 0;text-align:center;line-height:2.4;opacity:.6
+  }
+
+  .scrollhint{
+    position:absolute;left:50%;bottom:20px;transform:translateX(-50%);
+    font-family:var(--mono);font-size:8.5px;letter-spacing:.3em;text-transform:uppercase;opacity:.5;
+    animation:bob 2.4s ease-in-out infinite
+  }
+  @keyframes bob{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,7px)}}
+
+  @media (max-width:640px){
+    .meta{position:static;margin-top:26px;opacity:.5}
+    section{flex-direction:column;align-items:flex-start;justify-content:center}
+    .rail{display:none}
+  }
+</style>
+</head>
+<body>
+<div class="bar" id="bar"></div>
+<div class="rail" id="rail"></div>
+
+<section id="s1">
+  <div class="big b1">0001</div>
+  <h1 class="word" data-fx="outline"><span>SLIP</span></h1>
+  <div class="big b2">0002</div>
+  <div class="idx">01 / 07</div>
+  <div class="meta">A page about six words. Scroll; the letters will not stay still.</div>
+  <div class="scrollhint">Scroll ↓</div>
+</section>
+
+<section id="s2">
+  <h1 class="word" data-fx="chars"><span>STREAM</span></h1>
+  <div class="idx">02 / 07</div>
+  <div class="meta">Each letter rises a little later than the one before it, the way water does.</div>
+</section>
+
+<section id="s3">
+  <div class="wrap3">
+    <div class="l"><h1 class="word" data-fx="stack"><span>THE</span></h1></div>
+    <div class="l"><h1 class="word" data-fx="stack"><span>CURRENT</span></h1></div>
+    <div class="l"><h1 class="word" data-fx="stack"><span>CARRIES</span></h1></div>
+  </div>
+  <div class="idx">03 / 07</div>
+  <div class="meta">Three lines, one clip. They arrive like they were pushed.</div>
+</section>
+
+<section id="s4">
+  <h1 class="word" data-fx="split"><span>HALFWAY</span></h1>
+  <div class="idx">04 / 07</div>
+  <div class="meta">Half the word is ink and half is paper. It depends where you are standing.</div>
+</section>
+
+<section id="s5">
+  <h1 class="word" data-fx="tighten">Slow <i>letters</i> open up <u>under</u> load.</h1>
+  <div class="idx">05 / 07</div>
+  <div class="meta">Tracking is a material property. It stretches.</div>
+</section>
+
+<section id="s6">
+  <div class="disc" id="disc"></div>
+  <h1 class="word" data-fx="blend"><span>UNDERTOW</span></h1>
+  <div class="idx">06 / 07</div>
+  <div class="meta">Difference blending turns type into a hole in the page. Move it around.</div>
+</section>
+
+<section id="s7">
+  <h1 class="huge" data-fx="count">06</h1>
+  <p class="cap">Six words have been ruined<br>for any other use. <b>Happy reading.</b></p>
+  <div class="idx" style="position:absolute">07 / 07</div>
+</section>
+
+<script>
+(function(){
+  "use strict";
+  /* ---------- progress bar + rail ---------- */
+  var bar=document.getElementById('bar'),rail=document.getElementById('rail');
+  var secs=[].slice.call(document.querySelectorAll('section'));
+  secs.forEach(function(s,i){
+    var d=document.createElement('i');
+    if(i===0)d.className='on';
+    d.addEventListener('click',function(){s.scrollIntoView({behavior:'smooth'})});
+    rail.appendChild(d);
+  });
+  var dots=[].slice.call(rail.children);
+
+  function split(el){
+    var txt=el.textContent;
+    el.textContent='';
+    var out=[];
+    for(var i=0;i<txt.length;i++){
+      if(txt[i]===' '){el.appendChild(document.createTextNode(' '));continue;}
+      var w=document.createElement('span');
+      w.textContent=txt[i];
+      w.style.display='inline-block';
+      w.style.willChange='transform';
+      el.appendChild(w);
+      out.push(w);
+    }
+    return out;
+  }
+
+  /* pre-split the per-letter one */
+  var charWrap=document.querySelector('[data-fx="chars"]');
+  var chars=charWrap?split(charWrap):[];
+
+  /* stack: clip wrappers */
+  var stacks=[].slice.call(document.querySelectorAll('[data-fx="stack"]'));
+  stacks.forEach(function(el){
+    var host=el.parentNode;
+    var inner=el.querySelector('span');
+    host.style.overflow='hidden';
+    el.style.overflow='hidden';
+    el.dataset.inner=inner.textContent;
+    el.textContent='';
+    inner.style.display='block';
+    el.appendChild(inner);
+    el._inner=inner;
+  });
+
+  var splitWord=document.querySelector('[data-fx="split"]');
+  var splitInner=splitWord?splitWord.querySelector('span'):null;
+  var sText=splitInner?splitInner.textContent:'';
+  if(splitInner){
+    splitInner.textContent='';
+    var half=Math.ceil(sText.length/2);
+    for(var i2=0;i2<sText.length;i2++){
+      var c=document.createElement('span');
+      c.textContent=sText[i2];
+      c.style.display='inline-block';
+      c.style.willChange='transform,opacity';
+      if(i2<half)c.className='h';else c.className='m';
+      splitInner.appendChild(c);
+    }
+  }
+
+  var tightenEl=document.querySelector('[data-fx="tighten"]');
+  var countEl=document.querySelector('[data-fx="count"]');
+
+  function p(){
+    var v=window.pageYOffset||document.documentElement.scrollTop;
+    var max=document.documentElement.scrollHeight-window.innerHeight;
+    var pr=max>0?v/max:0;
+    bar.style.width=(pr*100).toFixed(2)+'%';
+    /* rail */
+    var idx=Math.min(secs.length-1,Math.floor(pr*secs.length+0.0001));
+    var best=0,bt=1e9;
+    secs.forEach(function(s,i3){
+      var t=Math.abs(s.getBoundingClientRect().top);
+      if(t<bt){bt=t;best=i3;}
+    });
+    dots.forEach(function(d,i4){d.classList.toggle('on',i4===best)});
+    return pr;
+  }
+  function sectionP(el){
+    var r=el.getBoundingClientRect();
+    var h=window.innerHeight;
+    return Math.max(-1,Math.min(2,(h/2 - (r.top+r.height/2))/(h)));
+  }
+
+  function render(){
+    var pr=p();
+    var wh=window.innerHeight;
+
+    /* 01 outline: drift */
+    var s1=document.getElementById('s1');
+    var k1=Math.max(-1,Math.min(1,sectionP(s1)));
+    var w1=document.querySelector('#s1 .word');
+    w1.style.transform='translateY('+(k1*-70).toFixed(1)+'px) skewY('+(k1*4).toFixed(2)+'deg)';
+
+    /* 02 chars */
+    var s2=document.getElementById('s2');
+    var k2=Math.max(-1,Math.min(1,sectionP(s2)));
+    chars.forEach(function(ch,i5){
+      var d=i5*0.14;
+      var t=Math.max(-1,Math.min(1,k2-d));
+      ch.style.transform='translateY('+((-0.5-t*0.5)*-80).toFixed(1)+'px)';
+      ch.style.opacity=(0.35+0.65*(0.5+k2*0.5)).toFixed(2);
+    });
+
+    /* 03 stack */
+    stacks.forEach(function(el,i6){
+      var d=i6*0.18;
+      var t=Math.max(-1,Math.min(1,sectionP(el.closest('section'))-d));
+      el._inner.style.transform='translateY('+((0.5-t*0.5)*115).toFixed(1)+'%';
+    });
+
+    /* 04 split */
+    var s4=document.getElementById('s4');
+    var k4=Math.max(-1,Math.min(1,sectionP(s4)));
+    if(splitInner){
+      [].forEach.call(splitInner.children,function(ch,i7){
+        var dir=i7<half?-1:1;
+        ch.style.transform='translateX('+(dir*k4*-90).toFixed(1)+'px)';
+        ch.style.opacity=(1-Math.abs(k4)*0.72).toFixed(2);
+      });
+    }
+
+    /* 05 tighten */
+    if(tightenEl){
+      var k5=Math.max(0,Math.min(1,0.5+sectionP(document.getElementById('s5'))*0.5));
+      tightenEl.style.letterSpacing=(-0.05+k5*0.06).toFixed(3)+'em';
+      tightenEl.style.transform='translateY('+((0.5-k5)*-40).toFixed(1)+'px)';
+    }
+
+    /* 06 blend disc follows scroll */
+    var d=document.getElementById('disc');
+    var k6=Math.max(-1,Math.min(1,sectionP(document.getElementById('s6'))));
+    d.style.transform='translate(-50%,-50%) translateX('+(k6*160).toFixed(1)+'px)';
+
+    /* 07 count */
+    if(countEl){
+      var k7=Math.max(0,Math.min(1,0.5+sectionP(document.getElementById('s7'))*0.5));
+      var n=Math.round(k7*6);
+      if(countEl.textContent!==String(n))countEl.innerHTML=(n<10?'0':'')+n;
+      countEl.style.transform='scale('+(0.86+k7*0.14).toFixed(3)+')';
+    }
+    requestAnimationFrame(render);
+  }
+  addEventListener('scroll',function(){},{passive:true});
+  requestAnimationFrame(render);
+})();
+</script>
+</body>
+</html>

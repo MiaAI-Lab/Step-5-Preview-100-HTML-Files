@@ -1,0 +1,85 @@
+# RIPPLE TANK — a wave equation you can disturb
+
+## Short title
+Wave Grid
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a ripple tank — a height field
+integrated on a grid, with reflecting edges, driven sources and a hand you can drag through
+it. No external dependencies whatsoever — no CDN, no web fonts, no external images, no JS
+libraries. All CSS and JavaScript inline, works offline by double-clicking, responsive,
+valid HTML5.
+
+Artistic direction: a lit tank in a dark room. Ground #070a12, canvas #04060c, hairlines
+rgba(233,241,255,.14), body #e9f1ff with muted #93a4bd, cyan #5fd0e8 for the accent and
+pink #ff8fd0 for the figures. Serif headings with italic accent words, uppercase .2em–.4em
+kickers, monospace figures.
+
+The tank is two Float32Arrays of 200 × 112 and one update: each cell becomes the mean of
+its four neighbours minus its own previous value, times a damping factor. Two arrays, one
+swap, no trigonometry — and the result refracts, reflects and interferes, because that is
+what the equation means. The edges are handled by copying the row or column just inside
+them at 0.92, which is a reflecting boundary rather than an absorbing one.
+
+Drawing is done at grid resolution into an offscreen canvas and scaled up with drawImage,
+which is both faster than shading every screen pixel and closer to what a real tank looks
+like under a camera. Three views: wireframe, where only the steepest slope lights up;
+shaded, where colour comes from the slope and a specular highlight is added where the
+surface is flat and high; and contours, where the height is quantised into bands, which is
+the pattern a real ripple tank produces through a strobe.
+
+Sources: one sinusoidal source by default, a second one offset in position and phase on
+demand, and a stone that drops a smooth cosine depression at a random point. Dragging the
+pointer disturbs the surface directly.
+
+Controls: damping (80–100 percent), force, the three draw modes, Drop a stone, Two
+sources and Calm the tank. Readout: peak height, the number of cells currently above the
+noise floor, mean surface displacement as an interference figure, how many sources are
+live, and the current draw mode. A prefers-reduced-motion check stops the sources on
+machines that ask for less motion.
+
+Layout: nav, centred hero, the tank with its caption, a dock of three sliders and three
+buttons, a readout row, then two three-cell note rows on the update, damping,
+interference, edges, shading and two sources, then a footer.
+
+Interaction: the tank is already running with one source. Visitors drag through it to draw
+their own waves, drop a stone for a single ring, add a second source and watch the
+interference pattern appear between them, take the damping right down to let the tank ring
+for a long time, and switch to contours to see what a strobe shows.
+
+## One-paragraph description of the intended design
+A ripple tank on canvas where a 200 × 112 height field is integrated by one rule — each
+cell becomes the mean of its four neighbours minus its own previous value, times a damping
+factor — with reflecting edges, one or two sinusoidal sources, a stone drop, and a pointer
+that disturbs the surface, drawn in three ways: a wireframe of steep slopes, a shaded
+surface lit by slope with a specular highlight on flat high ground, and contour bands that
+show the interference pattern the way a strobe does.
+
+## Major visual techniques used
+- The wave equation as one line: mean of four neighbours minus previous value, times
+  damping, over a double-buffered Float32Array
+- Reflecting edges by copying the row or column just inside the boundary at 0.92,
+  which is a reflection rather than an absorbing boundary
+- Drawing at grid resolution into an offscreen canvas and scaling with drawImage, which
+  is faster than per-screen-pixel shading and reads as a real tank under a camera
+- Colour from the slope rather than the height, so a flat grid reads as a lit surface
+- A specular highlight added where the surface is flat and high, which is what makes water
+  look wet
+- Wireframe view as a threshold on the slope, so only the steep places light up
+- Contour view as a quantised band of height, reproducing what a strobe-lit tank shows
+- Two sources with a phase offset, so the interference pattern between them is a real
+  consequence of the simulation
+- Stone drop as a smooth cosine depression rather than a spike, so the tank does not blow
+  up
+- Pointer capture on the tank, so dragging continues outside it
+- Mean surface displacement reported as the interference figure, computed from the same
+  array the picture uses
+- prefers-reduced-motion honoured by switching the sources off rather than by pausing the
+  whole simulation
+
+## Intended interaction model
+Water you put your hand in. The tank runs from the moment the page opens; visitors drag
+across it to make their own waves, drop a stone, add a second source and watch the
+interference lines appear, lower the damping to let it ring, and switch the view between
+wireframe, shaded and contours. Every number in the panel is measured off the same grid.

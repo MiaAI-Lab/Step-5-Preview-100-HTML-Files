@@ -1,0 +1,87 @@
+# THE WALL — a cave you have to light
+
+## Short title
+Cave Painting
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a cave wall of ochre and
+charcoal paintings that is dark until you carry a torch across it, with four pigments you
+can add with. No external dependencies whatsoever — no CDN, no web fonts, no external
+images, no JS libraries. All CSS and JavaScript inline, works offline by double-clicking,
+responsive, valid HTML5.
+
+Artistic direction: ochre and umber. Ground #150f0a, panels the same family, hairlines
+rgba(240,226,204,.14), body #f0e2cc with muted #a89579, one accent orange #d98a3c and a
+sage #8fc7a8. Serif headings with italic accent words, uppercase .2em–.4em kickers,
+monospace figures.
+
+The wall is drawn once into its own canvas at load: a rock face with horizontal strata,
+nine thousand specks of grain, twenty-six calcite streaks running down, a shaded ledge at
+the bottom, and then the paintings — a deer, two horses, a bison, three hand stencils, a
+scatter of blown dots and a row of dots along the ceiling. The animals are drawn from
+packed body outlines with the head low, the legs as vertical strokes and the mane as a few
+lines, because that is what a Palaeolithic panel looks like: not a drawing of an animal
+but a set of marks that resolve into one when you are close with a light.
+
+The hand stencils are drawn as a palm plus five rounded strokes, which is the negative
+space a blowpipe leaves.
+
+The torch is a hole cut in a field of black. Every frame the wall is drawn, then a radial
+gradient whose centre is transparent and whose edge is almost completely opaque fills the
+whole canvas, so only a warm pool around the pointer is lit. The radius is the glow slider
+times the remaining fuel, modulated by two out-of-phase sines so the light breathes the way
+a flame does, and a small warm pool is added with a lighter composite.
+
+Fuel drains at a fixed rate and Light a new torch refills it; below two percent the lit
+area collapses to an ember. Picking a pigment and dragging adds strokes to the wall canvas
+itself with the same four colours, so what you paint is permanent and behaves exactly like
+what is already there. Stencil a hand drops a hand stencil at the torch.
+
+Readout: fuel, the selected pigment, strokes made, the lit radius in pixels, and the panel's
+age.
+
+Layout: nav, centred hero, the cave canvas with its caption, a dock of pigments, three
+sliders and two buttons, a readout row, then two three-cell note rows on pigment, the
+stencil, overdrawing, light, flicker and paint, then a footer.
+
+Interaction: move the pointer to carry the torch and the animals appear one at a time;
+drag to paint with the same four pigments; make a hand stencil; and light a new torch when
+the old one dies.
+
+## One-paragraph description of the intended design
+A cave wall drawn once into an offscreen canvas — strata, grain, calcite streaks and a
+panel of ochre deer, horses, bison, hand stencils and blown dots — revealed frame by frame
+through a radial hole cut in a field of black that follows the pointer, its radius set by
+a glow slider, remaining fuel and two out-of-phase sines so the light flickers like a
+flame, with four pigments that paint permanently onto the same wall and a stencil button
+that drops a hand where the torch is.
+
+## Major visual techniques used
+- The wall drawn once into an offscreen canvas and never cleared, so the torch is a
+  reveal rather than a repaint
+- Darkness as a radial gradient from transparent at the centre to almost opaque black at
+  the edge, filled over the whole frame, which is the cheapest honest torch
+- Flame as two out-of-phase sines modulating the lit radius, so the pool breathes and
+  never settles
+- A second warm pool composited with 'lighter' right at the flame, which is what makes
+  the light read as fire rather than as a hole
+- Fuel as a monotonically decreasing number that collapses the lit radius to an ember at
+  the bottom, so the light really does fail
+- Rock built from strata bands, thousands of one-pixel specks, calcite streaks and a
+  shaded ledge, all drawn once
+- Animals as packed outlines with vertical-stroke legs and stroked manes, which is how
+  the original panels resolve rather than as illustrated creatures
+- Overdrawing by painting animals on top of each other at different alphas, so the panel
+  has the layered history a real one does
+- Hand stencil as a palm plus five rounded strokes — the negative space of a blowpipe
+- Visitor strokes written to the wall canvas itself, so they are permanent and lit by the
+  same torch
+- Blown dots as scattered circles of varying radius in the same pigments
+- Four pigments as aria-pressed swatches with the real paste colours
+
+## Intended interaction model
+A wall you light and then add to. Visitors carry the torch with the pointer, watch the
+animals appear, drag to paint in ochre, charcoal, kaolin or manganese, stencil a hand, and
+light a new torch when the old one dies. Everything painted is permanent, and everything
+painted is revealed only by the light you carry.

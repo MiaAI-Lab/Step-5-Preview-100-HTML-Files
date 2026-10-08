@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FALLING — A Box of Sand That Behaves</title>
+<style>
+  :root{
+    --bg:#0e1116;
+    --panel:#161c24;
+    --line:rgba(220,235,245,.12);
+    --text:#e4eef6;
+    --muted:rgba(228,238,246,.5);
+    --sand:#e0b25e;
+    --water:#3d8fd0;
+    --stone:#7d8794;
+    --fire:#e8632a;
+    --plant:#4fae5e;
+    --oil:#4a3a2a;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --serif:"Iowan Old Style",Palatino,Georgia,serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+
+  .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(14px,4vw,40px)}
+
+  nav{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:22px 0 0}
+  .brand{font-family:var(--mono);font-size:10px;letter-spacing:.3em;text-transform:uppercase}
+  .brand b{color:var(--sand);font-weight:400}
+  nav ul{display:flex;gap:clamp(12px,2.2vw,26px);list-style:none;margin:0;padding:0}
+  nav a{color:var(--muted);text-decoration:none;font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;transition:color .2s}
+  nav a:hover{color:var(--text)}
+
+  .hero{text-align:center;padding:clamp(24px,5vw,60px) 0 clamp(14px,3vw,26px)}
+  .hero .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.32em;text-transform:uppercase;color:var(--sand);display:block;margin-bottom:20px}
+  .hero h1{font-family:var(--serif);font-weight:400;font-size:clamp(28px,5.4vw,64px);line-height:1;letter-spacing:-.03em;margin:0 0 18px}
+  .hero h1 i{font-style:italic;color:var(--sand)}
+  .hero p{font-size:13.5px;line-height:1.8;color:var(--muted);max-width:48ch;margin:0 auto}
+
+  .lab{display:grid;grid-template-columns:1fr 260px;gap:clamp(14px,2.4vw,26px);padding:clamp(14px,3vw,26px) 0 clamp(30px,6vw,60px);align-items:start}
+  .box{
+    position:relative;aspect-ratio:16/11;background:#0a0d12;border:1px solid var(--line);
+    overflow:hidden;touch-action:none;cursor:crosshair
+  }
+  #sim{position:absolute;inset:0;width:100%;height:100%;display:block;image-rendering:pixelated}
+  .hint2{
+    position:absolute;left:0;right:0;bottom:0;padding:10px 14px;text-align:center;
+    font-family:var(--mono);font-size:8.5px;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--muted);background:linear-gradient(0deg,rgba(10,13,18,.9),transparent);
+    pointer-events:none
+  }
+  .side{display:grid;gap:14px}
+  .mats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+  .mat{
+    display:flex;align-items:center;gap:10px;padding:11px 12px;border:1px solid var(--line);
+    background:var(--panel);border-radius:10px;cursor:pointer;transition:border-color .2s,background .2s
+  }
+  .mat:hover{border-color:rgba(220,235,245,.3)}
+  .mat.on{border-color:currentColor;background:rgba(255,255,255,.05)}
+  .mat i{width:14px;height:14px;border-radius:3px;display:block;flex:0 0 auto}
+  .mat span{font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase}
+  .ctl{display:grid;gap:8px}
+  .ctl .k{font-family:var(--mono);font-size:8.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;width:100%;height:14px;background:transparent;cursor:pointer
+  }
+  input[type=range]::-webkit-slider-runnable-track{height:2px;background:var(--line);border-radius:2px}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:var(--sand);margin-top:-5px;border:0}
+  input[type=range]::-moz-range-track{height:2px;background:var(--line);border-radius:2px}
+  input[type=range]::-moz-range-thumb{width:12px;height:12px;border:0;border-radius:50%;background:var(--sand)}
+  button{
+    font-family:var(--mono);font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;
+    background:rgba(224,178,94,.14);border:1px solid rgba(224,178,94,.4);color:var(--text);
+    padding:11px 14px;border-radius:999px;cursor:pointer;transition:background .2s,color .2s
+  }
+  button:hover{background:var(--sand);color:#241a06}
+  .stats{font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);line-height:2.1;border-top:1px solid var(--line);padding-top:12px}
+  .stats b{color:var(--text);font-weight:400;float:right}
+
+  .notes{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin:0 0 clamp(24px,5vw,48px)}
+  .notes div{background:var(--bg);padding:26px 24px}
+  .notes b{display:block;font-family:var(--serif);font-weight:400;font-size:30px;color:var(--sand);line-height:1;margin-bottom:10px}
+  .notes h4{font-family:var(--mono);font-size:9px;letter-spacing:.24em;text-transform:uppercase;margin:0 0 12px}
+  .notes p{margin:0;font-size:12.5px;line-height:1.8;color:var(--muted)}
+
+  footer{border-top:1px solid var(--line);padding:26px 0 48px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+
+  @media (max-width:900px){.lab{grid-template-columns:1fr}.notes{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="brand">Falling · <b>a box of sand</b></div>
+    <ul>
+      <li><a href="#lab">The box</a></li>
+      <li><a href="#rules">Rules</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <span class="k">Cellular automaton · six materials</span>
+    <h1>Sand that <i>behaves</i> like sand.</h1>
+    <p>Every cell asks its neighbours what is below them. Sand falls and piles into
+    cones. Water spreads and levels. Fire climbs oil and dies in sand.</p>
+  </header>
+
+  <section class="lab" id="lab">
+    <div class="box">
+      <canvas id="sim"></canvas>
+      <div class="hint2">Drag to pour · the brush size slider sets how wide</div>
+    </div>
+    <div class="side">
+      <div class="mats" id="mats"></div>
+      <div class="ctl">
+        <span class="k">Brush · <span id="bsV">14</span> px</span>
+        <input type="range" id="bs" min="2" max="46" value="14" aria-label="Brush size">
+        <span class="k">Gravity · <span id="gv2">1.0</span></span>
+        <input type="range" id="grav" min="1" max="8" value="2" aria-label="Gravity">
+      </div>
+      <button id="clear">Empty the box</button>
+      <div class="stats">
+        Cells <b id="cCells">0</b><br>
+        Steps <b id="cSteps">0</b>
+      </div>
+    </div>
+  </section>
+
+  <section class="notes" id="rules">
+    <div><b>1</b><h4>sand</h4><p>Falls straight down; if blocked, tries diagonally. This is why sand makes cones and water does not.</p></div>
+    <div><b>2</b><h4>water</h4><p>Falls, then spreads sideways until it finds a level. It displaces sand and carries fire.</p></div>
+    <div><b>3</b><h4>fire</h4><p>Burns oil and plant, rises, and is extinguished by water or sand. It needs fuel to exist.</p></div>
+  </section>
+
+  <footer>
+    <span>Simulated in canvas · no libraries</span>
+    <span>One cell, one rule, six materials</span>
+    <span>Everything here is made of squares</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var cv=document.getElementById('sim'),c=cv.getContext('2d');
+  var CELL=3, COLS=0, ROWS=0;
+  var grid=null,steps=0;
+  var grav=4;
+  var EMPTY=0,SAND=1,WATER=2,STONE=3,FIRE=4,PLANT=5,OIL=6;
+  var MATS=[
+    {n:'Sand',v:SAND,c:'#e0b25e'},
+    {n:'Water',v:WATER,c:'#3d8fd0'},
+    {n:'Stone',v:STONE,c:'#7d8794'},
+    {n:'Fire',v:FIRE,c:'#e8632a'},
+    {n:'Plant',v:PLANT,c:'#4fae5e'},
+    {n:'Oil',v:OIL,c:'#4a3a2a'}
+  ];
+  var cur=SAND;
+  var life=[]; /* fire lifetime overlay */
+
+  function resize(){
+    var r=cv.getBoundingClientRect();
+    COLS=Math.max(20,Math.floor((r.width||640)/CELL));
+    ROWS=Math.max(20,Math.floor((r.height||440)/CELL));
+    cv.width=COLS;cv.height=ROWS;
+    grid=new Uint8Array(COLS*ROWS);
+    life=new Float32Array(COLS*ROWS);
+  }
+  function idx(x,y){return y*COLS+x}
+  function get(x,y){
+    if(x<0||x>=COLS||y<0||y>=ROWS)return STONE;
+    return grid[idx(x,y)];
+  }
+  function set(x,y,v){if(x<0||x>=COLS||y<0||y>=ROWS)return;grid[idx(x,y)]=v;}
+
+  function step(){
+    /* bottom-up so falling is correct */
+    for(var y=ROWS-1;y>=0;y--){
+      var dir=(steps%2===0)?1:-1;
+      for(var i=0;i<COLS;i++){
+        var x=(dir>0)?i:(COLS-1-i);
+        var v=get(x,y);
+        if(v===EMPTY)continue;
+        if(v===SAND){
+          if(get(x,y+1)===EMPTY||get(x,y+1)===WATER||get(x,y+1)===FIRE){
+            var below=get(x,y+1);
+            set(x,y+1,SAND);
+            if(below===WATER)set(x,y,WATER);else if(below===FIRE)set(x,y,FIRE);else set(x,y,EMPTY);
+          }else if(get(x-1,y+1)===EMPTY||get(x-1,y+1)===WATER||get(x-1,y+1)===FIRE){
+            var b2=get(x-1,y+1);
+            set(x-1,y+1,SAND);
+            if(b2===WATER)set(x,y,WATER);else if(b2===FIRE){set(x,y,FIRE);}else set(x,y,EMPTY);
+          }else if(get(x+1,y+1)===EMPTY||get(x+1,y+1)===WATER||get(x+1,y+1)===FIRE){
+            var b3=get(x+1,y+1);
+            set(x+1,y+1,SAND);
+            if(b3===WATER)set(x,y,WATER);else if(b3===FIRE){set(x,y,FIRE);}else set(x,y,EMPTY);
+          }
+        }
+        else if(v===WATER){
+          if(get(x,y+1)===EMPTY){set(x,y+1,WATER);set(x,y,EMPTY);}
+          else if(get(x,y+1)===SAND||get(x,y+1)===OIL){/* pass */}
+          else{
+            var d=(Math.random()<0.5)?-1:1;
+            if(get(x+d,y+1)===EMPTY){set(x+d,y+1,WATER);set(x,y,EMPTY);}
+            else{
+              var g=(Math.random()<0.5)?-1:1;
+              if(get(x+g,y)===EMPTY){set(x+g,y,WATER);set(x,y,EMPTY);}
+            }
+          }
+        }
+        else if(v===OIL){
+          if(get(x,y+1)===EMPTY){set(x,y+1,OIL);set(x,y,EMPTY);}
+          else{
+            var d2=(Math.random()<0.5)?-1:1;
+            if(get(x+d2,y+1)===EMPTY){set(x+d2,y+1,OIL);set(x,y,EMPTY);}
+            else if(get(x+1,y)===EMPTY&&Math.random()<0.4){set(x+1,y,OIL);set(x,y,EMPTY);}
+          }
+        }
+        else if(v===FIRE){
+          var L=life[idx(x,y)];
+          if(L<=0){set(x,y,EMPTY);continue;}
+          life[idx(x,y)]-=0.06;
+          /* eat neighbours */
+          if(Math.random()<0.14){
+            var fx=x+(Math.random()<0.5?-1:1), fy=y+(Math.random()<0.5?-1:1);
+            var fv=get(fx,fy);
+            if(fv===OIL||fv===PLANT){set(fx,fy,FIRE);life[idx(fx,fy)]=1.0;}
+            else if(fv===WATER){set(x,y,EMPTY);}
+          }
+          /* rise */
+          if(get(x,y-1)===EMPTY&&Math.random()<0.35){set(x,y-1,FIRE);life[idx(x,y-1)]=L*0.9;set(x,y,EMPTY);}
+        }
+        else if(v===PLANT){
+          /* grow into adjacent empty cells slowly, if water is near */
+          if(Math.random()<0.02){
+            var px=x+(Math.random()<0.5?-1:1), py=y-(Math.random()<0.5?0:1);
+            if(get(px,py)===EMPTY&&hasWater(x,y)){
+              set(px,py,PLANT);
+            }
+          }
+        }
+      }
+    }
+    steps++;
+  }
+  function hasWater(x,y){
+    for(var dy=-1;dy<=1;dy++)for(var dx=-1;dx<=1;dx++){
+      if(get(x+dx,y+dy)===WATER)return true;
+    }
+    return false;
+  }
+
+  function draw(){
+    var img=c.createImageData(COLS,ROWS);
+    var d=img.data;
+    for(var y=0;y<ROWS;y++){
+      for(var x=0;x<COLS;x++){
+        var i=(y*COLS+x)*4;
+        var v=grid[y*COLS+x];
+        var r,g,b;
+        if(v===EMPTY){r=12;g=15;b=20;}
+        else if(v===SAND){
+          r=224+((x*7+y*13)%12)-6;g=178+((x*3+y*5)%10)-5;b=94;
+        }
+        else if(v===WATER){r=52+((x*5+y*3)%14)-7;g=140+((x*7)%16)-8;b=205;}
+        else if(v===STONE){r=125;g=135;b=148;}
+        else if(v===FIRE){
+          var L=Math.max(0,Math.min(1,life[y*COLS+x]));
+          r=255;g=90+L*140;b=20+L*60;
+        }
+        else if(v===PLANT){
+          r=64+((x*7+y*11)%24)-12;g=174+((x*3)%20)-10;b=94;
+        }
+        else {r=74;g=58;b=42;}
+        d[i]=r;d[i+1]=g;d[i+2]=b;d[i+3]=255;
+      }
+    }
+    c.putImageData(img,0,0);
+  }
+
+  var painting=false;
+  function pt(e){
+    var r=cv.getBoundingClientRect();
+    return [Math.floor((e.clientX-r.left)/r.width*COLS),
+            Math.floor((e.clientY-r.top)/r.height*ROWS)];
+  }
+  function paint(x,y,rad,mat){
+    for(var dy=-rad;dy<=rad;dy++){
+      for(var dx=-rad;dx<=rad;dx++){
+        if(dx*dx+dy*dy>rad*rad)continue;
+        var px=x+dx,py=y+dy;
+        if(px<0||px>=COLS||py<0||py>=ROWS)continue;
+        var existing=get(px,py);
+        if(mat===FIRE){
+          if(existing===EMPTY||existing===OIL||existing===PLANT){
+            set(px,py,FIRE);life[idx(px,py)]=1;
+          }
+        }else if(mat!==EMPTY){
+          if(existing===EMPTY||existing===FIRE){set(px,py,mat);}
+        }
+      }
+    }
+  }
+  cv.addEventListener('pointerdown',function(e){
+    painting=true;var p=pt(e);
+    paint(p[0],p[1],brush,cur);
+    cv.setPointerCapture(e.pointerId);
+  });
+  cv.addEventListener('pointermove',function(e){
+    if(!painting)return;
+    var p=pt(e);
+    paint(p[0],p[1],brush,cur);
+  });
+  ['pointerup','pointercancel','pointerleave'].forEach(function(t){
+    cv.addEventListener(t,function(){painting=false;});
+  });
+
+  var brush=14;
+  document.getElementById('bs').addEventListener('input',function(){
+    brush=+this.value;document.getElementById('bsV').textContent=brush;
+  });
+  document.getElementById('grav').addEventListener('input',function(){
+    grav=+this.value;
+    document.getElementById('gv2').textContent=(grav/2).toFixed(1);
+  });
+
+  /* material picker */
+  var host=document.getElementById('mats');
+  MATS.forEach(function(m){
+    var d=document.createElement('div');
+    d.className='mat'+(m.v===cur?' on':'');
+    d.style.color=m.c;
+    d.innerHTML='<i style="background:'+m.c+'"></i><span>'+m.n+'</span>';
+    d.addEventListener('click',function(){
+      cur=m.v;
+      host.querySelectorAll('.mat').forEach(function(x){x.classList.remove('on')});
+      d.classList.add('on');
+    });
+    host.appendChild(d);
+  });
+
+  document.getElementById('clear').addEventListener('click',function(){
+    grid=new Uint8Array(COLS*ROWS);life=new Float32Array(COLS*ROWS);steps=0;
+  });
+
+  /* a little starting terrain */
+  function seed(){
+    var h=Math.floor(ROWS*0.22);
+    for(var x=0;x<COLS;x++){
+      var top=ROWS-h+Math.floor(Math.sin(x*0.08)*3);
+      for(var y=top;y<ROWS;y++){
+        if(y>ROWS-3)set(x,y,STONE);else set(x,y,SAND);
+      }
+    }
+    for(var i=0;i<COLS;i+=6)set(i,ROWS-h-2,STONE);
+    for(var j=0;j<3;j++){
+      var bx=Math.floor(COLS*0.2+j*COLS*0.3);
+      for(var k=0;k<10;k++)set(bx+k,ROWS-h-10,PLANT);
+    }
+  }
+
+  var count=0;
+  function loop(){
+    var reps=Math.max(1,Math.round(grav/2));
+    for(var r=0;r<reps;r++)step();
+    if(steps%2===0)draw();
+    document.getElementById('cSteps').textContent=steps.toLocaleString();
+    count++;
+    if(count%20===0){
+      var n=0;
+      for(var q=0;q<grid.length;q++)if(grid[q]!==EMPTY)n++;
+      document.getElementById('cCells').textContent=n.toLocaleString();
+    }
+    requestAnimationFrame(loop);
+  }
+  addEventListener('resize',function(){clearTimeout(window.__r);window.__r=setTimeout(function(){resize();seed()},140)});
+  resize();seed();draw();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

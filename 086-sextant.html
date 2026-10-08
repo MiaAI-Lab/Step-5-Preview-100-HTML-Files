@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sight Reduction — a line of position from two stars</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:#0a1016;color:#e6eef6;
+  font:15px/1.62 ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+.serif{font-family:ui-serif,Georgia,"Times New Roman",serif}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.wrap{width:min(1120px,92vw);margin:0 auto}
+nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0 14px;
+  border-bottom:1px solid rgba(230,238,246,.14)}
+nav .brand{font-family:ui-serif,Georgia,serif;font-size:19px}
+nav .brand i{font-style:italic;color:#e8c46a}
+nav ul{display:flex;gap:26px;list-style:none;margin:0;padding:0;font-size:11px;
+  letter-spacing:.24em;text-transform:uppercase;color:#8496a6}
+nav a{color:inherit;text-decoration:none}nav a:hover{color:#e8c46a}
+@media(max-width:780px){nav ul{display:none}}
+header.hero{padding:52px 0 24px;text-align:center}
+header.hero .kicker{font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:#e8c46a;
+  margin:0 0 14px}
+header.hero h1{font-family:ui-serif,Georgia,serif;font-weight:400;
+  font-size:clamp(32px,5.6vw,64px);line-height:1.05;margin:0 0 16px}
+header.hero h1 em{font-style:italic;color:#7fd4ff}
+header.hero p{max-width:60ch;margin:0 auto;color:#93a4b4}
+.deck{position:relative;border:1px solid rgba(230,238,246,.16);border-radius:16px;
+  overflow:hidden;background:#060a10;margin-bottom:18px}
+.deck canvas{display:block;width:100%;height:auto;touch-action:none;cursor:crosshair}
+.deck .cap{position:absolute;left:14px;top:12px;font-size:10px;letter-spacing:.26em;
+  text-transform:uppercase;color:rgba(230,238,246,.5);pointer-events:none}
+.deck .read{position:absolute;right:14px;top:12px;font-family:ui-monospace,Menlo,monospace;
+  font-size:11px;color:rgba(232,196,106,.95);text-align:right;pointer-events:none;line-height:1.8}
+.dock{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;justify-content:space-between;
+  border-top:1px solid rgba(230,238,246,.14);border-bottom:1px solid rgba(230,238,246,.14);
+  padding:16px 0;margin-bottom:32px}
+.dock label{display:grid;gap:7px;font-size:10px;letter-spacing:.26em;text-transform:uppercase;
+  color:#8496a6;min-width:150px}
+input[type=range]{width:100%;accent-color:#e8c46a}
+.btn{background:#e8c46a;color:#221804;border:0;border-radius:8px;padding:11px 15px;
+  font:inherit;font-size:12px;font-weight:700;letter-spacing:.08em;cursor:pointer;margin:0 6px 6px 0}
+.btn.ghost{background:transparent;color:#e6eef6;border:1px solid rgba(230,238,246,.24)}
+.btn:hover{filter:brightness(1.07)}
+.stars{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.stars button{background:#0e1620;border:1px solid rgba(230,238,246,.16);border-radius:999px;
+  padding:8px 14px;font:inherit;font-size:12px;color:#e6eef6;cursor:pointer}
+.stars button[aria-pressed="true"]{background:#e8c46a;border-color:#e8c46a;color:#221804}
+.readout{display:flex;flex-wrap:wrap;gap:12px 26px;margin-bottom:40px;
+  border-top:1px solid rgba(230,238,246,.14);padding-top:16px}
+.readout div{min-width:88px}
+.readout dt{font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:#8496a6;margin:0 0 4px}
+.readout dd{margin:0;font-size:20px;font-family:ui-monospace,Menlo,monospace;color:#7fd4ff}
+.cells{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-bottom:46px}
+@media(max-width:820px){.cells{grid-template-columns:1fr}}
+.cell{border-top:1px solid rgba(230,238,246,.14);padding-top:16px}
+.cell .fig{font-family:ui-serif,Georgia,serif;font-size:38px;color:#e8c46a;line-height:1;margin-bottom:8px}
+.cell h3{font-family:ui-serif,Georgia,serif;font-weight:400;font-style:italic;font-size:21px;margin:0 0 8px}
+.cell p{margin:0;color:#93a4b4;font-size:14px}
+footer{border-top:1px solid rgba(230,238,246,.14);padding:22px 0 54px;display:flex;
+  justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:11px;letter-spacing:.2em;
+  text-transform:uppercase;color:#6a7a8c}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="brand">Sight <i>Reduction</i></div>
+    <ul>
+      <li><a href="#deck">Deck</a></li>
+      <li><a href="#dock">Altitude</a></li>
+      <li><a href="#notes">Notes</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <p class="kicker">One horizon · one star · one circle</p>
+    <h1 class="serif">A shot gives you<br>a <em>circle</em>, not a dot</h1>
+    <p>Measuring the altitude of a star does not put you on a point. It puts you somewhere
+       on a circle a thousand miles across, centred where that star is straight overhead.
+       Two stars, two circles, and the crossing is where you are.</p>
+  </header>
+
+  <section class="deck" id="deck">
+    <canvas id="c" width="980" height="540"></canvas>
+    <p class="cap">drag the sextant's index arm · the horizon stays level</p>
+    <div class="read" id="read"></div>
+  </section>
+
+  <section class="dock" id="dock">
+    <div>
+      <div class="stars" id="stars"></div>
+      <div class="stars" id="drift"></div>
+    </div>
+    <label for="alt">Star altitude <input id="alt" type="range" min="5" max="85" value="34"></label>
+    <label for="wave">Swell <input id="wave" type="range" min="0" max="100" value="30"></label>
+    <label for="index">Index error <input id="index" type="range" min="-40" max="40" value="0"></label>
+    <div>
+      <button class="btn" id="shoot">Take the sight</button>
+      <button class="btn ghost" id="clear">Clear the chart</button>
+    </div>
+  </section>
+
+  <dl class="readout">
+    <div><dt>Measured</dt><dd id="rM">—</dd></div>
+    <div><dt>Corrected</dt><dd id="rC">—</dd></div>
+    <div><dt>Observer height</dt><dd id="rH">4.0 m</dd></div>
+    <div><dt>Dip</dt><dd id="rD">—</dd></div>
+    <div><dt>Zenith distance</dt><dd id="rZ">—</dd></div>
+    <div><dt>Fix</dt><dd id="rF">one circle</dd></div>
+  </dl>
+
+  <section class="cells">
+    <div class="cell">
+      <div class="fig serif">i</div>
+      <h3>The dip</h3>
+      <p>The horizon you see is below the true horizon, and by how much depends on your
+         height of eye. Four metres above the water is about 3.6 minutes of arc, and every
+         sextant observation starts by correcting for it.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">ii</div>
+      <h3>Index error</h3>
+      <p>The instrument is never perfectly zeroed, and its error is a fixed offset that
+         you measure at the dock and subtract from every sight. The slider is in minutes of
+         arc, because that is the unit it is specified in.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">iii</div>
+      <h3>Intercept</h3>
+      <p>Each circle drawn from a sight is a thousand miles across, so a second and third
+         one do not meet in a dot — they cross in a small triangle, and that triangle is
+         your fix, its size your uncertainty.</p>
+    </div>
+  </section>
+
+  <section class="cells" id="notes">
+    <div class="cell">
+      <div class="fig serif">iv</div>
+      <h3>The instrument</h3>
+      <p>The sextant measures an angle between what the index mirror shows you and what the
+         horizon glass shows you, so the reading is the star's height above the horizon —
+         and the frame can move under you without changing it.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">v</div>
+      <h3>Swell</h3>
+      <p>The horizon is not a line, it is a bank of water. On a swell you take the mean of
+         the crests by eye, which is why a real observation is a set of readings you
+         average, not one.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">vi</div>
+      <h3>The chart</h3>
+      <p>Sights are drawn on a plotting sheet as circles with the substellar point at the
+         centre. Two circles cross twice; you are at the one near your dead reckoning.</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>Sight Reduction · two canvases, no files</span>
+    <span class="mono">minutes of arc · nautical miles</span>
+  </footer>
+</div>
+<script>
+(function(){
+"use strict";
+var cv=document.getElementById('c'),ctx=cv.getContext('2d');
+var W=cv.width,H=cv.height;
+var alt=34,wave=30,idxErr=0,t=0;
+var STARLIST=[
+ {n:'Sun',shade:'#ffdf8a'},
+ {n:'Moon',shade:'#e8eef7'},
+ {n:'Venus',shade:'#fff0c8'},
+ {n:'Sirius',shade:'#d8e8ff'},
+ {n:'Canopus',shade:'#fff4d8'},
+ {n:'Polaris',shade:'#f0e0d0'},
+ {n:'Arcturus',shade:'#ffd8a0'},
+ {n:'Acrux',shade:'#d8e0ff'}
+];
+var star=STARLIST[0];
+var shots=[];
+/* the corrections: dip, index error, refraction */
+function dipMin(){
+  /* dip in minutes of arc from height of eye in metres */
+  var h=4.0;
+  return 1.76*Math.sqrt(h)*0.75+0.4;
+}
+function refractionMin(){
+  /* Bennett's approximation, in minutes of arc for an altitude in degrees */
+  var a=alt;
+  return 1/Math.tan((a+7.31/(a+4.4))*Math.PI/180);
+}
+function corrected(){
+  return alt + dipMin() - idxErr/60 + refractionMin()/60;
+}
+function zenith(){return 90-corrected();}
+/* distance to the substellar point in nautical miles, from the zenith distance
+   in minutes of arc: one nautical mile is one minute of arc */
+function distanceNM(){
+  return (90-corrected())*60;
+}
+/* ---------- the horizon bank ---------- */
+function horizonY(x){
+  return H*0.72+Math.sin(x*0.02+t*1.4)*wave*0.7+
+    Math.sin(x*0.05-t*2.1)*wave*0.3+Math.sin(x*0.011+t*0.8)*wave*0.5;
+}
+/* ---------- drawing ---------- */
+function draw(){
+  /* the sky */
+  var g=ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'#04060f');g.addColorStop(0.5,'#0a1224');g.addColorStop(1,'#0d1522');
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  /* stars, a few */
+  for(var i=0;i<40;i++){
+    var sx=(i*197)%W, sy=(i*53)%(H*0.6);
+    ctx.fillStyle='rgba(230,238,246,'+(0.1+((i*7)%5)/12)+')';
+    ctx.fillRect(sx,sy,1.4,1.4);
+  }
+  /* the observed star, at the measured altitude above the horizon */
+  var a0=alt*Math.PI/180;
+  var sx2=W*0.5+Math.cos(a0)*W*0.42;
+  var sy2=horizonY(W*0.5)-Math.sin(a0)*H*0.62;
+  /* the sextant frame: a horizon glass at the bottom, an index arm up to the star */
+  ctx.save();
+  ctx.translate(W*0.5,H*0.72);
+  /* the arc and its scale */
+  ctx.strokeStyle='rgba(232,196,106,.5)';ctx.lineWidth=1.2;
+  ctx.beginPath();ctx.arc(0,0,W*0.42,-Math.PI/2,-Math.PI/2+alt*Math.PI/180);
+  ctx.stroke();
+  for(var d=0;d<=80;d+=10){
+    var da=-Math.PI/2+d*Math.PI/180;
+    ctx.strokeStyle='rgba(232,196,106,.4)';ctx.lineWidth=1;
+    ctx.beginPath();
+    ctx.moveTo(Math.cos(da)*W*0.42,Math.sin(da)*W*0.42);
+    ctx.lineTo(Math.cos(da)*W*0.40,Math.sin(da)*W*0.40);
+    ctx.stroke();
+    ctx.fillStyle='rgba(232,196,106,.6)';
+    ctx.font='10px ui-monospace,Menlo,monospace';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(String(d),Math.cos(da)*W*0.375,Math.sin(da)*W*0.375);
+  }
+  /* the index arm: a bar from the pivot to the scale, with the mirror on it */
+  var ai=alt*Math.PI/180;
+  ctx.rotate(ai);
+  ctx.fillStyle='#8a6a2c';
+  ctx.fillRect(0,-4,W*0.42,8);
+  ctx.fillStyle='#d8d0c0';
+  ctx.beginPath();ctx.arc(W*0.42,0,7,0,6.3);ctx.fill();
+  ctx.restore();
+  /* the horizon glass: a half-silvered mirror at the centre */
+  ctx.fillStyle='rgba(200,220,240,.18)';
+  ctx.beginPath();ctx.arc(W*0.5,H*0.72,26,0,6.3);ctx.fill();
+  ctx.strokeStyle='rgba(230,238,246,.6)';ctx.lineWidth=1.4;
+  ctx.beginPath();ctx.moveTo(W*0.5-26,H*0.72);ctx.lineTo(W*0.5+26,H*0.72);ctx.stroke();
+  /* the frame rocks with the ship, but the reading does not change: the mirror
+     tracks the horizon, which is the whole point of a sextant over a quadrant */
+  if(motion!==0){
+    ctx.save();
+    ctx.translate(W*0.5,H*0.72);
+    ctx.rotate(frameOffset()*0.006);
+    ctx.translate(-W*0.5,-H*0.72);
+    ctx.strokeStyle='rgba(230,238,246,.25)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(W*0.5-40,H*0.72);ctx.lineTo(W*0.5+40,H*0.72);ctx.stroke();
+    ctx.restore();
+  }
+  /* the index error, drawn as the offset between the mirror's line and the star */
+  if(idxErr!==0){
+    ctx.strokeStyle='rgba(232,196,106,.5)';ctx.lineWidth=1;
+    ctx.setLineDash([4,4]);
+    var aerr=(alt+idxErr/60)*Math.PI/180;
+    ctx.beginPath();
+    ctx.moveTo(W*0.5,horizonY(W*0.5));
+    ctx.lineTo(W*0.5+Math.cos(aerr)*W*0.42,horizonY(W*0.5)-Math.sin(aerr)*H*0.62);
+    ctx.stroke();ctx.setLineDash([]);
+  }
+  /* the star itself */
+  var sg=ctx.createRadialGradient(sx2,sy2,1,sx2,sy2,22);
+  sg.addColorStop(0,star.shade);sg.addColorStop(0.3,'rgba(255,255,255,.6)');
+  sg.addColorStop(1,'rgba(255,255,255,0)');
+  ctx.fillStyle=sg;ctx.beginPath();ctx.arc(sx2,sy2,22,0,6.3);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(sx2,sy2,3,0,6.3);ctx.fill();
+  /* the sea */
+  var seaG=ctx.createLinearGradient(0,H*0.7,0,H);
+  seaG.addColorStop(0,'#0e1a2a');seaG.addColorStop(1,'#060a12');
+  ctx.fillStyle=seaG;
+  ctx.beginPath();ctx.moveTo(0,H);
+  for(var x=0;x<=W;x+=6)ctx.lineTo(x,horizonY(x));
+  ctx.lineTo(W,H);ctx.closePath();ctx.fill();
+  /* the swell lines */
+  ctx.strokeStyle='rgba(127,212,255,'+(0.06+wave/400)+')';ctx.lineWidth=1;
+  for(var s2=1;s2<8;s2++){
+    ctx.beginPath();
+    for(var x2=0;x2<=W;x2+=6)ctx.lineTo(x2,horizonY(x2)+s2*10);
+    ctx.stroke();
+  }
+  /* the deck: a handrail across the bottom */
+  ctx.fillStyle='#0a0f16';ctx.fillRect(0,H-30,W,30);
+  ctx.strokeStyle='rgba(230,238,246,.2)';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(0,H-28);ctx.lineTo(W,H-28);ctx.stroke();
+  /* the plotting sheet, inset bottom-right: the circles of position */
+  var pw=W*0.30,ph=H*0.40,px=W-pw-14,py=H-ph-34;
+  ctx.save();
+  ctx.beginPath();ctx.rect(px,py,pw,ph);ctx.clip();
+  ctx.drawImage(chart,0,0,W,H,px,py,pw,ph);
+  ctx.restore();
+  ctx.strokeStyle='rgba(230,238,246,.35)';ctx.lineWidth=1;
+  ctx.strokeRect(px,py,pw,ph);
+  ctx.fillStyle='rgba(230,238,246,.5)';
+  ctx.font='9px ui-monospace,Menlo,monospace';
+  ctx.textAlign='left';ctx.textBaseline='top';
+  ctx.fillText('PLOTTING SHEET',px+4,py+4);
+}
+/* the plotting sheet: circles of position on a latitude/longitude grid */
+var chart=document.createElement('canvas');
+chart.width=W;chart.height=H;
+var ch=chart.getContext('2d');
+function drawChart(){
+  ch.fillStyle='#0a1420';ch.fillRect(0,0,W,H);
+  /* a graticule */
+  ch.strokeStyle='rgba(230,238,246,.10)';ch.lineWidth=1;
+  for(var x=0;x<W;x+=W/12){ch.beginPath();ch.moveTo(x,0);ch.lineTo(x,H);ch.stroke();}
+  for(var y=0;y<H;y+=H/10){ch.beginPath();ch.moveTo(0,y);ch.lineTo(W,y);ch.stroke();}
+  ch.fillStyle='rgba(230,238,246,.4)';
+  ch.font='9px ui-monospace,Menlo,monospace';
+  for(var g=0;g<12;g+=2)ch.fillText(String(g*30)+'°W',g*W/12+4,H-6);
+  for(var g2=0;g2<10;g2+=2)ch.fillText(String(60-g2*30)+'°N',4,g2*H/10+12);
+  /* each sight is a circle on the sheet, centred on the substellar point */
+  shots.forEach(function(s,i){
+    /* the substellar point: a point on the sheet from the star's azimuth */
+    var cx=W*0.5+Math.cos(s.az)*s.off, cy=H*0.5+Math.sin(s.az)*s.off;
+    /* the circle of position: radius from the zenith distance, scaled */
+    var r=s.zd*3.4;
+    ch.strokeStyle=i===shots.length-1?'#e8c46a':'rgba(127,212,255,.6)';
+    ch.lineWidth=1.6;
+    ch.setLineDash(i===shots.length-1?[]:[6,5]);
+    ch.beginPath();ch.arc(cx,cy,r,0,6.3);ch.stroke();
+    ch.setLineDash([]);
+    /* the substellar point */
+    ch.fillStyle='rgba(230,238,246,.9)';
+    ch.beginPath();ch.arc(cx,cy,3,0,6.3);ch.fill();
+    ch.font='10px ui-monospace,Menlo,monospace';
+    ch.fillText(s.name,cx+7,cy+3);
+  });
+  /* the fix: the crossing, drawn when there are at least two */
+  if(shots.length>=2){
+    var a=shots[shots.length-2],b=shots[shots.length-1];
+    /* the two circles cross near wherever they were placed */
+    var fx=(a.cx+b.cx)/2+Math.sin(t*0.2)*6, fy=(a.cy+b.cy)/2+Math.cos(t*0.17)*6;
+    ch.strokeStyle='#e8c46a';ch.lineWidth=1.2;
+    ch.beginPath();ch.arc(fx,fy,10,0,6.3);ch.stroke();
+    ch.beginPath();ch.moveTo(fx-14,fy);ch.lineTo(fx+14,fy);
+    ch.moveTo(fx,fy-14);ch.lineTo(fx,fy+14);ch.stroke();
+  }
+}
+
+/* ---------- controls, readout, loop ---------- */
+var sbox=document.getElementById('stars');
+STARLIST.forEach(function(s,i){
+  var b=document.createElement('button');
+  b.textContent=s.n;
+  b.setAttribute('aria-pressed',String(i===0));
+  b.addEventListener('click',function(){
+    star=s;
+    [].slice.call(sbox.children).forEach(function(o){
+      o.setAttribute('aria-pressed',String(o===b));});
+  });
+  sbox.appendChild(b);
+});
+/* the "drift" row is the sextant's mounting: you can rock it to prove the reading holds */
+var dbox=document.getElementById('drift');
+['steady','heaving','rolling'].forEach(function(n,i){
+  var b=document.createElement('button');
+  b.textContent=n;
+  b.setAttribute('aria-pressed',String(i===0));
+  b.addEventListener('click',function(){
+    motion=i;
+    [].slice.call(dbox.children).forEach(function(o){
+      o.setAttribute('aria-pressed',String(o===b));});
+  });
+  dbox.appendChild(b);
+});
+var motion=0;
+function bind(id,fn){var el=document.getElementById(id);
+  el.addEventListener('input',function(){fn(+el.value);});}
+bind('alt',function(v){alt=v;});
+bind('wave',function(v){wave=v;});
+bind('index',function(v){idxErr=v;});
+document.getElementById('shoot').addEventListener('click',function(){
+  var az=(shots.length*2.1+0.7)%6.28;
+  shots.push({
+    name:star.n,az:az,off:60+shots.length*54,
+    zd:(90-corrected()),alt:alt,measured:alt,
+    cx:W*0.5+Math.cos(az)*(60+shots.length*54),
+    cy:H*0.5+Math.sin(az)*(60+shots.length*54)
+  });
+  if(shots.length>4)shots.shift();
+});
+document.getElementById('clear').addEventListener('click',function(){shots=[];});
+function readout(){
+  document.getElementById('rM').textContent=alt.toFixed(1)+'°';
+  document.getElementById('rC').textContent=corrected().toFixed(1)+'°';
+  document.getElementById('rD').textContent='-'+dipMin().toFixed(1)+"'";
+  document.getElementById('rZ').textContent=zenith().toFixed(1)+'°';
+  document.getElementById('rF').textContent=
+    shots.length===0?'no sight':shots.length===1?'one circle':'crossing';
+  var r=document.getElementById('read');
+  r.innerHTML='sextant '+alt.toFixed(0)+'°'+(idxErr?"<br>index error "+(idxErr>0?'+':'')+idxErr+"'":"")+
+    '<br>distance '+distanceNM().toFixed(0)+' nm';
+}
+/* the frame rocks; the reading does not change, which is the point of the instrument */
+function frameOffset(){
+  if(motion===0)return 0;
+  var amp=motion===1?4:14;
+  return Math.sin(t*1.6)*amp;
+}
+var last=0;
+function loop(ts){
+  var dt=last?Math.min(.05,(ts-last)/1000):0;last=ts;
+  t+=dt;
+  draw();drawChart();readout();
+  requestAnimationFrame(loop);
+}
+draw();drawChart();readout();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

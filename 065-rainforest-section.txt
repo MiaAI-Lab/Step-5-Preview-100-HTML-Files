@@ -1,0 +1,86 @@
+# RAINFOREST SECTION — four floors of light
+
+## Short title
+Rainforest
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: an annotated cross-section of
+a rainforest in four strata, where the light that reaches each floor is a function of the
+hour you set and the weather you turn on. No external dependencies whatsoever — no CDN,
+no web fonts, no external images, no JS libraries. All CSS and JavaScript inline, works
+offline by double-clicking, responsive, valid HTML5.
+
+Artistic direction: a wet green section on near-black. Ground #0a1310, hairlines
+rgba(230,242,234,.14), body #e6f2ea with muted #93a89c, one green accent #8fd694 and
+amber #ffd166 for figures and species names. Serif headings with italic accent words,
+uppercase .2em–.4em kickers, monospace readouts.
+
+The section is an SVG on a 1000 × 620 viewBox built at load from a single seed: a sky
+gradient, four strata whose top edges are quadratic waves that flatten with depth, two
+emergent trees that break the roof, sixteen canopy crowns, twenty-two understory trunks
+each carrying a broad leaf on a random scale and rotation, and thirty ferns along the
+floor. Everything comes from a mulberry32 generator, so the section is stable across
+reloads and completely different if the seed changes.
+
+The light is the point. Eight key hours — night, first light, dawn, morning, noon,
+afternoon, dusk, night — hold a pair of RGB triples each, and any hour between them is
+interpolated. Dragging the slider rewrites both gradient stops and re-filters the whole
+section with brightness and saturation derived from how far the hour is from solar noon,
+so the strata are literally re-lit rather than tinted. The readout reports the percentage
+of light that reaches the floor.
+
+The weather runs on a canvas laid over the section: rain spawns at a rate set by the
+rainfall slider, most drops are caught by the canopy line and removed, and the few that
+get through slow to a drip. Mist is a set of drifting radial gradients; light shafts are
+four quadrilaterals from the canopy to the floor whose opacity flickers on a sine, the
+way light through leaves does. Leaves drift down whichever way the weather is going.
+
+Six species hotspots are absolutely positioned over the section at real strata depths —
+harpy eagle, sloth, morpho, poison dart frog, toucan, leafcutter ant — and each updates
+a card with the binomial and a note on why it lives at that height.
+
+Layout: nav, centred hero, the section with its card and hotspots, a dock with the hour
+and rainfall sliders and three toggles, a readout row, two three-cell note rows on the
+four strata and on the light, then a footer. Links hidden under 780px.
+
+Interaction: drag the hour and the section is re-lit from night to noon to dusk; start
+the rain and set how hard it falls and watch how much of it gets through the roof; turn
+on mist and light shafts; tap any hotspot to read about the animal that lives there.
+
+## One-paragraph description of the intended design
+A rainforest cross-section on an SVG built from one seed into four strata — emergent,
+canopy, understory, floor — where dragging the hour rewrites the sky gradient and
+re-filters the whole section so each floor is actually re-lit, and where a canvas
+overlay rains on the canopy at a rate you set, catches most of it at the roof, lets a
+little through as drips, adds drifting mist and flickering light shafts, and six species
+hotspots at their real depths explain who lives where.
+
+## Major visual techniques used
+- Section generated from a mulberry32 seed, so the same file always produces the same
+  forest and a seed change produces a different one
+- Stratum top edges as quadratic waves whose amplitude flattens with depth, giving the
+  floors their own horizons
+- Hour-keyed colour interpolation across eight keyframes, so any hour is a real mix
+  of the two nearest keys rather than a filter thrown at a fixed picture
+- Whole-section relighting as a single brightness/saturation filter derived from the
+  distance from solar noon, which is what makes the floors behave differently
+- Floor light percentage computed from the same lift term as the filter, so the readout
+  and the picture cannot disagree
+- Rain on a canvas overlaid on the SVG, with a canopy line that removes most drops and
+  slows the survivors to a drip
+- Mist as drifting radial gradients cleared and redrawn each frame, so it never streaks
+- Light shafts as quadrilaterals whose opacity flickers on per-shaft sines
+- Understory leaves placed with a random scale and rotation from the same seeded stream
+- Hotspots as absolutely positioned buttons at real stratum depths, driving a single
+  card so only one species is ever open
+- Canvas backing store sized to DPR with CSS scaling, so the weather stays aligned with
+  the SVG underneath at every width
+- Fixed internal SVG viewBox with preserveAspectRatio, so the strata and the hotspot
+  percentages stay in agreement
+
+## Intended interaction model
+A diagram you can sit in. Visitors drag the hour to watch the light get taken apart
+floor by floor, set the rainfall and start the rain to see how little of it lands, switch
+on mist and shafts, and tap the animals to find out why each one lives at the height it
+does. The controls change the physics of the picture rather than decorating it.

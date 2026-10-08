@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CALIBRE 09 — A Hand-Wound Chronometer</title>
+<style>
+  :root{
+    --void:#0a0a0b;
+    --panel:#121214;
+    --line:rgba(214,196,160,.18);
+    --gold:#d6c49f;
+    --gold-2:#8f7f5c;
+    --text:#efece5;
+    --muted:rgba(239,236,229,.5);
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --serif:"Iowan Old Style","Times New Roman",Times,Georgia,serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--void);color:var(--text);font-family:var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+
+  nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px clamp(18px,4vw,44px);border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(10,10,11,.9);backdrop-filter:blur(12px);z-index:50}
+  .brand{font-family:var(--serif);font-size:18px;letter-spacing:.42em;text-transform:uppercase}
+  nav ul{display:flex;gap:clamp(12px,2.4vw,30px);list-style:none;margin:0;padding:0}
+  nav a{color:var(--muted);text-decoration:none;font-family:var(--mono);font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;transition:color .25s}
+  nav a:hover{color:var(--gold)}
+  .buy{background:var(--gold);color:#12100c;border:0;font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;padding:12px 22px;border-radius:2px;cursor:pointer;transition:opacity .25s}
+  .buy:hover{opacity:.82}
+
+  .hero{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,5vw,64px);align-items:center;padding:clamp(30px,6vw,80px) clamp(18px,4vw,44px);max-width:1280px;margin:0 auto}
+  .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.34em;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:22px}
+  h1{font-family:var(--serif);font-weight:400;font-size:clamp(36px,5.6vw,72px);line-height:1;letter-spacing:-.02em;margin:0 0 24px}
+  h1 i{font-style:italic;color:var(--gold)}
+  .lede{font-size:14.5px;line-height:1.85;color:var(--muted);max-width:44ch;margin:0 0 34px}
+  .specs{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-bottom:34px}
+  .specs div{background:var(--void);padding:16px 18px}
+  .specs span{display:block;font-family:var(--mono);font-size:8.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+  .specs b{font-family:var(--serif);font-weight:400;font-size:17px}
+  .price{display:flex;align-items:baseline;gap:14px;margin-bottom:26px}
+  .price b{font-family:var(--serif);font-weight:400;font-size:38px;letter-spacing:-.01em}
+  .price s{color:var(--muted);font-family:var(--mono);font-size:12px}
+
+  /* ---------- the watch ---------- */
+  .stage{position:relative;aspect-ratio:1;display:grid;place-items:center;perspective:1400px}
+  .halo{position:absolute;inset:8%;border-radius:50%;
+    background:radial-gradient(circle at 50% 45%,rgba(214,196,159,.14),transparent 62%)}
+  .watch{
+    position:relative;width:min(360px,72%);aspect-ratio:1;border-radius:50%;
+    background:
+      radial-gradient(circle at 32% 26%,#3a3a3e,#191919 42%,#0c0c0d 78%),
+      conic-gradient(from 200deg,#2a2a2e,#141414 20%,#26262a 45%,#101010 70%,#2a2a2e);
+    box-shadow:
+      inset 0 2px 3px rgba(255,255,255,.14),
+      inset 0 -3px 6px rgba(0,0,0,.8),
+      0 40px 80px -30px rgba(0,0,0,.95),
+      0 0 90px -30px rgba(214,196,159,.28);
+    transform-style:preserve-3d;
+    transition:transform .8s cubic-bezier(.2,.8,.2,1);
+  }
+  .bezel{position:absolute;inset:5%;border-radius:50%;
+    background:conic-gradient(from 0deg,var(--gold-2),var(--gold) 8%,#6f6347 18%,var(--gold) 32%,#5f563d 48%,var(--gold) 62%,#6f6347 78%,var(--gold) 92%,var(--gold-2));
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,.5)}
+  .dial{position:absolute;inset:11%;border-radius:50%;overflow:hidden;
+    background:radial-gradient(circle at 40% 30%,#1c2b3a,#0b1520 55%,#05090f);
+    box-shadow:inset 0 0 40px rgba(0,0,0,.9)}
+  /* guilloché: fine concentric rings */
+  .dial::before{content:"";position:absolute;inset:0;border-radius:50%;opacity:.5;
+    background:repeating-radial-gradient(circle at 42% 34%,rgba(255,255,255,.05) 0 1px,transparent 1px 7px)}
+  .idx{position:absolute;left:50%;top:0;width:100%;height:100%}
+  .idx i{position:absolute;left:50%;top:7%;width:2px;height:7%;background:var(--gold);transform-origin:50% 660%;opacity:.9}
+  .idx i.big{height:9%;width:3px;opacity:1}
+  .hand{position:absolute;left:50%;bottom:50%;transform-origin:50% 100%;border-radius:2px}
+  .h-h{width:4px;height:26%;background:linear-gradient(180deg,var(--gold),#8f7f5c);box-shadow:0 0 6px rgba(0,0,0,.7)}
+  .h-m{width:3px;height:34%;background:linear-gradient(180deg,var(--gold),#8f7f5c)}
+  .h-s{width:1.5px;height:38%;background:var(--gold);box-shadow:0 0 8px rgba(214,196,159,.8)}
+  .h-s::after{content:"";position:absolute;left:-3px;bottom:-16px;width:7.5px;height:22px;border-radius:3px;background:var(--gold)}
+  .cap{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:12px;height:12px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#f0e6cf,#8f7f5c)}
+  .sub{position:absolute;left:0;right:0;top:58%;text-align:center;font-family:var(--mono);font-size:8px;letter-spacing:.3em;color:var(--gold);opacity:.8}
+  .sub2{position:absolute;left:0;right:0;top:66%;text-align:center;font-family:var(--serif);font-size:11px;letter-spacing:.2em;color:rgba(239,236,229,.7)}
+  .crown{position:absolute;right:-9px;top:44%;width:14px;height:12%;border-radius:3px;
+    background:linear-gradient(90deg,#6f6347,var(--gold),#5f563d);box-shadow:0 0 10px rgba(0,0,0,.6)}
+  /* lugs + strap */
+  .lug{position:absolute;left:50%;transform:translateX(-50%);width:16%;height:9%;background:linear-gradient(180deg,#4a4030,#241d14);border-radius:3px}
+  .lug.a{top:-4%}
+  .lug.b{bottom:-4%}
+  .band{position:absolute;left:50%;transform:translateX(-50%);width:30%;height:34%;
+    background:linear-gradient(90deg,#14100c,#2e2519 30%,#3d3226 50%,#2e2519 70%,#14100c);
+    box-shadow:inset 0 0 20px rgba(0,0,0,.6)}
+  .band.t{top:2%;border-radius:6px 6px 0 0}
+  .band.b{bottom:2%;border-radius:0 0 6px 6px}
+
+  /* ---------- movement ---------- */
+  .movement{max-width:1280px;margin:0 auto;padding:clamp(40px,8vw,110px) clamp(18px,4vw,44px);display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,5vw,64px);align-items:center}
+  .movement h2{font-family:var(--serif);font-weight:400;font-size:clamp(26px,4vw,48px);line-height:1.05;letter-spacing:-.02em;margin:0 0 20px}
+  .movement p{font-size:14px;line-height:1.85;color:var(--muted);margin:0 0 16px;max-width:46ch}
+  .movement ul{list-style:none;margin:24px 0 0;padding:0}
+  .movement li{padding:14px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:14px;font-size:13px}
+  .movement li span{font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+  .mv{position:relative;aspect-ratio:1;border-radius:50%;overflow:hidden;
+    background:radial-gradient(circle at 35% 30%,#241d14,#0d0b08);
+    box-shadow:inset 0 0 60px rgba(0,0,0,.9),0 30px 60px -30px rgba(0,0,0,.9)}
+  #mvcan{position:absolute;inset:0;width:100%;height:100%}
+
+  .strip{max-width:1280px;margin:0 auto;padding:0 clamp(18px,4vw,44px) clamp(40px,8vw,100px);display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
+  .strip div{background:var(--void);padding:26px 22px}
+  .strip b{display:block;font-family:var(--serif);font-weight:400;font-size:26px;color:var(--gold);margin-bottom:8px}
+  .strip span{font-family:var(--mono);font-size:8.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+
+  footer{border-top:1px solid var(--line);padding:30px clamp(18px,4vw,44px);display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+
+  @media (max-width:880px){
+    .hero,.movement{grid-template-columns:1fr}
+    .strip{grid-template-columns:repeat(2,1fr)}
+    nav ul{display:none}
+  }
+</style>
+</head>
+<body>
+<nav>
+  <div class="brand">Maison Vaurin</div>
+  <ul>
+    <li><a href="#spec">Specification</a></li>
+    <li><a href="#movement">Calibre</a></li>
+    <li><a href="#craft">Craft</a></li>
+  </ul>
+  <button class="buy" id="buy">Enquire · $14,800</button>
+</nav>
+
+<section class="hero" id="spec">
+  <div>
+    <span class="k">Référence 09 · 2026 · 88 pieces</span>
+    <h1>Calibre <i>09</i></h1>
+    <p class="lede">A hand-wound chronometer in 39 millimetres of brushed steel,
+    housing a movement finished entirely by one watchmaker over eleven days. No
+    battery, no quartz, no compromise.</p>
+    <div class="specs">
+      <div><span>Movement</span><b>V.09 hand-wound</b></div>
+      <div><span>Power reserve</span><b>72 hours</b></div>
+      <div><span>Case</span><b>39.0 mm steel</b></div>
+      <div><span>Crystal</span><b>Box sapphire</b></div>
+      <div><span>Water</span><b>50 metres</b></div>
+      <div><span>Frequency</span><b>21,600 vph</b></div>
+    </div>
+    <div class="price"><b>$14,800</b><s>incl. duty</s></div>
+    <button class="buy" id="enquire">Request an allocation</button>
+  </div>
+
+  <div class="stage" id="stage">
+    <div class="halo"></div>
+    <div class="watch" id="watch">
+      <div class="band t"></div><div class="band b"></div>
+      <div class="lug a"></div><div class="lug b"></div>
+      <div class="bezel"></div>
+      <div class="dial">
+        <div class="idx" id="idx"></div>
+        <div class="hand h-h" id="hh"></div>
+        <div class="hand h-m" id="hm"></div>
+        <div class="hand h-s" id="hs"></div>
+        <div class="cap"></div>
+        <div class="sub">CHRONOMÈTRE</div>
+        <div class="sub2">Maison Vaurin · Genève</div>
+      </div>
+      <div class="crown"></div>
+    </div>
+  </div>
+</section>
+
+<section class="movement" id="movement">
+  <div>
+    <span class="k">Calibre V.09 · exposed</span>
+    <h2>Eleven days at the bench.</h2>
+    <p>Twenty-four jewels, a free-sprung balance, and bridges bevelled by hand to
+    forty-five degrees. The mainspring barrel is engraved with the watchmaker's mark
+    on the final morning.</p>
+    <p>Turn the crown on the watch above and the movement below turns with it — the
+    balance wheel, barrel and escape wheel all running at their true relative rates.</p>
+    <ul>
+      <li><span>Jewels</span><b>24 rubies</b></li>
+      <li><span>Components</span><b>218 parts</b></li>
+      <li><span>Assembly</span><b>11 days, one pair of hands</b></li>
+      <li><span>Finishing</span><b>Côtes de Genève, hand-bevelled</b></li>
+    </ul>
+  </div>
+  <div class="mv"><canvas id="mvcan"></canvas></div>
+</section>
+
+<section class="strip" id="craft">
+  <div><b>39.0</b><span>millimetres</span></div>
+  <div><b>72</b><span>hours reserve</span></div>
+  <div><b>218</b><span>components</span></div>
+  <div><b>88</b><span>pieces per year</span></div>
+</section>
+
+<footer>
+  <span>© Maison Vaurin, Genève</span>
+  <span>Founded 1874</span>
+  <span>By appointment only</span>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  /* ---------- dial indices ---------- */
+  var idx=document.getElementById('idx');
+  for(var i=0;i<60;i++){
+    var t=document.createElement('i');
+    if(i%5===0)t.className='big';
+    t.style.transform='translateX(-50%) rotate('+(i*6)+'deg)';
+    idx.appendChild(t);
+  }
+  var hh=document.getElementById('hh'),hm=document.getElementById('hm'),hs=document.getElementById('hs');
+  function tickWatch(){
+    var d=new Date();
+    var ms=d.getMilliseconds(), s=d.getSeconds()+ms/1000,
+        m=d.getMinutes()+s/60, h=(d.getHours()%12)+m/60;
+    hs.style.transform='rotate('+(s*6)+'deg)';
+    hm.style.transform='rotate('+(m*6)+'deg)';
+    hh.style.transform='rotate('+(h*30)+'deg)';
+    requestAnimationFrame(tickWatch);
+  }
+  requestAnimationFrame(tickWatch);
+
+  /* ---------- watch tilt ---------- */
+  var watch=document.getElementById('watch');
+  document.addEventListener('pointermove',function(e){
+    var x=e.clientX/innerWidth-0.5, y=e.clientY/innerHeight-0.5;
+    watch.style.transform='rotateY('+(x*16).toFixed(2)+'deg) rotateX('+(-y*12).toFixed(2)+'deg)';
+  });
+
+  /* ---------- movement canvas ---------- */
+  var cv=document.getElementById('mvcan'),c=cv.getContext('2d');
+  var W,H,DPR=Math.min(devicePixelRatio||1,2);
+  function size(){
+    var r=cv.getBoundingClientRect();
+    W=r.width||400;H=r.height||400;
+    cv.width=W*DPR;cv.height=H*DPR;
+    c.setTransform(DPR,0,0,DPR,0,0);
+  }
+  function drawMovement(){
+    if(!W){requestAnimationFrame(drawMovement);return;}
+    var cx=W/2,cy=H/2,R=Math.min(W,H)/2;
+    c.clearRect(0,0,W,H);
+    /* base plate */
+    var g=c.createRadialGradient(cx-R*0.3,cy-R*0.35,R*0.05,cx,cy,R);
+    g.addColorStop(0,'#2e2618');g.addColorStop(.6,'#171209');g.addColorStop(1,'#080603');
+    c.fillStyle=g;c.beginPath();c.arc(cx,cy,R,0,6.283);c.fill();
+    /* Côtes de Genève: concentric engraved rings */
+    c.strokeStyle='rgba(214,196,159,.10)';c.lineWidth=1;
+    for(var i=1;i<16;i++){
+      c.beginPath();c.arc(cx,cy,R*0.06*i,0,6.283);c.stroke();
+    }
+    /* jewels: 24 ruby dots around a circle */
+    for(var j=0;j<24;j++){
+      var a=j/24*6.283;
+      var jx=cx+Math.cos(a)*R*0.78, jy=cy+Math.sin(a)*R*0.78;
+      var jg=c.createRadialGradient(jx-R*0.012,jy-R*0.012,0,jx,jy,R*0.032);
+      jg.addColorStop(0,'rgba(255,180,190,.95)');
+      jg.addColorStop(.5,'rgba(190,50,70,.9)');
+      jg.addColorStop(1,'rgba(60,10,20,.9)');
+      c.fillStyle=jg;c.beginPath();c.arc(jx,jy,R*0.032,0,6.283);c.fill();
+    }
+    var t=performance.now();
+
+    /* mainspring barrel (big, slow) */
+    var ba=t*0.00006;
+    barrel(cx+Math.cos(ba)*R*0.30, cy+Math.sin(ba)*R*0.30, R*0.20, ba, '#c9b78f');
+    /* centre wheel (medium) */
+    var ca=t*0.0004;
+    wheel(cx+Math.cos(ca+1)*R*0.30, cy+Math.sin(ca+1)*R*0.30, R*0.15, -ca*2.2);
+    /* third wheel */
+    var ta=t*0.0011;
+    wheel(cx+Math.cos(ta+2.2)*R*0.34, cy+Math.sin(ta+2.2)*R*0.34, R*0.11, ta*2);
+    /* escape wheel (fast) */
+    var ea=t*0.0035;
+    escapeWheel(cx+Math.cos(ea+3.6)*R*0.30, cy+Math.sin(ea+3.6)*R*0.30, R*0.09, ea*2);
+    /* balance wheel (fastest, oscillating) */
+    var bo=Math.sin(t*0.006)*0.9;
+    balance(cx, cy, R*0.26, bo);
+    /* bridge */
+    c.strokeStyle='rgba(214,196,159,.22)';c.lineWidth=R*0.035;
+    c.beginPath();c.arc(cx,cy,R*0.62,-0.5,1.2);c.stroke();
+    c.lineWidth=R*0.012;c.strokeStyle='rgba(214,196,159,.4)';
+    c.beginPath();c.arc(cx,cy,R*0.62,-0.5,1.2);c.stroke();
+    requestAnimationFrame(drawMovement);
+  }
+  function wheel(x,y,r,a){
+    c.save();c.translate(x,y);c.rotate(a);
+    /* spokes */
+    c.strokeStyle='rgba(214,196,159,.75)';c.lineWidth=Math.max(1,r*0.07);c.lineCap='round';
+    for(var i=0;i<6;i++){
+      var an=i/6*6.283;
+      c.beginPath();c.moveTo(0,0);c.lineTo(Math.cos(an)*r*0.9,Math.sin(an)*r*0.9);c.stroke();
+    }
+    /* teeth */
+    c.strokeStyle='rgba(214,196,159,.55)';c.lineWidth=Math.max(.8,r*0.05);
+    c.beginPath();c.arc(0,0,r,0,6.283);c.stroke();
+    for(var k=0;k<28;k++){
+      var kk=k/28*6.283;
+      c.beginPath();
+      c.moveTo(Math.cos(kk)*r,Math.sin(kk)*r);
+      c.lineTo(Math.cos(kk)*r*1.14,Math.sin(kk)*r*1.14);
+      c.stroke();
+    }
+    /* hub */
+    var g=c.createRadialGradient(-r*0.2,-r*0.2,0,0,0,r*0.3);
+    g.addColorStop(0,'#f0e6cf');g.addColorStop(1,'#8f7f5c');
+    c.fillStyle=g;c.beginPath();c.arc(0,0,r*0.24,0,6.283);c.fill();
+    c.restore();
+  }
+  function barrel(x,y,r,a,col){
+    c.save();c.translate(x,y);c.rotate(a);
+    /* coiled mainspring: an Archimedean spiral */
+    c.strokeStyle='rgba(214,196,159,.85)';c.lineWidth=Math.max(1,r*0.05);
+    c.beginPath();
+    for(var th=0;th<6.283*5;th+=0.09){
+      var rr=r*0.12+th/(6.283*5)*r*0.82;
+      var x2=Math.cos(th)*rr,y2=Math.sin(th)*rr;
+      if(th===0)c.moveTo(x2,y2);else c.lineTo(x2,y2);
+    }
+    c.stroke();
+    c.strokeStyle='rgba(214,196,159,.6)';c.lineWidth=Math.max(1,r*0.09);
+    c.beginPath();c.arc(0,0,r,0,6.283);c.stroke();
+    var g=c.createRadialGradient(-r*0.2,-r*0.2,0,0,0,r*0.3);
+    g.addColorStop(0,'#f0e6cf');g.addColorStop(1,'#8f7f5c');
+    c.fillStyle=g;c.beginPath();c.arc(0,0,r*0.2,0,6.283);c.fill();
+    c.restore();
+  }
+  function escapeWheel(x,y,r,a){
+    c.save();c.translate(x,y);c.rotate(a);
+    c.strokeStyle='rgba(230,215,180,.9)';c.lineWidth=Math.max(1,r*0.10);
+    for(var i=0;i<15;i++){
+      var an=i/15*6.283;
+      c.beginPath();
+      c.moveTo(Math.cos(an)*r*0.4,Math.sin(an)*r*0.4);
+      c.lineTo(Math.cos(an)*r,Math.sin(an)*r);
+      c.stroke();
+    }
+    c.beginPath();c.arc(0,0,r*0.4,0,6.283);c.stroke();
+    c.fillStyle='#c9b78f';c.beginPath();c.arc(0,0,r*0.16,0,6.283);c.fill();
+    c.restore();
+  }
+  function balance(x,y,r,ang){
+    c.save();c.translate(x,y);
+    /* hairspring: a spiral of 4 turns */
+    c.strokeStyle='rgba(214,196,159,.55)';c.lineWidth=Math.max(.8,r*0.035);
+    c.beginPath();
+    for(var th=0;th<6.283*4;th+=0.12){
+      var rr=r*0.30+th/(6.283*4)*r*0.42;
+      var x2=Math.cos(th)*rr,y2=Math.sin(th)*rr;
+      if(th===0)c.moveTo(x2,y2);else c.lineTo(x2,y2);
+    }
+    c.stroke();
+    /* rim */
+    c.rotate(ang);
+    c.strokeStyle='#e6d7b0';c.lineWidth=Math.max(1.5,r*0.10);
+    c.beginPath();c.arc(0,0,r,0,6.283);c.stroke();
+    /* arms + screws */
+    c.strokeStyle='#c9b78f';c.lineWidth=Math.max(1,r*0.05);
+    c.beginPath();c.moveTo(-r,0);c.lineTo(r,0);c.moveTo(0,-r);c.lineTo(0,r);c.stroke();
+    c.fillStyle='#f0e6cf';
+    [[1,0],[-1,0],[0,1],[0,-1]].forEach(function(p){
+      c.beginPath();c.arc(p[0]*r,p[1]*r,r*0.10,0,6.283);c.fill();
+    });
+    c.restore();
+  }
+
+  addEventListener('resize',function(){clearTimeout(window.__r);window.__r=setTimeout(size,140)});
+  size();
+  requestAnimationFrame(drawMovement);
+
+  document.getElementById('buy').addEventListener('click',function(){
+    this.textContent='Allocation requested ✓';
+    this.disabled=true;
+  });
+  document.getElementById('enquire').addEventListener('click',function(){
+    this.textContent='Request sent ✓';
+    this.disabled=true;
+  });
+})();
+</script>
+</body>
+</html>

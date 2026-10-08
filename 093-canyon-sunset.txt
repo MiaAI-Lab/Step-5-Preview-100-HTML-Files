@@ -1,0 +1,86 @@
+# GOLDEN HOUR — the last twenty minutes
+
+## Short title
+Canyon Sunset
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a canyon in the last twenty
+minutes of light, where the colour of everything is computed from the sun's altitude and
+the air mass it has crossed, and where the walls are strata that re-light as the sun drops.
+No external dependencies whatsoever — no CDN, no web fonts, no external images, no JS
+libraries. All CSS and JavaScript inline, works offline by double-clicking, responsive,
+valid HTML5.
+
+Artistic direction: a warm final light. Ground #1a0e0a, hairlines rgba(246,232,220,.14),
+body #f6e8dc with muted #9c8878, sun orange #ff9c3c as the accent and a canyon red #e0543c
+for the figures. Serif headings with italic accent words, uppercase .2em–.4em kickers,
+monospace figures.
+
+The canyon is three walls of nine strata, each a sine-shaped boundary drawn from its own
+seed, layered far to near and shaded by depth. Each wall is filled with a three-way mix of
+the rock's lit, mid and dark tones scaled by how much light that face gets, so the whole
+picture re-lights when the sun moves.
+
+The sky is a gradient whose stops are the computed light colour, and the sun is a radial
+glow of the same colour at a height set by the sun's altitude. Haze is a wash at the
+horizon, dust deepens the red, and three sky modes add a band of high cloud or an underglow
+of low cloud.
+
+The physics are real. Air mass is Kasten and Young's approximation, so at six degrees it is
+nearly ten and at sixty degrees it is close to one. Colour temperature falls from 5,500
+kelvin toward 2,000, with the dust adding to the reddening. The light colour is a
+kelvin-to-RGB conversion. Shadow length is one over the tangent of the sun's altitude, so a
+six-degree sun casts a shadow ten times the height of the thing making it.
+
+Four rocks — Navajo sandstone, Redwall limestone, Chinle shale and basalt — each with its
+own lit, mid and dark tones and its own glow factor. Controls: four rocks, three skies, sun
+altitude, dust, haze, Let it set and Back to noon. Dragging the canvas moves the sun
+directly. Readout: sun altitude, air mass, colour temperature, shadow length, fraction of
+the wall lit, and the phase from afternoon through golden hour, last light and afterglow.
+
+Layout: nav, centred hero, the canyon canvas with its caption, a dock of two chip rows,
+three sliders and two buttons, a readout row, then two three-cell note rows on air mass,
+colour temperature, shadows, long shadows, four rocks and three skies, then a footer.
+
+Interaction: the light is already low. Visitors drag the sun down through golden hour into
+afterglow and watch the air mass, the colour temperature and the shadow length all climb
+as the walls redden and dim; pull the dust up to deepen the red and flatten the walls; push
+the haze up; switch rock and watch basalt refuse to glow; and press Back to noon to see
+what the whole thing is doing differently.
+
+## One-paragraph description of the intended design
+A canyon of three walls and nine strata each on canvas, filled with a three-way mix of the
+rock's lit, mid and dark tones scaled by the light that face receives, under a sky whose
+gradient stops are the computed light colour — where air mass is Kasten and Young's
+approximation, colour temperature falls from 5,500 kelvin toward 2,000 with the dust
+adding to the reddening, the light colour is a kelvin-to-RGB conversion, shadow length is
+one over the tangent of the sun's altitude, and a multiply band deepens the shadow the
+lower the sun sits.
+
+## Major visual techniques used
+- Air mass by Kasten and Young, so at six degrees it is nearly ten and at sixty it is close
+  to one, and both the readout and the colour follow it
+- Colour temperature from the air mass plus dust, then kelvin-to-RGB, so the light colour
+  is computed rather than picked
+- Shadow length as one over the tangent of the altitude, so a six-degree sun casts a
+  ten-times shadow and the readout says so
+- Strata as nine sine boundaries from their own seeds, layered far to near and shaded by
+  depth for aerial perspective
+- Each wall filled with a three-way mix of the rock's lit, mid and dark tones scaled by the
+  light the face gets, so a rock switch is a real re-light
+- Shadow as a multiply band whose depth follows the sun's altitude
+- Sun as a radial glow in the computed light colour at the altitude's height
+- Haze as a horizon wash whose alpha is the haze slider
+- Dust deepening the red and flattening the walls, which is the trade it actually makes
+- Three sky modes: a band of high cloud, an underglow of low cloud, or nothing
+- Sun's reflection on the water as scattered bars in the light colour
+- Strata labels drawn in the classic Grand Canyon order, so the picture reads as a specific
+  place
+
+## Intended interaction model
+A place to watch the light go. Visitors drag the sun down from afternoon through golden hour
+to afterglow and every number on the panel climbs with it — air mass, colour temperature and
+shadow length — while the walls redden and dim. They add dust to deepen the colour and
+flatten the walls, lift the haze, switch the rock, and go back to noon to see what the whole
+thing does differently at one air mass.

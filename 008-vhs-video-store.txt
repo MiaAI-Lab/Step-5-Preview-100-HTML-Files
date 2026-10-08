@@ -1,0 +1,85 @@
+# VIDEO CASCADE — Tape 014
+
+## Short title
+VHS Video Store
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: the storefront of a
+fictional last-video-rental-shop called VIDEO CASCADE, rendered as if seen on a
+CRT television. No external dependencies at all — no CDN, no web fonts, no external
+images, no external SVG files, no JavaScript libraries. All CSS and JavaScript
+inline, works offline by double-clicking, responsive, valid HTML5.
+
+Artistic direction: analogue video. The entire page sits under a fixed CRT overlay
+stack: a repeating-linear-gradient scanline mask multiplied over the page, a radial
+vignette that eats the corners, a slow vertical "head switching" roll bar
+travelling down the screen in screen blend mode, and a whole-page jitter animation
+that only fires for a few frames every five seconds, translating the entire viewport
+sideways — a real tape defect. Typography is the black-weight display face
+(Arial Black / Impact fallback) against monospace labels, exactly as a video
+store's signage is set.
+
+Layout: a sticky VCR on-screen-display bar across the top — white badge, blinking
+REC dot, SP marker, running clock, channel, and two buttons. Then a centred hero:
+"VIDEO" over "CASCADE" in enormous type with a chromatic-aberration text-shadow
+(magenta offset +2px, cyan −2px, white bloom) that jitters harder for a frame in
+the middle of every cycle, under a wide-tracked amber tagline and a fake "RATED
+NR · BETA / NOT RATED BY THE MPAA" box. Then a "NEW SHELF" grid: twenty VHS boxes
+with category filters, each box a dark gradient card holding a 4:3 "sleeve" of flat
+gradient art, a heavy display title, a static scanline texture over the sleeve, a
+year, an IN STOCK / RARE tag, and a six-segment rental-status bar. Then a "NOW
+PLAYING" VCR unit: a header strip with the tape name and tracking mode, a 16:7
+screen containing a canvas that renders the "picture" — a wobbling band of the
+tape's own palette colour, moving luminance bars, a horizontal tracking noise
+band, chroma-offset ghosts composited in screen mode, and, when no tape is loaded,
+snow static — with a cyan-glowing on-screen display caption above it, and a control
+row (Play/Pause, Rewind, Tracking, Eject) plus a live SMPTE timecode. Finally a
+four-cell statistics strip and a footer.
+
+Colour palette: broadcast black #07070b, warm off-white #f2f0e8, chroma cyan
+#5ff2ff, magenta #ff4fa3, amber #ffcc44, and a single mint green for stock status.
+
+Interaction: clicking any tape loads it into the VCR — the screen switches from
+snow to that tape's wobbling picture and the caption shows its title, category and
+year. Play/Pause toggles the machine and rewrites its own label; Rewind resets the
+timecode; Tracking cycles four modes and flashes the OSD; Eject returns to snow;
+"Dropout" in the OSD bar triggers a burst of static bursts across the screen; "FF"
+jumps the timecode forward ninety seconds. Every control flash writes into the same
+on-screen display caption, so the VCR always talks to you. The category buttons
+re-filter the shelf. A clock in the OSD bar ticks every second, and the tape count
+occasionally drifts.
+
+## One-paragraph description of the intended design
+A video rental shop as seen through a dying television: chromatic-aberration
+display type, a full-page CRT overlay with scanlines, roll bar and periodic
+whole-page jitter, a shelf of flat-gradient VHS sleeves with category filters, and
+a working VCR unit whose canvas picture wobbles, chroma-ghosts, drops out and
+snows — all driven by eight monospace controls that speak through the on-screen
+display.
+
+## Major visual techniques used
+- CRT simulation: repeating-linear-gradient scanlines with multiply, radial
+  vignette, a screen-blend roll bar sweeping the viewport, and an intermittent
+  whole-viewport jitter in steps(1) timing
+- Chromatic aberration on display type from paired magenta/cyan text-shadow
+  offsets that jitter at keyframe stop-points
+- Canvas "video picture": palette gradient, moving luminance bars, a drifting
+  tracking-noise band, and chroma ghosts composited with 'screen'
+- Canvas snow static drawn from hundreds of random low-alpha rectangles
+- Dropout burst generated from random horizontal slivers
+- Flat gradient VHS sleeve artwork with a repeating scanline texture overlay
+  (::after) and heavy display type with hard text-shadow
+- Category filtering via a data-attribute map and DOM rebuild
+- Live SMPTE timecode (hh:mm:ss:ff) computed from wall-clock deltas
+- On-screen display caption reused by every control as a shared feedback channel
+- Sticky VCR-OSD top bar with a blinking REC dot in steps(1) timing
+- Auto-fill responsive tape grid, four-cell stats strip collapsing to two
+  columns under 640px, prefers-reduced-motion honoured
+
+## Intended interaction model
+A browsable shop with a toy VCR at the bottom of it. Visitors pick a tape from the
+shelf (or filter the shelf by category) to load it into the player, then operate
+the transport — play/pause, rewind, tracking cycle, eject, fast-forward, dropout —
+watching the picture and the on-screen caption respond. The CRT defects continue
+whether anyone touches anything, so the page always feels live.

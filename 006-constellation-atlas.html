@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ATLAS MINOR — An Engraved Sky, Generated</title>
+<style>
+  :root{
+    --night:#0a1024;
+    --night2:#131c3a;
+    --cream:#f0e6d2;
+    --gold:#d9b26a;
+    --gold-dim:rgba(217,178,106,.42);
+    --line:rgba(217,178,106,.20);
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    --sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden}
+  body{
+    background:var(--night);color:var(--cream);font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;
+  }
+  #sky{position:fixed;inset:0;z-index:0;cursor:crosshair}
+  .frame{
+    position:fixed;inset:14px;z-index:1;pointer-events:none;
+    border:1px solid var(--gold-dim);
+  }
+  .frame::before,.frame::after{
+    content:"";position:absolute;width:16px;height:16px;border:1px solid var(--gold);
+  }
+  .frame::before{top:-1px;left:-1px;border-right:0;border-bottom:0}
+  .frame::after{bottom:-1px;right:-1px;border-left:0;border-top:0}
+  .vign{position:fixed;inset:0;z-index:1;pointer-events:none;
+    background:radial-gradient(120% 100% at 50% 45%,transparent 45%,rgba(4,7,18,.85))}
+
+  .hud{position:fixed;z-index:3}
+  .tl{top:34px;left:38px}
+  .br{bottom:34px;right:38px;text-align:right}
+  .bl{bottom:34px;left:38px}
+  .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.34em;text-transform:uppercase;color:var(--gold);opacity:.85}
+  h1{
+    font-family:var(--serif);font-weight:400;font-style:italic;
+    font-size:clamp(28px,4.4vw,54px);line-height:1;letter-spacing:-.01em;margin:10px 0 8px;
+  }
+  .sub{font-size:12.5px;line-height:1.6;max-width:32ch;opacity:.62;margin:0}
+
+  .card{
+    position:fixed;z-index:3;right:38px;top:34px;width:min(280px,44vw);
+    border:1px solid var(--gold-dim);background:rgba(10,16,36,.72);
+    backdrop-filter:blur(10px);
+    padding:18px 20px;opacity:0;transform:translateY(-8px);
+    transition:opacity .45s,transform .45s cubic-bezier(.2,.8,.2,1);
+  }
+  .card.on{opacity:1;transform:none}
+  .card .n{font-family:var(--mono);font-size:9px;letter-spacing:.26em;color:var(--gold);text-transform:uppercase}
+  .card h2{font-family:var(--serif);font-weight:400;font-style:italic;font-size:26px;margin:8px 0 10px}
+  .card p{margin:0;font-size:12.5px;line-height:1.62;opacity:.75}
+  .card .mag{margin-top:12px;padding-top:12px;border-top:1px solid var(--line);display:flex;justify-content:space-between;font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;opacity:.6}
+
+  .tools{position:fixed;z-index:3;left:38px;bottom:86px;display:flex;gap:8px;flex-wrap:wrap}
+  .tools button{
+    font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;
+    background:transparent;border:1px solid var(--gold-dim);color:var(--cream);
+    padding:9px 14px;cursor:pointer;transition:background .25s,color .25s,border-color .25s;
+  }
+  .tools button:hover{background:var(--gold);color:#0a1024;border-color:var(--gold)}
+  .tools button.on{border-color:var(--gold);color:var(--gold)}
+
+  @media (max-width:760px){
+    .tl{top:26px;left:26px}.br{bottom:26px;right:26px}.bl{bottom:26px;left:26px}
+    .card{right:26px;top:26px;width:min(240px,60vw)}
+    .tools{left:26px;bottom:78px}
+    .sub{display:none}
+  }
+</style>
+</head>
+<body>
+<canvas id="sky"></canvas>
+<div class="vign"></div>
+<div class="frame"></div>
+
+<div class="hud tl">
+  <div class="k">Atlas Minor · plate <span id="plate">I</span></div>
+  <h1>Sky of Small Things</h1>
+  <p class="sub">A dozen figures, invented each time you re-roll. Hover a
+  constellation to read what it was named for.</p>
+</div>
+
+<div class="card" id="card">
+  <div class="n" id="cName">—</div>
+  <h2 id="cTitle">—</h2>
+  <p id="cBody">—</p>
+  <div class="mag"><span id="cMag">mag —</span><span id="cStars">— stars</span></div>
+</div>
+
+<div class="tools">
+  <button id="reroll">Re-roll the sky</button>
+  <button id="labels" class="on">Names</button>
+  <button id="gridb" class="on">Grid</button>
+</div>
+
+<div class="hud bl"><span class="k">Lat 0° · Lon <span id="lon">0.0</span>° · <span id="cnt">0</span> figures</span></div>
+<div class="hud br"><span class="k">Engraved 2026 · Edition of one</span></div>
+
+<script>
+(function(){
+  "use strict";
+  var cv=document.getElementById('sky'),c=cv.getContext('2d');
+  var W,H,DPR=Math.min(window.devicePixelRatio||1,2);
+  var stars=[],figs=[],dust=[];
+  var showLabels=true,showGrid=true;
+  var mx=0.5,my=0.5,px=0,py=0;
+
+  var NAMES=['Lantern','Kettle','Minor Key','Sparrow','Weathercock','Thimble',
+    'Quill','Anchor','Compass','Lantern-Bearer','Small Hour','Threshold',
+    'Hollow Bell','Wool','Ferry','Moth','Sieve','Cradle','Riddle','Plumb Line',
+    'Ledger','Cinder','Whisk','Cobbler','Spar','Tiller','Ember','Rushlight',
+    'Fennel','Pocketknife','Marbles','Saltspoon','Crow','Latch','Letter',
+    'Bridle','Cistern','Raft','Needle','Buckle','Thresh'];
+  var TALES=[
+    'Named by a cartographer who could not sleep and had run out of animals.',
+    'First drawn to explain a gap in an older map that nobody could account for.',
+    'Supposedly marks the spot where a lantern was dropped from a balloon in 1843.',
+    'The faintest figure on every plate that includes it — and the most argued over.',
+    'Its three brightest stars form a line so straight that early surveyors used it as a rule.',
+    'Traditionally read upside down, which changes what it appears to be holding.',
+    'Recorded twice, with two different spellings, by two brothers who never spoke again.',
+    'So small that it is invisible in any sky larger than the plate it is printed on.',
+    'Drawn in a single continuous line by an engraver who was paid by the line.'
+  ];
+  function pick(a){return a[(Math.random()*a.length)|0]}
+
+  function rnd(a,b){return a+Math.random()*(b-a)}
+
+  function build(){
+    stars=[];figs=[];
+    var n=Math.round(W*H/5200);
+    for(var i=0;i<n;i++){
+      var m=Math.pow(Math.random(),3.1);
+      stars.push({
+        x:Math.random()*W,y:Math.random()*H,
+        r:0.4+m*1.85,
+        a:0.22+m*0.78,
+        tw:Math.random()*6.283,
+        ts:0.4+Math.random()*1.4,
+        warm:Math.random()<0.34
+      });
+    }
+    var NF=8+((Math.random()*5)|0);
+    for(var f=0;f<NF;f++){
+      var cx=rnd(W*0.1,W*0.9), cy=rnd(H*0.12,H*0.88);
+      var count=4+((Math.random()*4)|0);
+      var pts=[];
+      var ang=rnd(0,6.283), span=rnd(50,150);
+      var jx=0,jy=0;
+      for(var k=0;k<count;k++){
+        var t=k/(count-1);
+        ang+=rnd(-0.85,0.85);
+        jx+=Math.cos(ang)*span*(0.55+Math.random()*0.85);
+        jy+=Math.sin(ang)*span*(0.55+Math.random()*0.85);
+        pts.push({x:cx+jx+rnd(-14,14),y:cy+jy+rnd(-14,14)});
+      }
+      /* attach the nearest real stars so the lines never float */
+      var nodes=pts.map(function(p){return nearest(p.x,p.y)});
+      figs.push({
+        pts:pts, nodes:nodes,
+        name:pick(NAMES),
+        tale:pick(TALES),
+        mag:(1.2+Math.random()*3.4).toFixed(1),
+        hl:0, ra:(Math.random()*24).toFixed(2), dec:((-Math.random()*80)|0)
+      });
+    }
+    dust=[];
+    for(var d=0;d<70;d++)dust.push({x:Math.random()*W,y:Math.random()*H,r:rnd(20,120),a:rnd(.012,.05)});
+    document.getElementById('cnt').textContent=figs.length;
+  }
+  function nearest(x,y){
+    var best=null,bd=1e9;
+    for(var i=0;i<stars.length;i++){
+      var dx=stars[i].x-x,dy=stars[i].y-y,d=dx*dx+dy*dy;
+      if(d<bd){bd=d;best=stars[i];}
+    }
+    return best;
+  }
+
+  function resize(){
+    W=innerWidth;H=innerHeight;
+    cv.width=W*DPR;cv.height=H*DPR;cv.style.width=W+'px';cv.style.height=H+'px';
+    c.setTransform(DPR,0,0,DPR,0,0);
+    build();
+  }
+
+  function draw(t){
+    /* ground */
+    var g=c.createLinearGradient(0,0,W,H);
+    g.addColorStop(0,'#070c1c');g.addColorStop(.5,'#0a1024');g.addColorStop(1,'#131c3a');
+    c.fillStyle=g;c.fillRect(0,0,W,H);
+
+    /* nebula dust */
+    for(var d=0;d<dust.length;d++){
+      var du=dust[d];
+      var rg=c.createRadialGradient(du.x,du.y,0,du.x,du.y,du.r);
+      rg.addColorStop(0,'rgba(120,150,255,'+du.a+')');
+      rg.addColorStop(1,'rgba(120,150,255,0)');
+      c.fillStyle=rg;c.beginPath();c.arc(du.x,du.y,du.r,0,6.283);c.fill();
+    }
+
+    /* parallax shift */
+    px+=(mx-px)*0.05; py+=(my-py)*0.05;
+    var ox=(px-0.5)*-16, oy=(py-0.5)*-10;
+
+    /* coordinate grid */
+    if(showGrid){
+      c.strokeStyle='rgba(217,178,106,.09)';c.lineWidth=1;
+      var step=Math.max(70,W/12);
+      for(var gx=step;gx<W;gx+=step){c.beginPath();c.moveTo(gx+ox*.4,0);c.lineTo(gx+ox*.4,H);c.stroke();}
+      for(var gy=step;gy<H;gy+=step){c.beginPath();c.moveTo(0,gy+oy*.4);c.lineTo(W,gy+oy*.4);c.stroke();}
+      /* ecliptic */
+      c.strokeStyle='rgba(217,178,106,.2)';c.setLineDash([2,7]);
+      c.beginPath();c.moveTo(0,H*0.62+oy*.4);c.lineTo(W,H*0.42+oy*.4);c.stroke();
+      c.setLineDash([]);
+    }
+
+    /* stars */
+    for(var i=0;i<stars.length;i++){
+      var s=stars[i];
+      var tw=0.72+0.28*Math.sin(t*0.001*s.ts+s.tw);
+      var x=s.x+ox, y=s.y+oy;
+      c.globalAlpha=Math.min(1,s.a*tw);
+      c.fillStyle=s.warm?'#ffe6bd':'#dfe9ff';
+      c.beginPath();c.arc(x,y,s.r,0,6.283);c.fill();
+      if(s.r>1.5){
+        c.globalAlpha=Math.min(1,s.a*tw*0.5);
+        c.strokeStyle=s.warm?'rgba(255,230,189,.5)':'rgba(223,233,255,.5)';
+        c.lineWidth=0.7;
+        var L=s.r*4.5;
+        c.beginPath();c.moveTo(x-L,y);c.lineTo(x+L,y);c.moveTo(x,y-L);c.lineTo(x,y+L);c.stroke();
+      }
+    }
+    c.globalAlpha=1;
+
+    /* constellations */
+    for(var f=0;f<figs.length;f++){
+      var fig=figs[f];
+      fig.hl+=((fig.hover?1:0)-fig.hl)*0.12;
+      var hl=fig.hl;
+      c.lineJoin='round';
+      /* hand-engraved double line: offset faint wide + tight bright */
+      for(var pass=0;pass<2;pass++){
+        c.beginPath();
+        for(var k2=0;k2<fig.nodes.length;k2++){
+          var nx=fig.nodes[k2].x+ox, ny=fig.nodes[k2].y+oy;
+          if(k2===0)c.moveTo(nx,ny);else c.lineTo(nx,ny);
+        }
+        c.lineWidth=pass===0?5.5:1.1;
+        c.strokeStyle=pass===0?'rgba(217,178,106,'+(0.05+hl*0.10).toFixed(3)+')'
+                               :'rgba(240,230,210,'+(0.30+hl*0.65).toFixed(3)+')';
+        c.stroke();
+      }
+      /* star nodes emphasised */
+      for(var k3=0;k3<fig.nodes.length;k3++){
+        var nd=fig.nodes[k3];
+        var gx2=nd.x+ox, gy2=nd.y+oy;
+        c.fillStyle='rgba(255,246,225,'+(0.75+hl*0.25).toFixed(3)+')';
+        c.beginPath();c.arc(gx2,gy2,1.6+hl*1.5,0,6.283);c.fill();
+      }
+      if(showLabels||hl>0.05){
+        var lx=fig.pts[0].x+ox, ly=fig.pts[0].y+oy-18;
+        c.globalAlpha=showLabels?(0.5+hl*0.5):hl;
+        c.strokeStyle='rgba(217,178,106,'+(0.25+hl*0.5)+')';
+        c.lineWidth=0.8;
+        c.beginPath();c.moveTo(lx,ly+6);c.lineTo(lx,ly+14);c.stroke();
+        c.fillStyle=hl>0.5?'#ffe9bd':'rgba(240,230,210,.85)';
+        c.font='italic '+(11+hl*3)+'px "Iowan Old Style",Palatino,Georgia,serif';
+        c.textAlign='left';
+        c.fillText(fig.name,lx+5,ly+4);
+        c.globalAlpha=1;
+      }
+    }
+
+    requestAnimationFrame(draw);
+  }
+
+  function hit(x,y){
+    for(var i=figs.length-1;i>=0;i--){
+      var f=figs[i];
+      for(var k=0;k<f.pts.length;k++){
+        var dx=x-(f.pts[k].x+(px-0.5)*-16), dy=y-(f.pts[k].y+(py-0.5)*-10);
+        if(dx*dx+dy*dy<420)return f;
+      }
+    }
+    return null;
+  }
+  cv.addEventListener('pointermove',function(e){
+    mx=e.clientX/innerWidth;my=e.clientY/innerHeight;
+    var f=hit(e.clientX,e.clientY);
+    figs.forEach(function(x){x.hover=(x===f)});
+    var card=document.getElementById('card');
+    if(f){
+      card.classList.add('on');
+      document.getElementById('cName').textContent='RA '+f.ra+'h · DEC '+f.dec+'°';
+      document.getElementById('cTitle').textContent=f.name;
+      document.getElementById('cBody').textContent=f.tale;
+      document.getElementById('cMag').textContent='mag '+f.mag;
+      document.getElementById('cStars').textContent=f.nodes.length+' stars';
+      cv.style.cursor='pointer';
+    }else{card.classList.remove('on');cv.style.cursor='crosshair';}
+  });
+  cv.addEventListener('pointerleave',function(){
+    figs.forEach(function(x){x.hover=false});
+    document.getElementById('card').classList.remove('on');
+  });
+  document.getElementById('reroll').addEventListener('click',function(){
+    var romans=['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
+    build();
+    document.getElementById('plate').textContent=romans[(Math.random()*romans.length)|0];
+    document.getElementById('lon').textContent=(Math.random()*360).toFixed(1);
+  });
+  document.getElementById('labels').addEventListener('click',function(){
+    showLabels=!showLabels;this.classList.toggle('on',showLabels);
+  });
+  document.getElementById('gridb').addEventListener('click',function(){
+    showGrid=!showGrid;this.classList.toggle('on',showGrid);
+  });
+  window.addEventListener('resize',function(){clearTimeout(window.__rt);window.__rt=setTimeout(resize,140)});
+  document.getElementById('cnt').textContent='0';
+  resize();
+  requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>

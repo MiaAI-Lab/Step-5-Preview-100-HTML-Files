@@ -1,0 +1,77 @@
+# SECTION — Meridian Tower, Levels 1–62
+
+## Short title
+Skyscraper Section
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: an architectural
+long-section drawing of a fictional skyscraper, called SECTION. No external
+dependencies whatsoever — no CDN, no web fonts, no external images, no external SVG
+files, no JavaScript libraries. All CSS and JavaScript inline, works offline by
+double-clicking, responsive, valid HTML5.
+
+Artistic direction: a printed drawing sheet. Warm paper #eae5db, ink brown-black
+#1e1c19, hairline rules at 18%, steel grey #7a7f88 and glass blue #8fa8bc as the
+material colours, and one drawing-red #b03a2a used for the sheet number, the
+headline word and the facts figures. The drawing panel itself is a lighter paper
+gradient (#f2eee5 → #e6e0d3) with a 2px ink title rule above the plan. Type is a
+high-contrast serif for the headline and figures, a system sans for paragraphs, and
+7.5–9.5px wide-tracked monospace for every drawing annotation.
+
+The section is built from twenty-three data rows, each describing a band of levels
+with its level number, its use and a width fraction — the mezzanine floorplate
+widths taper downward from the roof plant to the portico, exactly as a real
+stepped-tower section does. Each row renders as a band with a level number and its
+use in uppercase monospace, tinted by kind: core levels (plant, sky lobby, boiler
+room) get a dark grey wash, the street portico gets a red wash, and the lift machine
+room gets a steel wash. A left axis column carries a 2px ink rule with one tick and
+one level number per row, positioned by JavaScript from each row's measured offset
+and re-placed on resize.
+
+The interaction is the sheet being read: hovering a level band turns it to pure
+white, casts a 3px red inset on its left edge, and fills the band with a
+horizontal glass-blue gradient to that level's annotated width over 0.9 seconds —
+so the whole section can be "coloured in" level by level, and the widths reveal the
+building's setback.
+
+Layout: a nav with a monospace brand and two links. A centred hero with a red
+eyebrow, a serif headline with one italic steel word, and a paragraph. Then the
+drawing panel with its title rule and the two-column plan (axis + levels). Then a
+three-cell notes row built from 1px gaps with large red serif figures (302 m, 1:400,
+62 levels). Then a ruled monospace footer.
+
+Interaction: hover to fill and label a level band; nothing else is interactive. The
+tick positions recompute on resize. The notes row collapses to one column under
+820px and the plan's axis column narrows.
+
+## One-paragraph description of the intended design
+A printed architectural section: twenty-three level bands from the car park to the
+lift machine room with tapering floorplate widths, tinted by programme and labelled
+in uppercase monospace, beside a ruled left axis of level ticks — each band filling
+with a glass-blue gradient to its own annotated width when hovered, so the building
+can be read level by level.
+
+## Major visual techniques used
+- Twenty-three data rows rendered as bands with per-level width fractions, giving a
+  stepped tower silhouette
+- Programme-tinted bands: core, ground and roof kinds each gets its own wash
+- Left axis with a 2px ink rule and one tick per level, positioned from measured row
+  offsets in JavaScript and re-placed on resize
+- Hover fill: an absolutely positioned gradient bar animated to the level's width
+  over 0.9s on an ease-out curve
+- Pure-white hover band plus a 3px red inset edge
+- Drawing-sheet panel with a lighter paper gradient and a 2px ink title rule
+- Level band height increasing slightly down the sheet, as in a real section
+- Monospace annotation typography at 7.5–9.5px with uppercase tracking
+- Serif figures with one steel-grey italic word against the paper ground
+- Three-cell notes grid built from 1px gaps showing the hairline behind
+- Ruled footer with three monospace annotations
+- Responsive: notes to one column, axis column narrowed, under 820px
+- prefers-reduced-motion collapsing the fill transition
+
+## Intended interaction model
+A drawing to be read. Visitors hover each level band to fill it to its annotated
+width and reveal the tower's setbacks, then move on; there are no controls, no
+navigation inside the drawing, and nothing to submit. The sheet behaves like a
+printed plan that happens to respond to a cursor.

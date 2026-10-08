@@ -1,0 +1,48 @@
+## The exact prompt used to generate this HTML file
+
+Generate 100 completely self-contained HTML files. DO NOT LOOK AT ANY OTHER FOLDER.
+ONLY IN THE CURRENT FOLDER. DO THIS AS A NEW AND CLEAN TASK. IGNORE EVERYTHING ELSE
+NOT RELATED TO THE TASK. DO NOT USE A GENERATOR. NEED TO CREATE THESE HTMLS ONE BY ONE,
+OR ONE BY AGENT. The goal is 100 unique, polished, fully self-contained single-file HTML
+pages, each with its own concept, its own visual language, and its own interaction model.
+
+This is file 099 of 100.
+
+# The Pattern Garden
+
+## Short title
+The Pattern Garden
+
+## One-paragraph description of the intended design
+A dark editorial horticulture journal with one large canvas at its centre: seven plants,
+each simulated by the actual algorithm that produced its scientific model rather than by a
+drawing of it. Lindenmayer's string rewriting grows a fractal tree; Ohno's phyllotaxis
+places florets at the golden angle 137.5077 degrees with radius proportional to the square
+root of the index, drawing the parastichy spirals that the eye resolves; de Reffye's
+stochastic buds decide at every moment whether to wait, flower, sleep or branch, with
+age-dependent probabilities; Runions' space colonisation grows tips toward attraction
+points and kills them on contact; Weber and Penn's parameterised trunk draws a tree from
+taper, levels, apex angle and split ratio; Honda's symmetric binary tree and Palmer's
+annual-shingle oak and simple willow close the set. A slow season cycle walks forward and
+back through five colour states, and flowers, leaves and fruit follow it. The type is a
+warm serif on near-black with a single leaf-green accent; the notes section is a six-cell
+grid with roman numerals as the only ornament. Nothing is randomised without a seed, and
+the same seed always grows the same plant: it is a garden, not a gif.
+
+## Major visual techniques used
+- Canvas 2D with turtle graphics: push/pop stack, angle in degrees, segment length by order
+- L-system with a bounded string (240k characters) so the recursion cannot run away
+- Phyllotaxis: golden angle, sqrt-index spacing, Fibonacci parastichies drawn as polylines
+- Space colonisation: attraction points, nearest visible tip, kill distance, cached tree
+- Deterministic LCG seeded per draw so growth is reproducible from a seed number
+- Season gradient as five-stop linear interpolation in RGB between sky/ground pairs
+- DPR-aware canvas sizing from the parent's layout box, refit on resize
+- Roman numeral figures, a leaf-green monochrome, hairline rules, generous leading
+
+## Intended interaction model
+Seven plant buttons switch model and reset the cached colonisation tree; six season chips
+jump the cycle to spring, summer, autumn or bare and hold it; three sliders drive order
+(1-12), branch angle (0-89) and wind (0-100) live; Regrow reseeds the deterministic random
+source; Freeze holds time. Pointer movement over the bed leans on the wind and bends the
+growing branches. Keys 1-7 choose a plant, + and - change order, f freezes and r reseeds.
+A readout reports plant, iteration, segment count, leaf count and wind.

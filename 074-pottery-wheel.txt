@@ -1,0 +1,83 @@
+# THE WHEEL — a pot from one profile
+
+## Short title
+Pottery Atelier
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a potter's wheel where a vessel
+is stored as a profile of radii at even heights, drawn as a revolved silhouette, glazed and
+fired. No external dependencies whatsoever — no CDN, no web fonts, no external images, no
+JS libraries. All CSS and JavaScript inline, works offline by double-clicking, responsive,
+valid HTML5.
+
+Artistic direction: a warm studio. Ground #efe9e0, canvas a cream radial gradient,
+hairlines rgba(47,42,36,.2), ink #2f2a24 with muted #6a5f52, terracotta #b4552d as the
+accent and a leaf green #4a6b52. Serif headings with italic accent words, uppercase
+.2em–.4em kickers, monospace figures.
+
+The pot is a Float32Array of twenty-two radii at even heights — exactly what a turner reads
+off the wheel. The drawing is the revolution: the profile is walked down the right side and
+back up the left to make a silhouette, filled with a horizontal gradient that is light at
+the left edge, body colour at the centre and darkest at the right, which is the projection
+a pot actually makes. The mouth is an ellipse, the interior is the profile pulled inward by
+the wall thickness and filled with its own gradient, and two faint throwing rings sit on the
+wall where a potter's fingers were.
+
+Glazes: tenmoku, celadon, shino, copper red and clear. Each has a body colour, a shadow
+colour and an edge colour, and each is mixed toward its shadow by the firing level; the
+clear glaze shows the clay underneath instead. Firing slider moves the palette from cone
+06 to cone 10.
+
+Controls: five glaze swatches as aria-pressed buttons, firing, wall thickness, spin, Bowl,
+Bottle, Cylinder and Collapse — which sags every radius toward the middle and turns the
+vessel into a puddle. Dragging the profile itself moves a single radius, so a visitor can
+pull a neck out or push a belly in.
+
+Readout: profile points, height, maximum radius, and volume — computed by summing discs of
+the interior radius, so a thicker wall really does give a smaller volume.
+
+Layout: nav, centred hero, the wheel canvas, a dock of swatches, sliders and four shape
+buttons, a readout row, then two three-cell note rows on the profile, the revolution, the
+wall, glaze, firing and collapse, then a footer.
+
+Interaction: the wheel is already turning. Visitors switch shapes to see how one rotation
+gives three completely different vessels, drag the profile to pull a neck or a belly out by
+hand, change the glaze and the firing to see the same pot in five surfaces, set the wall
+thickness and watch the volume fall, and press Collapse to ruin it.
+
+## One-paragraph description of the intended design
+A potter's wheel where a vessel is twenty-two radii at even heights, revolved into a
+silhouette with a left-to-right gradient, a mouth ellipse, an interior pulled in by the wall
+thickness and a volume computed from discs of that interior — with five glazes (tenmoku,
+celadon, shino, copper red, clear) each mixed toward its shadow by a firing level, Bowl,
+Bottle, Cylinder and Collapse presets, a spin slider, and a draggable profile that changes
+one radius at a time.
+
+## Major visual techniques used
+- Profile as a typed array of radii at even heights, walked down one side and up the other
+  to build the silhouette, so the whole vessel is one data structure
+- Horizontal gradient across the body — light at the left, body colour at the centre,
+  darkest at the right — which is what a revolved surface really looks like
+- Mouth drawn as an ellipse with a dark interior, so the vessel has an inside
+- Interior as the same profile pulled inward by the wall thickness, which makes wall
+  thickness visible and also computes the volume
+- Volume by discs of the interior radius, so the number and the drawing agree
+- Glaze as three colours mixed by the firing level, with the clear glaze falling through
+  to the clay
+- Firing slider mapped to cone numbers (06 up to 10), so the readout is the real
+  vocabulary
+- Draggable profile points, with the dragged one drawn larger and in the accent colour
+- Spin as motion arcs whose length and alpha follow the spin slider, so the wheel reads
+  as turning even when nothing else moves
+- Collapse as a sag toward a common radius, which is literally what a wall does
+- Shadow as an ellipse scaled to the base radius, so the pot sits on the wheel
+- A parse that accepts both hex and rgb strings, so a mixed colour can be mixed again
+  without breaking
+
+## Intended interaction model
+A wheel to throw on. Visitors pick a shape to see how one rotation gives three different
+vessels, drag the profile to pull the form out by hand, choose a glaze and a firing to see
+the same pot in another surface, set the wall and watch the volume drop, and collapse it
+when they have gone too far. Every number in the panel is computed from the same profile
+the drawing uses.

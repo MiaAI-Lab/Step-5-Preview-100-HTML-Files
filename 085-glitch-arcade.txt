@@ -1,0 +1,80 @@
+# BYTE STORM — a cabinet that is fighting itself
+
+## Short title
+Glitch Arcade
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a playable arcade cabinet whose
+monitor is broken in three ways that are individually real faults — a tear, a chroma split
+and lost macroblocks — with a 4:3 tube in a 16:9 bezel and scanlines. No external
+dependencies whatsoever — no CDN, no web fonts, no external images, no JS libraries. All
+CSS and JavaScript inline, works offline by double-clicking, responsive, valid HTML5.
+
+Artistic direction: a cabinet in a dark room. Ground #0a0812, hairlines
+rgba(232,228,247,.14), body #e8e4f7 with muted #9d97b8, magenta #ff2e88 as the accent and
+a scanline cyan #2ee8ff for the game. Serif headings with italic accent words, uppercase
+.2em–.4em kickers, monospace figures.
+
+The game is drawn into an offscreen canvas: a parallax star field, a delta ship with an
+engine flame, bullets, rotating hexagonal foes and debris, plus a HUD with a padded score.
+It plays with the arrow keys and space, with hull, score and waves.
+
+The faults are applied to that picture, not to a copy. A tear is a seam travelling down
+the screen with two halves of two frames displaced either side, and the seam line itself
+drawn bright because the beam is uncapped there. A chroma split is the game drawn twice
+more with a screen blend at a horizontal offset in each direction, which is what a
+mistimed decoder does to every edge. Block noise is lost macroblocks — rectangles of the
+game redrawn a few pixels away, so the picture freezes in squares. Scanlines are one dark
+line every three rows, which is the beam blanking its gaps.
+
+The mask is a 4:3 tube inside a 16:9 bezel: two dark bars down the sides and a hairline
+rect, with the HUD drawn inside the mask. Past a block-noise threshold the vertical hold
+slips and the picture rolls off the top and comes back at the bottom.
+
+Controls: tear, chroma split, block noise, Insert coin and Fix the monitor. Readout: score,
+wave, hull, dropped frames, rolls, and the vertical-hold state.
+
+Layout: nav, centred hero, the cabinet canvas with its caption, a dock of three sliders and
+two buttons, a readout row, then two three-cell note rows on vertical roll, chroma, blocks,
+scanlines, tear and coin, then a footer.
+
+Interaction: insert a coin and fly; the faults stay whatever you set them to. Drag the tear
+up until the picture is two different frames at once, push the chroma until every edge has
+a coloured ghost, and raise the block noise until the hold slips and the whole thing rolls.
+Fix the monitor clears all three at once.
+
+## One-paragraph description of the intended design
+A playable vector shmup drawn into an offscreen canvas and then broken by real faults: a
+travelling tear that displaces two halves of two frames and draws the seam bright, a chroma
+split that re-composites the game twice at opposite horizontal offsets with a screen blend,
+lost macroblocks redrawn a few pixels off, scanlines every third row, and a 4:3 mask
+inside a 16:9 bezel — with tear, chroma and block sliders, a coin slot to start the game,
+and a vertical hold that slips into a full roll when the block noise gets high enough.
+
+## Major visual techniques used
+- The game rendered into an offscreen canvas first, so the faults are applied to a picture
+  rather than to drawing commands
+- Tear as a travelling seam with the two halves displaced in opposite directions, and the
+  seam line drawn as a bright uncapped beam
+- Chroma split as two extra drawImage passes at opposite horizontal offsets with a
+  screen blend, which is exactly what a mistimed subcarrier decoder produces
+- Block noise as rectangles of the game redrawn a few pixels away, so the picture freezes
+  in squares rather than being sprinkled with noise
+- Scanlines as one dark line every three rows — the beam blanking its own gaps
+- Vertical roll as a drawImage offset that runs the picture off the top and back in at
+  the bottom, triggered when the block noise crosses a threshold
+- 4:3 tube inside a 16:9 bezel, drawn as two dark side bars and a hairline rect with the
+  HUD clipped inside it
+- Score padded to six digits with padStart, because arcade score readouts are
+- Ship, bullets, foes and debris as plain vector shapes over a parallax star field
+- Hull damage, debris and wave progression from collisions, so the game underneath is real
+- Frame drops counted when the block noise is high, tying the readout to the fault
+- Fix the monitor clears all three faults and locks the hold in one write
+
+## Intended interaction model
+A broken cabinet. Visitors insert a coin and fly with the arrows and space while the
+faults run, then push each slider up until the picture is two frames at once, every edge
+has a ghost, and the vertical hold lets go — and press Fix the monitor to get the tube back.
+The game underneath never stops being playable, which is the point: the faults are a monitor
+problem, not a game problem.

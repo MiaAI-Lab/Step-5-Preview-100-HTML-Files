@@ -1,0 +1,81 @@
+# SS AURELIA — Southampton to Rio, 1931
+
+## Short title
+Art Deco Ocean Liner
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a booking page for a
+fictional 1931 Art Deco ocean liner, the SS AURELIA, on its maiden Southampton to
+Rio voyage. No external dependencies of any kind — no CDN, no web fonts, no external
+images, no external SVG files, no JavaScript libraries. All CSS and JavaScript
+inline, works offline by double-clicking, responsive, valid HTML5.
+
+Artistic direction: 1930s travel poster. Deep ocean teal (#062a3a) to near-black,
+cream type, and gold everywhere — gold hairline rules, gold hatched cell overlays,
+gold corner brackets. Behind everything a layered sky: a coral glow top-right, a
+teal glow bottom-left, a deep diagonal wash, and a huge slowly-rotating fan of thin
+gold rays built from a repeating-conic-gradient, radially masked so it only shows
+near its origin, blended into the background in screen mode. A low-opacity SVG
+turbulence grain sits on top in overlay blend so everything reads as printed ink on
+paper.
+
+Layout, top to bottom: a centred hairline "Cunard Aurelia Line" mark flanked by
+gold diamonds; a hero with a hand-drawn Art Deco sunburst fan (inline SVG paths, no
+external file), a small uppercase eyebrow, and the ship's name in enormous
+geometric sans caps (Futura / Century Gothic stack) with a much smaller, very
+widely-tracked route line beneath it; a hairline gold rule; a three-cell
+accommodation grid built from 1px gaps over a gold background so the gaps read as
+rules, each cell carrying a 135° gold hatch overlay, a category number, an
+uppercase room name, a paragraph of period prose, and a ruled price row; a
+two-column itinerary section with a real table of the passage (dates, ports,
+cumulative miles, hover-highlighting to coral) beside a numbered list of what is on
+board; a bordered "Book a berth" panel with two gold corner brackets and a gold
+gradient button; and a three-part monospace footer with the ship's tonnage and
+official number.
+
+Typography: a geometric sans (Futura → Century Gothic → Avenir → system) used at
+400 weight with heavy uppercase tracking for all display type — the exact opposite
+of the other pages in this set — and a 9–10px wide-tracked monospace for every
+label, port, price and catalog number. Line-heights are wide (1.86–2.4) so the
+page feels unhurried and expensive.
+
+Colour palette: ocean teal #062a3a, deep navy-ink #04161f, cream #f4ead6, gold
+#c8a04a and light gold #e6cd8b, with a single coral #d96a4f as the accent for
+hover states and the price.
+
+Interaction: essentially none, and deliberately so. Hovering a passage row turns
+the date coral and the text full cream; hovering the gold button lifts it and
+intensifies its shadow; clicking it converts the label to a confirmation. The
+background rays turn continuously at 24 seconds per revolution. The grid collapses
+to one column under 900px.
+
+## One-paragraph description of the intended design
+A 1931 ocean-liner poster turned into a booking page: a deep teal night sky with a
+slowly turning gold sunburst fan, enormous geometric caps set at wide tracking,
+gold hairline rules and hatched panel overlays, a passage itinerary that blooms
+coral on hover, and a gold-leaf button that closes the sale.
+
+## Major visual techniques used
+- Layered atmospheric background: two offset radial glows plus a deep diagonal
+  linear wash
+- Slowly rotating Art Deco sunburst from a repeating-conic-gradient masked to a
+  radial falloff and blended in screen mode
+- Inline SVG decorative sunburst fan (paths + two concentric circles) drawn
+  directly in the markup, no external file
+- Gold "rules" manufactured from 1px grid gaps over a gold-coloured grid background
+- 135° gold hatch overlay on each cell at 9% opacity via a repeating-linear-gradient
+- Corner brackets from zero-sided borders on absolutely positioned pseudo-elements
+- Extreme uppercase tracking (.2em–.5em) on a geometric sans for that 1930s
+  poster spacing
+- Printed-ink grain from an inline SVG feTurbulence data-URI in overlay blend
+- Table row hover state that recolours only the date cell
+- Gold gradient CTA button with lift + shadow intensification on hover
+- 3 → 1 column collapse; rotating rays disabled under prefers-reduced-motion
+
+## Intended interaction model
+A poster with a single transaction at the end. Visitors read the page as an
+advertisement — name, route, prices, itinerary, the promise of the ship — and the
+only real action is the gold "Reserve a cabin" button, which confirms in place.
+Hovering the itinerary rows is the only other feedback the page gives, and it is
+purely decorative.

@@ -1,0 +1,85 @@
+# STAR NAMES — a sky you can carry north
+
+## Short title
+Star Names
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a real star chart of the
+ecliptic in true coordinates, where the twelve months place the Sun in the zodiac, where
+a star's parallax circle is drawn in the right size, and where the equinox drift is shown
+as it really happens. No external dependencies whatsoever — no CDN, no web fonts, no
+external images, no JS libraries. All CSS and JavaScript inline, works offline by
+double-clicking, responsive, valid HTML5.
+
+Artistic direction: a cold, deep night sky. Ground #070a12, hairlines rgba(230,236,247,.13),
+body #e6ecf7 with muted #93a3bd, starlight blue #9fc4ff as the accent and sun yellow #ffd68c
+for the Sun. Serif headings with italic accent words, uppercase .2em–.4em kickers,
+monospace figures.
+
+Fifty-six real stars across thirteen ecliptic and zodiac constellations, each with its
+name, abbreviation, right ascension, declination, apparent magnitude and distance in
+parsecs: Aldebaran, Pollux, Regulus, Spica, Antares, Rasalhague, Kaus Australis, Deneb
+Algedi, Sadalsuud and the rest.
+
+The chart is an orthographic projection of the celestial sphere centred on a chosen right
+ascension and declination, so the horizon is the limb of the visible hemisphere and stars
+below it are simply not drawn. Declination follows the latitude slider, which is why the
+whole sky pivots. The ecliptic is a great circle computed from the obliquity of 23.439°,
+and the zodiac band is ±8° of ecliptic latitude around it.
+
+Ecliptic and equatorial coordinates are both computed exactly. Parallax is 1/d arcseconds,
+so Alpha Centauri's 1.3 parsecs give 0.75″ and Antares's 169 parsecs give 0.006″. Precession
+moves a star's ecliptic longitude by 50.29 arcseconds a year, so over a full cycle of 26,000
+years the year counter runs the equinox right round the zodiac.
+
+Controls: twelve months, five drawing toggles (figures, ecliptic, zodiac, parallax,
+precession), latitude, sidereal time, faint limit, Tonight, Show precession. Drag to pan,
+scroll to zoom. Readout: month, stars drawn, nearest star, second-nearest parallax,
+constellations, and a caption line giving latitude, right ascension, declination and the
+active exaggeration.
+
+Layout: nav, centred hero, the sky canvas with its caption beside a control column, then
+two three-cell note rows on the ecliptic, parallax, precession, Bayer and Flamsteed,
+magnitude and latitude, then a footer.
+
+Interaction: the chart opens on the evening sky for January. Visitors pull the latitude to
+their own and watch the whole hemisphere pivot and the constellations below the horizon
+disappear; step the months round and watch the Sun travel through the zodiac one sign at a
+time; turn on parallax and see a ring round every star sized by 1/d; press Show precession
+and watch the drag arrows grow as the year counter climbs toward 26,000; drag to pan the
+sky and scroll to zoom in on a figure.
+
+## One-paragraph description of the intended design
+A real star chart of the ecliptic on canvas, drawn by orthographic projection of the
+celestial sphere so the horizon is the limb of the visible hemisphere and declination
+follows the latitude slider — where fifty-six named stars in thirteen constellations carry
+their true right ascension, declination, magnitude and distance in parsecs, the ecliptic is
+a great circle at the obliquity of 23.439°, the zodiac band is ±8° of ecliptic latitude,
+parallax rings are 1/d arcseconds, and precession moves the stars 50.29 arcseconds of
+longitude a year, with drag to pan, scroll to zoom, and a Tonight button that centres the
+actual sky on the visitor's actual date.
+
+## Major visual techniques used
+- Orthographic projection of the celestial sphere centred on a chosen right ascension and
+  declination, so the horizon is the limb and hidden stars are not drawn
+- The ecliptic as a true great circle at the obliquity of 23.439°, and the zodiac band as
+  ±8° of ecliptic latitude
+- Exact transforms between equatorial and ecliptic coordinates
+- Parallax as 1/d arcseconds, drawn as rings exaggerated ×10⁵ so they are visible
+- Precession as 50.29 arcseconds of longitude a year, running a full 26,000-year cycle
+- Star radius from magnitude, so five magnitudes is half the disc, the way the eye works
+- Star colour banded by magnitude, warm for the brightest and cool for the faintest
+- Constellation stick figures as ordered lists of star names, clipped at the horizon
+- The Sun placed in its zodiac sign for the month, with a radial glow and a label
+- A dashed equinox meridian and a dashed celestial equator
+- A caption line in the corner giving the latitude, right ascension, declination and any
+  active exaggeration
+
+## Intended interaction model
+A sky to carry north. Visitors set their own latitude and watch the hemisphere pivot and
+the constellations south of the horizon vanish; step the months round and watch the Sun
+walk through the zodiac a sign at a time; switch on parallax and read a ring's size as a
+distance; press Show precession and watch the drag arrows lengthen as the year counter
+climbs toward 26,000; drag to pan and scroll to zoom into a single figure; and press
+Tonight to see the sky as it actually is tonight.

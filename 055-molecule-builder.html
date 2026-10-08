@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>
+LAB BENCH — Molecule Builder
+</title>
+<style>
+  :root{
+    --bg:#0d1216;
+    --panel:#141b21;
+    --line:rgba(200,230,220,.13);
+    --ink:#e4f2ec;
+    --dim:rgba(228,242,236,.55);
+    --mint:#5cf2c0;
+    --violet:#a98cff;
+    --amber:#ffc46b;
+    --red:#ff6b7f;
+    --blue:#6bc8ff;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --serif:"Iowan Old Style",Palatino,Georgia,serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  ::selection{background:var(--mint);color:#05130e}
+
+  .wrap{max-width:1120px;margin:0 auto;padding:0 clamp(16px,4vw,44px)}
+  nav{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:24px 0 0}
+  .brand{font-family:var(--serif);font-size:19px;letter-spacing:.3em;text-transform:uppercase}
+  nav ul{display:flex;gap:clamp(12px,2.2vw,28px);list-style:none;margin:0;padding:0}
+  nav a{color:var(--dim);text-decoration:none;font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;transition:color .2s}
+  nav a:hover{color:var(--ink)}
+
+  .hero{text-align:center;padding:clamp(26px,6vw,64px) 0 clamp(14px,3vw,24px)}
+  .hero .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.3em;text-transform:uppercase;color:var(--mint);display:block;margin-bottom:22px}
+  .hero h1{font-family:var(--serif);font-weight:400;font-size:clamp(30px,6.4vw,78px);line-height:.96;letter-spacing:-.03em;margin:0 0 20px}
+  .hero h1 i{font-style:italic;color:var(--mint)}
+  .hero p{font-size:14px;line-height:1.8;color:var(--dim);max-width:48ch;margin:0 auto}
+
+  /* ---------- the bench ---------- */
+  .bench{
+    margin:clamp(20px,4vw,42px) 0;
+    border:1px solid var(--line);background:var(--panel);
+    display:grid;grid-template-columns:260px 1fr;
+    gap:0
+  }
+  .shelf{
+    border-right:1px solid var(--line);
+    padding:clamp(16px,3vw,28px);
+    display:grid;gap:22px;align-content:start
+  }
+  .shelf h3,.readout h3{
+    font-family:var(--mono);font-size:9px;letter-spacing:.24em;text-transform:uppercase;
+    color:var(--dim);margin:0 0 12px;font-weight:400
+  }
+  .atoms{display:grid;gap:8px}
+  .at{
+    display:flex;align-items:center;gap:12px;padding:9px 12px;
+    border:1px solid var(--line);background:rgba(255,255,255,.02);
+    cursor:pointer;transition:border-color .18s,background .18s
+  }
+  .at:hover{border-color:rgba(92,242,192,.45);background:rgba(92,242,192,.06)}
+  .at.on{border-color:var(--mint);background:rgba(92,242,192,.12)}
+  .at i{
+    width:22px;height:22px;border-radius:50%;flex:none;display:grid;place-items:center;
+    font-family:var(--serif);font-size:11px;font-style:normal;color:#04120b;
+    background:radial-gradient(circle at 34% 28%,#ffffff 0%,currentColor 55%,rgba(0,0,0,.35) 130%);
+    box-shadow:0 0 14px currentColor
+  }
+  .at b{font-family:var(--mono);font-size:10px;letter-spacing:.16em;font-weight:400;text-transform:uppercase}
+  .at span{font-family:var(--mono);font-size:8.5px;color:var(--dim);margin-left:auto;letter-spacing,.1em}
+  .modes{display:grid;gap:8px}
+  .modes button{
+    font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;
+    padding:10px 12px;text-align:left;background:transparent;color:var(--dim);
+    border:1px solid var(--line);cursor:pointer;transition:all .18s
+  }
+  .modes button:hover{color:var(--ink);border-color:rgba(228,242,236,.3)}
+  .modes button.on{color:var(--mint);border-color:var(--mint);background:rgba(92,242,192,.08)}
+
+  .stage{position:relative;min-height:420px;display:grid;grid-template-rows:1fr auto}
+  .canvas-holder{position:relative;overflow:hidden}
+  .canvas-holder canvas{display:block;width:100%;height:auto;touch-action:none}
+  .labmat{
+    position:absolute;inset:0;pointer-events:none;opacity:.5;
+    background-image:
+      linear-gradient(rgba(200,230,220,.045) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(200,230,220,.045) 1px,transparent 1px);
+    background-size:100% 34px,34px 100%;
+    mask-image:radial-gradient(80% 80% at 50% 45%,#000,transparent 75%);
+    -webkit-mask-image:radial-gradient(80% 80% at 50% 45%,#000,transparent 75%)
+  }
+  .readout{border-top:1px solid var(--line);padding:16px 20px;display:flex;gap:22px;flex-wrap:wrap;
+    font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+  .readout b{color:var(--ink);font-weight:400}
+  .readout .err{color:var(--red)}
+
+  .tools{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:clamp(16px,3vw,30px) 0}
+  .tools button{
+    font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;
+    background:var(--mint);color:#04120b;border:0;padding:12px 20px;cursor:pointer;transition:opacity .2s
+  }
+  .tools button:hover{opacity:.84}
+  .tools button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+  .tools button.ghost:hover{border-color:var(--mint);color:var(--mint);opacity:1}
+
+  .recipes{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin:0 0 clamp(24px,5vw,48px)}
+  .recipes>div{background:var(--bg);padding:26px 24px;cursor:pointer;transition:background .2s}
+  .recipes>div:hover{background:rgba(92,242,192,.06)}
+  .recipes em{display:block;font-family:var(--serif);font-style:italic;font-size:19px;color:var(--mint);margin-bottom:12px}
+  .recipes p{margin:0;font-size:12.5px;line-height:1.8;color:var(--dim)}
+  .recipes code{font-family:var(--mono);font-size:10px;letter-spacing,.1em;color:var(--amber)}
+
+  .cols{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin:0 0 clamp(24px,5vw,48px)}
+  .cols>div{background:var(--bg);padding:28px 26px}
+  .cols b{display:block;font-family:var(--serif);font-weight:400;font-size:32px;color:var(--mint);line-height:1;margin-bottom:12px}
+  .cols h4{font-family:var(--mono);font-size:9px;letter-spacing:.24em;text-transform:uppercase;margin:0 0 12px}
+  .cols p{margin:0;font-size:12.5px;line-height:1.85;color:var(--dim)}
+
+  footer{border-top:1px solid var(--line);padding:26px 0 48px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
+
+  @media (max-width:820px){.bench{grid-template-columns:1fr}.recipes,.cols{grid-template-columns:1fr}.shelf{border-right:0;border-bottom:1px solid var(--line)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="brand">Lab Bench</div>
+    <ul>
+      <li><a href="#bench">The bench</a></li>
+      <li><a href="#recipes">Recipes</a></li>
+      <li><a href="#notes">Notes</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <span class="k">Valence rules on · rotational freedom on</span>
+    <h1>Snap two atoms.<br>Build a <i>bond.</i></h1>
+    <p>Choose an element, place it on the bench, drag from one atom to another to
+    connect them, and watch the valence check decide whether chemistry will allow it.</p>
+  </header>
+
+  <section id="bench">
+    <div class="bench">
+      <aside class="shelf">
+        <div>
+          <h3>Elements</h3>
+          <div class="atoms" id="atoms"></div>
+        </div>
+        <div>
+          <h3>Bond order</h3>
+          <div class="modes" id="bonds">
+            <button data-order="1" class="on">Single</button>
+            <button data-order="2">Double</button>
+            <button data-order="3">Triple</button>
+          </div>
+        </div>
+        <div>
+          <h3>View</h3>
+          <div class="modes" id="views">
+            <button data-view="wire" class="on">Wire</button>
+            <button data-view="ball">Ball &amp; stick</button>
+            <button data-view="space">Space fill</button>
+          </div>
+        </div>
+      </aside>
+
+      <div class="stage">
+        <div class="canvas-holder">
+          <div class="labmat"></div>
+          <canvas id="cv" width="640" height="420" aria-label="Molecule bench"></canvas>
+        </div>
+        <div class="readout">
+          <span>Atoms <b id="rA">0</b></span>
+          <span>Bonds <b id="rB">0</b></span>
+          <span>Formula <b id="rF">—</b></span>
+          <span id="rE">Valence ok</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tools">
+      <button id="clear">Empty the bench</button>
+      <button id="demo" class="ghost">Build ethanol</button>
+      <button id="spin" class="ghost">Free rotation</button>
+    </div>
+  </section>
+
+  <section class="recipes" id="recipes">
+    <div><em>Water</em><p>Place one oxygen, two hydrogens, drag a single bond from the oxygen to each hydrogen. <code>H₂O</code> — bent, 104.5°.</p></div>
+    <div><em>Ammonia</em><p>One nitrogen, three hydrogens, three single bonds. <code>NH₃</code> — a trigonal pyramid.</p></div>
+    <div><em>&Delta;-9 tetrahydrocannabinol</em><p>Twenty-one carbons, thirty hydrogens, two oxygens. The bench will not check this one, but it will let you try. <code>C₂₁H₃₀O₂</code></p></div>
+  </section>
+
+  <section class="cols" id="notes">
+    <div><b>4</b><h4>bonds, carbon</h4><p>Which is why carbon makes almost everything and why the two remaining single bonds on a methyl group are what a reaction reaches for first.</p></div>
+    <div><b>2</b><h4>atoms, same element, two bonds</h4><p>A double line is not two single lines. It is shorter, stronger, and it refuses to rotate, which is the whole basis of handedness in living things.</p></div>
+    <div><b>0</b><h4>clicks to break a bond</h4><p>Click the bond itself. The atoms stay where they are and the valence is restored, quietly, the way an eraser works.</p></div>
+  </section>
+
+  <footer>
+    <span>Not a real integrator · real valence rules</span>
+    <span>Everything on this page is drawn by hand</span>
+    <span>Drag atoms · drag to bond</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  /* ---------- element table ---------- */
+  var ELEMENTS=[
+    {sym:'H',val:1,r:13,c:'#cfd8dc'},
+    {sym:'C',val:4,r:19,c:'#2b2b30'},
+    {sym:'N',val:3,r:18,c:'#3f6bd8'},
+    {sym:'O',val:2,r:17,c:'#d6362f'},
+    {sym:'S',val:2,r:22,c:'#d8a83a'},
+    {sym:'P',val:3,r:21,c:'#a05ad8'},
+    {sym:'Cl',val:1,r:20,c:'#3fbf6a'},
+    {sym:'Na',val:1,r:26,c:'#b06fd8'}
+  ];
+
+  var cv=document.getElementById('cv');
+  var ctx=cv.getContext('2d');
+  var W=640,H=420;
+  var atoms=[],bonds=[],id=1;
+  var pick='C',order=1,view='wire';
+  var spin=0,spinOn=false;
+  var drag=null,linkFrom=null,hoverAtom=null,hoverBond=null;
+
+  var atomsEl=document.getElementById('atoms');
+  ELEMENTS.forEach(function(e){
+    var b=document.createElement('div');
+    b.className='at'+(e.sym===pick?' on':'');
+    b.dataset.sym=e.sym;
+    b.innerHTML='<i style="color:'+e.c+'">'+e.sym+'</i><b>'+e.sym+'</b><span>'+(e.val>1?e.val:'')+'</span>';
+    b.addEventListener('click',function(){
+      pick=e.sym;
+      [].forEach.call(atomsEl.children,function(x){x.classList.toggle('on',x.dataset.sym===pick)});
+    });
+    atomsEl.appendChild(b);
+  });
+  var bondsEl=document.getElementById('bonds');
+  [].forEach.call(bondsEl.children,function(b){
+    b.addEventListener('click',function(){
+      order=parseInt(b.dataset.order,10);
+      [].forEach.call(bondsEl.children,function(x){x.classList.toggle('on',x===b)});
+    });
+  });
+  var viewsEl=document.getElementById('views');
+  [].forEach.call(viewsEl.children,function(b){
+    b.addEventListener('click',function(){
+      view=b.dataset.view;
+      [].forEach.call(viewsEl.children,function(x){x.classList.toggle('on',x===b)});
+    });
+  });
+
+  function defOf(sym){
+    for(var i=0;i<ELEMENTS.length;i++)if(ELEMENTS[i].sym===sym)return ELEMENTS[i];
+    return ELEMENTS[0];
+  }
+  function usedBonds(a){
+    var n=0;
+    for(var i=0;i<bonds.length;i++){
+      if(bonds[i].a===a.id)n+=bonds[i].order;
+      else if(bonds[i].b===a.id)n+=bonds[i].order;
+    }
+    return n;
+  }
+  function findAtom(x,y){
+    for(var i=0;i<atoms.length;i++){
+      var a=atoms[i],dx=x-a.x,dy=y-a.y;
+      var rad=defOf(a.sym).r+8;
+      if(dx*dx+dy*dy<=rad*rad)return a;
+    }
+    return null;
+  }
+  function findBond(x,y){
+    for(var i=0;i<bonds.length;i++){
+      var b=bonds[i],a1=getAtom(b.a),a2=getAtom(b.b);
+      if(!a1||!a2)continue;
+      if(ptSeg(x,y,a1.x,a1.y,a2.x,a2.y,7))return b;
+    }
+    return null;
+  }
+  function getAtom(idi){
+    for(var i=0;i<atoms.length;i++)if(atoms[i].id===idi)return atoms[i];
+    return null;
+  }
+  function ptSeg(px,py,x1,y1,x2,y2,tol){
+    var dx=x2-x1,dy=y2-y1,L2=dx*dx+dy*dy;
+    if(L2===0)return (px-x1)*(px-x1)+(py-y1)*(py-y1)<=tol*tol;
+    var t=Math.max(0,Math.min(1,((px-x1)*dx+(py-y1)*dy)/L2));
+    var ex=x1+t*dx-px,ey=y1+t*dy-py;
+    return ex*ex+ey*ey<=tol*tol;
+  }
+  function pairExists(x,y){
+    for(var i=0;i<bonds.length;i++)
+      if((bonds[i].a===x&&bonds[i].b===y)||(bonds[i].a===y&&bonds[i].b===x))return bonds[i];
+    return null;
+  }
+  function addAtom(x,y,sym){
+    atoms.push({id:id++,x:x,y:y,sym:sym,ph:Math.random()*Math.PI*2});
+  }
+  /* returns a message if the bond is chemically illegal, or null if fine */
+  function addBond(ai,bi,o){
+    var ex=pairExists(ai,bi);
+    if(ex){
+      ex.order=Math.min(3,ex.order+o);
+      return overValence(ai,bi);
+    }
+    bonds.push({a:ai,b:bi,order:o});
+    return overValence(ai,bi);
+  }
+  /* which atom, if any, is past its valence once the last bond is counted */
+  function overValence(ai,bi){
+    var a=getAtom(ai),b=getAtom(bi);
+    var v=null;
+    if(a&&usedBonds(a)>defOf(a.sym).val)v=a.sym;
+    if(b&&usedBonds(b)>defOf(b.sym).val)v=(v?v+' & ':'')+b.sym;
+    return v?('Over-valenced: '+v):null;
+  }
+  function toast(msg){
+    var e=document.getElementById('rE');
+    e.textContent=msg;
+    e.classList.add('err');
+    clearTimeout(e._t);
+    e._t=setTimeout(function(){
+      e.classList.remove('err');
+      e.textContent='Valence ok';
+    },1600);
+  }
+  function checkValence(){
+    var bad=null;
+    for(var i=0;i<atoms.length;i++){
+      var d=defOf(atoms[i].sym);
+      if(usedBonds(atoms[i])>d.val){bad=atoms[i].sym;}
+    }
+    return bad;
+  }
+
+  /* ---------- pointer handling ---------- */
+  function ptPos(ev){
+    var r=cv.getBoundingClientRect();
+    return {x:(ev.clientX-r.left)*(cv.width/r.width),y:(ev.clientY-r.top)*(cv.height/r.height)};
+  }
+  cv.addEventListener('pointerdown',function(ev){
+    var p=ptPos(ev);
+    var a=findAtom(p.x,p.y);
+    cv.setPointerCapture(ev.pointerId);
+    if(a){
+      drag={id:a.id,ox:p.x-a.x,oy:p.y-a.y,moved:false};
+      return;
+    }
+    var b=findBond(p.x,p.y);
+    if(b){
+      bonds.splice(bonds.indexOf(b),1);
+      updateReadout();
+      return;
+    }
+    addAtom(p.x,p.y,pick);
+    updateReadout();
+  });
+  cv.addEventListener('pointermove',function(ev){
+    var p=ptPos(ev);
+    hoverAtom=findAtom(p.x,p.y);
+    hoverBond=findBond(p.x,p.y);
+    cv.style.cursor=hoverAtom?(linkFrom?'crosshair':'grab'):(hoverBond?'not-allowed':'copy');
+    if(!drag)return;
+    var a=getAtom(drag.id);
+    if(!a)return;
+    a.x=p.x-drag.ox;a.y=p.y-drag.oy;
+    a.x=Math.max(12,Math.min(cv.width-12,a.x));
+    a.y=Math.max(12,Math.min(cv.height-12,a.y));
+    drag.moved=true;
+  });
+  function endDrag(ev){
+    if(!drag)return;
+    var a=getAtom(drag.id);
+    var p=ptPos(ev);
+    var target=null;
+    if(drag.moved){
+      target=findAtom(p.x,p.y);
+      if(target&&target.id!==a.id){
+        var warn=addBond(a.id,target.id,order);
+        if(warn)toast(warn);
+      }
+    }else{
+      /* a click with no movement: start a link from this atom */
+      if(linkFrom&&linkFrom!==a.id){
+        var warn=addBond(linkFrom,a.id,order);
+        linkFrom=null;
+        if(warn)toast(warn);
+      }else{
+        linkFrom=(linkFrom===a.id)?null:a.id;
+      }
+    }
+    drag=null;
+    updateReadout();
+  }
+  cv.addEventListener('pointerup',endDrag);
+  cv.addEventListener('pointercancel',function(){drag=null;linkFrom=null});
+
+  /* ---------- render ---------- */
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    /* bench shadow */
+    var g=ctx.createRadialGradient(W/2,H*0.62,20,W/2,H*0.62,W*0.7);
+    g.addColorStop(0,'rgba(92,242,192,.055)');
+    g.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+
+    var rot=spinOn?spin:0;
+    /* bonds first */
+    for(var i=0;i<bonds.length;i++){
+      var b=bonds[i],a1=getAtom(b.a),a2=getAtom(b.b);
+      if(!a1||!a2)continue;
+      drawBond(a1,a2,b.order);
+    }
+    /* link rope while dragging a new bond */
+    if(drag&&linkFrom){
+      var la=getAtom(linkFrom);
+      if(la){
+        ctx.save();
+        ctx.strokeStyle='rgba(92,242,192,.6)';
+        ctx.setLineDash([5,5]);ctx.lineWidth=2;
+        ctx.beginPath();ctx.moveTo(la.x,la.y);ctx.lineTo(getAtom(drag.id).x,getAtom(drag.id).y);ctx.stroke();
+        ctx.restore();
+      }
+    }
+    /* atoms */
+    for(var j=0;j<atoms.length;j++){
+      drawAtom(atoms[j],rot);
+    }
+    spin+=spinOn?0.006:0.0004;
+  }
+  function drawBond(a,b,ord){
+    var dx=b.x-a.x,dy=b.y-a.y;
+    var L=Math.sqrt(dx*dx+dy*dy)||1;
+    var ux=dx/L,uy=dy/L;
+    var ra=defOf(a.sym).r,rb=defOf(b.sym).r;
+    var sx=a.x+ux*ra,sy=a.y+uy*ra;
+    var ex=b.x-ux*rb,ey=b.y-uy*rb;
+    var gap=4,seg;
+    ctx.save();
+    ctx.strokeStyle=view==='wire'?'#9fb6ad':'rgba(230,245,238,.85)';
+    ctx.lineWidth=2;ctx.lineCap='round';
+    for(var k=0;k<ord;k++){
+      var off=(k-(ord-1)/2)*gap;
+      var px=-uy*off,py=ux*off;
+      seg=Math.max(1,L-ra-rb-gap);
+      ctx.beginPath();
+      ctx.moveTo(sx+px+ux*1,sy+py+uy*1);
+      ctx.lineTo(sx+px+ux*(seg),sy+py+uy*(seg));
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+  function drawAtom(a,rot){
+    var d=defOf(a.sym);
+    var r=d.r*(view==='space'?1.28:1);
+    var col=d.c;
+    var w=rot?Math.abs(Math.cos(rot*0.4+a.ph))*0.45+0.55:1; /* fake Z depth */
+    var shade=view==='wire'?1.0:w;
+    ctx.save();
+    if(linkFrom===a.id){
+      ctx.shadowColor='#5cf2c0';ctx.shadowBlur=18;
+    }
+    if(view==='wire'){
+      /* wire view: a dark ring in the element's colour, letter inside */
+      ctx.beginPath();ctx.arc(a.x,a.y,r,0,6.2832);
+      ctx.fillStyle='rgba(13,18,22,.92)';ctx.fill();
+      ctx.lineWidth=2;ctx.strokeStyle=hoverAtom===a?'#5cf2c0':col;ctx.stroke();
+      ctx.fillStyle='#e4f2ec';
+      ctx.font=(a.sym.length>1?'10 ':'12 ')+'500 '+'"Segoe UI",system-ui,sans-serif';
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(a.sym,a.x,a.y+0.5);
+    }else{
+      /* ball & stick / space fill: a shaded sphere */
+      var gg=ctx.createRadialGradient(a.x-r*0.36,a.y-r*0.4,r*0.1,a.x,a.y,r*1.12);
+      gg.addColorStop(0,shadeCol(col,'#ffffff',0.62*shade));
+      gg.addColorStop(0.45,shadeCol(col,'#ffffff',0.06*shade));
+      gg.addColorStop(1,shadeCol(col,'#000000',0.42));
+      ctx.beginPath();ctx.arc(a.x,a.y,r,0,6.2832);
+      ctx.fillStyle=gg;ctx.fill();
+      if(view==='ball'){
+        ctx.fillStyle='rgba(255,255,255,.9)';
+        ctx.font=(a.sym.length>1?'9 ':'11 ')+'bold ui-sans-serif,system-ui,sans-serif';
+        ctx.textAlign='center';ctx.textBaseline='middle';
+        ctx.fillText(a.sym,a.x,a.y+0.5);
+      }
+    }
+    ctx.restore();
+  }
+  function shadeCol(hex,toward,t){
+    var a=parseInt(hex.slice(1),16);
+    var b=parseInt(toward.slice(1),16);
+    var ar=a>>16,ag=(a>>8)&255,ab=a&255;
+    var br=b>>16,bg=(b>>8)&255,bb=b&255;
+    var r=Math.round(ar+(br-ar)*t),g=Math.round(ag+(bg-ag)*t),bl=Math.round(ab+(bb-ab)*t);
+    return 'rgb('+r+','+g+','+bl+')';
+  }
+  function updateReadout(){
+    document.getElementById('rA').textContent=atoms.length;
+    document.getElementById('rB').textContent=bonds.length;
+    var counts={},parts=[],i;
+    for(i=0;i<atoms.length;i++)counts[atoms[i].sym]=(counts[atoms[i].sym]||0)+1;
+    var order=['C','H','N','O','S','P','Cl','Na'];
+    for(i=0;i<order.length;i++){
+      if(counts[order[i]])parts.push(order[i]+(counts[order[i]]>1?counts[order[i]]:''));
+    }
+    document.getElementById('rF').textContent=parts.length?parts.join(''):'—';
+    var bad=checkValence();
+    var el=document.getElementById('rE');
+    if(bad){el.textContent='Over-valenced: '+bad;el.classList.add('err');}
+    else {el.textContent='Valence ok';el.classList.remove('err');}
+  }
+
+  document.getElementById('clear').addEventListener('click',function(){
+    atoms=[];bonds=[];linkFrom=null;updateReadout();
+  });
+  document.getElementById('demo').addEventListener('click',function(){
+    atoms=[];bonds=[];id=1;
+    /* ethanol: C-C-O-H + hydrogens, laid out left to right */
+    var pts=[
+      ['C',150,140],['C',250,150],['O',350,140],['H',430,180],
+      ['H',250,250],['H',250,60],['H',150,60],['H',150,240],['H',350,60]
+    ];
+    var map={};
+    pts.forEach(function(p,idx){
+      map[idx]=id;
+      addAtom(p[1],p[2],p[0]);
+    });
+    /* id is now one past the last atom placed, which is what map[] refers to */
+    [[0,1,1],[1,2,1],[2,3,1],[1,4,1],[1,5,1],[0,6,1],[0,7,1],[2,8,1]].forEach(function(t){
+      addBond(map[t[0]],map[t[1]],t[2]);
+    });
+    linkFrom=null;
+    updateReadout();
+  });
+  var spinBtn=document.getElementById('spin');
+  spinBtn.addEventListener('click',function(){
+    spinOn=!spinOn;
+    spinBtn.textContent=spinOn?'Stop rotation':'Free rotation';
+  });
+
+  /* seed the bench with water so it is never empty */
+  addAtom(280,190,'O');addAtom(180,150,'H');addAtom(370,240,'H');
+  addBond(atoms[0].id,atoms[1].id,1);
+  addBond(atoms[0].id,atoms[2].id,1);
+  updateReadout();
+
+  function loop(){draw();requestAnimationFrame(loop);}
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

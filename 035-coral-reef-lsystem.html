@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>REEF — A Garden That Builds Itself</title>
+<style>
+  :root{
+    --bg:#03151c;
+    --ink:#e2f4f2;
+    --dim:rgba(226,244,242,.52);
+    --line:rgba(226,244,242,.13);
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --serif:"Iowan Old Style",Palatino,Georgia,serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+  .sea{
+    position:fixed;inset:0;z-index:0;
+    background:
+      radial-gradient(60% 40% at 76% 16%,rgba(255,214,140,.20),transparent 66%),
+      radial-gradient(70% 50% at 20% 84%,rgba(20,120,130,.24),transparent 70%),
+      linear-gradient(180deg,#0a3a4c 0%,#062736 40%,#03151c 78%,#020e14 100%);
+  }
+  #cv{position:fixed;inset:0;z-index:1;display:block}
+
+  .ui{position:fixed;inset:0;z-index:3;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(18px,3.4vw,40px)}
+  .top{display:flex;justify-content:space-between;align-items:flex-start;gap:18px}
+  .k{font-family:var(--mono);font-size:9px;letter-spacing:.34em;text-transform:uppercase;color:#ffd98a}
+  h1{font-family:var(--serif);font-weight:400;font-style:italic;font-size:clamp(28px,5.2vw,62px);line-height:.98;letter-spacing:-.02em;margin:10px 0 0}
+  h1 b{font-style:normal;font-weight:400;color:#ffd98a}
+  .top p{margin:12px 0 0;font-size:12px;line-height:1.75;max-width:32ch;color:var(--dim)}
+  .mtr{text-align:right;font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);line-height:2.4}
+  .mtr b{display:block;font-size:15px;color:#ffd98a;font-weight:400;letter-spacing:.02em}
+
+  .bottom{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+  .tray{
+    pointer-events:auto;display:flex;gap:clamp(8px,1.3vw,16px);flex-wrap:wrap;align-items:center;
+    background:rgba(6,32,42,.62);border:1px solid var(--line);border-radius:16px;
+    padding:11px clamp(12px,1.8vw,20px);backdrop-filter:blur(14px)
+  }
+  .g{display:flex;align-items:center;gap:8px}
+  .kk{font-family:var(--mono);font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
+  .vv{font-family:var(--mono);font-size:9.5px;color:#ffd98a;min-width:26px;font-variant-numeric:tabular-nums}
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;width:64px;height:14px;background:transparent;cursor:pointer
+  }
+  input[type=range]::-webkit-slider-runnable-track{height:2px;background:var(--line);border-radius:2px}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;border-radius:50%;background:#ffd98a;margin-top:-5px;border:0;box-shadow:0 0 10px rgba(255,217,138,.7)}
+  input[type=range]::-moz-range-track{height:2px;background:var(--line);border-radius:2px}
+  input[type=range]::-moz-range-thumb{width:11px;height:11px;border:0;border-radius:50%;background:#ffd98a}
+  button{
+    pointer-events:auto;font-family:var(--mono);font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;
+    background:rgba(255,217,138,.12);border:1px solid rgba(255,217,138,.36);color:var(--ink);
+    padding:9px 13px;border-radius:999px;cursor:pointer;transition:background .2s,color .2s
+  }
+  button:hover{background:#ffd98a;color:#241a04}
+  button.on{background:#ffd98a;color:#241a04}
+  .hint{font-family:var(--mono);font-size:8.5px;letter-spacing:.22em;text-transform:uppercase;color:rgba(226,244,242,.4);pointer-events:none}
+
+  @media (max-width:760px){.top p,.mtr,.hint{display:none}.ui{padding:14px}}
+</style>
+</head>
+<body>
+<div class="sea"></div>
+<canvas id="cv"></canvas>
+
+<div class="ui">
+  <div class="top">
+    <div>
+      <div class="k">L-system · recursive growth</div>
+      <h1>A garden that<br><b>builds itself.</b></h1>
+      <p>Branch, angle, repeat. The reef is a sentence applied to itself: each
+      branch carries the whole rule again, three levels down.</p>
+    </div>
+    <div class="mtr">
+      Branches<b id="mB">0</b>
+      Depth<b id="mD">3</b>
+      Phase<b id="mP">0.00</b>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <div class="tray">
+      <div class="g"><span class="kk">Depth</span><input type="range" id="depth" min="1" max="6" value="3" aria-label="Recursion depth"><span class="vv" id="depthV">3</span></div>
+      <div class="g"><span class="kk">Angle</span><input type="range" id="ang" min="6" max="90" value="34" aria-label="Branch angle"><span class="vv" id="angV">34</span></div>
+      <div class="g"><span class="kk">Decay</span><input type="range" id="dec" min="40" max="90" value="72" aria-label="Length decay"><span class="vv" id="decV">72</span></div>
+      <button id="sway" class="on">Sway</button>
+      <button id="seed">Re-seed</button>
+    </div>
+    <div class="hint">Drag to steer the current</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var cv=document.getElementById('cv'),c=cv.getContext('2d');
+  var W,H,DPR=Math.min(devicePixelRatio||1,2);
+  var depth=3,ang=34,dec=72,sway=true;
+  var roots=[];
+  var current=0,currentT=0;
+  var t=0;
+
+  /* an L-system branch: recursively draw lines with a tapered width */
+  function branch(x,y,len,a,d,gen){
+    if(d<=0||len<2)return;
+    var angR=ang*Math.PI/180;
+    /* sway: the deeper the branch, the more it moves */
+    var swayAmt=sway?Math.sin(t*0.7+gen*1.3+x*0.01)*0.05*(d/depth+0.3):0;
+    var a1=a-angR+swayAmt, a2=a+angR-swayAmt;
+    var ex=x+Math.cos(a)*len, ey=y+Math.sin(a)*len;
+    /* taper the line via two strokes */
+    var w=Math.max(0.5,(d/depth)*4.2);
+    c.lineCap='round';
+    c.beginPath();c.moveTo(x,y);c.lineTo(ex,ey);
+    c.strokeStyle='rgba(232,140,120,'+(0.28+0.5*(d/depth)).toFixed(3)+')';
+    c.lineWidth=w;
+    c.stroke();
+    /* a lighter inner core for the tips */
+    if(d<=2){
+      c.strokeStyle='rgba(255,214,170,'+(0.5*(d/depth)+0.2).toFixed(3)+')';
+      c.lineWidth=w*0.45;
+      c.stroke();
+    }
+    nodeCount++;
+    var nl=len*(dec/100);
+    branch(ex,ey,nl,a1,d-1,gen+1);
+    branch(ex,ey,nl,a2,d-1,gen+1);
+    /* sometimes a third shoot straight on — decided once per branch so the
+       shape is stable frame to frame (hash of position) */
+    if(d>1&&((Math.sin(x*12.9898+y*78.233)*43758.5453)%1+1)%1<0.28){
+      branch(ex,ey,nl*0.8,a+swayAmt,d-1,gen+1);
+    }
+  }
+
+  var nodeCount=0;
+
+  function seedBuild(){
+    roots=[];
+    var n=5+((Math.random()*5)|0);
+    for(var i=0;i<n;i++){
+      roots.push({
+        x:(0.08+ (i/n)*0.84)*W + (Math.random()-.5)*30,
+        len:Math.min(W,H)*(0.10+Math.random()*0.07),
+        a:-Math.PI/2 + (Math.random()-.5)*0.4
+      });
+    }
+  }
+  function resize(){
+    W=innerWidth;H=innerHeight;
+    cv.width=W*DPR;cv.height=H*DPR;cv.style.width=W+'px';cv.style.height=H+'px';
+    c.setTransform(DPR,0,0,DPR,0,0);
+    seedBuild();
+  }
+
+  /* ambient motes */
+  var motes=[];
+  function moteBuild(){
+    motes=[];
+    for(var i=0;i<70;i++){
+      motes.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.8+.5,
+        sp:Math.random()*.3+.08,ph:Math.random()*6.283});
+    }
+  }
+
+  function draw(){
+    t+=0.016;
+    c.setTransform(DPR,0,0,DPR,0,0);
+    c.clearRect(0,0,W,H);
+    current+=(currentT-current)*0.03;
+
+    /* motes drifting with the current */
+    c.save();
+    c.globalCompositeOperation='lighter';
+    for(var i=0;i<motes.length;i++){
+      var m=motes[i];
+      m.ph+=0.014*m.sp;
+      m.x+=current*0.7+Math.sin(m.ph)*0.2;
+      if(m.x>W+6)m.x=-6;
+      c.fillStyle='rgba(255,224,180,'+(0.06+m.sp*0.4).toFixed(3)+')';
+      c.beginPath();c.arc(m.x,m.y+Math.cos(m.ph)*4,m.r,0,6.283);c.fill();
+    }
+    c.restore();
+
+    /* the reef */
+    nodeCount=0;
+    var floor=H*0.94;
+    /* seabed */
+    c.beginPath();
+    c.moveTo(0,H);
+    c.lineTo(0,floor);
+    for(var x=0;x<=W;x+=20)c.lineTo(x,floor+Math.sin(x*0.02)*8);
+    c.lineTo(W,H);c.closePath();
+    var bg2=c.createLinearGradient(0,floor-20,0,H);
+    bg2.addColorStop(0,'rgba(30,70,80,.55)');bg2.addColorStop(1,'rgba(6,26,34,.9)');
+    c.fillStyle=bg2;c.fill();
+
+    for(var r=0;r<roots.length;r++){
+      var rt=roots[r];
+      branch(rt.x,floor,rt.len,rt.a,depth,0);
+    }
+
+    document.getElementById('mB').textContent=nodeCount.toLocaleString();
+    document.getElementById('mP').textContent=current.toFixed(2);
+    requestAnimationFrame(draw);
+  }
+
+  var dragging=false,lx=0;
+  cv.addEventListener('pointerdown',function(e){dragging=true;lx=e.clientX;cv.setPointerCapture(e.pointerId);});
+  cv.addEventListener('pointermove',function(e){
+    if(!dragging)return;
+    currentT+=(e.clientX-lx)*0.02;
+    currentT=Math.max(-1.4,Math.min(1.4,currentT));
+    lx=e.clientX;
+  });
+  ['pointerup','pointercancel'].forEach(function(t2){cv.addEventListener(t2,function(){dragging=false;})});
+
+  document.getElementById('depth').addEventListener('input',function(){
+    depth=+this.value;document.getElementById('depthV').textContent=depth;
+    document.getElementById('mD').textContent=depth;
+  });
+  document.getElementById('ang').addEventListener('input',function(){
+    ang=+this.value;document.getElementById('angV').textContent=ang;
+  });
+  document.getElementById('dec').addEventListener('input',function(){
+    dec=+this.value;document.getElementById('decV').textContent=dec;
+  });
+  var sb=document.getElementById('sway');
+  sb.addEventListener('click',function(){sway=!sway;this.classList.toggle('on',sway);});
+  document.getElementById('seed').addEventListener('click',function(){seedBuild();moteBuild();});
+
+  addEventListener('resize',function(){clearTimeout(window.__r);window.__r=setTimeout(function(){resize();moteBuild()},140)});
+  resize();moteBuild();
+  requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>

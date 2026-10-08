@@ -1,0 +1,83 @@
+# FIRST LIGHT — A Valley at 04:50
+
+## Short title
+Aurora Valley Dawn
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: an atmospheric valley
+scene at first light, called FIRST LIGHT. No external dependencies whatsoever — no
+CDN, no web fonts, no external images, no external SVG files, no JavaScript
+libraries. All CSS and JavaScript inline, works offline by double-clicking, responsive,
+valid HTML5.
+
+Artistic direction: the two minutes when the sun is just below the ridge. The CSS
+room behind the canvas is a five-stop vertical gradient from night navy #1a2350
+through blue-violet #2b3a68 and violet #57497a into rose #9a6a78 and warm
+#d99a72; its brightness and hue are recomputed every frame from the sun altitude so
+the entire page warms as the sun rises. On the canvas, a four-stop sky is drawn by
+interpolating between a night palette and a day palette along the same altitude
+value — every channel mixed separately, so at −14° the sky is deep indigo and at
++6° it is a pale warm blue.
+
+The sun sits low, its radius and glow scaled by altitude, drifting slowly on a sine;
+below +0.4° it is not drawn at all. Nine ridges are generated as twenty-one-point
+double-sine silhouettes, drawn far first. Each ridge's colour is a mix between its
+near-colour (dark violet-green) and pale haze, weighted by distance and the Haze
+slider — real atmospheric perspective, so the far ridges are the palest things in
+frame. Each ridge is filled with a vertical gradient whose top stop brightens by
+the amount of sun that reaches it, and clipped to itself a soft dark wedge is drawn
+just below the crest — that ridge's own shadow cast onto the valley beneath it. When
+the sun is high enough, a warm hairline runs along each crest. Seven bands of
+cool-white mist sit in the valley bottoms in additive blend, drifting on a sine.
+
+Layout: a full-viewport canvas over the room gradient with a floating UI overlay
+whose pointer-events pass through except on the controls. Top-left is a monospace
+station label above an italic serif headline with one line in warm amber, plus a
+short paragraph. Top-right is a monospace meter stack showing sun altitude, ridge
+count and a contrast value derived from the haze. Bottom is a glass tray with three
+sliders — Sun (altitude −14° to +6°), Haze (0–100) and Ridges (4–12) — plus a Mist
+toggle and a Dawn button that animates the sun upward through a full day-night
+cycle.
+
+Interaction: the sun slider is the master control — pulling it up climbs the sun
+over the ridge line and lights every crest, pushing it down drops the frame into
+night. Haze controls atmospheric depth; Ridges adds or removes layers, each
+regenerated with its own silhouette. Mist toggles the valley bands. Dawn runs the
+sun automatically from night through dawn to day and loops. The CSS room gradient
+tracks the sun the whole time.
+
+## One-paragraph description of the intended design
+A valley at first light where the sun is the master control: nine double-sine
+ridges drawn far-first with true atmospheric perspective (each a mix of its near
+colour toward pale haze), each filled with a gradient that brightens on the crest,
+each casting a soft shadow wedge onto the layer beneath, warm hairlines lighting up
+the crests as the sun climbs, cool mist bands drifting in the valleys, and the
+entire page gradient warming as the sun rises.
+
+## Major visual techniques used
+- Per-frame channel interpolation between a night palette and a day palette across
+  four sky stops, driven by sun altitude
+- Sun disc and wide radial glow whose radius and alpha scale with altitude, drifting
+  on a sine, hidden below +0.4°
+- Double-sine ridge silhouettes from twenty-one points, generated per ridge
+- Atmospheric perspective: each ridge's colour mixed toward pale haze by distance
+  and the Haze slider
+- Vertical ridge gradient whose top stop brightens by how much sun reaches it
+- Self-clipped shadow wedges: the ridge path used as a clip, then a gradient strip
+  repeated along the crest below it
+- Warm hairline crest strokes that appear only when the sun is high enough
+- Seven additive cool-white mist bands drifting on sines in the valley bottoms
+- CSS room gradient whose brightness and hue-rotate are recomputed per frame
+- Live sun-altitude, ridge-count and haze-derived contrast readouts
+- Dawn button that increments the sun slider continuously and loops
+- Ridge slider that adds or removes layers, each regenerated with its own silhouette
+- Italic serif headline with one amber line against 8.5px tracked monospace
+- Floating glass tray with backdrop-filter blur; extras hidden under 760px
+
+## Intended interaction model
+A scene with one master dial. Visitors pull the sun slider to climb the sun over the
+ridges and watch every crest light, every shadow cast and the whole page gradient
+warm; or press Dawn to let it happen by itself. Haze and Ridges reshape the
+atmosphere, and Mist toggles the valley bands. The overlay never traps the pointer
+except on the controls.

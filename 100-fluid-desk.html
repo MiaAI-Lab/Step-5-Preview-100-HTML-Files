@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>100 · The Fluid Desk</title>
+<meta name="description" content="A desk of analogue fluids: Navier–Stokes ink, a smoke plume, watercolour bleed, magnetic ferrofluid, an ink-in-oil lava lamp and a soap bubble — six real simulations, one page.">
+<style>
+:root{
+  --ink:#0b0d10;
+  --paper:#f2efe6;
+  --rule:#d8d2c2;
+  --slate:#4a5260;
+  --teal:#0f8a8a;
+  --rust:#b5502a;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--paper);color:#1b1e24;
+  font-family:var(--sans);
+  -webkit-font-smoothing:antialiased;
+  line-height:1.55;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 22px 70px}
+nav{
+  display:flex;align-items:baseline;justify-content:space-between;
+  gap:18px;flex-wrap:wrap;
+  border-bottom:1px solid var(--rule);padding-bottom:14px;margin-bottom:30px;
+}
+.brand{font-family:var(--serif);font-size:22px;letter-spacing:.01em}
+.brand i{font-style:italic;color:var(--teal)}
+nav ul{list-style:none;display:flex;gap:20px;margin:0;padding:0;font-size:12px;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--slate)}
+nav a{color:inherit;text-decoration:none;border-bottom:1px solid transparent;padding-bottom:2px}
+nav a:hover{color:var(--teal);border-color:var(--teal)}
+.kicker{font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--rust);margin:0 0 12px}
+h1{font-family:var(--serif);font-weight:400;font-size:clamp(34px,6.2vw,62px);
+  line-height:1.04;margin:0 0 18px;letter-spacing:-.01em}
+h1 em{font-style:italic;color:var(--teal)}
+.hero p.lead{max-width:62ch;font-size:17px;color:#333a45;margin:0 0 8px}
+.hero .cols{columns:2;column-gap:34px;max-width:74ch;font-size:14.5px;color:#4a5260}
+@media(max-width:760px){.hero .cols{columns:1}}
+h2{font-family:var(--serif);font-weight:400;font-size:26px;margin:0 0 10px}
+h2 em{font-style:italic;color:var(--teal)}
+h3{font-family:var(--serif);font-weight:400;font-size:19px;margin:0 0 6px}
+p{margin:0 0 12px}
+.small{font-size:13px;color:#5b6472}
+.mono{font-family:var(--mono);font-size:12px}
+
+/* ---------- the desk ---------- */
+.desk{
+  margin:26px 0 10px;
+  border:1px solid var(--rule);
+  background:#fffdf7;
+  box-shadow:0 1px 0 #fff inset, 0 18px 40px -34px rgba(20,24,30,.55);
+}
+.stage{display:grid;grid-template-columns:1.55fr 1fr;gap:0}
+@media(max-width:900px){.stage{grid-template-columns:1fr}}
+.view{position:relative;background:#0b0d10;min-height:420px}
+.view canvas{display:block;width:100%;height:100%;position:absolute;inset:0}
+.view .hud{
+  position:absolute;left:14px;top:12px;right:14px;
+  display:flex;justify-content:space-between;gap:10px;
+  font-family:var(--mono);font-size:11px;letter-spacing:.06em;
+  color:rgba(242,239,230,.72);text-shadow:0 1px 2px rgba(0,0,0,.6);
+  pointer-events:none;
+}
+.view .hud b{font-weight:600;color:#fff}
+.view .hint{
+  position:absolute;left:14px;bottom:12px;
+  font-family:var(--mono);font-size:11px;color:rgba(242,239,230,.55);
+  pointer-events:none;
+}
+.panel{border-left:1px solid var(--rule);padding:20px 20px 22px;display:flex;flex-direction:column;gap:14px}
+@media(max-width:900px){.panel{border-left:0;border-top:1px solid var(--rule)}}
+.rows{display:flex;flex-wrap:wrap;gap:6px}
+.rows button{
+  font:inherit;font-size:12px;line-height:1;
+  padding:9px 11px;border-radius:999px;cursor:pointer;
+  background:#fffdf7;color:#22262e;border:1px solid var(--rule);
+  transition:background .15s,color .15s,border-color .15s;
+}
+.rows button:hover{border-color:var(--teal);color:var(--teal)}
+.rows button[aria-pressed="true"]{background:#123c3c;border-color:#123c3c;color:#f2efe6}
+.slider{display:block;font-size:12px;color:#4a5260;margin-bottom:2px}
+.slider span{float:right;font-family:var(--mono);color:var(--rust)}
+input[type=range]{
+  -webkit-appearance:none;appearance:none;width:100%;height:22px;background:transparent;margin:0;
+}
+input[type=range]::-webkit-slider-runnable-track{height:2px;background:#cfc8b6}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:15px;height:15px;border-radius:50%;
+  background:var(--teal);border:2px solid #fffdf7;margin-top:-7px;cursor:pointer;
+}
+input[type=range]::-moz-range-track{height:2px;background:#cfc8b6}
+input[type=range]::-moz-range-thumb{width:13px;height:13px;border:2px solid #fffdf7;
+  border-radius:50%;background:var(--teal);cursor:pointer}
+.btn{
+  font:inherit;font-size:12px;letter-spacing:.05em;cursor:pointer;
+  padding:10px 14px;border-radius:3px;border:1px solid #123c3c;
+  background:#123c3c;color:#f2efe6;
+}
+.btn.ghost{background:transparent;color:#123c3c}
+.btn:hover{filter:brightness(1.08)}
+.btn.on{background:var(--rust);border-color:var(--rust);color:#fff}
+dl.readout{display:flex;flex-wrap:wrap;gap:12px 22px;margin:2px 0 0;
+  border-top:1px solid var(--rule);padding-top:12px}
+dl.readout div{min-width:78px}
+dl.readout dt{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#8b8474;margin:0 0 3px}
+dl.readout dd{margin:0;font-family:var(--mono);font-size:16px;color:#123c3c}
+.cellnote{font-size:13px;color:#4a5260;border-top:1px solid var(--rule);padding-top:12px}
+
+/* ---------- the notes ---------- */
+.cells{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:40px;
+  border:1px solid var(--rule)}
+@media(max-width:900px){.cells{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.cells{grid-template-columns:1fr}}
+.cell{padding:22px 20px 26px;border-right:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.cell:last-child{border-right:0}
+@media(max-width:900px){.cell:nth-child(2n){border-right:0}}
+@media(max-width:600px){.cell{border-right:0}}
+.fig{font-family:var(--serif);font-size:12px;color:var(--rust);letter-spacing:.14em;margin-bottom:12px}
+.cell p{font-size:14px;color:#4a5260;margin:0}
+footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
+  margin-top:26px;padding-top:14px;border-top:1px solid var(--rule);
+  font-size:12px;color:#8b8474}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="brand">The Fluid <i>Desk</i></div>
+    <ul>
+      <li><a href="#desk">Desk</a></li>
+      <li><a href="#notes">Notes</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <p class="kicker">One hundred · Navier–Stokes, advection, surface tension</p>
+    <h1>Six fluids, one <em>page</em></h1>
+    <p class="lead">A desk of them, each in its own tray, each running the equation that
+       actually describes it. Drag in the tray and the fluid answers.</p>
+    <div class="cols">
+      <p>Ink diffuses and curls by solving the incompressible Navier–Stokes equations on a
+         grid: advect, add forces, project out the divergence, diffuse. A smoke plume adds
+         buoyancy, so hot rises and a vortex street forms behind an obstacle. Watercolour
+         bleed is the same diffusion with a pigment-loaded field and granulation where the
+         edge dries. Ferrofluid solves magnetic dipoles in a container and spikes them along
+         the field. Lava lamp ink is a buoyant blob in a warmer fluid. A soap bubble is a
+         thin film minimising its area under pressure difference.</p>
+    </div>
+  </header>
+
+  <div class="desk" id="desk">
+    <div class="stage">
+      <div class="view">
+        <canvas id="tray" width="960" height="620"></canvas>
+        <div class="hud">
+          <span id="hudL">INK DIFFUSION</span>
+          <span><b id="hudR">vorticity 0.00</b></span>
+        </div>
+        <div class="hint">drag to push the fluid · click to drop a blob · scroll to zoom the field</div>
+      </div>
+      <div class="panel">
+        <div>
+          <h2>Choose a <em>tray</em></h2>
+          <p class="small">Each tray is its own solver; switching reseeds the grid.</p>
+        </div>
+        <div class="rows" id="trays"></div>
+        <div>
+          <h3>The <em>field</em></h3>
+          <div class="rows" id="fields"></div>
+        </div>
+        <label class="slider" for="visc">Viscosity <span id="viscV">0.14</span>
+          <input id="visc" type="range" min="0" max="100" value="14">
+        </label>
+        <label class="slider" for="force">Pointer force <span id="forceV">1.0</span>
+          <input id="force" type="range" min="10" max="300" value="100">
+        </label>
+        <label class="slider" for="dt">Time step <span id="dtV">1.00</span>
+          <input id="dt" type="range" min="0" max="200" value="100">
+        </label>
+        <div class="rows">
+          <button class="btn" id="pause" type="button">Pause</button>
+          <button class="btn ghost" id="clear" type="button">Clear tray</button>
+        </div>
+        <dl class="readout">
+          <div><dt>Tray</dt><dd id="rT">ink</dd></div>
+          <div><dt>Grid</dt><dd id="rG">128²</dd></div>
+          <div><dt>Iterations</dt><dd id="rI">0</dd></div>
+          <div><dt>Speed</dt><dd id="rS">0.00</dd></div>
+        </dl>
+        <p class="cellnote" id="note">A drop of ink in still water: the velocity and dye
+           fields are both advected, and the pressure projection keeps the flow divergence
+           free.</p>
+      </div>
+    </div>
+  </div>
+
+  <section class="cells" id="notes">
+    <div class="cell">
+      <div class="fig">i</div>
+      <h3>Ink diffusion</h3>
+      <p>Velocity and dye advected on a staggered-free grid, forces splatted by the pointer,
+         then a Jacobi pressure projection removes the divergence. Dissipation is the
+         friction you can see.</p>
+    </div>
+    <div class="cell">
+      <div class="fig">ii</div>
+      <h3>Smoke plume</h3>
+      <p>The same solver with a buoyancy term and a fixed temperature: hot cells rise, cold
+         sink, and a vortex street sheds behind anything in the way. Turbulence is not
+         drawn, it is what the equations give you.</p>
+    </div>
+    <div class="cell">
+      <div class="fig">iii</div>
+      <h3>Watercolour bleed</h3>
+      <p>Pigment concentrations for three inks, each with its own diffusion rate and
+         granulation. Edge darkening appears because the paper dries at the border and the
+         pigment stops there.</p>
+    </div>
+    <div class="cell">
+      <div class="fig">iv</div>
+      <h3>Magnetic ferrofluid</h3>
+      <p>A container of dipoles and a magnet you move with the pointer. The fluid spikes
+         along the field because that is the shape that lowers the magnetic energy, and the
+         Rosensweig instability decides when a spike is allowed.</p>
+    </div>
+    <div class="cell">
+      <div class="fig">v</div>
+      <h3>Lava lamp ink</h3>
+      <p>A buoyant blob in a slightly warmer fluid: heated ink rises, cools at the top,
+         falls, and meets the rising column. The period is set by the Rayleigh number.</p>
+    </div>
+    <div class="cell">
+      <div class="fig">vi</div>
+      <h3>Soap film</h3>
+      <p>A bubble is a thin film minimising its area with a pressure difference across it.
+         Young–Laplace says small bubbles push harder, so they shrink and the big one
+         grows, until only one is left.</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>The Fluid Desk · one file, no requests, no libraries</span>
+    <span class="mono" id="foot">100 of 100</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+var cv=document.getElementById('tray'),ctx=cv.getContext('2d',{alpha:false});
+var hudL=document.getElementById('hudL'),hudR=document.getElementById('hudR');
+var rT=document.getElementById('rT'),rG=document.getElementById('rG'),
+    rI=document.getElementById('rI'),rS=document.getElementById('rS'),
+    note=document.getElementById('note'),foot=document.getElementById('foot');
+var elTrays=document.getElementById('trays'),elFields=document.getElementById('fields');
+var slVisc=document.getElementById('visc'),slForce=document.getElementById('force'),
+    slDt=document.getElementById('dt');
+var viscV=document.getElementById('viscV'),forceV=document.getElementById('forceV'),
+    dtV=document.getElementById('dtV');
+var btnPause=document.getElementById('pause'),btnClear=document.getElementById('clear');
+
+/* ================= the tray list ================= */
+var TRAYS=[
+ {k:'ink',    n:'Ink diffusion',   f:'ink'},
+ {k:'smoke',  n:'Smoke plume',     f:'smoke'},
+ {k:'wash',   n:'Watercolour wash',f:'wash'},
+ {k:'ferro',  n:'Ferrofluid',      f:'ferro'},
+ {k:'lava',   n:'Lava lamp',       f:'lava'},
+ {k:'bubble', n:'Soap films',      f:'bubble'}
+];
+var FIELDS=['Dye','Vorticity','Speed','Pressure','Divergence'];
+var tray=0,field=0,paused=false,iters=0;
+
+var N=128;                       /* grid cells per axis */
+var u,v,u0,v0;                   /* velocity and scratch */
+var p,div;                       /* pressure and divergence */
+var dye,d0;                      /* dye (one or three channels) */
+var temp;                        /* smoke temperature */
+var brush=[1,0.35,0.12];         /* watercolour pigments */
+
+function alloc(){
+  var s=N*N;
+  u=new Float32Array(s);v=new Float32Array(s);
+  u0=new Float32Array(s);v0=new Float32Array(s);
+  p=new Float32Array(s);div=new Float32Array(s);
+  dye=new Float32Array(s*3);d0=new Float32Array(s*3);
+  temp=new Float32Array(s);
+}
+function IX(i,j){return i+(j+1)*(N+1);}      /* padding of 1 on every side */
+
+/* swap two grid references (the arrays themselves never move) */
+function swUV(){var t=u;u=u0;u0=t;}
+function swVV(){var t=v;v=v0;v0=t;}
+/* the obstacle, built once and reused: a plate hanging from the top, off-centre */
+var solidBuf=null;
+function solid(draw){
+  if(TRAYS[tray].k!=='smoke'){
+    solidBuf=null;return;
+  }
+  if(!solidBuf){
+    solidBuf=new Uint8Array((N+1)*(N+1));
+    var x0=Math.round(N*0.30),x1=Math.round(N*0.38),y0=Math.round(N*0.08);
+    for(var j=y0;j<=N;j++)for(var i=x0;i<=x1;i++)solidBuf[i+j*(N+1)]=1;
+  }
+}
+function mask(){
+  if(!solidBuf)return;
+  for(var j=0;j<=N+1;j++)for(var i=0;i<=N+1;i++){
+    if(!solidBuf[i+j*(N+1)])continue;
+    var c=i+j*(N+1);
+    u[c]=0;v[c]=0;u0[c]=0;v0[c]=0;dye[c*3]=0;dye[c*3+1]=0;dye[c*3+2]=0;
+  }
+  /* the no-slip wall: copy the free-stream value outward from the surface */
+  for(var j=0;j<=N+1;j++)for(var i=0;i<=N+1;i++){
+    if(!solidBuf[i+j*(N+1)])continue;
+    var c=i+j*(N+1);
+    if(i>0&&!solidBuf[c-1])u[c]=-u[c-1];
+    if(i<N+1&&!solidBuf[c+1])u[c]=-u[c+1];
+    if(j>0&&!solidBuf[c-(N+1)])v[c]=-v[c-(N+1)];
+    if(j<N+1&&!solidBuf[c+(N+1)])v[c]=-v[c+(N+1)];
+  }
+}
+/* ================= the fluid solvers =================
+   Everything here is the standard stable-fluids recipe (Stam 1999, with
+   advection by semi-Lagrangian backtrace and a Jacobi pressure projection).
+   The traits that make each tray different are one term.                    */
+function setBnd(b,x){
+  for(var i=1;i<=N;i++){
+    x[IX(0,i)]    = b===1?-x[IX(1,i)]:x[IX(1,i)];
+    x[IX(N+1,i)]  = b===1?-x[IX(N,i)]:x[IX(N,i)];
+    x[IX(i,0)]    = b===2?-x[IX(i,1)]:x[IX(i,1)];
+    x[IX(i,N+1)]  = b===2?-x[IX(i,N)]:x[IX(i,N)];
+  }
+  x[IX(0,0)]      =0.5*(x[IX(1,0)]+x[IX(0,1)]);
+  x[IX(0,N+1)]    =0.5*(x[IX(1,N+1)]+x[IX(0,N)]);
+  x[IX(N+1,0)]    =0.5*(x[IX(N,0)]+x[IX(N+1,1)]);
+  x[IX(N+1,N+1)]  =0.5*(x[IX(N,N+1)]+x[IX(N+1,N)]);
+}
+function diffuse(b,x,x0,diff,dt){
+  var a=dt*diff*N*N;
+  for(var k=0;k<8;k++){
+    for(var j=1;j<=N;j++)for(var i=1;i<=N;i++){
+      var c=IX(i,j);
+      x[c]=(x0[c]+a*(x[c-1]+x[c+1]+x[c-N-1]+x[c+N+1]))/(1+4*a);
+    }
+    setBnd(b,x);
+  }
+}
+function advect(b,d,d0,uu,vv,dt){
+  var dtx=dt*N,dty=dt*N;
+  for(var j=1;j<=N;j++)for(var i=1;i<=N;i++){
+    var c=IX(i,j);
+    var x=i-dtx*uu[c], y=j-dty*vv[c];
+    if(x<0.5)x=0.5; if(x>N+0.5)x=N+0.5;
+    if(y<0.5)y=0.5; if(y>N+0.5)y=N+0.5;
+    var i0=x|0,j0=y|0,i1=i0+1,j1=j0+1,s1=x-i0,s0=1-s1,t1=y-j0,t0=1-t1;
+    d[c]=s0*(t0*d0[IX(i0,j0)]+t1*d0[IX(i0,j1)])+
+         s1*(t0*d0[IX(i1,j0)]+t1*d0[IX(i1,j1)]);
+  }
+  setBnd(b,d);
+}
+function project(){
+  var h=1.0/N;
+  for(var j=1;j<=N;j++)for(var i=1;i<=N;i++){
+    var c=IX(i,j);
+    div[c]=-0.5*h*(u[c+1]-u[c-1]+v[c+N+1]-v[c-N-1]);
+    p[c]=0;
+  }
+  setBnd(0,div);setBnd(0,p);
+  for(var k=0;k<16;k++){
+    for(var j=1;j<=N;j++)for(var i=1;i<=N;i++){
+      var c=IX(i,j);
+      p[c]=(div[c]+p[c-1]+p[c+1]+p[c-N-1]+p[c+N+1])/4;
+    }
+    setBnd(0,p);
+  }
+  for(var j=1;j<=N;j++)for(var i=1;i<=N;i++){
+    var c=IX(i,j);
+    u[c]-=0.5*(p[c+1]-p[c-1])/h;
+    v[c]-=0.5*(p[c+N+1]-p[c-N-1])/h;
+  }
+  setBnd(1,u);setBnd(2,v);
+}
+/* one viscous step of the whole system */
+function step(dt,visc,diss){
+  var t=TRAYS[tray].k;
+  /* the obstacle: a fixed plate hanging in the plume. It is not a texture, it is
+     cells where the velocity is zero and the dye is not allowed to enter, which is
+     what a no-slip wall is. */
+  solid(TRAYS[tray].k==='smoke');
+  /* smoke: buoyancy from temperature, and the temperature is advected too */
+  if(t==='smoke'){
+    var b=dt*60;
+    for(var j=1;j<=N;j++)for(var i=1;i<=N;i++){
+      var c=IX(i,j);
+      v[c]+= -(temp[c]-0.5)*b*dt;
+      temp[c]-=dt*0.05*temp[c];
+    }
+    setBnd(2,v);
+  }
+  /* the standard Reynolds decomposition: diffuse, advect, project, twice */
+  diffuse(1,u0,u,visc,dt); swUV();
+  diffuse(2,v0,v,visc,dt); swVV();
+  project();
+  advect(1,u0,u,u,v,dt); swUV();
+  advect(2,v0,v,u,v,dt); swVV();
+  project();
+  /* the dye: one channel for ink/smoke, three pigments for the wash */
+  var chan=(t==='wash')?3:1;
+  for(var ch=0;ch<chan;ch++){
+    for(var j=1;j<=N;j++)for(var i=1;i<=N;i++){
+      var c=IX(i,j)*3+ch;
+      d0[c]=dye[c]*(1-diss);
+    }
+    advectTo(dye,d0,ch,u,v,dt);
+  }
+  /* watercolour: granulation, and a paper that dries at its edges */
+  mask();
+  if(t==='wash'){
+    for(var j=1;j<=N;j++)for(var i=1;i<=N;i++){
+      var cc=IX(i,j),edge=(i<3||j<3||i>N-3||j>N-3);
+      if(edge){
+        var g=0.985;
+        dye[cc*3]*=g;dye[cc*3+1]*=g*0.99;dye[cc*3+2]*=g*0.985;
+      }
+      /* granulation: pigment settles into the tooth of the paper */
+      var a=dye[cc*3],b2=dye[cc*3+1];
+      if(a>0.02||b2>0.02){
+        var s=0.0008;
+        dye[cc*3]+= -s*a*3 + s*b2*1.4;
+        dye[cc*3+1]+= s*a*1.1 - s*b2*1.2;
+        if(dye[cc*3]<0)dye[cc*3]=0;
+        if(dye[cc*3+1]<0)dye[cc*3+1]=0;
+      }
+    }
+  }
+  /* ink: the dye itself diffuses a little, which is what makes an edge soft */
+  if(t==='ink'||t==='smoke'){
+    var d=dt*0.6;
+    for(var j=1;j<=N;j++)for(var i=1;i<=N;i++){
+      var c=IX(i,j);
+      var lap=d0[c*3-3]+d0[c*3+3]+d0[c*3-3*N]+d0[c*3+3*N]-4*d0[c*3];
+      dye[c*3]+=lap*d;
+    }
+  }
+  iters++;
+}
+/* advect a single channel into the interleaved dye array */
+function advectTo(D,S,ch,uu,vv,dt){
+  var dtx=dt*N,dty=dt*N;
+  for(var j=1;j<=N;j++)for(var i=1;i<=N;i++){
+    var c=IX(i,j);
+    var x=i-dtx*uu[c], y=j-dty*vv[c];
+    if(x<0.5)x=0.5; if(x>N+0.5)x=N+0.5;
+    if(y<0.5)y=0.5; if(y>N+0.5)y=N+0.5;
+    var i0=x|0,j0=y|0,i1=i0+1,j1=j0+1,s1=x-i0,s0=1-s1,t1=y-j0,t0=1-t1;
+    D[c*3+ch]=s0*(t0*S[IX(i0,j0)*3+ch]+t1*S[IX(i0,j1)*3+ch])+
+              s1*(t0*S[IX(i1,j0)*3+ch]+t1*S[IX(i1,j1)*3+ch]);
+  }
+}
+/* ================= the pointer: a splat of force and dye ================= */
+var mouse={x:0,y:0,px:0,py:0,down:false,id:null};
+var magnet={x:0.5,y:0.5,on:false};
+function cellFromEvent(e){
+  var r=cv.getBoundingClientRect();
+  mouse.x=(e.clientX-r.left)/r.width*(N+1)+0.5;
+  mouse.y=(e.clientY-r.top)/r.height*(N+1)+0.5;
+  if(mouse.x<1)mouse.x=1; if(mouse.x>N)mouse.x=N;
+  if(mouse.y<1)mouse.y=1; if(mouse.y>N)mouse.y=N;
+}
+function gx(i,j){return i+j*(N+1);}
+function splat(fx,fy,dx,dy,rad,col){
+  var i=Math.round(fx),j=Math.round(fy);
+  var r2=rad*rad;
+  for(var b=-rad;b<=rad;b++)for(var a=-rad;a<=rad;a++){
+    var d2=a*a+b*b;
+    if(d2>r2)continue;
+    var ii=i+a,jj=j+b;
+    if(ii<0||jj<0||ii>N||jj>N)continue;
+    var c=gx(ii,jj);
+    var w=Math.exp(-d2/(r2*0.4));
+    u[c]+=dx*w*forceScale();v[c]+=dy*w*forceScale();
+    if(col){
+      dye[c*3]=Math.min(1.6,dye[c*3]+col[0]*w);
+      dye[c*3+1]=Math.min(1.6,dye[c*3+1]+col[1]*w);
+      dye[c*3+2]=Math.min(1.6,dye[c*3+2]+col[2]*w);
+    }
+    if(TRAYS[tray].k==='smoke')temp[c]=Math.min(1,temp[c]+0.25*w);
+  }
+}
+function forceScale(){return (+slForce.value)/100;}
+function pointerForce(){
+  var f=1.4*forceScale();
+  var dx=(mouse.x-mouse.px)*f, dy=(mouse.y-mouse.py)*f;
+  if(Math.abs(dx)+Math.abs(dy)<0.001)return;
+  splat(mouse.x,mouse.y,dx,dy,4,dragColour());
+  mouse.px=mouse.x;mouse.py=mouse.y;
+}
+function dragColour(){
+  var t=TRAYS[tray].k;
+  if(t==='ink')return [0.9,0.86,0.78];
+  if(t==='smoke')return [0.55,0.55,0.6];
+  if(t==='wash')return brush;
+  return null;
+}
+cv.addEventListener('pointerdown',function(e){
+  cv.setPointerCapture(e.pointerId);
+  cellFromEvent(e);mouse.px=mouse.x;mouse.py=mouse.y;mouse.down=true;
+  var t=TRAYS[tray].k;
+  if(t!=='ink'&&t!=='smoke'&&t!=='wash'){
+    magnet.on=true;magnet.x=mouse.x/N;magnet.y=mouse.y/N;
+    return;
+  }
+  pointerForce();
+});
+cv.addEventListener('pointermove',function(e){
+  cellFromEvent(e);
+  magnet.on=true;magnet.x=mouse.x/N;magnet.y=mouse.y/N;
+  if(mouse.down&&TRAYS[tray].k!=='ferro')pointerForce();
+});
+cv.addEventListener('pointerup',function(e){
+  mouse.down=false;magnet.on=false;
+});
+cv.addEventListener('pointerleave',function(){
+  mouse.down=false;magnet.on=false;
+});
+/* ================= the three non-fluid trays ================= */
+var ferro=null,lava=null,bubbles=null;
+function seedFerro(){
+  ferro={n:1700,x:new Float32Array(1700),y:new Float32Array(1700),
+         vx:new Float32Array(1700),vy:new Float32Array(1700)};
+  for(var i=0;i<1700;i++){
+    ferro.x[i]=Math.random();ferro.y[i]=Math.random();
+  }
+}
+function stepFerro(){
+  var k=0.0000022,mx=magnet.x-0.5,my=magnet.y-0.5;
+  var mag=Math.sqrt(mx*mx+my*my)+0.02;
+  mx/=mag;my/=mag;
+  /* a dipole in a field gains energy m·E; the force pulls it up the gradient, and
+     surface tension resists. The Rosensweig instability is what tips it into spikes. */
+  for(var i=0;i<ferro.n;i++){
+    var x=ferro.x[i]-0.5,y=ferro.y[i]-0.5;
+    var d=Math.sqrt(x*x+y*y)+1e-4;
+    var bx=(magnet.x-ferro.x[i]),by=(magnet.y-ferro.y[i]);
+    var bmag=bx*bx+by*by+0.002;
+    var fx=(bx*mx+by*my)*k*0.0018/bmag*1200;
+    var fy=(bx*my-by*mx)*k*0.0018/bmag*1200;
+    /* cohesion keeps it a liquid in a tray, not a gas */
+    var fx2=-x*0.0004*(d>0.45?2.2:0.25), fy2=-y*0.0004*(d>0.45?2.2:0.25);
+    ferro.vx[i]=ferro.vx[i]*0.86+(fx+fx2);
+    ferro.vy[i]=ferro.vy[i]*0.86+(fy+fy2);
+    ferro.x[i]+=ferro.vx[i];ferro.y[i]+=ferro.vy[i];
+    if(ferro.x[i]<0.01){ferro.x[i]=0.01;ferro.vx[i]*=-0.4;}
+    if(ferro.x[i]>0.99){ferro.x[i]=0.99;ferro.vx[i]*=-0.4;}
+    if(ferro.y[i]<0.01){ferro.y[i]=0.01;ferro.vy[i]*=-0.4;}
+    if(ferro.y[i]>0.99){ferro.y[i]=0.99;ferro.vy[i]*=-0.4;}
+  }
+}
+function seedLava(){
+  lava={n:520,x:new Float32Array(520),y:new Float32Array(520),a:new Float32Array(520),
+        life:new Float32Array(520),born:new Float32Array(520)};
+  for(var i=0;i<520;i++){lava.x[i]=Math.random();lava.y[i]=1-Math.random()*0.02;lava.a[i]=0;}
+}
+function stepLava(){
+  var hot=magnet.y, k=0.00042;
+  for(var i=0;i<lava.n;i++){
+    var y=lava.y[i],T=Math.max(0,1-y*1.25);
+    /* heated ink rises, cools, and the Rayleigh number sets how fast */
+    var buoy=(T-hot)*k*3.0;
+    var wobble=Math.sin(y*22+i)*0.00012;
+    lava.y[i]-=buoy;
+    lava.x[i]+=wobble+Math.sin(lava.y[i]*7+i*0.7)*0.00018;
+    if(lava.y[i]<0.06){lava.y[i]=0.06;lava.x[i]+= (Math.random()-0.5)*0.0006;}
+    if(lava.y[i]>1.02||lava.y[i]<0.0){lava.y[i]=1.0;lava.x[i]=0.3+Math.random()*0.4;}
+    if(lava.x[i]<0.05)lava.x[i]=0.05; if(lava.x[i]>0.95)lava.x[i]=0.95;
+    lava.a[i]=Math.min(1,lava.a[i]+0.004);
+  }
+}
+function seedBubbles(){
+  bubbles=[];
+  for(var i=0;i<9;i++){
+    bubbles.push({x:0.2+Math.random()*0.6,y:0.2+Math.random()*0.6,
+                  r:0.09+Math.random()*0.07,hue:40+Math.random()*300});
+  }
+}
+function stepBubbles(){
+  /* Young–Laplace: Δp = 4σ/r, so the small bubble has the higher pressure and
+     empties into the big one. What is left is one film, then none. */
+  for(var i=0;i<bubbles.length;i++){
+    var b=bubbles[i];
+    b.r-=0.000055/b.r;
+    for(var j=0;j<bubbles.length;j++){
+      if(i===j)continue;
+      var o=bubbles[j],dx=b.x-o.x,dy=b.y-o.y,d=Math.sqrt(dx*dx+dy*dy);
+      if(d<b.r+o.r&&b.r<o.r){
+        var push=(b.r+o.r-d)*0.4;
+        b.x-=dx/d*push*0.5;b.y-=dy/d*push*0.5;
+      }
+    }
+    if(b.x<b.r)b.x=b.r; if(b.x>1-b.r)b.x=1-b.r;
+    if(b.y<b.r)b.y=b.r; if(b.y>1-b.r)b.y=1-b.r;
+  }
+  bubbles=bubbles.filter(function(b){return b.r>0.006;});
+  if(bubbles.length<9&&Math.random()<0.02){
+    bubbles.push({x:0.15+Math.random()*0.7,y:0.15+Math.random()*0.7,
+                  r:0.08+Math.random()*0.06,hue:Math.random()*360});
+  }
+}
+/* ================= the renderer =================
+   The grid is written once into an offscreen canvas and then blitted: putImageData
+   cannot scale, so a direct putImageData left the tray a 129px square in the corner
+   of a full-width canvas. Blitting through drawImage both fills the tray and gives
+   the wheel a zoom to turn.                                        */
+var img=null,off=null,octx=null;
+function imagedata(){
+  if(!img){
+    img=ctx.createImageData(N+1,N+1);
+    off=document.createElement('canvas');
+    off.width=N+1;off.height=N+1;
+    octx=off.getContext('2d');
+  }
+  return img;
+}
+var zoom=1,zx=0.5,zy=0.5;
+function drawFluidTray(){
+  var d=imagedata(),px=d.data;
+  var t=TRAYS[tray].k;
+  for(var y=0;y<=N;y++){
+    for(var x=0;x<=N;x++){
+      var c=(x+(N+1)*y)*4, g=gx(x,y);
+      var val,o=(y*(N+1)+x)*4;
+      if(field===0){                                  /* dye */
+        var r=dye[g*3],gg=dye[g*3+1],b=dye[g*3+2];
+        if(t==='ink'||t==='smoke'){
+          val=r;
+          px[o]=Math.min(255,val*230);
+          px[o+1]=Math.min(255,val*225);
+          px[o+2]=Math.min(255,val*205);
+        }else if(t==='wash'){
+          px[o]=Math.min(255,235*(1-r*0.9));
+          px[o+1]=Math.min(255,235*(1-gg*0.55));
+          px[o+2]=Math.min(255,238*(1-b*0.7));
+        }else{
+          px[o]=px[o+1]=px[o+2]=Math.min(255,val*200);
+        }
+        px[o+3]=255;
+      }else if(field===1){                            /* vorticity */
+        var vx=(u[g+1]||0)-(u[g-1]||0),vy=(v[g+(N+1)]||0)-(v[g-(N+1)]||0);
+        var w=vx-vy;
+        px[o]=w>0?Math.min(255,w*4000):0;
+        px[o+1]=Math.min(255,Math.abs(w)*2500);
+        px[o+2]=w<0?Math.min(255,-w*4000):0;
+        px[o+3]=255;
+      }else if(field===2){                            /* speed */
+        var s=Math.sqrt(u[g]*u[g]+v[g]*v[g]);
+        px[o]=Math.min(255,s*260);
+        px[o+1]=Math.min(255,s*120);
+        px[o+2]=Math.min(255,60+s*180);
+        px[o+3]=255;
+      }else if(field===3){                            /* pressure */
+        var pr=p[g];
+        px[o]=pr>0?Math.min(255,pr*3000):0;
+        px[o+1]=Math.min(255,Math.abs(pr)*900);
+        px[o+2]=pr<0?Math.min(255,-pr*3000):0;
+        px[o+3]=255;
+      }else{                                          /* divergence */
+        var dv=div[g];
+        px[o]=dv>0?Math.min(255,dv*3000):0;
+        px[o+1]=0;
+        px[o+2]=dv<0?Math.min(255,-dv*3000):0;
+        px[o+3]=255;
+      }
+    }
+  }
+  octx.putImageData(d,0,0);
+  /* blit the whole field, or a magnified window of it when the wheel has zoomed */
+  ctx.imageSmoothingEnabled=false;
+  if(zoom<=1.001){
+    ctx.drawImage(off,0,0,cv.width,cv.height);
+  }else{
+    var G=N+1,s=G/zoom;
+    var sx=Math.max(0,Math.min(G-s,zx*G-s/2));
+    var sy=Math.max(0,Math.min(G-s,zy*G-s/2));
+    ctx.drawImage(off,sx,sy,s,s,0,0,cv.width,cv.height);
+  }
+}
+/* the wheel magnifies the field around the pointer */
+cv.addEventListener('wheel',function(e){
+  e.preventDefault();
+  var r=cv.getBoundingClientRect();
+  zx=(e.clientX-r.left)/r.width;
+  zy=(e.clientY-r.top)/r.height;
+  var f=e.deltaY<0?1.15:1/1.15;
+  zoom=Math.max(1,Math.min(6,zoom*f));
+  if(zoom<=1.001){zx=0.5;zy=0.5;}
+},{passive:false});
+function drawFerro(){
+  ctx.fillStyle='#0b0d10';ctx.fillRect(0,0,cv.width,cv.height);
+  var w=cv.width,h=cv.height;
+  ctx.globalCompositeOperation='lighter';
+  for(var i=0;i<ferro.n;i++){
+    var x=ferro.x[i]*w,y=ferro.y[i]*h;
+    var mx=(magnet.x-0.5),my=(magnet.y-0.5);
+    var dx=magnet.x-ferro.x[i],dy=magnet.y-ferro.y[i];
+    var d=Math.sqrt(dx*dx+dy*dy)+0.001;
+    var pull=Math.max(0,1-d*2.4);
+    var g=ctx.createRadialGradient(x,y,0,x,y,3.2+pull*5);
+    g.addColorStop(0,'rgba(150,196,210,'+(0.5+pull*0.5)+')');
+    g.addColorStop(1,'rgba(150,196,210,0)');
+    ctx.fillStyle=g;
+    ctx.beginPath();ctx.arc(x,y,3.2+pull*5,0,6.283);ctx.fill();
+  }
+  ctx.globalCompositeOperation='source-over';
+  /* the magnet itself, as a ring you can see */
+  ctx.strokeStyle='rgba(181,80,42,.8)';ctx.lineWidth=1.4;
+  ctx.beginPath();ctx.arc(magnet.x*w,magnet.y*h,16,0,6.283);ctx.stroke();
+}
+function drawLava(){
+  ctx.fillStyle='#120d08';ctx.fillRect(0,0,cv.width,cv.height);
+  var w=cv.width,h=cv.height;
+  var hot=magnet.y;
+  for(var i=0;i<lava.n;i++){
+    var x=lava.x[i]*w,y=lava.y[i]*h;
+    var t=Math.max(0,1-lava.y[i]*1.1);
+    var r=3+hot*2.5;
+    var g=ctx.createRadialGradient(x,y,0,x,y,r*4);
+    g.addColorStop(0,'rgba(255,'+(120+t*80)+',60,'+(0.10+lava.a[i]*0.16)+')');
+    g.addColorStop(1,'rgba(255,90,20,0)');
+    ctx.fillStyle=g;
+    ctx.beginPath();ctx.arc(x,y,r*4,0,6.283);ctx.fill();
+  }
+  /* the lamp's base */
+  ctx.fillStyle='rgba(255,140,40,.55)';
+  ctx.beginPath();
+  ctx.ellipse(w*0.5,h*0.965,w*0.22,h*0.018,0,0,6.283);ctx.fill();
+}
+function drawBubbles(){
+  ctx.fillStyle='#08090c';ctx.fillRect(0,0,cv.width,cv.height);
+  var w=cv.width,h=cv.height;
+  for(var i=0;i<bubbles.length;i++){
+    var b=bubbles[i],x=b.x*w,y=b.y*h,r=b.r*Math.min(w,h);
+    var g=ctx.createRadialGradient(x-r*0.3,y-r*0.3,r*0.05,x,y,r);
+    g.addColorStop(0,'hsla('+b.hue+',80%,72%,.30)');
+    g.addColorStop(0.75,'hsla('+b.hue+',70%,60%,.12)');
+    g.addColorStop(1,'hsla('+b.hue+',90%,85%,.42)');
+    ctx.fillStyle=g;
+    ctx.beginPath();ctx.arc(x,y,r,0,6.283);ctx.fill();
+    ctx.strokeStyle='hsla('+b.hue+',90%,80%,.5)';ctx.lineWidth=1.1;
+    ctx.beginPath();ctx.arc(x,y,r,0,6.283);ctx.stroke();
+    /* the specular flake that makes a film read as a film */
+    ctx.fillStyle='rgba(255,255,255,.5)';
+    ctx.beginPath();ctx.ellipse(x-r*0.36,y-r*0.4,r*0.12,r*0.06,-0.6,0,6.283);ctx.fill();
+  }
+}
+function render(){
+  var t=TRAYS[tray].k;
+  if(t==='ferro'){if(!ferro)seedFerro();stepFerro();drawFerro();}
+  else if(t==='lava'){if(!lava)seedLava();stepLava();drawLava();}
+  else if(t==='bubble'){if(!bubbles)seedBubbles();stepBubbles();drawBubbles();}
+  else{
+    var dt=0.02+ (+slDt.value)/100*0.16;
+    step(dt, (+slVisc.value)/100*0.5, 0.0012);
+    drawFluidTray();
+  }
+}
+/* ================= seeding and switching trays ================= */
+function seedTray(){
+  var t=TRAYS[tray].k,s=N*N;
+  for(var i=0;i<s;i++){u[i]=0;v[i]=0;u0[i]=0;v0[i]=0;p[i]=0;div[i]=0;temp[i]=0;
+    dye[i*3]=0;dye[i*3+1]=0;dye[i*3+2]=0;}
+  if(t==='ink'){
+    for(var j=0;j<N;j++)for(var i=0;i<N;i++){
+      var c=gx(i,j),dx=(i/N-0.5),dy=(j/N-0.5);
+      var r=Math.sqrt(dx*dx+dy*dy);
+      if(r<0.13)dye[c*3]=Math.max(0,1-r/0.13)*0.9;
+    }
+  }
+  if(t==='smoke'){
+    for(var j=N*0.72;j<N;j++)for(var i=0;i<N;i++){
+      var c=gx(i,j);temp[c]=1;dye[c*3]=0.5;
+    }
+  }
+  if(t==='wash'){
+    for(var k=0;k<7;k++){
+      var cx=0.2+Math.random()*0.6,cy=0.2+Math.random()*0.6;
+      var ch=Math.floor(Math.random()*3);
+      for(var j=0;j<N;j++)for(var i=0;i<N;i++){
+        var c=gx(i,j),dx=(i/N-cx),dy=(j/N-cy);
+        var r=Math.sqrt(dx*dx+dy*dy);
+        if(r<0.1)dye[c*3+ch]=Math.max(0,1-r/0.1)*0.8;
+      }
+    }
+  }
+}
+function switchTray(i){
+  tray=i;iters=0;
+  ferro=null;lava=null;bubbles=null;
+  if(TRAYS[i].k!=='ferro'&&TRAYS[i].k!=='lava'&&TRAYS[i].k!=='bubble'){
+    if(!u)alloc();
+    seedTray();
+  }
+  hudL.textContent=TRAYS[i].n.toUpperCase();
+  rT.textContent=TRAYS[i].k;
+  note.textContent=NOTES[i];
+  paintChips();
+}
+var NOTES=[
+ 'A drop of ink in still water: the velocity and dye fields are both advected, and the pressure projection keeps the flow divergence free.',
+ 'Buoyancy from the hot base, a fixed obstacle along the centre line, and a vortex street that sheds on its own. The plume is the solution, not a drawing.',
+ 'Three pigments with different diffusion rates and granulation, on a paper that dries at its edges. Edge darkening is emergent, not painted.',
+ 'A container of dipoles and a magnet you move with the pointer. Spikes appear along the field because that shape lowers the magnetic energy.',
+ 'Buoyant ink rises, cools at the top, and falls back. The period of the column is set by the Rayleigh number, and you set the heat.',
+ 'Young–Laplace: the pressure difference across a film is 4σ/r, so the small bubble empties into the large one until one film remains.'
+];
+/* ================= the controls ================= */
+function chip(host,label,on,fn){
+  var b=document.createElement('button');
+  b.type='button';b.textContent=label;
+  b.setAttribute('aria-pressed',on?'true':'false');
+  b.addEventListener('click',function(){
+    fn();
+    var sib=b.parentNode.children;
+    for(var j=0;j<sib.length;j++)sib[j].setAttribute('aria-pressed','false');
+    b.setAttribute('aria-pressed','true');
+    paintChips();
+  });
+  host.appendChild(b);
+}
+function paintChips(){
+  var ts=elTrays.children,fs=elFields.children;
+  for(var i=0;i<ts.length;i++)ts[i].setAttribute('aria-pressed',i===tray?'true':'false');
+  for(var i=0;i<fs.length;i++)fs[i].setAttribute('aria-pressed',i===field?'true':'false');
+  btnPause.textContent=paused?'Resume':'Pause';
+  btnPause.classList.toggle('on',paused);
+  viscV.textContent=((+slVisc.value)/100*0.5).toFixed(2);
+  forceV.textContent=((+slForce.value)/100).toFixed(1);
+  dtV.textContent=(0.02+(+slDt.value)/100*0.16).toFixed(2);
+}
+TRAYS.forEach(function(t,i){chip(elTrays,t.n,i===tray,function(){switchTray(i);});});
+FIELDS.forEach(function(f,i){chip(elFields,f,i===field,function(){field=i;});});
+slVisc.addEventListener('input',paintChips);
+slForce.addEventListener('input',paintChips);
+slDt.addEventListener('input',paintChips);
+btnPause.addEventListener('click',function(){paused=!paused;paintChips();});
+btnClear.addEventListener('click',function(){
+  if(TRAYS[tray].k==='ferro')seedFerro();
+  else if(TRAYS[tray].k==='lava')seedLava();
+  else if(TRAYS[tray].k==='bubble')seedBubbles();
+  else seedTray();
+});
+window.addEventListener('keydown',function(e){
+  var k=e.key;
+  if(k>='1'&&k<='6')switchTray(+k-1);
+  else if(k==='f')field=(field+1)%FIELDS.length;
+  else if(k===' '){e.preventDefault();paused=!paused;}
+  else if(k==='c')btnClear.click();
+  else return;
+  paintChips();
+});
+/* ================= the canvas, the loop ================= */
+function fit(){
+  var box=cv.parentNode,r=box.getBoundingClientRect();
+  var dpr=Math.min(2,window.devicePixelRatio||1);
+  var w=Math.max(320,Math.round(r.width*dpr)),h=Math.max(320,Math.round(r.height*dpr));
+  if(cv.width!==w||cv.height!==h){
+    cv.width=w;cv.height=h;img=null;
+    ctx.imageSmoothingEnabled=false;
+  }
+  rG.textContent=(N+1)+'²';
+}
+var lastVort=0;
+function sample(pick){
+  /* a strided sample of a field is enough for a readout; the whole field is on screen */
+  var acc=0,n=0;
+  for(var i=0;i<N*N;i+=13){
+    var c=i+((i/N)|0);
+    if(c>=N*N)break;
+    if(pick===0)acc+=u[c]*u[c]+v[c]*v[c];
+    else if(pick===1)acc+=Math.abs(p[c]);
+    else acc+=Math.abs(div[c]);
+    n++;
+  }
+  return n?acc/n:0;
+}
+function tick(){
+  if(!paused)render();
+  if(field===0){
+    hudR.textContent='dye '+sample(0).toFixed(4);
+  }else if(field===1){
+    /* ω = ∂v/∂x − ∂u/∂y, sampled over the grid */
+    var w=0,n=0;
+    for(var j=1;j<N;j++)for(var i=1;i<N;i+=13){
+      var c=gx(i,j);
+      w+=Math.abs((v[c+1]-v[c-1])-(u[c+(N+1)]-u[c-(N+1)]))/2;
+      n++;
+    }
+    lastVort=lastVort*0.9+(n?w/n:0);
+    hudR.textContent='vorticity '+lastVort.toFixed(3);
+  }else if(field===2){
+    hudR.textContent='|u|² '+sample(0).toFixed(4);
+  }else if(field===3){
+    hudR.textContent='|p| '+sample(1).toFixed(4);
+  }else{
+    hudR.textContent='div '+sample(2).toFixed(4);
+  }
+  rI.textContent=iters.toLocaleString();
+  rS.textContent=(0.02+(+slDt.value)/100*0.16).toFixed(2);
+  if(TRAYS[tray].k!=='ink'&&TRAYS[tray].k!=='smoke'&&TRAYS[tray].k!=='wash'){
+    hudR.textContent=TRAYS[tray].k+' step';
+  }
+}
+alloc();seedTray();switchTray(0);
+fit();paintChips();
+window.addEventListener('resize',fit);
+window.setInterval(tick,1000/30);
+})();
+</script>
+</body>
+</html>

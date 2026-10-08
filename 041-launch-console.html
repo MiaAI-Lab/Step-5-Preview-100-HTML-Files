@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LAUNCH CONSOLE — Pad 4, T-Minus</title>
+<style>
+  :root{
+    --bg:#080c0a;
+    --panel:#0e1512;
+    --line:rgba(180,220,190,.14);
+    --text:#dcefe2;
+    --muted:rgba(220,239,226,.5);
+    --green:#57e08a;
+    --amber:#ffc45c;
+    --red:#ff5f56;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--mono);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+
+  .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(14px,4vw,40px)}
+
+  .bar{
+    display:flex;align-items:center;gap:clamp(8px,1.8vw,22px);flex-wrap:wrap;
+    padding:14px clamp(14px,4vw,40px);border-bottom:1px solid var(--line);
+    font-size:9.5px;letter-spacing:.22em;text-transform:uppercase;position:relative;z-index:2
+  }
+  .bar .id{color:var(--muted)}
+  .bar .id b{color:var(--amber);font-weight:400}
+  .bar .sp{flex:1}
+  .bar .stat{display:flex;align-items:center;gap:7px;color:var(--muted)}
+  .bar .dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);animation:bp 1.2s steps(1) infinite}
+  @keyframes bp{0%,50%{opacity:1}51%,100%{opacity:.2}}
+
+  .hero{padding:clamp(24px,5vw,56px) 0 clamp(14px,3vw,24px);display:grid;grid-template-columns:1.2fr 1fr;gap:clamp(20px,4vw,48px);align-items:end}
+  .hero .k{font-size:9.5px;letter-spacing:.3em;text-transform:uppercase;color:var(--amber);display:block;margin-bottom:18px}
+  .hero h1{font-family:var(--sans);font-weight:200;font-size:clamp(28px,5.4vw,64px);line-height:.98;letter-spacing:-.025em;margin:0}
+  .hero h1 b{font-weight:600;color:var(--green)}
+  .hero p{font-size:13px;line-height:1.8;color:var(--muted);margin:0}
+
+  /* ---------- countdown ---------- */
+  .cd{
+    border:1px solid var(--line);background:var(--panel);
+    padding:clamp(20px,4vw,34px);margin:clamp(16px,3vw,30px) 0;
+    display:grid;grid-template-columns:auto 1fr;gap:clamp(18px,3vw,34px);align-items:center
+  }
+  .clock{
+    font-family:var(--mono);font-size:clamp(38px,8vw,86px);font-weight:300;
+    letter-spacing:-.02em;line-height:1;font-variant-numeric:tabular-nums;color:var(--amber)
+  }
+  .clock .u{font-size:.4em;color:var(--muted);margin-left:8px;letter-spacing:.2em}
+  .gauges{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line)}
+  .gauges div{background:var(--panel);padding:14px 16px}
+  .gauges span{display:block;font-size:8.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+  .gauges b{font-size:20px;font-weight:400;letter-spacing:-.01em}
+  .gauges b.ok{color:var(--green)}
+  .gauges b.warn{color:var(--amber)}
+
+  .ctrls{display:flex;gap:8px;flex-wrap:wrap;margin-top:clamp(6px,1.4vw,14px);grid-column:1/-1}
+  button{
+    font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;
+    background:rgba(87,224,138,.12);border:1px solid rgba(87,224,138,.4);color:var(--text);
+    padding:13px 20px;border-radius:4px;cursor:pointer;transition:all .2s
+  }
+  button:hover{background:var(--green);color:#0a1a10}
+  button.on{background:var(--green);color:#0a1a10}
+  button.danger{background:rgba(255,95,86,.12);border-color:rgba(255,95,86,.45)}
+  button.danger:hover{background:var(--red);color:#1a0605}
+
+  /* ---------- systems ---------- */
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin:clamp(16px,3vw,30px) 0}
+  .cell{background:var(--panel);padding:22px 20px}
+  .cell span{display:block;font-size:8.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+  .cell b{font-size:17px;font-weight:400;display:block;line-height:1.25}
+  .cell .st{font-family:var(--mono);font-size:8.5px;letter-spacing:.16em;margin-top:10px;text-transform:uppercase}
+  .cell .st.g{color:var(--green)}
+  .cell .st.a{color:var(--amber)}
+  .cell .st.r{color:var(--red)}
+
+  /* ---------- trace ---------- */
+  .trace{border:1px solid var(--line);background:var(--panel);padding:clamp(16px,3vw,26px);margin:clamp(16px,3vw,30px) 0}
+  .trace .h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+  .trace .h b{font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;font-weight:400}
+  .trace .h span{font-size:9px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase}
+  #cv{width:100%;height:160px;display:block}
+
+  /* ---------- log ---------- */
+  .log{border:1px solid var(--line);background:var(--panel);padding:clamp(16px,3vw,24px);margin:clamp(16px,3vw,30px) 0}
+  .log .h{font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;margin-bottom:14px;color:var(--muted)}
+  #log{height:170px;overflow-y:auto;font-size:11.5px;line-height:1.85}
+  #log div{white-space:pre-wrap}
+  .g{color:var(--green)}.a{color:var(--amber)}.r{color:var(--red)}.m{color:var(--muted)}
+
+  footer{border-top:1px solid var(--line);padding:24px clamp(14px,4vw,40px) 48px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+
+  @media (max-width:900px){
+    .hero{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,1fr)}
+    .gauges{grid-template-columns:1fr}
+    .cd{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div class="bar">
+  <span class="id">PAD <b>4</b></span>
+  <span class="id">VEHICLE <b>VULCAN-7</b></span>
+  <span class="id">MISSION <b>ISS-41</b></span>
+  <span class="sp"></span>
+  <span class="stat"><span class="dot"></span>ALL SYSTEMS NOMINAL</span>
+</div>
+
+<div class="wrap">
+  <header class="hero">
+    <div>
+      <span class="k">Launch control · LC-39 complex</span>
+      <h1>Everything is<br><b>ready.</b> Except<br>the weather.</h1>
+    </div>
+    <p>Hold at T-minus 4 minutes. The range is green, the vehicle is green, and the
+    upper-level winds are the only thing still arguing about the schedule.</p>
+  </header>
+
+  <section class="cd">
+    <div class="clock" id="clock">04:00<span class="u">T−</span></div>
+    <div class="gauges">
+      <div><span>Wind aloft</span><b id="gW" class="warn">118 kt</b></div>
+      <div><span>Range status</span><b class="ok">GO</b></div>
+      <div><span>Vehicle</span><b class="ok">GO</b></div>
+      <div><span>Recovery</span><b class="ok">GO</b></div>
+      <div><span>Weather</span><b class="warn">NO-GO</b></div>
+      <div><span>Crew</span><b class="ok">GO</b></div>
+    </div>
+    <div class="ctrls">
+      <button id="hold">Hold</button>
+      <button id="resume">Resume</button>
+      <button id="fast">Fast forward</button>
+      <button id="scrub" class="danger">Scrub</button>
+    </div>
+  </section>
+
+  <section class="grid">
+    <div class="cell"><span>Stage 1 · LOX/RP-1</span><b>4 120 kN</b><span class="st g">chilled</span></div>
+    <div class="cell"><span>Stage 2 · LOX/LH2</span><b>1 108 kN</b><span class="st g">chilled</span></div>
+    <div class="cell"><span>Payload</span><b>17 800 kg</b><span class="st g">armed</span></div>
+    <div class="cell"><span>Guidance</span><b>Vulcan MK IV</b><span class="st g">aligned</span></div>
+    <div class="cell"><span>Telemetry</span><b>S-band · 4.2 Gb/s</b><span class="st g">locked</span></div>
+    <div class="cell"><span>Power</span><b>Li-ion 28 V</b><span class="st g">98%</span></div>
+    <div class="cell"><span>Cabin</span><b>101.3 kPa · 21°C</b><span class="st g">stable</span></div>
+    <div class="cell"><span>Abort</span><b>Armed · 3 modes</b><span class="st a">standby</span></div>
+  </section>
+
+  <section class="trace">
+    <div class="h"><b>Chamber pressure trace</b><span>kPa · last 40 seconds</span></div>
+    <canvas id="cv"></canvas>
+  </section>
+
+  <section class="log">
+    <div class="h">Flight control log</div>
+    <div id="log"></div>
+  </section>
+</div>
+
+<footer>
+  <span>Range: Eastern Test Range</span>
+  <span>Window: 06:14:00 – 06:44:00 UTC</span>
+  <span>Simulated console · nothing launches</span>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  /* ---------- countdown ---------- */
+  var t=240;              /* seconds */
+  var running=false,rate=1;
+  var el=document.getElementById('clock');
+  var unit=document.createElement('span');
+  unit.className='u';
+  unit.textContent='T\u2212';
+  function fmt(s){
+    s=Math.max(0,Math.round(s));
+    var m=Math.floor(s/60),ss=s%60;
+    return (m<10?'0':'')+m+':'+(ss<10?'0':'')+ss;
+  }
+  function tick(){
+    if(running){
+      t-=rate*0.016;
+      if(t<=0){
+        t=0;running=false;
+        say('T−0. LIFTOFF. All engines at full thrust.','g');
+        say('Vehicle is pitching over. Telemetry is nominal.','m');
+        document.getElementById('clock').style.color='var(--green)';
+      }
+      var wind=Math.round(90+Math.random()*46+Math.max(0,(30-t))*0.3);
+      document.getElementById('gW').textContent=wind+' kt';
+      document.getElementById('gW').className=wind>128?'r':'warn';
+    }
+    el.textContent='';
+    el.appendChild(document.createTextNode(fmt(t)));
+    el.appendChild(unit);
+    setTimeout(tick,16);
+  }
+  el.innerHTML='04:00<span class="u">T−</span>';
+
+  var hold=document.getElementById('hold'),
+      resume=document.getElementById('resume'),
+      fast=document.getElementById('fast'),
+      scrub=document.getElementById('scrub');
+  function setBtn(b,on){b.classList.toggle('on',on)}
+  hold.addEventListener('click',function(){
+    if(!running){say('Already holding.','a');return;}
+    running=false;setBtn(this,true);setBtn(resume,false);setBtn(fast,false);
+    say('HOLD. Countdown stopped at T−'+fmt(t)+'. Reason: upper-level winds.','a');
+    rate=1;
+  });
+  resume.addEventListener('click',function(){
+    if(running)return;
+    running=true;rate=1;setBtn(this,true);setBtn(hold,false);
+    say('Countdown resumed at T−'+fmt(t)+'.','g');
+  });
+  fast.addEventListener('click',function(){
+    if(!running)return;
+    rate=8;setBtn(this,true);setBtn(resume,false);
+    say('Fast-forward. Interior clock running at 8× for procedure check.','a');
+  });
+  scrub.addEventListener('click',function(){
+    running=false;rate=1;
+    setBtn(hold,false);setBtn(resume,false);setBtn(fast,false);
+    t=240;el.textContent='04:00';el.style.color='';
+    say('SCRUB. Launch attempt cancelled. Next window 06:14 UTC tomorrow.','r');
+  });
+
+  /* ---------- log ---------- */
+  var log=document.getElementById('log');
+  function say(txt,cls){
+    var d=document.createElement('div');
+    if(cls)d.className=cls;
+    var now=new Date();
+    var p=function(n){return (n<10?'0':'')+n};
+    d.textContent='['+p(now.getHours())+':'+p(now.getMinutes())+':'+p(now.getSeconds())+'] '+txt;
+    log.appendChild(d);
+    log.scrollTop=log.scrollHeight;
+  }
+  say('Launch control console online. Vehicle Vulcan-7, mission ISS-41.','m');
+  say('Terminal count proceeded to T−4 minutes.','m');
+  say('Weather officer reports upper-level winds exceeding limits.','a');
+  say('Countdown placed in HOLD pending conditions.','a');
+
+  var CHATTER=[
+    ['Range safety confirms corridor 4 is clear.','m'],
+    ['Ground umbilical retract verified on stages 1 and 2.','m'],
+    ['Crew ingress complete, hatch secured.','g'],
+    ['Guidance alignment confirmed by both IMU sets.','g'],
+    ['Weather balloon launch from 30 km downrange.','a'],
+    ['Recovery ship reports on station 640 km downrange.','m'],
+    ['Strongback retract in 20 seconds.','m'],
+    ['Flight termination system armed and verified.','g'],
+    ['Cabin pressurisation nominal.','g'],
+    ['Weather officer reports shear layer at 11 km.','a']
+  ];
+  var ci=0;
+  setInterval(function(){
+    if(ci>=CHATTER.length)return;
+    var c=CHATTER[ci++];
+    say(c[0],c[1]);
+  },4200);
+
+  /* ---------- pressure trace ---------- */
+  var cv=document.getElementById('cv'),c=cv.getContext('2d');
+  var W,H,DPR=Math.min(devicePixelRatio||1,2);
+  var data=[];
+  for(var i=0;i<80;i++)data.push(2100+Math.sin(i*0.2)*40);
+  function size(){
+    var r=cv.getBoundingClientRect();
+    W=r.width||600;H=160;
+    cv.width=W*DPR;cv.height=H*DPR;
+    c.setTransform(DPR,0,0,DPR,0,0);
+  }
+  function drawTrace(){
+    if(!W){requestAnimationFrame(drawTrace);return;}
+    c.clearRect(0,0,W,H);
+    /* grid */
+    c.strokeStyle='rgba(180,220,190,.08)';c.lineWidth=1;
+    for(var g=0;g<=4;g++){
+      var y=6+g*(H-12)/4;
+      c.beginPath();c.moveTo(0,y);c.lineTo(W,y);c.stroke();
+    }
+    /* area */
+    var lo=2000,hi=2300;
+    var bw=W/data.length;
+    c.beginPath();
+    for(var i=0;i<data.length;i++){
+      var x=i*bw;
+      var y=H-6-(data[i]-lo)/(hi-lo)*(H-12);
+      if(i===0)c.moveTo(x,y);else c.lineTo(x,y);
+    }
+    var last=data[data.length-1];
+    var ly=H-6-(last-lo)/(hi-lo)*(H-12);
+    c.lineTo(W,H);c.lineTo(0,H);c.closePath();
+    var g2=c.createLinearGradient(0,0,0,H);
+    g2.addColorStop(0,'rgba(87,224,138,.28)');
+    g2.addColorStop(1,'rgba(87,224,138,0)');
+    c.fillStyle=g2;c.fill();
+    /* line */
+    c.beginPath();
+    for(var j=0;j<data.length;j++){
+      var xx=j*bw, yy=H-6-(data[j]-lo)/(hi-lo)*(H-12);
+      if(j===0)c.moveTo(xx,yy);else c.lineTo(xx,yy);
+    }
+    c.strokeStyle=running?'#57e08a':'#ffc45c';
+    c.lineWidth=1.8;c.lineJoin='round';c.stroke();
+    /* head */
+    c.fillStyle='#fff';c.shadowColor=c.strokeStyle;c.shadowBlur=12;
+    c.beginPath();c.arc(data.length*bw-bw,ly,3,0,6.283);c.fill();c.shadowBlur=0;
+    /* labels */
+    c.fillStyle='rgba(220,239,226,.4)';c.font='9px ui-monospace,monospace';c.textAlign='left';
+    c.fillText((hi/1000).toFixed(2)+' MPa',6,14);
+    c.fillText((lo/1000).toFixed(2)+' MPa',6,H-6);
+    requestAnimationFrame(drawTrace);
+  }
+  setInterval(function(){
+    if(running){
+      data.push(2150+Math.random()*60+ (Math.random()<0.06?Math.random()*180:0));
+    }else{
+      data.push(2100+Math.sin(Date.now()*0.001)*30);
+    }
+    data.shift();
+  },120);
+
+  addEventListener('resize',function(){clearTimeout(window.__r);window.__r=setTimeout(size,140)});
+  size();
+  tick();
+  requestAnimationFrame(drawTrace);
+})();
+</script>
+</body>
+</html>

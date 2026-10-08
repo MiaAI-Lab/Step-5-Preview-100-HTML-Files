@@ -1,0 +1,91 @@
+# THE DOME — an eyepiece you can aim
+
+## Short title
+Observatory
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: an observatory eyepiece you have
+to aim, with a catalogue of real deep-sky objects, a field of view you choose, and altitude
+and azimuth computed from latitude and hour angle. No external dependencies whatsoever —
+no CDN, no web fonts, no external images, no JS libraries. All CSS and JavaScript inline,
+works offline by double-clicking, responsive, valid HTML5.
+
+Artistic direction: a dome at night. Ground #0b0a12, canvas #05050c, hairlines
+rgba(242,236,245,.14), body #f2ecf5 with muted #a79caa, amber #e8c46a for the reticle and
+figures and a red #e0533f for the primary action. Serif headings with italic accent words,
+uppercase .2em–.4em kickers, monospace coordinates and ket-free notation.
+
+The field is a canvas on a 900 × 520 backing store, scaled by CSS. It draws a seeded
+field of nine hundred stars, each with right ascension, declination, magnitude and a tint,
+projected by an orthographic rule: right ascension offset by the hour angle across, scaled
+by the cosine of the declination of the field centre, and declination straight up. Stars
+fainter than the field's magnitude limit are not drawn at all, and the ones that are scale
+and fade by magnitude, so the field really does change character between the naked-eye and
+high-power settings.
+
+The reticle is fixed to the eyepiece, not to the sky: a crosshair, a small circle, a dashed
+field stop at the radius of the field of view, and a scale bar whose label switches from
+degrees to arc-minutes below one degree.
+
+Eight catalogue objects with real coordinates — the Orion Nebula, Andromeda, Hercules
+Cluster, Pleiades, Albireo, the North America Nebula, the Whirlpool and Saturn — each with
+its magnitude and a one-line note. Picking one slews the mount: the field centre eases
+toward the target at a fixed rate rather than jumping, and the target is drawn as a soft
+glow whose size follows its brightness. Nearest object finds the closest in angular
+separation.
+
+Altitude and azimuth are computed properly from the declination, the latitude and the hour
+angle, so crossing the meridian really does put a target at its highest, and the readout
+reports both. Tracking advances the hour angle at the sidereal rate; turning it off blurs
+the star field, which is what an untracked mount does to a photograph.
+
+Controls: latitude (0–70), hour angle, field of view (naked eye, binoculars, wide field,
+high power), Track the sky and Nearest object. Dragging the field slews the mount directly
+and cancels any slew in progress. Readout: target, altitude, azimuth, field and magnitude.
+
+Layout: nav, centred hero, the eyepiece with its coordinate overlay, a dock of three
+sliders and two buttons, a four-up catalogue grid, a readout row, then two three-cell note
+rows on the field, altitude, field of view, magnitude, tracking and red light, then a
+footer. Catalogue collapses 4 → 2 → 1, links hidden under 780px.
+
+Interaction: pick a target and watch the mount slew, or drag the field yourself. Change the
+field of view to see the same sky as a naked eye and as a high-power view, drag the hour
+angle to watch the altitude climb past the meridian, drag the latitude to see what a target
+looks like from the equator or from the north, and turn tracking on for the sidereal drift.
+
+## One-paragraph description of the intended design
+An eyepiece view on canvas where a seeded field of nine hundred stars is projected by right
+ascension and declination with a magnitude limit and brightness that change with the chosen
+field of view, a fixed reticle and scale bar, a catalogue of eight real deep-sky objects
+that slew the mount toward them at a fixed rate, altitude and azimuth properly computed
+from latitude and hour angle, a track button that advances the hour angle at the sidereal
+rate and blurs the field when off, and dragging to slew the mount by hand.
+
+## Major visual techniques used
+- Orthographic projection from right ascension and declination, with the across-axis
+  scaled by the cosine of the field's declination, so the field has the right shape
+- Magnitude limit enforced by not drawing faint stars at all, and size and alpha derived
+  from magnitude, so each field of view is a different picture
+- Reticle, small circle, dashed field stop and scale bar all drawn in the eyepiece's
+  frame rather than the sky's, which is the whole point of an eyepiece
+- Scale bar label switching between degrees and arc-minutes at one degree
+- Slew as a fixed-rate ease toward the target rather than a jump or a bezier, so the
+  mount behaves like a mount
+- Dragging the field slews directly and cancels the slew, so two inputs cannot fight
+- Target glow as a radial gradient whose radius follows the object's brightness
+- Altitude and azimuth from the standard spherical relations, so meridian crossing is
+  correct rather than decorative
+- Tracking advancing the hour angle at 15 degrees an hour and blurring the star field
+  when off, which is what an untracked mount does
+- Catalogue cards carrying the real coordinates in formatted RA and Dec, so the numbers
+  on the card are the numbers the sky uses
+- Nearest object by true angular separation in the two axes, not by screen distance
+- Coordinate overlay written every frame from the same view object the drawing uses
+- A dark palette throughout, justified in the copy by dark adaptation
+
+## Intended interaction model
+An instrument you have to work. Visitors read the catalogue, pick a target and watch the
+mount slew, or drag the field to aim it themselves; they choose the field of view, drag the
+hour angle to see a target rise and set, drag the latitude to move the observatory, and
+turn tracking on so the drift is handled for them. Nothing is aimed for you.

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GLACIER — Inside the Blue</title>
+<style>
+  :root{
+    --ink:#eef6fb;
+    --dim:rgba(238,246,251,.55);
+    --line:rgba(238,246,251,.14);
+    --ice:#8fd8f0;
+    --deep:#2a6f9f;
+    --light:#d8f4ff;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --serif:"Iowan Old Style",Palatino,Georgia,serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden}
+  body{background:#04141f;color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+  .cave{
+    position:fixed;inset:0;z-index:0;
+    background:
+      radial-gradient(50% 40% at 30% 24%,rgba(216,244,255,.30),transparent 66%),
+      radial-gradient(70% 50% at 76% 70%,rgba(42,111,159,.30),transparent 70%),
+      linear-gradient(180deg,#0a2a3d 0%,#062131 44%,#04141f 100%);
+    transition:filter .8s linear
+  }
+  #cv{position:fixed;inset:0;z-index:1;display:block}
+
+  .ui{position:fixed;inset:0;z-index:3;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(18px,3.4vw,40px)}
+  .top{display:flex;justify-content:space-between;align-items:flex-start;gap:18px}
+  .k{font-family:var(--mono);font-size:9px;letter-spacing:.32em;text-transform:uppercase;color:var(--light)}
+  h1{font-family:var(--serif);font-weight:400;font-style:italic;font-size:clamp(28px,5.2vw,62px);line-height:.98;letter-spacing:-.02em;margin:10px 0 0}
+  h1 b{font-style:normal;font-weight:400;color:var(--ice)}
+  .top p{margin:12px 0 0;font-size:12px;line-height:1.75;max-width:32ch;color:var(--dim)}
+  .mtr{text-align:right;font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);line-height:2.4}
+  .mtr b{display:block;font-size:15px;color:var(--light);font-weight:400;letter-spacing:.02em}
+
+  .bottom{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+  .tray{
+    pointer-events:auto;display:flex;gap:clamp(8px,1.3vw,16px);flex-wrap:wrap;align-items:center;
+    background:rgba(6,26,38,.62);border:1px solid var(--line);border-radius:16px;
+    padding:11px clamp(12px,1.8vw,20px);backdrop-filter:blur(14px)
+  }
+  .g{display:flex;align-items:center;gap:8px}
+  .kk{font-family:var(--mono);font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+  .vv{font-family:var(--mono);font-size:9.5px;color:var(--light);min-width:30px;font-variant-numeric:tabular-nums}
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;width:64px;height:14px;background:transparent;cursor:pointer
+  }
+  input[type=range]::-webkit-slider-runnable-track{height:2px;background:var(--line);border-radius:2px}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;border-radius:50%;background:var(--ice);margin-top:-5px;border:0;box-shadow:0 0 10px rgba(143,216,240,.7)}
+  input[type=range]::-moz-range-track{height:2px;background:var(--line);border-radius:2px}
+  input[type=range]::-moz-range-thumb{width:11px;height:11px;border:0;border-radius:50%;background:var(--ice)}
+  button{
+    pointer-events:auto;font-family:var(--mono);font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;
+    background:rgba(143,216,240,.12);border:1px solid rgba(143,216,240,.36);color:var(--ink);
+    padding:9px 13px;border-radius:999px;cursor:pointer;transition:background .2s,color .2s
+  }
+  button:hover{background:var(--ice);color:#06222e}
+  button.on{background:var(--ice);color:#06222e}
+  .hint{font-family:var(--mono);font-size:8.5px;letter-spacing:.2em;text-transform:uppercase;color:rgba(238,246,251,.4);pointer-events:none}
+
+  @media (max-width:760px){.top p,.mtr,.hint{display:none}.ui{padding:14px}}
+</style>
+</head>
+<body>
+<div class="cave" id="cave"></div>
+<canvas id="cv"></canvas>
+
+<div class="ui">
+  <div class="top">
+    <div>
+      <div class="k">Vatnajökull · ice cave, 400 m from the surface</div>
+      <h1>Blue is what the<br><b>red light left.</b></h1>
+      <p>Glacier ice absorbs red. Two metres in, everything is blue, which is why
+      these caves are the size of rooms and the colour of deep water.</p>
+    </div>
+    <div class="mtr">
+      Ice temp<b id="mT">−8.4 °C</b>
+      Facets<b id="mF">0</b>
+      Refraction<b id="mR">1.31</b>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <div class="tray">
+      <div class="g"><span class="kk">Clarity</span><input type="range" id="cl" min="0" max="100" value="58" aria-label="Ice clarity"><span class="vv" id="clV">58</span></div>
+      <div class="g"><span class="kk">Facets</span><input type="range" id="fc" min="10" max="120" value="58" aria-label="Facet count"><span class="vv" id="fcV">58</span></div>
+      <div class="g"><span class="kk">Light</span><input type="range" id="lg" min="0" max="100" value="52" aria-label="Light angle"><span class="vv" id="lgV">52</span></div>
+      <button id="shimmer" class="on">Shimmer</button>
+      <button id="melt">Meltwater</button>
+    </div>
+    <div class="hint">Move the pointer — the facets refract toward it</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var cv=document.getElementById('cv'),c=cv.getContext('2d');
+  var W,H,DPR=Math.min(window.devicePixelRatio||1,2);
+  var facets=[],shards=[];
+  var clarity=58,count=58,light=52,shimmer=true,melt=false;
+  var mx=0.5,my=0.3,pmx=0.5,pmy=0.3;
+  var t=0;
+
+  function mkFacet(){
+    return {x:Math.random(),y:Math.random(),
+      w:0.02+Math.random()*0.05,h:0.05+Math.random()*0.14,
+      a:Math.random()*6.283,
+      rot:Math.random()*6.283,
+      sp:(Math.random()-.5)*0.4,
+      depth:Math.random(),
+      hue:190+Math.random()*30,
+      ph:Math.random()*6.283};
+  }
+  function mkShard(){
+    return {x:Math.random(),y:Math.random(),vy:0.1+Math.random()*0.4,
+      r:0.4+Math.random()*1.6,ph:Math.random()*6.283};
+  }
+  function build(){
+    facets=[];shards=[];
+    for(var i=0;i<count;i++)facets.push(mkFacet());
+    for(var s=0;s<70;s++)shards.push(mkShard());
+    /* far facets first, once, so the loop below does not sort every frame */
+    facets.sort(function(a,b){return a.depth-b.depth});
+  }
+  function resize(){
+    W=innerWidth;H=innerHeight;
+    cv.width=W*DPR;cv.height=H*DPR;cv.style.width=W+'px';cv.style.height=H+'px';
+    c.setTransform(DPR,0,0,DPR,0,0);
+  }
+
+  function draw(){
+    t+=0.016;
+    var cf=clarity/100, lf=light/100;
+    c.setTransform(DPR,0,0,DPR,0,0);
+    c.clearRect(0,0,W,H);
+
+    /* the light shaft entering from the top left */
+    pmx+=(mx-pmx)*0.05;pmy+=(my-pmy)*0.05;
+    var lx=pmx*W, ly=pmy*H;
+    var lg=c.createRadialGradient(lx,ly,0,lx,ly,Math.max(W,H)*(0.5+lf*0.5));
+    lg.addColorStop(0,'rgba(216,244,255,'+(0.14+lf*0.22).toFixed(3)+')');
+    lg.addColorStop(.25,'rgba(143,216,240,'+(0.06+lf*0.10).toFixed(3)+')');
+    lg.addColorStop(1,'rgba(120,200,235,0)');
+    c.fillStyle=lg;c.fillRect(0,0,W,H);
+
+    var i,f;
+    c.save();
+    c.globalCompositeOperation='lighter';
+    for(i=0;i<facets.length;i++){
+      f=facets[i];
+      /* each facet turns slowly toward the pointer, like a real ice plane */
+      var target=Math.atan2(ly-(f.y*H),lx-(f.x*W));
+      var dx=target-f.a;
+      while(dx>Math.PI)dx-=2*Math.PI;
+      while(dx<-Math.PI)dx+=2*Math.PI;
+      f.a+=dx*0.008;
+      if(shimmer)f.rot+=f.sp*0.004;
+
+      var x=f.x*W, y=f.y*H;
+      var w=f.w*W*(0.6+f.depth*0.9)*(0.7+cf*0.6);
+      var h=f.h*H*(0.6+f.depth*0.9)*(0.7+cf*0.6);
+      c.save();
+      c.translate(x,y);
+      c.rotate(f.rot);
+      /* a long thin rhombus: the classic ice facet */
+      c.beginPath();
+      c.moveTo(0,-h/2);
+      c.lineTo(w/2,0);
+      c.lineTo(0,h/2);
+      c.lineTo(-w/2,0);
+      c.closePath();
+      /* brightness from how much the facet's normal points at the light */
+      var face=Math.abs(Math.cos(f.a-target));
+      var al=(0.04+face*0.30)*(0.4+cf*0.9)*(0.5+f.depth*0.5);
+      var g3=c.createLinearGradient(-w/2,-h/2,w/2,h/2);
+      g3.addColorStop(0,'hsla('+f.hue+',95%,'+(72+face*22)+'%,'+al.toFixed(3)+')');
+      g3.addColorStop(.5,'hsla('+(f.hue+14)+',90%,'+(58+face*20)+'%,'+(al*0.5).toFixed(3)+')');
+      g3.addColorStop(1,'hsla('+f.hue+',95%,'+(78+face*20)+'%,'+(al*0.2).toFixed(3)+')');
+      c.fillStyle=g3;
+      c.fill();
+      /* a bright edge on the lit side */
+      if(face>0.5){
+        c.strokeStyle='hsla('+f.hue+',100%,92%,'+((face-0.5)*0.5*cf).toFixed(3)+')';
+        c.lineWidth=0.9;
+        c.stroke();
+      }
+      c.restore();
+    }
+    c.restore();
+
+    /* meltwater: falling droplets that streak as they fall */
+    if(melt){
+      c.save();
+      c.globalCompositeOperation='lighter';
+      for(i=0;i<shards.length;i++){
+        var sh=shards[i];
+        sh.y+=sh.vy*0.004;
+        if(sh.y>1.02){sh.y=-0.02;sh.x=Math.random();}
+        var sy=sh.y*H;
+        var sx=sh.x*W+Math.sin(t*0.6+sh.ph)*6;
+        c.strokeStyle='rgba(200,240,255,.18)';
+        c.lineWidth=sh.r*0.8;
+        c.beginPath();c.moveTo(sx,sy);c.lineTo(sx,sy+22);c.stroke();
+        c.fillStyle='rgba(230,250,255,.5)';
+        c.beginPath();c.arc(sx,sy,sh.r,0,6.283);c.fill();
+      }
+      c.restore();
+    }
+
+    /* the deep blue floor shadow */
+    var fl=c.createLinearGradient(0,H*0.7,0,H);
+    fl.addColorStop(0,'rgba(4,20,31,0)');
+    fl.addColorStop(1,'rgba(4,20,31,.7)');
+    c.fillStyle=fl;c.fillRect(0,H*0.7,W,H*0.3);
+
+    document.getElementById('cave').style.filter='brightness('+(0.5+cf*0.5*0.8).toFixed(2)+') saturate('+(0.8+cf*0.5).toFixed(2)+')';
+    document.getElementById('mF').textContent=facets.length;
+    document.getElementById('mR').textContent=(1.30+cf*0.03).toFixed(2);
+    document.getElementById('mT').textContent=(melt?-3.1:-8.4).toFixed(1)+' \u00b0C';
+    requestAnimationFrame(draw);
+  }
+
+  addEventListener('pointermove',function(e){
+    mx=e.clientX/innerWidth;my=e.clientY/innerHeight;
+  });
+
+  document.getElementById('cl').addEventListener('input',function(){
+    clarity=+this.value;document.getElementById('clV').textContent=clarity;
+  });
+  document.getElementById('fc').addEventListener('input',function(){
+    count=+this.value;document.getElementById('fcV').textContent=count;
+    while(facets.length>count)facets.pop();
+    while(facets.length<count)facets.push(mkFacet());
+  });
+  document.getElementById('lg').addEventListener('input',function(){
+    light=+this.value;document.getElementById('lgV').textContent=light;
+  });
+  var sb=document.getElementById('shimmer');
+  sb.addEventListener('click',function(){shimmer=!shimmer;this.classList.toggle('on',shimmer);});
+  var mb=document.getElementById('melt');
+  mb.addEventListener('click',function(){melt=!melt;this.classList.toggle('on',melt);});
+
+  addEventListener('resize',function(){clearTimeout(window.__r);window.__r=setTimeout(resize,140)});
+  resize();build();
+  requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>

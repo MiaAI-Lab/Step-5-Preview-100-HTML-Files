@@ -1,0 +1,88 @@
+# ROSE — North Transept, Light at Four O'Clock
+
+## Short title
+Gothic Rose Window
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a page about a Gothic
+rose window, called ROSE, whose tracery turns. No external dependencies whatsoever
+— no CDN, no web fonts, no external images, no external SVG files, no JavaScript
+libraries. All CSS and JavaScript inline, works offline by double-clicking, responsive,
+valid HTML5.
+
+Artistic direction: warm limestone and painted glass. The page ground is stone
+#e8e2d4, the window surround is a radial gradient of the same stone into #cfc6b2
+and #b9af99, and the glass area is a warm daylight gradient (#fdf6e4 → #f0e0bc →
+#e2cba0) so the panels read as light coming through. Ink is #2a2620, the tracery is
+drawn in translucent lead rgba(42,38,32,.72), and the single accent is a deep
+oxblood red #8c2f2f used for one italic word in the headline, the eyebrow and the
+figures. Type is a high-contrast serif for display and figures, with a 9–9.5px
+wide-tracked monospace for all labels and captions.
+
+The window is built from DOM elements, not canvas. Twelve principal petals are
+placed around the centre with rotate(a)deg translate(R·0.30), each a rotated square
+clipped to a diamond with clip-path:polygon(50% 0, 100% 50%, 50% 100%, 0 50%),
+filled with a radial gradient that runs from the lighter to the darker of its
+colour pair, and composited in screen blend against the daylight ground so it reads
+as light passing through. A smaller inner petal in the plain lighter colour sits
+inside each, and a ring of twenty-four small diamond panels runs around the hub,
+each in one of six medieval glass colours (copper red, cobalt blue, green, ochre,
+purple, orange), their light and dark tones taken from the same pair.
+
+The tracery is a separate layer: twelve thick principal bars radiating from the hub
+at 3px, twelve thinner secondary bars at 1.5px offset halfway between them, and
+thirty-six fine spokes at 1px reaching into the inner ring — all short rectangles
+rotated into place with transform-origin at the centre. Two concentric rings of
+lead (2px and 1px) and a stone hub with a lead ring complete the structure.
+
+The animation: the glass layer rotates slowly in one direction while the two lead
+rings counter-rotate at different rates, all driven from one accumulating time
+value in radians — so the tracery and the glass move against each other at
+different speeds, which is exactly how a rose window reads as you walk past it.
+
+Layout: a nav with a monospace brand and two links. A centred hero with an
+oxblood eyebrow, a serif headline with one italic oxblood word, and a paragraph
+about four o'clock light. Then a square stage holding the window, followed by a
+monospace caption (diameter, twelve bars, 132 panels). Then a three-cell columns
+row built from 1px gaps with large oxblood serif figures. Then a ruled monospace
+footer.
+
+Interaction: essentially none — the window counter-rotates continuously and there
+are no controls. The page's one real behaviour is that it rebuilds the entire
+window on resize, since every petal and bar is sized from the measured glass
+radius. The columns collapse to one under 820px.
+
+## One-paragraph description of the intended design
+A stained-glass rose window built from DOM: twelve diamond-clipped petals in six
+medieval colour pairs screen-blended over a warm daylight ground, an inner ring of
+twenty-four small panels, and three tiers of lead tracery — twelve thick bars,
+twelve thin ones, thirty-six fine spokes — with the glass rotating one way and the
+two lead rings counter-rotating against it.
+
+## Major visual techniques used
+- Diamond petals from clip-path:polygon(50% 0, 100% 50%, 50% 100%, 0 50%) on
+  rotated squares
+- Rotational placement with rotate(a)deg + translate(R·k) and transform-origin at
+  the centre
+- Screen blend compositing over a warm daylight gradient so panels read as light
+
+- Radial gradient fills running from lighter to darker tone within each petal
+- Three tiers of lead tracery: 3px principal bars, 1.5px secondary bars offset
+  halfway, 1px spokes into the inner ring
+- Two concentric lead rings at 2px and 1px, plus a stone hub with a lead ring
+- Counter-rotation: glass one way, the two rings the other, from one accumulating
+  radian time value
+- Stone surround from a radial gradient with a soft drop shadow and inset
+  highlight
+- Full rebuild on resize from the measured glass radius
+- Six-colour palette with a light/dark pair per colour
+- Serif display with one oxblood italic word against 9px tracked monospace
+- Stone-and-lead palette with a single oxblood accent
+- Three-column facts row built from 1px gaps, collapsing under 820px
+
+## Intended interaction model
+A generated artefact to look at. The window turns continuously; there are no
+controls and no input. Resizing the window rebuilds every petal and bar from the
+new radius, which is the page's only responsive behaviour beyond the layout
+collapse.

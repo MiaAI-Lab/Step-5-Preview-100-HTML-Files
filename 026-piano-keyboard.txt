@@ -1,0 +1,98 @@
+# KLAVIER — A Room With 88 Keys
+
+## Short title
+Piano Keyboard
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a playable piano
+keyboard instrument called KLAVIER. No external dependencies whatsoever — no CDN,
+no web fonts, no external images, no external SVG files, no JavaScript libraries.
+All CSS and JavaScript inline, works offline by double-clicking, responsive, valid
+HTML5. No audio samples are used: every note is synthesised with the Web Audio API.
+
+Artistic direction: a dark wood parlour. The ground is near-black brown #14100d
+with a warm radial glow at the top; the instrument itself is a wood-gradient
+cabinet (light wood #5a4128 into #3a2a1c into near-black) with a rounded top, an
+inset highlight, a hatched "fall board" strip above the keys, a strip of red felt
+below them, and a gold highlight that fires at the exact x position of whichever
+key you strike. White keys are ivory gradients (ivory #f6f1e4 into a shadow
+#ded7c6) with three-sided inset shadows so each key has a shaded edge and a lifted
+top; black keys are two-thirds height, 62% of a white key's width, centred on the
+boundary, in a near-black vertical gradient with a faint bottom highlight, and sit
+on z-index 3 above the whites.
+
+The synthesis: the AudioContext is created on the first interaction (browser
+policy). Each note connects to a per-voice gain, then to a master gain into a
+DynamicsCompressorNode, which feeds both the destination and a reverb send — a
+ConvolverNode loaded with an impulse response generated at runtime by filling a
+1.8-second stereo buffer with noise decaying as (1 − i/len)^2.2. Each voice is four
+sine oscillators at 1×, 2×, 3× and 4.2× the fundamental, each with its own gain
+and its own exponentially decaying envelope — higher partials die faster, which is
+what makes it read as struck rather than buzzed. The overall envelope is a 6 ms
+attack to a velocity-scaled peak, a fall to 35% over 140 ms, then an exponential
+release whose length comes from the Release slider.
+
+The keyboard: one to five octaves built from C3, each white key positioned by
+percentage width and each black key centred on its boundary, labelled with note
+names in an 8px monospace. Keys flash a pressed state (translateY 2px, darker
+gradient, inset shadow) on strike. Input comes from three sources — pointer down,
+pointer enter while dragging (so you can slide across the keys), and the computer
+keyboard, mapped as A W S E D F T G Y H U J K O L across two octaves with the black
+keys on the W E T Y U O cluster. The demo button plays a preset figure at 230 ms
+intervals and can be stopped mid-way.
+
+Layout: a nav with a serif brand at 0.42em tracking. A centred hero with a gold
+eyebrow, a serif headline with one italic gold word, and a paragraph about
+synthesis. Then the instrument: the wood cabinet with the fall board, keys and felt
+strip. Then a glass control tray with three sliders (Octaves 1–5, Release 10–90,
+Reverb 0–100) plus a figure-playback toggle and a sustain toggle. Then a
+three-cell column of large gold serif numerals (3 strings per note, 52 white and
+36 black, 230 strings in total) with explanatory paragraphs. Then a bordered pull
+quote about touch. Then a ruled monospace footer.
+
+Interaction: strike keys with the mouse, touch or keyboard; slide across them; choose
+how many octaves are visible; set the release length and reverb amount; toggle
+sustain off to make every note damp itself; or press "Play a figure" and watch the
+keys play themselves, with the gold fall-board flash tracking each strike. Key
+labels hide below 560px.
+
+## One-paragraph description of the intended design
+A dark wood parlour instrument: a CSS-built keyboard cabinet with ivory and ebony
+keys, a hatched fall board, red felt and a gold flash that fires wherever you
+strike, over a Web Audio synthesis of four decaying sine partials per note with a
+runtime-generated reverb — playable by mouse, touch, sliding drag or the computer
+keyboard.
+
+## Major visual techniques used
+- Wood cabinet from a multi-stop vertical gradient with an inset top highlight
+- Ivory keys from a two-stop gradient with three-sided inset shadows (edge shadow,
+  bottom shade, lifted top) and a drop shadow
+- Ebony keys at 62% height and 62% width, centred on the white-key boundary, on a
+  higher z-index
+- Percentage-positioned keys so the keyboard scales with the container
+- Pressed key states: translateY(2px), darker gradient, inset shadow, 40ms transition
+- Hatched fall board from a repeating-linear-gradient with an inset shadow
+- Gold flash bar positioned by the struck key's bounding rectangle
+- Red felt strip with a coloured box-shadow bloom
+- Web Audio synthesis: four sine partials per voice with individual exponentially
+  decaying envelopes, so higher partials die faster
+- Runtime-generated convolution reverb from a decaying-noise stereo impulse buffer
+- Per-voice gain with a 6 ms attack, 140 ms fall to 35%, and a slider-controlled
+  exponential release
+- DynamicsCompressorNode on the master bus
+- Computer-keyboard mapping across two octaves (A–L naturals, W E T Y U O sharps)
+  with key-repeat suppression via a held map
+- Slide-across-keys playing via pointerenter while a button is held
+- Slider controls for octave count, release and reverb; sustain and figure-playback
+  toggles
+- Serif display at 0.42em tracking against 8.5px tracked monospace labels
+- Instrument layout with glass control tray; labels hidden under 560px, reading
+  columns collapsing under 880px
+
+## Intended interaction model
+An instrument. Visitors strike keys with a mouse, a finger, or the A-to-L row of
+their keyboard, slide across the keys to glissando, and shape the sound with octave
+count, release and reverb sliders plus a sustain toggle — or hand the playing over
+to the built-in figure and watch the keys move themselves. Nothing needs to be
+submitted and there is no score to complete.

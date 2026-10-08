@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ROSE — North Transept, Light at Four O'Clock</title>
+<style>
+  :root{
+    --stone:#e8e2d4;
+    --stone2:#cfc6b2;
+    --ink:#2a2620;
+    --line:rgba(42,38,32,.18);
+    --lead:rgba(42,38,32,.72);
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --serif:"Iowan Old Style",Palatino,Georgia,serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--stone);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  ::selection{background:#8c2f2f;color:var(--stone)}
+
+  .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(16px,4vw,44px)}
+
+  nav{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:24px 0 0}
+  .brand{font-family:var(--mono);font-size:10px;letter-spacing:.3em;text-transform:uppercase}
+  .brand b{color:#8c2f2f;font-weight:400}
+  nav ul{display:flex;gap:clamp(12px,2.2vw,28px);list-style:none;margin:0;padding:0}
+  nav a{color:rgba(42,38,32,.55);text-decoration:none;font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;transition:color .2s}
+  nav a:hover{color:var(--ink)}
+
+  .hero{text-align:center;padding:clamp(26px,5vw,64px) 0 clamp(14px,3vw,24px)}
+  .hero .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.32em;text-transform:uppercase;color:#8c2f2f;display:block;margin-bottom:20px}
+  .hero h1{font-family:var(--serif);font-weight:400;font-size:clamp(30px,6vw,74px);line-height:1;letter-spacing:-.025em;margin:0 0 18px}
+  .hero h1 i{font-style:italic;color:#8c2f2f}
+  .hero p{font-size:13.5px;line-height:1.85;color:rgba(42,38,32,.62);max-width:46ch;margin:0 auto}
+
+  .stage{
+    position:relative;aspect-ratio:1;max-width:640px;margin:clamp(18px,4vw,40px) auto;
+    display:grid;place-items:center
+  }
+  .rose{position:relative;width:100%;aspect-ratio:1}
+  /* the stone surround */
+  .rose::before{
+    content:"";position:absolute;inset:0;border-radius:50%;
+    background:radial-gradient(circle at 38% 30%,var(--stone),var(--stone2) 72%,#b9af99);
+    box-shadow:0 30px 60px -30px rgba(42,38,32,.55),inset 0 2px 0 rgba(255,255,255,.6)
+  }
+  .glass{
+    position:absolute;inset:6%;border-radius:50%;overflow:hidden;
+    background:radial-gradient(circle at 40% 32%,#fdf6e4,#f0e0bc 60%,#e2cba0);
+    box-shadow:inset 0 0 0 6px var(--stone2),inset 0 0 0 7px var(--lead),inset 0 0 50px rgba(42,38,32,.45)
+  }
+  .ray{position:absolute;left:50%;top:50%;width:0;height:0;transform-origin:0 0}
+  .petal{
+    position:absolute;left:50%;top:50%;transform-origin:0 0;
+    width:var(--w);height:var(--h);
+    margin-left:calc(var(--w) / -2);margin-top:calc(var(--h) / -2);
+    clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);
+    opacity:.9;mix-blend-mode:screen
+  }
+  /* the lead tracery */
+  .tracery{position:absolute;inset:0;border-radius:50%;pointer-events:none}
+  .tracery i{position:absolute;left:50%;top:50%;display:block;background:var(--lead);transform-origin:0 0}
+  .hub{
+    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    border-radius:50%;background:radial-gradient(circle at 38% 32%,#f6efdc,var(--stone2));
+    box-shadow:0 0 0 3px var(--lead)
+  }
+  .ring{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:50%;border:2px solid var(--lead)}
+  .ring.thin{border-width:1px}
+
+  .caption{
+    text-align:center;font-family:var(--mono);font-size:9.5px;letter-spacing:.24em;
+    text-transform:uppercase;color:rgba(42,38,32,.55);margin:0 0 clamp(24px,5vw,48px);line-height:2.2
+  }
+  .caption b{color:#8c2f2f;font-weight:400}
+
+  .cols{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin:0 0 clamp(24px,5vw,48px)}
+  .cols div{background:var(--stone);padding:28px 26px}
+  .cols b{display:block;font-family:var(--serif);font-weight:400;font-size:32px;color:#8c2f2f;line-height:1;margin-bottom:12px}
+  .cols h4{font-family:var(--mono);font-size:9px;letter-spacing:.24em;text-transform:uppercase;margin:0 0 12px}
+  .cols p{margin:0;font-size:12.5px;line-height:1.85;color:rgba(42,38,32,.62)}
+
+  footer{border-top:1px solid var(--line);padding:26px 0 48px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:rgba(42,38,32,.5)}
+
+  @media (max-width:820px){.cols{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="brand">Sainte-Croix · <b>north transept</b></div>
+    <ul>
+      <li><a href="#rose">The rose</a></li>
+      <li><a href="#glass">Glass</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <span class="k">c. 1230 · rayonnant</span>
+    <h1>Twelve petals,<br>and <i>the hour.</i></h1>
+    <p>Made to hold the four o'clock light for about eleven minutes a day. The
+    tracery turns; the glass does not, because the glass is the wall.</p>
+  </header>
+
+  <section id="rose">
+    <div class="stage">
+      <div class="rose">
+        <div class="glass" id="glass"></div>
+        <div class="tracery" id="tracery"></div>
+        <div class="hub" id="hub"></div>
+        <div class="ring" id="r1"></div>
+        <div class="ring thin" id="r2"></div>
+      </div>
+    </div>
+    <p class="caption">Diameter <b>8.4 m</b> · twelve principal tracery bars<br>132 panels · no two the same colour</p>
+  </section>
+
+  <section class="cols" id="glass">
+    <div><b>8.4</b><h4>metres across</h4><p>Set into 60 cm of masonry, the tracery bars are sandstone, each a single piece worked on both faces.</p></div>
+    <div><b>132</b><h4>panels</h4><p>Painted and fired on site, then leaded into the bars. The reds are copper; the blues are cobalt.</p></div>
+    <div><b>4</b><h4>o'clock, daily</h4><p>For a few minutes the inner ring projects itself across the floor of the transept, and then it is gone.</p></div>
+  </section>
+
+  <footer>
+    <span>Rose window · ray drawings in CSS</span>
+    <span>No images, no libraries</span>
+    <span>Light is the only material</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var glass=document.getElementById('glass');
+  var tracery=document.getElementById('tracery');
+  var N=12;
+  /* a palette of medieval glass colours */
+  var COLORS=[
+    ['#a8281f','#d4563c'],['#1c3f8f','#4a6fd0'],['#1a6b4a','#4fae74'],
+    ['#8a6a12','#d4a83c'],['#6a2470','#a45aa8'],['#a8451f','#d4763c']
+  ];
+
+  function build(){
+    var size=glass.clientWidth||400;
+    var R=size/2;
+    glass.innerHTML='';tracery.innerHTML='';
+
+    for(var i=0;i<N;i++){
+      var a=(i/N)*360;
+      var col=COLORS[i%COLORS.length];
+      var p=document.createElement('div');
+      p.className='petal';
+      p.style.setProperty('--w',(R*0.60)+'px');
+      p.style.setProperty('--h',(R*0.94)+'px');
+      p.style.transform='rotate('+a+'deg) translate('+(R*0.30)+'px)';
+      p.style.background='radial-gradient(120% 100% at 50% 0%,'+col[1]+','+col[0]+')';
+      glass.appendChild(p);
+
+      /* an inner smaller petal in the lighter colour */
+      var p2=document.createElement('div');
+      p2.className='petal';
+      p2.style.setProperty('--w',(R*0.26)+'px');
+      p2.style.setProperty('--h',(R*0.40)+'px');
+      p2.style.transform='rotate('+a+'deg) translate('+(R*0.50)+'px)';
+      p2.style.background=col[1];
+      p2.style.opacity='.95';
+      glass.appendChild(p2);
+    }
+    /* inner ring of small panels */
+    for(var k=0;k<24;k++){
+      var a2=(k/24)*360;
+      var q=document.createElement('div');
+      q.className='petal';
+      var s=R*0.14;
+      q.style.setProperty('--w',s+'px');
+      q.style.setProperty('--h',s+'px');
+      q.style.transform='rotate('+a2+'deg) translate('+(R*0.18)+'px) scale(.7)';
+      q.style.background=COLORS[k%COLORS.length][0];
+      q.style.opacity='.9';
+      glass.appendChild(q);
+    }
+
+    /* tracery: the twelve principal bars */
+    for(var b=0;b<N;b++){
+      var a3=(b/N)*360;
+      var bar=document.createElement('i');
+      var len=R*0.86, th=3;
+      bar.style.width=len+'px';
+      bar.style.height=th+'px';
+      bar.style.marginTop=(-th/2)+'px';
+      bar.style.transform='rotate('+a3+'deg) translateX('+(R*0.06)+'px)';
+      tracery.appendChild(bar);
+    }
+    /* the secondary bars between petal tips */
+    for(var c2=0;c2<N*2;c2++){
+      var a4=(c2/(N*2))*360;
+      var bar2=document.createElement('i');
+      var l2=R*0.44, t2=1.5;
+      bar2.style.width=l2+'px';bar2.style.height=t2+'px';
+      bar2.style.marginTop=(-t2/2)+'px';
+      bar2.style.opacity='.6';
+      bar2.style.transform='rotate('+a4+'deg) translateX('+(R*0.42)+'px)';
+      tracery.appendChild(bar2);
+    }
+    /* radial spokes into the inner ring */
+    for(var s2=0;s2<36;s2++){
+      var a5=(s2/36)*360;
+      var sp=document.createElement('i');
+      var l3=R*0.20, t3=1;
+      sp.style.width=l3+'px';sp.style.height=t3+'px';
+      sp.style.marginTop=(-t3/2)+'px';
+      sp.style.opacity='.45';
+      sp.style.transform='rotate('+a5+'deg) translateX('+(R*0.20)+'px)';
+      tracery.appendChild(sp);
+    }
+
+    var hub=document.getElementById('hub');
+    hub.style.width=(R*0.30)+'px';hub.style.height=(R*0.30)+'px';
+    document.getElementById('r1').style.width=(R*0.66)+'px';
+    document.getElementById('r1').style.height=(R*0.66)+'px';
+    document.getElementById('r2').style.width=(R*0.92)+'px';
+    document.getElementById('r2').style.height=(R*0.92)+'px';
+  }
+
+  /* slow counter-rotation of the two rings against the glass */
+  var t=0;
+  function anim(){
+    t+=0.0006;
+    document.getElementById('r1').style.transform='translate(-50%,-50%) rotate('+(t*100).toFixed(3)+'rad)';
+    document.getElementById('r2').style.transform='translate(-50%,-50%) rotate('+(-t*62).toFixed(3)+'rad)';
+    glass.style.transform='rotate('+(t*38).toFixed(3)+'rad)';
+    requestAnimationFrame(anim);
+  }
+
+  var rt;
+  addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(build,140)});
+  build();
+  requestAnimationFrame(anim);
+})();
+</script>
+</body>
+</html>

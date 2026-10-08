@@ -1,0 +1,83 @@
+# THE FLUTE — bubbles that are not round
+
+## Short title
+Champagne Bubbles
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a flute of sparkling wine where
+every bubble rises at its own terminal velocity, wobbles under drag, carries a wake, and
+pops at the surface — with four glass shapes and the temperature in the equations. No
+external dependencies whatsoever — no CDN, no web fonts, no external images, no JS
+libraries. All CSS and JavaScript inline, works offline by double-clicking, responsive,
+valid HTML5.
+
+Artistic direction: a dark cellar. Ground #0f0c06, hairlines rgba(244,234,218,.14, body
+#f4eada with muted #9c927c, pale gold #e8cf8a as the accent and a deep amber #e0b060 for
+the figures. Serif headings with italic accent words, uppercase .2em–.4em kickers,
+monospace figures.
+
+The glass is four shapes — flute, coupe, tulip and white wine — each with its own rim
+radius, base radius and height, drawn as a trapezoid of wine behind a translucent glass
+outline, with a stem and foot. The wine's colour is the cuvée's own, from the pale straw of
+a blanc de blancs to the pink of a rosé.
+
+Bubbles nucleate at etched points along the inside wall and rise at a terminal velocity
+proportional to the square of their radius, which is why the big ones are always the ones
+you notice. As they rise they wobble, and the wobble amplitude grows with size — so a large
+bubble is drawn as an ellipse that squashes and rotates with a white highlight on its
+leading face, which is exactly how a rising bubble is not a sphere. A big bubble also sheds
+a wake: a scatter of small bubbles that rise and fade beneath it.
+
+The Reynolds number is computed for the mean bubble from its radius, its velocity and the
+kinematic viscosity of water at the current temperature, so raising the temperature really
+does drop Reynolds. The dissolved gas volume falls to zero when it is flat, and the
+pressure readout goes from six atmospheres to one.
+
+Controls: five cuvées, four glasses, effervescence, temperature, etched points, Top up and
+Let it go flat. Readout: bubbles rising, mean bubble size, Reynolds, dissolved gas in litres
+per litre, state and pressure.
+
+Layout: nav, centred hero, the glass canvas with its caption, a dock of two chip rows,
+three sliders and two buttons, a readout row, then two three-cell note rows on nucleation,
+the wobble, pressure, the flute, temperature and flat, then a footer.
+
+Interaction: the flute is already fizzing. Visitors pull the effervescence down and the
+chains thin out, raise the temperature and the bubbles grow and Reynolds drops, change the
+glass and the whole column changes shape, pour a fresh flute for a burst, and let it go flat
+until the chains stop and the glass is only wine.
+
+## One-paragraph description of the intended design
+A flute of sparkling wine on canvas where bubbles nucleate at etched points on the wall and
+rise at a terminal velocity proportional to the square of their radius, wobbling as they go
+with an amplitude that grows with size so a large bubble is drawn as a rotating squashed
+ellipse with a leading-edge highlight, shedding a scatter of small wake bubbles beneath it —
+across four glass shapes drawn as trapezoids of cuvée-coloured wine behind a translucent
+outline, with a Reynolds number computed from radius, velocity and the temperature's
+kinematic viscosity, a dissolved-gas volume that falls to zero when flat, and a pressure
+that goes from six atmospheres to one.
+
+## Major visual techniques used
+- Terminal velocity proportional to radius squared, so the size of a bubble and its speed
+  are one relationship
+- Wobble amplitude as a function of radius, so the big bubbles are the non-spherical ones
+- Bubble drawn as a rotated, squashed ellipse with a white highlight on the leading face,
+  which is the actual shape of a rising bubble
+- Wake as a scatter of small bubbles spawned under large ones, rising and fading
+- Four glass shapes as rim radius, base radius and height, drawn as a wine trapezoid
+  behind a translucent outline
+- Reynolds computed from the mean bubble's radius, its velocity and the kinematic
+  viscosity of water at the set temperature
+- Temperature in the equations twice: in the nucleation rate and in the viscosity
+- Dissolved gas as a volume that only reaches zero when flat
+- Pressure readout derived from the effervescence, dropping to one atmosphere when flat
+- Wine gradient across the glass in the cuvée's own hue
+- Top up as an immediate burst of bubbles inside the glass
+- Etched points drawn on the wall as the origin every chain comes from
+
+## Intended interaction model
+A glass to watch. The flute is already fizzing; visitors pull the effervescence down until
+the chains thin, raise the temperature and watch the bubbles grow and Reynolds fall, switch
+glass shape and see the column change, pour a fresh flute for a burst, and let it go flat
+until the chains stop and the glass is only wine. Every number in the panel is computed from
+the same bubbles the drawing uses.

@@ -1,0 +1,75 @@
+# MERIDIAN — Small-Batch Roastery, Est. 2014
+
+## Short title
+Coffee Roastery
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a landing page for a
+fictional small-batch coffee roastery called MERIDIAN. No external dependencies
+whatsoever — no CDN, no web fonts, no external images, no external SVG files, no
+JavaScript libraries. All CSS and JavaScript inline, works offline by
+double-clicking, responsive, valid HTML5.
+
+Artistic direction: warm analogue print. Ground is paper #f7f1e6 with a deeper
+paper #efe5d5, ink brown #241c14, espresso #3b2416 and crema #c98a4b as the single
+accent, with hairline rules at 16% ink. A full-viewport paper-grain overlay — an
+inline SVG feTurbulence data-URI at 35% opacity in multiply blend — sits over the
+whole page so everything reads as printed on stock. Type is a high-contrast serif
+for the headline and the product names, a system sans for paragraphs, and a
+9–10.5px wide-tracked monospace for every label, price and metadata.
+
+The cup is the centrepiece and is built entirely from divs. A saucer is an ellipse
+underneath; the body is a rounded rectangle with an asymmetric eight-value
+border-radius (the classic tapered-cup shape) filled with a warm ivory gradient and
+given three shadow layers — a dark inset on one side, a white inset on the other,
+and a soft drop shadow — plus its own turbulence-data-URI speckle at 45% opacity so
+the porcelain has a grain. The rim is an ellipse seen in perspective, the coffee
+inside it is a darker ellipse with an inset top shadow, and the handle is a
+half-border ring in porcelain colour. Four steam wisps are 2px gradient bars that
+rise and fade on staggered 4-second loops, with their durations staggered further by
+the script on load.
+
+Layout: a nav with a serif brand at 0.3em tracking and three links. A hero split
+between a serif headline (one italic crema word), a paragraph, two buttons (one
+espresso-filled, one ghost), and the cup inside a circular warm glow. Then a menu
+section heading with a monospace annotation, and a three-cell coffee menu built from
+1px gaps — each cell with a numbered monospace origin, a serif name, a short
+tasting paragraph, a dashed-rule footer with a preparation note and a price in
+espresso. Then a four-cell process strip with 44px crema numerals (Buy, Roast,
+Rest, Go). Then a visit section and a ruled monospace footer.
+
+Interaction: almost none, and deliberately. The menu cards warm from paper to
+deeper paper on hover; the buttons lift and their shadows deepen; the steam keeps
+rising with a per-visit timing variation. There are no controls, no carousels and no
+forms — the page is a printed announcement that happens to be a web page.
+
+## One-paragraph description of the intended design
+A warm analogue roastery announcement: paper stock with a turbulence grain, three
+coffees announced in serif names with tasting notes and prices, a four-step process
+in large crema numerals, and a CSS porcelain cup — tapered body, elliptical rim and
+coffee surface, half-border handle, four rising steam wisps — glowing at the centre
+of the hero.
+
+## Major visual techniques used
+- Paper grain from an inline SVG feTurbulence data-URI in multiply blend over the
+  whole viewport
+- Porcelain speckle from a second turbulence data-URI on the cup body at 45% opacity
+- Tapered cup body from an asymmetric eight-value border-radius
+- Cup volume from three layered shadows: dark inset, white inset, soft drop shadow
+- Elliptical rim and coffee surface with an inset top shadow for perspective
+- Half-border handle (border-radius 0 50% 50% 0, border-left: 0)
+- Four 2px steam gradient bars rising and fading on staggered loops, with durations
+  further staggered by script
+- Circular warm glow behind the cup from stacked radial gradients
+- Palette discipline: paper, ink, espresso, one crema accent
+- 1px-gap menu and process grids with hairline showing through
+- Dashed-rule footers inside each menu cell
+- Three-layer button treatment: fill, lift and shadow intensification
+- Serif display with one italic accent word against 9px tracked monospace
+- Two-column hero collapsing to one under 900px; grids to one column
+
+## Intended interaction model
+A printed announcement. Visitors read it: what is on the bar, how it is roasted,
+where the shop is. The only feedback is the hover warming of a card and the lift of
+a button, plus the ambient steam. Nothing asks to be operated.

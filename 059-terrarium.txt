@@ -1,0 +1,83 @@
+# WARDIAN CASE — a closed world you can keep
+
+## Short title
+Terrarium
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a sealed Wardian case that
+runs as a small closed ecosystem, with the water cycle made visible on the glass and
+every meter derived from the same simulation. No external dependencies whatsoever — no
+CDN, no web fonts, no external images, no JS libraries. All CSS and JavaScript inline,
+works offline by double-clicking, responsive, valid HTML5.
+
+Artistic direction: a dark greenhouse. Ground #0f1512, panel #131a15, hairlines
+rgba(226,236,223,.14), body #e2ecdf with muted #9db09b, one green accent #8fd694 and a
+pale lime #c8e6a0 for figures. Serif headings, uppercase .2em–.4em kickers, and roman
+numerals on the note cells.
+
+The case: a canvas at 760 × 900 inside a rounded jar div with a brass lid drawn as a
+three-stop linear gradient. The air is a vertical gradient whose top colour is driven
+by the light slider, plus a radial sun shaft composited in 'lighter' so the light level
+actually changes the picture. The soil is a sine-folded silhouette with leaf-litter
+speckle, and the plants are random spines of twenty-six segments that grow segment by
+segment, sprouting alternating leaves along whatever has grown so far; their hue slides
+toward yellow under stress. Fruit sits on the soil with a shadow and a leaf stem.
+
+The water cycle: droplets spawn high on the glass at a rate set by the light level,
+grow while they are in the upper half, accelerate under gravity scaled by their own
+size, and are removed at the soil line where they add moisture back. So the case
+literally rains on itself, and the rain stops when you turn the light down.
+
+Flies walk the glass: hunger drives them toward the fruit, they eat, they die of
+starvation or age and are composted back into moisture, and they reproduce when they
+are well fed — so population follows food rather than a clock.
+
+Panel: pour water, drop in fruit, release a fly, start a new case, a light slider, and
+five meters (moisture, oxygen, leaf area, population, day). Layout: nav, centred hero,
+a two-column bench of jar and panel, then two three-cell note rows (water cycle, growth,
+mouths, balance, brass, time), then a ruled footer. One column under 900px, links hidden
+under 780px.
+
+Interaction: the case runs on its own. Visitors pull the light slider and watch the air
+change and the rain speed up or stop, pour water to restore moisture, drop fruit to
+feed a population, release flies and watch the oxygen meter fall, and start a new case
+when the balance is beyond saving. One second here is a quarter hour in the case, and
+the day counter is what the meters are measured against.
+
+## One-paragraph description of the intended design
+A sealed Wardian case running as a closed ecosystem on canvas: plants grow segment by
+segment toward a light you control with a slider that also tints the air and drives the
+rain of condensation droplets on the glass, moisture evaporates and returns, flies walk
+the interior, eat the fruit, die and are composted into the soil, and five meters —
+moisture, oxygen, leaf area, population and day — report the same numbers the drawing
+is built from.
+
+## Major visual techniques used
+- Air gradient whose top colour is computed from the light slider, so the control
+  changes the whole picture rather than a readout
+- Radial sun shaft composited with globalCompositeOperation 'lighter'
+- Soil silhouette from summed sines instead of a straight line
+- Plant growth as progressive draw of a pre-generated spine, so growth is a length
+  change rather than a new random shape each frame
+- Leaves as paired quadratic bladders along the grown part of the spine, alternating
+  side by index parity
+- Hue slide toward yellow under stress, computed from the same stress value that
+  drives growth
+- Water cycle as a particle system: spawn rate from light, growth in the upper half,
+  gravity scaled by radius, absorption at the soil line returning moisture
+- Sun shaft and vignette as radial gradients rather than filters
+- Flies drawn as a body plus translucent wing strokes whose opacity oscillates
+- Population as a consequence of food and hunger, not a spawn timer
+- Dead flies composted into moisture, closing the loop rather than just vanishing
+- Canvas sized once in markup and scaled by CSS, so the aspect ratio holds at any
+  width without a resize handler
+- Meters written to the DOM at the end of each frame, in the same order they are
+  computed
+
+## Intended interaction model
+A thing to keep alive. Visitors set the light, pour water, add fruit and release flies,
+then watch the meters tell them whether the case is still working — the rain stops when
+the light stops, the plants yellow when the moisture runs out, and the population
+follows whatever fruit is left. Nothing is scheduled to happen; everything on screen is
+a consequence of the few numbers the panel exposes.

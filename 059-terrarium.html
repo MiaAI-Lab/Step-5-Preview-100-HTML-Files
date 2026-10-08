@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Wardian Case — a closed world you can keep</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:#0f1512;color:#e2ecdf;
+  font:15px/1.62 ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.serif{font-family:ui-serif,Georgia,"Times New Roman",serif}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.wrap{width:min(1120px,92vw);margin:0 auto}
+nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0 14px;
+  border-bottom:1px solid rgba(226,236,223,.14)}
+nav .brand{font-family:ui-serif,Georgia,serif;font-size:19px}
+nav .brand i{font-style:italic;color:#8fd694}
+nav ul{display:flex;gap:26px;list-style:none;margin:0;padding:0;font-size:11px;
+  letter-spacing:.24em;text-transform:uppercase;color:#8b9a8c}
+nav a{color:inherit;text-decoration:none}nav a:hover{color:#8fd694}
+@media(max-width:780px){nav ul{display:none}}
+header.hero{padding:66px 0 42px;text-align:center}
+header.hero .kicker{font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:#8fd694;
+  margin:0 0 16px}
+header.hero h1{font-family:ui-serif,Georgia,serif;font-weight:400;
+  font-size:clamp(36px,6vw,72px);line-height:1.04;margin:0 0 20px}
+header.hero h1 em{font-style:italic;color:#c8e6a0}
+header.hero p{max-width:58ch;margin:0 auto;color:#9db09b}
+/* ---------- bench ---------- */
+.bench{display:grid;grid-template-columns:1fr 260px;gap:24px;align-items:start;
+  border-top:1px solid rgba(226,236,223,.14);border-bottom:1px solid rgba(226,236,223,.14);
+  padding:26px 0 32px;margin-bottom:48px}
+@media(max-width:900px){.bench{grid-template-columns:1fr}}
+.jar{position:relative;border-radius:18px 18px 10px 10px;overflow:hidden;
+  border:1px solid rgba(226,236,223,.16);
+  background:linear-gradient(#16241c,#0d1410);
+  box-shadow:inset 0 0 60px rgba(0,0,0,.6)}
+.jar canvas{display:block;width:100%;height:auto}
+.jar .label{position:absolute;left:14px;top:12px;font-size:10px;letter-spacing:.3em;
+  text-transform:uppercase;color:rgba(226,236,223,.55);pointer-events:none}
+.brass{position:absolute;left:0;right:0;top:0;height:8px;
+  background:linear-gradient(#a9832f,#e6c477 45%,#8a6420)}
+.panel{border:1px solid rgba(226,236,223,.16);border-radius:12px;padding:18px;
+  background:#131a15}
+.panel h2{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:#8b9a8c;
+  margin:0 0 14px;font-weight:600}
+.btn{width:100%;margin-bottom:8px;background:rgba(143,214,148,.12);color:#e2ecdf;
+  border:1px solid rgba(143,214,148,.35);border-radius:8px;padding:10px;
+  font:inherit;font-size:12px;letter-spacing:.08em;cursor:pointer;text-align:left}
+.btn:hover{background:rgba(143,214,148,.22)}
+.btn span{float:right;color:#8fd694;font-family:ui-monospace,Menlo,monospace;font-size:11px}
+label.slider{display:block;font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  color:#8b9a8c;margin:14px 0 8px}
+input[type=range]{width:100%;accent-color:#8fd694}
+.meters{margin-top:4px}
+.meter{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:7px 0;
+  border-bottom:1px dotted rgba(226,236,223,.16)}
+.meter b{font-weight:500;color:#c8e6a0;font-family:ui-monospace,Menlo,monospace}
+.cells{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-bottom:48px}
+@media(max-width:820px){.cells{grid-template-columns:1fr}}
+.cell{border-top:1px solid rgba(226,236,223,.16);padding-top:16px}
+.cell .fig{font-family:ui-serif,Georgia,serif;font-size:40px;color:#c8e6a0;line-height:1;margin-bottom:8px}
+.cell h3{font-family:ui-serif,Georgia,serif;font-weight:400;font-style:italic;font-size:21px;margin:0 0 8px}
+.cell p{margin:0;color:#9db09b;font-size:14px}
+footer{border-top:1px solid rgba(226,236,223,.14);padding:22px 0 56px;display:flex;
+  justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:11px;letter-spacing:.2em;
+  text-transform:uppercase;color:#6f7f71}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="brand">Wardian <i>Case</i></div>
+    <ul>
+      <li><a href="#case">The case</a></li>
+      <li><a href="#soil">Instruments</a></li>
+      <li><a href="#notes">Notes</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <p class="kicker">A closed world you can keep</p>
+    <h1 class="serif">Light, water,<br>and <em>nothing</em> else</h1>
+    <p>A sealed case has no soil delivery, no rain and no escape. What happens inside is
+       the sum of what you gave it: how much light falls, how much moisture is held, and
+       how many mouths there are to feed.</p>
+  </header>
+
+  <section class="bench" id="case">
+    <div class="jar">
+      <div class="brass"></div>
+      <canvas id="c" width="760" height="900"></canvas>
+      <p class="label">Case no. 7 · sealed 1829</p>
+    </div>
+    <aside class="panel">
+      <h2>Instruments</h2>
+      <button class="btn" id="water">Pour water<span id="wv">0 ml</span></button>
+      <button class="btn" id="fruit">Drop in fruit<span id="fv">3</span></button>
+      <button class="btn" id="fly">Release a fly<span id="pv">0</span></button>
+      <button class="btn" id="reset">Start a new case</button>
+      <label class="slider" for="light">Light</label>
+      <input id="light" type="range" min="0" max="100" value="55">
+      <div class="meters">
+        <div class="meter">Moisture<b id="mM">—</b></div>
+        <div class="meter">Oxygen<b id="mO">—</b></div>
+        <div class="meter">Leaf area<b id="mL">—</b></div>
+        <div class="meter">Population<b id="mP">—</b></div>
+        <div class="meter">Day<b id="mD">—</b></div>
+      </div>
+    </aside>
+  </section>
+
+  <section class="cells" id="soil">
+    <div class="cell">
+      <div class="fig serif">i</div>
+      <h3>Water cycle</h3>
+      <p>Moisture evapourates continuously and condenses on the colder glass. The
+         droplets that form there grow, get heavy, and fall back to the soil — which is
+         the whole rain system of a sealed case.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">ii</div>
+      <h3>Growth</h3>
+      <p>Each plant grows toward the light at a rate set by both light and moisture.
+         Yellow leaves mean the case is running dry; thick dark leaves mean it has
+         everything it wants.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">iii</div>
+      <h3>Mouths</h3>
+      <p>A fly eats, decays and is composted. Population follows the fruit supply, not
+         a clock, so a case with too many mouths starves itself back down.</p>
+    </div>
+  </section>
+
+  <section class="cells" id="notes">
+    <div class="cell">
+      <div class="fig serif">iv</div>
+      <h3>Balance</h3>
+      <p>Oxygen is the sum of what the leaves make minus what the mouths take. Watch
+         the meter, not the plants: the meter is the honest number.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">v</div>
+      <h3>Brass</h3>
+      <p>The frame is a gradient band sprayed across the top edge only — no image, no
+         texture, just a linear gradient with three stops doing the work.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">vi</div>
+      <h3>Time</h3>
+      <p>One second here is about a quarter of an hour in the case, and the day counter
+         is what the whole simulation is measured against.</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>Wardian Case · one canvas, no files</span>
+    <span class="mono">closed system</span>
+  </footer>
+</div>
+<script>
+(function(){
+"use strict";
+var cv=document.getElementById('c'),ctx=cv.getContext('2d');
+var W=cv.width,H=cv.height;
+var light=55,moist=62,oxy=58,day=0,clock=0,fruit=3,drops=[],flies=[],plants=[];
+var GRAV=0.018;
+
+function reset(){
+  moist=62;oxy=58;day=0;clock=0;fruit=3;drops=[];flies=[];plants=[];
+  for(var i=0;i<5;i++)addPlant();
+  for(var i=0;i<26;i++)spawnDrop(true);
+}
+function addPlant(){
+  var x=60+Math.random()*(W-120),seg=[{y:H-70}],len=0,a=-Math.PI/2;
+  for(var i=0;i<26;i++){len+=8+Math.random()*5;
+    a+=(Math.random()-.5)*.34;seg.push({x:x+Math.cos(a)*len,y:H-70+Math.sin(a)*len,a:a,len:len});}
+  plants.push({x:x,spine:seg,spread:0,leaves:[],hue:96});
+}
+function spawnDrop(anywhere){
+  drops.push({
+    x:anywhere?Math.random()*W:120+Math.random()*(W-240),
+    y:anywhere?Math.random()*H*.7:40+Math.random()*20,
+    r:1.2+Math.random()*2.2,v:(anywhere?0:.2+Math.random()*.3),stale:0
+  });
+}
+/* ---------------- simulation ---------------- */
+function sim(dt){
+  clock+=dt;
+  if(clock>4){clock=0;day++;}
+  var L=light/100;
+  /* moisture: evaporation against light, soil holds what is there */
+  moist+= (L*0.9-0.28)*dt*(0.5+plants.length*0.05);
+  moist=Math.max(0,Math.min(100,moist));
+  /* leaves: growth or dieback from light and water */
+  var stress=Math.abs(L-0.62)+Math.max(0,(58-moist)/100);
+  for(var i=0;i<plants.length;i++){
+    var p=plants[i];
+    var rate=(0.5+L*0.9)*(moist/58)-stress*0.5;
+    p.spread=Math.max(0,Math.min(1,p.spread+rate*dt*0.03));
+    if(stress>0.55)p.spread=Math.max(0,p.spread-dt*0.01);
+    p.hue=96+(stress>0.55?38:0)-(rate>1.4?16:0);
+  }
+  /* oxygen: made by leaves, taken by mouths */
+  var area=0;for(var j=0;j<plants.length;j++)area+=plants[j].spread;
+  oxy+=(area*1.4-0.25-flies.length*0.5)*dt*0.35;
+  oxy=Math.max(0,Math.min(100,oxy));
+  /* flies eat fruit, decay, and reproduce when there is food */
+  for(var k=flies.length-1;k>=0;k--){
+    var f=flies[k];
+    f.life-=dt;
+    f.hunger-=dt*(0.5+ (fruit>0?0.3:1.2));
+    /* they walk the glass: a slow wander that leans toward the fruit when hungry */
+    var tx=W*0.5+Math.cos(clock*0.3+f.ph)*60, ty=H*0.55;
+    var want=(f.hunger<40)?1:0.2;
+    f.x+=(tx-f.x)*dt*want*0.08+(Math.sin(clock*2.2+f.ph)*10*dt);
+    f.y+=(ty-f.y)*dt*want*0.08+(Math.cos(clock*1.7+f.ph)*8*dt);
+    f.x=Math.max(14,Math.min(W-14,f.x));
+    f.y=Math.max(14,Math.min(H-100,f.y));
+    if(fruit>0&&f.hunger<28){fruit-=dt*0.004;f.hunger+=dt*0.5;}
+    if(f.hunger<0||f.life<0){
+      /* a dead fly is compost: it returns to the soil as moisture and plant food */
+      moist=Math.min(100,moist+1.6);flies.splice(k,1);continue;
+    }
+    if(f.hunger>72&&flies.length<14&&Math.random()<dt*0.0025){
+      flies.push({x:W*.5,y:H*.4,vx:0,vy:0,life:120,hunger:50,ph:Math.random()*6.28});
+    }
+  }
+  /* droplets on the glass */
+  if(Math.random()<dt*L*0.9)spawnDrop(false);
+  for(var d=drops.length-1;d>=0;d--){
+    var s=drops[d];
+    if(s.y<H*.5)s.r+=dt*0.03;
+    s.v+=GRAV*dt*(s.r/3);
+    s.y+=s.v*dt*6;
+    if(s.r>3.2)s.v*=0.985;
+    if(s.y>H-90){moist=Math.min(100,moist+0.35);drops.splice(d,1);}
+  }
+}
+
+/* ---------------- rendering ---------------- */
+function draw(t){
+  /* air: the light level tints the whole case */
+  var l=light/100;
+  var sky=ctx.createLinearGradient(0,0,0,H);
+  sky.addColorStop(0,'rgba('+Math.round(40+l*70)+','+Math.round(60+l*80)+','+Math.round(50+l*50)+',1)');
+  sky.addColorStop(.55,'#16241c');
+  sky.addColorStop(1,'#0e1712');
+  ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
+  /* sun shaft from the top-left corner */
+  ctx.save();ctx.globalCompositeOperation='lighter';
+  var g2=ctx.createRadialGradient(W*0.2,0,10,W*0.2,0,W*0.95);
+  g2.addColorStop(0,'rgba(255,240,190,'+(0.30*l).toFixed(3)+')');
+  g2.addColorStop(1,'rgba(255,240,190,0)');
+  ctx.fillStyle=g2;ctx.fillRect(0,0,W,H);ctx.restore();
+  /* soil */
+  var soil=ctx.createLinearGradient(0,H-90,0,H);
+  soil.addColorStop(0,'#3a2f22');soil.addColorStop(1,'#1d1710');
+  ctx.fillStyle=soil;
+  ctx.beginPath();ctx.moveTo(0,H);
+  for(var x=0;x<=W;x+=40){
+    ctx.lineTo(x,H-90+Math.sin(x*0.03)*8+Math.sin(x*0.011)*6);
+  }
+  ctx.lineTo(W,H);ctx.closePath();ctx.fill();
+  ctx.fillStyle='rgba(0,0,0,.25)';ctx.fillRect(0,H-92,W,4);
+  /* leaf litter speckle */
+  ctx.fillStyle='rgba(214,196,160,.18)';
+  for(var i=0;i<50;i++){
+    var sx=(i*97)%W, sy=H-90+((i*53)%70);
+    ctx.fillRect(sx,sy,3,1.6);
+  }
+  /* plants */
+  plants.forEach(function(p){plant(p,t);});
+  /* fruit */
+  for(var f=0;f<Math.floor(fruit);f++){
+    if(fruit<1&&f>0)break;
+    var fx=W*0.5+Math.cos(t*0.0004+f*2.1)*30;
+    var fy=H-96+Math.sin(t*0.0006+f*1.7)*10;
+    ctx.fillStyle='rgba(0,0,0,.3)';ctx.beginPath();ctx.ellipse(fx+2,fy+4,15,9,0,0,6.3);ctx.fill();
+    ctx.fillStyle='#c2622f';ctx.beginPath();ctx.arc(fx,fy,13,0,6.3);ctx.fill();
+    ctx.fillStyle='rgba(255,225,180,.5)';ctx.beginPath();ctx.arc(fx-4,fy-5,4,0,6.3);ctx.fill();
+    ctx.strokeStyle='#4a6b32';ctx.lineWidth=2.4;ctx.beginPath();
+    ctx.moveTo(fx+8,fy-4);ctx.lineTo(fx+20,fy-12);ctx.stroke();
+  }
+  /* flies: they walk on the glass, so draw them as small dark bodies with wing blurs */
+  flies.forEach(function(fl){
+    var a=(fl.hunger>60?1:0.35);
+    ctx.fillStyle='rgba(0,0,0,'+a+')';ctx.beginPath();ctx.arc(fl.x,fl.y,3.4,0,6.3);ctx.fill();
+    ctx.strokeStyle='rgba(240,250,255,'+(0.25+0.25*Math.abs(Math.sin(t*0.02+fl.ph)))+')';
+    ctx.lineWidth=1;
+    ctx.beginPath();
+    ctx.moveTo(fl.x-4,fl.y-1);ctx.lineTo(fl.x-8,fl.y-4);
+    ctx.moveTo(fl.x+4,fl.y-1);ctx.lineTo(fl.x+8,fl.y-4);ctx.stroke();
+  });
+  /* droplets: the water cycle, visible */
+  drops.forEach(function(d){
+    ctx.beginPath();ctx.arc(d.x,d.y,d.r,0,6.3);
+    ctx.fillStyle='rgba(200,235,255,.20)';ctx.fill();
+    ctx.strokeStyle='rgba(230,250,255,.5)';ctx.lineWidth=.7;
+    ctx.beginPath();ctx.arc(d.x,d.y,d.r,-2.4,-0.4);ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,.75)';
+    ctx.beginPath();ctx.arc(d.x-d.r*0.3,d.y-d.r*0.35,Math.max(.5,d.r*0.22),0,6.3);ctx.fill();
+  });
+  /* glass: two specular hairlines and a corner vignette */
+  ctx.strokeStyle='rgba(255,255,255,.07)';ctx.lineWidth=18;
+  ctx.beginPath();ctx.moveTo(24,40);ctx.lineTo(24,H-70);ctx.stroke();
+  var v=ctx.createRadialGradient(W*0.5,H*0.45,H*0.35,W*0.5,H*0.5,H*0.95);
+  v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(0,0,0,.55)');
+  ctx.fillStyle=v;ctx.fillRect(0,0,W,H);
+}
+function plant(p,t){
+  var n=p.spine.length, cut=Math.max(3,Math.round(3+p.spread*(n-3)));
+  var col='hsl('+p.hue.toFixed(0)+',32%,'+((p.spread>0.35?30:22)+p.spread*8).toFixed(0)+'%)';
+  ctx.strokeStyle=col;ctx.lineWidth=2.6;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(p.spine[0].x,p.spine[0].y);
+  for(var i=1;i<cut;i++){var s=p.spine[i];ctx.lineTo(s.x,s.y);}
+  ctx.stroke();
+  /* leaves sprout along the grown part of the spine */
+  var m=Math.floor(p.spread*8);
+  for(var k=1;k<=m;k++){
+    var a=p.spine[Math.min(cut-1,k*2)];
+    if(!a||a.x===undefined)continue;
+    var side=(k%2?1:-1),L=16+p.spread*26,ang=(a.a||-1.57)+side*(0.7+k*0.04);
+    var lx=a.x+Math.cos(ang)*L, ly=a.y+Math.sin(ang)*L;
+    ctx.fillStyle=col;
+    ctx.beginPath();
+    ctx.moveTo(a.x,a.y);
+    ctx.quadraticCurveTo(a.x+Math.cos(ang)*L*0.6+side*10,a.y+Math.sin(ang)*L*0.6-12,lx,ly);
+    ctx.quadraticCurveTo(a.x+Math.cos(ang)*L*0.4,a.y+Math.sin(ang)*L*0.4+10,a.x,a.y);
+    ctx.fill();
+  }
+  if(p.spread>0.05){
+    var tip=p.spine[Math.min(cut-1,n-1)];
+    ctx.fillStyle='hsl('+(p.hue+40).toFixed(0)+',45%,72%)';
+    ctx.beginPath();ctx.arc(tip.x,tip.y,2.6,0,6.3);ctx.fill();
+  }
+}
+
+/* ---------------- controls ---------------- */
+var lightEl=document.getElementById('light');
+lightEl.addEventListener('input',function(){light=+lightEl.value;});
+var poured=0;
+document.getElementById('water').addEventListener('click',function(){
+  moist=Math.min(100,moist+16);poured+=5;
+  for(var i=0;i<9;i++)spawnDrop(false);
+  document.getElementById('wv').textContent=poured+' ml';
+});
+document.getElementById('fruit').addEventListener('click',function(){
+  fruit++;document.getElementById('fv').textContent=fruit;
+});
+document.getElementById('fly').addEventListener('click',function(){
+  flies.push({x:120+Math.random()*(W-240),y:H*0.35+Math.random()*60,vx:0,vy:0,
+    life:200,hunger:60,ph:Math.random()*6.28});
+  document.getElementById('pv').textContent=flies.length;
+});
+document.getElementById('reset').addEventListener('click',reset);
+function readout(){
+  var pct=function(v){return Math.round(Math.max(0,Math.min(100,v)))+'%';};
+  document.getElementById('mM').textContent=pct(moist);
+  document.getElementById('mO').textContent=pct(oxy);
+  var area=0;plants.forEach(function(p){area+=p.spread;});
+  document.getElementById('mL').textContent=(area*3).toFixed(1)+' u²';
+  document.getElementById('mP').textContent=flies.length;
+  document.getElementById('mD').textContent=day+' d';
+}
+/* ---------------- loop ---------------- */
+var last=0;
+function loop(ts){
+  var dt=last?Math.min(.05,(ts-last)/1000):0;last=ts;
+  sim(dt);draw(ts);readout();
+  requestAnimationFrame(loop);
+}
+reset();readout();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

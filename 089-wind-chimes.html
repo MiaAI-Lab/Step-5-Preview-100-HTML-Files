@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chimes — hang tubes until they strike you</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:#0d1210;color:#e6f0ea;
+  font:15px/1.62 ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+.serif{font-family:ui-serif,Georgia,"Times New Roman",serif}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.wrap{width:min(1100px,92vw);margin:0 auto}
+nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0 14px;
+  border-bottom:1px solid rgba(230,240,234,.14)}
+nav .brand{font-family:ui-serif,Georgia,serif;font-size:19px}
+nav .brand i{font-style:italic;color:#c8b06a}
+nav ul{display:flex;gap:26px;list-style:none;margin:0;padding:0;font-size:11px;
+  letter-spacing:.24em;text-transform:uppercase;color:#8a9a92}
+nav a{color:inherit;text-decoration:none}nav a:hover{color:#c8b06a}
+@media(max-width:780px){nav ul{display:none}}
+header.hero{padding:52px 0 22px;text-align:center}
+header.hero .kicker{font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:#c8b06a;
+  margin:0 0 14px}
+header.hero h1{font-family:ui-serif,Georgia,serif;font-weight:400;
+  font-size:clamp(32px,5.6vw,62px);line-height:1.05;margin:0 0 16px}
+header.hero h1 em{font-style:italic;color:#8fd0b0}
+header.hero p{max-width:60ch;margin:0 auto;color:#93a49b}
+.garden{position:relative;border:1px solid rgba(230,240,234,.16);border-radius:16px;
+  overflow:hidden;background:#080d0b;margin-bottom:18px}
+.garden canvas{display:block;width:100%;height:auto;touch-action:none;cursor:crosshair}
+.garden .cap{position:absolute;left:14px;top:12px;font-size:10px;letter-spacing:.26em;
+  text-transform:uppercase;color:rgba(230,240,234,.5);pointer-events:none}
+.dock{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;justify-content:space-between;
+  border-top:1px solid rgba(230,240,234,.14);border-bottom:1px solid rgba(230,240,234,.14);
+  padding:16px 0;margin-bottom:32px}
+.dock label{display:grid;gap:7px;font-size:10px;letter-spacing:.26em;text-transform:uppercase;
+  color:#8a9a92;min-width:150px}
+input[type=range]{width:100%;accent-color:#c8b06a}
+.btn{background:#c8b06a;color:#221c06;border:0;border-radius:8px;padding:11px 15px;
+  font:inherit;font-size:12px;font-weight:700;letter-spacing:.08em;cursor:pointer;margin:0 6px 6px 0}
+.btn.ghost{background:transparent;color:#e6f0ea;border:1px solid rgba(230,240,234,.24)}
+.btn:hover{filter:brightness(1.07)}
+.keys{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.keys button{background:#101815;border:1px solid rgba(230,240,234,.16);border-radius:999px;
+  padding:8px 14px;font:inherit;font-size:12px;color:#e6f0ea;cursor:pointer}
+.keys button[aria-pressed="true"]{background:#8fd0b0;border-color:#8fd0b0;color:#06231a}
+.readout{display:flex;flex-wrap:wrap;gap:12px 24px;margin-bottom:40px;
+  border-top:1px solid rgba(230,240,234,.14);padding-top:16px}
+.readout div{min-width:88px}
+.readout dt{font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:#8a9a92;margin:0 0 4px}
+.readout dd{margin:0;font-size:20px;font-family:ui-monospace,Menlo,monospace;color:#8fd0b0}
+.cells{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-bottom:46px}
+@media(max-width:820px){.cells{grid-template-columns:1fr}}
+.cell{border-top:1px solid rgba(230,240,234,.16);padding-top:16px}
+.cell .fig{font-family:ui-serif,Georgia,serif;font-size:38px;color:#8fd0b0;line-height:1;margin-bottom:8px}
+.cell h3{font-family:ui-serif,Georgia,serif;font-weight:400;font-style:italic;font-size:21px;margin:0 0 8px}
+.cell p{margin:0;color:#93a49b;font-size:14px}
+footer{border-top:1px solid rgba(230,240,234,.14);padding:22px 0 54px;display:flex;
+  justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:11px;letter-spacing:.2em;
+  text-transform:uppercase;color:#6a7a72}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="brand">Wind <i>Chimes</i></div>
+    <ul>
+      <li><a href="#garden">Garden</a></li>
+      <li><a href="#dock">Tubes</a></li>
+      <li><a href="#notes">Notes</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <p class="kicker">Scale · timbre · inharmonicity</p>
+    <h1 class="serif">A chime is a tube<br>that <em>refuses</em> a string</h1>
+    <p>A tube's overtones are not the neat multiples a string gives you. They sit at
+       2.76, 5.40 and 8.93 times the strike note, so every chord it plays is slightly
+       wrong on purpose — and that wrongness is the sound.</p>
+  </header>
+
+  <section class="garden" id="garden">
+    <canvas id="c" width="1000" height="520"></canvas>
+    <p class="cap">click a tube or drag the wind · eight tubes, one scale</p>
+  </section>
+
+  <section class="dock" id="dock">
+    <div>
+      <div class="keys" id="keys"></div>
+      <div class="keys" id="winds"></div>
+    </div>
+    <label for="wind">Wind <input id="wind" type="range" min="0" max="100" value="38"></label>
+    <label for="decay">Decay <input id="decay" type="range" min="20" max="100" value="62"></label>
+    <label for="clang">Clang <input id="clang" type="range" min="0" max="100" value="42"></label>
+    <div>
+      <button class="btn" id="gust">A gust</button>
+      <button class="btn ghost" id="hang">Hang a set</button>
+    </div>
+  </section>
+
+  <dl class="readout">
+    <div><dt>Ringing</dt><dd id="rR">0</dd></div>
+    <div><dt>Last stroke</dt><dd id="rL">—</dd></div>
+    <div><dt>Longest tube</dt><dd id="rT">—</dd></div>
+    <div><dt>Overtone 1</dt><dd id="rO1">2.76×</dd></div>
+    <div><dt>Overtone 2</dt><dd id="rO2">5.40×</dd></div>
+    <div><dt>Overtone 3</dt><dd id="rO3">8.93×</dd></div>
+  </dl>
+
+  <section class="cells">
+    <div class="cell">
+      <div class="fig serif">i</div>
+      <h3>Inharmonicity</h3>
+      <p>A tube's partials sit at 1, 2.76, 5.40 and 8.93 times the fundamental instead of
+         1, 2, 3 and 4. Every interval it plays is therefore a little out, and the ear
+         reads that as metal rather than as pitch.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">ii</div>
+      <h3>Timbre</h3>
+      <p>Bamboo is thin and dry and gone in a second. Aluminium is bright and rings for
+         ages. Copper is low and dark. The clang slider is how much of the upper partials
+         you hear, which is the difference between a wind chime and a bell.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">iii</div>
+      <h3>The scale</h3>
+      <p>Chimes are usually hung to a pentatonic scale, because a scale with no semitones
+         can sound wrong by almost any combination. The keys row switches between
+         pentatonic, whole-tone and the Japanese hirajoshi.</p>
+    </div>
+  </section>
+
+  <section class="cells" id="notes">
+    <div class="cell">
+      <div class="fig serif">iv</div>
+      <h3>The wind</h3>
+      <p>Each tube is a pendulum driven by the same wind, and they swing at their own
+         period, so the set never strikes the same phrase twice. The wind is a number and
+         a noise, and the striking is not.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">v</div>
+      <h3>Decay</h3>
+      <p>Decay is how fast a struck tube goes quiet, and it depends on the material far
+         more than on how hard you hit it. Aluminium holds; bamboo does not.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">vi</div>
+      <h3>Hang a set</h3>
+      <p>Eight tubes in one scale, hung longest to shortest, so the low ones swing slowly
+         and the high ones chatter. The same geometry every time, tuned differently.</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>Wind Chimes · two canvases, no files</span>
+    <span class="mono">1 : 2.76 : 5.40 : 8.93</span>
+  </footer>
+</div>
+<script>
+(function(){
+"use strict";
+var cv=document.getElementById('c'),ctx=cv.getContext('2d');
+var W=cv.width,H=cv.height;
+var wind=38,decay=62,clang=42,t=0;
+var SCALES=[
+ {n:'pentatonic',semis:[0,2,4,7,9,12,14,16],base:196.0},
+ {n:'whole tone',semis:[0,2,4,6,8,10,12,14],base:207.65},
+ {n:'hirajoshi',semis:[0,2,3,7,8,12,14,15],base:174.61},
+ {n:'pelog',semis:[0,1,3,7,8,12,13,15],base:185.0}
+];
+var MIP=[
+ {n:'aluminium',ratios:[1,2.76,5.40,8.93],rings:1.0,tone:'#c8ccd4',band:'#e8f0f7'},
+ {n:'copper',ratios:[1,2.74,5.34,8.80],rings:1.35,tone:'#b87333',band:'#e0a060'},
+ {n:'bamboo',ratios:[1,2.67,5.20,8.70],rings:0.4,tone:'#c8a860',band:'#e8d098'},
+ {n:'steel',ratios:[1,2.80,5.50,9.10],rings:1.15,tone:'#8a94a0',band:'#c0ccd8'},
+ {n:'brass',ratios:[1,2.77,5.42,8.98],rings:1.1,tone:'#c9a227',band:'#e8c860'},
+ {n:'glass',ratios:[1,2.76,5.40,8.93],rings:1.6,tone:'#a8d8e0',band:'#d8f0f8'}
+];
+var mi=MIP[0];
+var scale=SCALES[0];
+var tubes=[];
+function hang(){
+  tubes=[];
+  var n=8,i;
+  for(i=0;i<n;i++){
+    var s=scale.semis[i];
+    var semi=scale.semis[0]-s;         /* the low notes are the long ones */
+    var f=scale.base*Math.pow(2,-semi/12);
+    tubes.push({
+      x:W*(0.5+(i-(n-1)/2)*0.085),
+      f:f,
+      len:150+ (n-1-i)*26,
+      top:H*0.10,
+      ang:0,vel:0,
+      ph:Math.random()*6.28,
+      rate:0.5+ (n-i)*0.16,
+      hit:0
+    });
+  }
+}
+hang();
+/* ---------- the audio ---------- */
+var ac=null,master=null;
+function audio(){
+  if(ac)return ac;
+  var AC=window.AudioContext||window.webkitAudioContext;
+  if(!AC)return null;
+  ac=new AC();
+  master=ac.createGain();master.gain.value=0.4;
+  var comp=ac.createDynamicsCompressor();
+  master.connect(comp);comp.connect(ac.destination);
+  return ac;
+}
+function strike(tube,strength){
+  tube.hit=1;
+  if(!ac)audio();
+  if(!ac)return;
+  if(ac.state==='suspended')ac.resume();
+  var amp=(strength||0.3)*0.3;
+  var clangK=clang/100;
+  mi.ratios.forEach(function(r,i){
+    var o=ac.createOscillator(),g=ac.createGain();
+    var type=i===0?(clangK>0.7?'square':'triangle'):(clangK>0.5?'square':'sine');
+    o.type=type;
+    o.frequency.value=tube.f*r;
+    var dur=(decay/100)*3.4*mi.rings/(1+i*0.7);
+    var t0=ac.currentTime;
+    g.gain.setValueAtTime(0,t0);
+    g.gain.linearRampToValueAtTime(amp/(1+i*1.7),t0+0.006);
+    g.gain.exponentialRampToValueAtTime(0.0008,t0+dur);
+    o.connect(g);g.connect(master);o.start(t0);o.stop(t0+dur+0.05);
+  });
+  /* a little noise for the clanger of them */
+  if(clangK>0.5){
+    var len=Math.floor(ac.sampleRate*0.03);
+    var buf=ac.createBuffer(1,len,ac.sampleRate),d=buf.getChannelData(0);
+    for(var k=0;k<len;k++)d[k]=(Math.random()*2-1)*(1-k/len)*clangK;
+    var s=ac.createBufferSource();s.buffer=buf;
+    var fg=ac.createGain();fg.gain.value=amp*0.4;
+    s.connect(fg);fg.connect(master);s.start();
+  }
+}
+/* ---------- the set ---------- */
+function draw(){
+  /* the dark */
+  var g=ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'#0e1614');g.addColorStop(1,'#080d0b');
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  /* a moon behind */
+  var mg=ctx.createRadialGradient(W*0.8,H*0.2,10,W*0.8,H*0.2,140);
+  mg.addColorStop(0,'rgba(240,250,240,.20)');mg.addColorStop(1,'rgba(240,250,240,0)');
+  ctx.fillStyle=mg;ctx.beginPath();ctx.arc(W*0.8,H*0.2,140,0,6.3);ctx.fill();
+  /* the wind streaks */
+  ctx.strokeStyle='rgba(200,230,210,'+(wind/700)+')';ctx.lineWidth=1;
+  for(var s=0;s<10;s++){
+    var y=(s*H/10+t*20)%H;
+    ctx.beginPath();ctx.moveTo(0,y);
+    ctx.quadraticCurveTo(W*0.5,y-14+Math.sin(t+s)*8,W,y);
+    ctx.stroke();
+  }
+  /* the bar the tubes hang from */
+  ctx.fillStyle=mi.tone;
+  ctx.fillRect(W*0.28,H*0.06,W*0.44,8);
+  ctx.fillStyle='rgba(0,0,0,.4)';
+  ctx.fillRect(W*0.28,H*0.13,W*0.44,4);
+  /* the tubes */
+  tubes.forEach(function(tu,i){
+    /* the cord */
+    ctx.strokeStyle='rgba(200,220,210,.4)';ctx.lineWidth=1;
+    ctx.beginPath();
+    ctx.moveTo(tu.x,tu.top);
+    ctx.lineTo(tu.x+Math.sin(tu.ang)*tu.len*0.2,tu.top+tu.len*0.55);
+    ctx.stroke();
+    /* the tube: a vertical bar with a gradient, swinging about the cord */
+    ctx.save();
+    ctx.translate(tu.x,tu.top);
+    ctx.rotate(tu.ang);
+    /* the cord to the tube's hole */
+    ctx.strokeStyle='rgba(200,220,210,.4)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(0,tu.len*0.42);ctx.stroke();
+    /* the tube body */
+    var tw=12+i*1.4;
+    var tg=ctx.createLinearGradient(-tw/2,0,tw/2,0);
+    tg.addColorStop(0,mi.band);tg.addColorStop(0.4,mi.tone);tg.addColorStop(1,'#000');
+    ctx.fillStyle=tg;
+    ctx.fillRect(-tw/2,tu.len*0.42,tw,tu.len*0.58);
+    /* the hole at the top */
+    ctx.fillStyle='rgba(0,0,0,.55)';
+    ctx.beginPath();ctx.ellipse(0,tu.len*0.42,tw/2,tw*0.16,0,0,6.3);ctx.fill();
+    /* a highlight along the tube */
+    ctx.fillStyle='rgba(255,255,255,.25)';
+    ctx.fillRect(-tw/2+2,tu.len*0.46,2.4,tu.len*0.52);
+    /* the strike flash */
+    if(tu.hit>0){
+      ctx.globalAlpha=tu.hit*0.5;
+      ctx.fillStyle='#fff';
+      ctx.fillRect(-tw/2-4,tu.len*0.42-2,tw+8,tu.len*0.58+6);
+      ctx.globalAlpha=1;
+      tu.hit-=0.06;
+      if(tu.hit<0)tu.hit=0;
+    }
+    ctx.restore();
+    /* the clapper: the bit in the middle that hits the tube */
+    ctx.fillStyle=mi.tone;
+    ctx.beginPath();
+    ctx.arc(tu.x+Math.sin(tu.ang)*tu.len*0.14,tu.top+tu.len*0.78,4,0,6.3);
+    ctx.fill();
+  });
+  /* the render of the last strike, drawn as a small overtone row */
+  if(lastStrike){
+    ctx.fillStyle='rgba(143,208,176,.85)';
+    ctx.font='11px ui-monospace,Menlo,monospace';
+    ctx.textAlign='left';ctx.textBaseline='top';
+    var x=16,y=16;
+    ctx.fillText('partials',x,y);
+    mi.ratios.forEach(function(r,i){
+      ctx.fillText(r.toFixed(2)+'×',x+i*46,y+16);
+    });
+  }
+}
+
+/* ---------- wind, strike, controls ---------- */
+var lastStrike=null;
+function stepWind(dt){
+  tubes.forEach(function(tu){
+    /* each tube is a pendulum: its period depends on its length, so the low ones
+       swing slowly and the high ones chatter */
+    var period=0.9+tu.len/220;
+    var drive=wind/100;
+    var swing=Math.sin(t*(6.283/period)*tu.rate+tu.ph)*drive;
+    tu.vel+=(swing*0.9-tu.ang*0.7)*dt*16;
+    tu.vel*=0.985;
+    tu.ang+=tu.vel*dt;
+    if(Math.abs(tu.ang)>0.42)tu.ang=Math.sign(tu.ang)*0.42;
+    /* it strikes the clapper when it swings far enough */
+    if(Math.abs(tu.ang)>0.34&&!tu.struck){
+      tu.struck=true;
+      lastStrike=tu;
+      strike(tu,Math.abs(tu.ang)*2.2);
+    }
+    if(Math.abs(tu.ang)<0.22)tu.struck=false;
+  });
+}
+var kbox=document.getElementById('keys');
+SCALES.forEach(function(s,i){
+  var b=document.createElement('button');
+  b.textContent=s.n;
+  b.setAttribute('aria-pressed',String(i===0));
+  b.addEventListener('click',function(){
+    scale=s;hang();
+    [].slice.call(kbox.children).forEach(function(o){
+      o.setAttribute('aria-pressed',String(o===b));});
+  });
+  kbox.appendChild(b);
+});
+var mbox=document.getElementById('winds');
+MIP.forEach(function(m,i){
+  var b=document.createElement('button');
+  b.textContent=m.n;
+  b.setAttribute('aria-pressed',String(i===0));
+  b.addEventListener('click',function(){
+    mi=m;
+    [].slice.call(mbox.children).forEach(function(o){
+      o.setAttribute('aria-pressed',String(o===b));});
+    document.getElementById('rO1').textContent=m.ratios[1].toFixed(2)+'×';
+    document.getElementById('rO2').textContent=m.ratios[2].toFixed(2)+'×';
+    document.getElementById('rO3').textContent=m.ratios[3].toFixed(2)+'×';
+  });
+  mbox.appendChild(b);
+});
+function bind(id,fn){var el=document.getElementById(id);
+  el.addEventListener('input',function(){fn(+el.value);});}
+bind('wind',function(v){wind=v;});
+bind('decay',function(v){decay=v;});
+bind('clang',function(v){clang=v;});
+document.getElementById('gust').addEventListener('click',function(){
+  wind=Math.min(100,wind+45);
+  document.getElementById('wind').value=wind;
+  tubes.forEach(function(tu){tu.vel+=(Math.random()-.5)*2.4;});
+});
+document.getElementById('hang').addEventListener('click',function(){
+  hang();
+});
+/* clicking a tube strikes it */
+cv.addEventListener('pointerdown',function(e){
+  var r=cv.getBoundingClientRect();
+  var x=(e.clientX-r.left)*(W/r.width),y=(e.clientY-r.top)*(H/r.height);
+  var best=null,bd=1e9;
+  tubes.forEach(function(tu){
+    var d=Math.hypot(x-tu.x,y-(tu.top+tu.len*0.7));
+    if(d<bd){bd=d;best=tu;}
+  });
+  if(best&&bd<90){lastStrike=best;strike(best,0.5);best.vel+=0.5;}
+});
+/* dragging across the set is the wind */
+var dragging=false;
+cv.addEventListener('pointermove',function(e){
+  if(!dragging)return;
+  var r=cv.getBoundingClientRect();
+  var x=(e.clientX-r.left)*(W/r.width);
+  tubes.forEach(function(tu){
+    if(Math.abs(x-tu.x)<40)tu.vel+=(Math.random()-.5)*0.6;
+  });
+});
+cv.addEventListener('pointerdown',function(){dragging=true;});
+function endDrag(){dragging=false;}
+cv.addEventListener('pointerup',endDrag);
+cv.addEventListener('pointercancel',endDrag);
+function readout(){
+  var ringing=0;
+  tubes.forEach(function(tu){if(tu.hit>0)ringing++;});
+  document.getElementById('rR').textContent=ringing;
+  document.getElementById('rL').textContent=lastStrike?
+    Math.round(lastStrike.f)+' Hz':'—';
+  var longest=0;
+  tubes.forEach(function(tu){if(tu.len>longest)longest=tu.len;});
+  document.getElementById('rT').textContent=longest+' px';
+}
+var last=0;
+function loop(ts){
+  var dt=last?Math.min(.05,(ts-last)/1000):0;last=ts;
+  t+=dt;stepWind(dt);draw();readout();
+  requestAnimationFrame(loop);
+}
+draw();readout();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

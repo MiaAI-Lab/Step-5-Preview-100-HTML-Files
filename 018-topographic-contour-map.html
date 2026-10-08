@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CONTOUR — A Survey of Imaginary Ground</title>
+<style>
+  :root{
+    --paper:#efe9dc;
+    --ink:#1d2b24;
+    --teal:#0f766e;
+    --rust:#b45309;
+    --grey:#8a8578;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --serif:"Iowan Old Style",Palatino,Georgia,serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden}
+  body{background:var(--paper);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+  #map{position:fixed;inset:0;z-index:0;display:block}
+
+  .ui{position:fixed;inset:0;z-index:2;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(16px,3vw,34px)}
+  .top{display:flex;justify-content:space-between;align-items:flex-start;gap:18px}
+  .k{font-family:var(--mono);font-size:9px;letter-spacing:.34em;text-transform:uppercase;color:var(--rust)}
+  h1{font-family:var(--serif);font-weight:400;font-size:clamp(24px,4.2vw,50px);line-height:1;letter-spacing:-.02em;margin:10px 0 0}
+  h1 i{font-style:italic;color:var(--teal)}
+  .top p{margin:12px 0 0;font-size:12px;line-height:1.75;max-width:34ch;color:rgba(29,43,36,.7)}
+  .stats{text-align:right;font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:rgba(29,43,36,.6);line-height:2.4}
+  .stats b{display:block;font-size:15px;color:var(--ink);font-weight:400;letter-spacing:.02em}
+
+  .bottom{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+  .tray{
+    pointer-events:auto;display:flex;gap:clamp(8px,1.3vw,16px);flex-wrap:wrap;align-items:center;
+    background:rgba(239,233,220,.82);border:1px solid rgba(29,43,36,.18);border-radius:14px;
+    padding:11px clamp(12px,1.8vw,20px);backdrop-filter:blur(12px)
+  }
+  .g{display:flex;align-items:center;gap:8px}
+  .kk{font-family:var(--mono);font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;color:rgba(29,43,36,.6)}
+  .vv{font-family:var(--mono);font-size:9.5px;color:var(--teal);min-width:26px;font-variant-numeric:tabular-nums}
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;width:66px;height:14px;background:transparent;cursor:pointer
+  }
+  input[type=range]::-webkit-slider-runnable-track{height:2px;background:rgba(29,43,36,.28);border-radius:2px}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;border-radius:50%;background:var(--rust);margin-top:-5px;border:0}
+  input[type=range]::-moz-range-track{height:2px;background:rgba(29,43,36,.28);border-radius:2px}
+  input[type=range]::-moz-range-thumb{width:11px;height:11px;border:0;border-radius:50%;background:var(--rust)}
+  button{
+    pointer-events:auto;font-family:var(--mono);font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;
+    background:rgba(15,118,110,.12);border:1px solid rgba(15,118,110,.4);color:var(--ink);
+    padding:9px 13px;border-radius:999px;cursor:pointer;transition:background .2s,color .2s
+  }
+  button:hover{background:var(--teal);color:var(--paper)}
+  .hint{font-family:var(--mono);font-size:8.5px;letter-spacing:.22em;text-transform:uppercase;color:rgba(29,43,36,.45);pointer-events:none}
+
+  @media (max-width:760px){.top p,.stats,.hint{display:none}.ui{padding:14px}}
+</style>
+</head>
+<body>
+<canvas id="map"></canvas>
+
+<div class="ui">
+  <div class="top">
+    <div>
+      <div class="k">Sheet 14 · grid NH42 · scale 1:24000</div>
+      <h1>Contours of <i>imaginary</i> ground.</h1>
+      <p>A heightfield built from layered sine ridges, drawn as marching isolines.
+      Every fifth line is indexed; the rest are just there to hold the shape.</p>
+    </div>
+    <div class="stats">
+      Interval<b id="sI">25 m</b>
+      Lines<b id="sL">0</b>
+      Range<b id="sR">0 m</b>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <div class="tray">
+      <div class="g"><span class="kk">Ridge</span><input type="range" id="ridge" min="1" max="9" value="3" aria-label="Ridge frequency"><span class="vv" id="ridgeV">3</span></div>
+      <div class="g"><span class="kk">Relief</span><input type="range" id="relief" min="10" max="100" value="62" aria-label="Relief"><span class="vv" id="reliefV">62</span></div>
+      <div class="g"><span class="kk">Interval</span><input type="range" id="interval" min="5" max="60" value="25" aria-label="Contour interval"><span class="vv" id="intervalV">25</span></div>
+      <button id="newland">New ground</button>
+      <button id="shade">Shading</button>
+    </div>
+    <div class="hint">Hover to read the elevation</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var cv=document.getElementById('map'),c=cv.getContext('2d');
+  var W,H,DPR=Math.min(devicePixelRatio||1,2);
+  var STEP=4;                 /* sampling cell in css px */
+  var grid=[],cols=0,rows=0;
+  var ridge=3,relief=62,interval=25,shading=false;
+  var seed=Math.random()*1000;
+  var hover={x:-1,y:-1};
+
+  /* layered sine heightfield */
+  function height(x,y){
+    var s=seed;
+    var h=0;
+    h+=Math.sin((x*0.006*ridge)+s)*1.0;
+    h+=Math.sin((y*0.0085*ridge)-s*0.7)*0.8;
+    h+=Math.sin((x*0.014+y*0.011)+s*1.3)*0.42;
+    h+=Math.sin((x*0.027-y*0.019)-s*0.4)*0.22;
+    h+=Math.sin((x*0.05+y*0.043)+s*2.1)*0.11;
+    /* a couple of local peaks so the map has named summits */
+    h+=Math.exp(-(((x-W*0.3)**2+(y-H*0.28)**2)/(2*Math.pow(W*0.10,2))))*1.5;
+    h+=Math.exp(-(((x-W*0.72)**2+(y-H*0.66)**2)/(2*Math.pow(W*0.08,2))))*1.1;
+    return h;
+  }
+  function build(){
+    cols=Math.ceil(W/STEP)+1; rows=Math.ceil(H/STEP)+1;
+    grid=new Float64Array(cols*rows);
+    for(var j=0;j<rows;j++){
+      for(var i=0;i<cols;i++){
+        grid[j*cols+i]=height(i*STEP,j*STEP);
+      }
+    }
+  }
+  function resize(){
+    W=innerWidth;H=innerHeight;
+    cv.width=W*DPR;cv.height=H*DPR;cv.style.width=W+'px';cv.style.height=H+'px';
+    c.setTransform(DPR,0,0,DPR,0,0);
+    build();render();
+  }
+
+  function render(){
+    /* paper */
+    c.fillStyle='#efe9dc';c.fillRect(0,0,W,H);
+    /* hillshade: cheap directional light from the heightfield */
+    if(shading){
+      var img=c.getImageData(0,0,W*DPR,H*DPR);
+      var d=img.data;
+      for(var j=1;j<rows-1;j++){
+        for(var i=1;i<cols-1;i++){
+          var dzdx=(grid[j*cols+i+1]-grid[j*cols+i-1]);
+          var dzdy=(grid[(j+1)*cols+i]-grid[(j-1)*cols+i]);
+          var nz=1/Math.max(0.2,relief/62);
+          var len=Math.sqrt(dzdx*dzdx+dzdy*dzdy+nz*nz);
+          /* light from the north-west */
+          var l=(-dzdx-dzdy+nz)/len;
+          var v=Math.max(0,Math.min(1,l));
+          var px=Math.round(i*STEP*DPR),py=Math.round(j*STEP*DPR);
+          var o=(py*W*DPR+px)*4;
+          if(o+3<d.length){
+            d[o]  =Math.min(255,d[o]  *(0.62+v*0.55));
+            d[o+1]=Math.min(255,d[o+1]*(0.62+v*0.55));
+            d[o+2]=Math.min(255,d[o+2]*(0.62+v*0.52));
+          }
+        }
+      }
+      c.putImageData(img,0,0);
+    }
+
+    /* grid graticule */
+    c.strokeStyle='rgba(29,43,36,.08)';c.lineWidth=1;
+    for(var gx=0;gx<W;gx+=80){c.beginPath();c.moveTo(gx+.5,0);c.lineTo(gx+.5,H);c.stroke();}
+    for(var gy=0;gy<H;gy+=80){c.beginPath();c.moveTo(0,gy+.5);c.lineTo(W,gy+.5);c.stroke();}
+
+    /* marching squares isolines */
+    var levels=[];
+    var amp=relief/62;
+    var lo=-2.6*amp, hi=2.6*amp;
+    for(var L=Math.ceil(lo/1);L*1<=hi;L+=1)levels.push(L);
+    var drawn=0;
+    c.lineWidth=1;
+    for(var li=0;li<levels.length;li++){
+      var lv=levels[li];
+      var major=(li%5===0);
+      c.strokeStyle=major?'rgba(29,43,36,.62)':'rgba(29,43,36,.26)';
+      c.lineWidth=major?1.3:0.8;
+      c.beginPath();
+      for(var j2=0;j2<rows-1;j2++){
+        for(var i2=0;i2<cols-1;i2++){
+          var a=grid[j2*cols+i2], b=grid[j2*cols+i2+1],
+              d2=grid[(j2+1)*cols+i2+1], e=grid[(j2+1)*cols+i2];
+          var idx=0;
+          if(a>lv)idx|=1;
+          if(b>lv)idx|=2;
+          if(d2>lv)idx|=4;
+          if(e>lv)idx|=8;
+          if(idx===0||idx===15)continue;
+          var x0=i2*STEP, y0=j2*STEP;
+          /* edge crossing points, computed lazily only where needed */
+          var t=(lv-a)/(b-a), tx=x0+t*STEP;
+          var r2=(lv-b)/(d2-b), ry=y0+r2*STEP;
+          var bo=(lv-e)/(d2-e), bx=x0+bo*STEP;
+          var l2=(lv-a)/(e-a), ly=y0+l2*STEP;
+          switch(idx){
+            case 1:case 14:c.moveTo(x0,ly);c.lineTo(tx,y0);drawn++;break;
+            case 2:case 13:c.moveTo(tx,y0);c.lineTo(x0+STEP,ry);drawn++;break;
+            case 3:case 12:c.moveTo(x0,ly);c.lineTo(x0+STEP,ry);drawn++;break;
+            case 4:case 11:c.moveTo(x0+STEP,ry);c.lineTo(bx,y0+STEP);drawn++;break;
+            case 6:case 9:c.moveTo(tx,y0);c.lineTo(bx,y0+STEP);drawn++;break;
+            case 7:case 8:c.moveTo(x0,ly);c.lineTo(bx,y0+STEP);drawn++;break;
+            case 5:c.moveTo(x0,ly);c.lineTo(tx,y0);c.moveTo(x0+STEP,ry);c.lineTo(bx,y0+STEP);drawn+=2;break;
+            case 10:c.moveTo(tx,y0);c.lineTo(x0+STEP,ry);c.moveTo(x0,ly);c.lineTo(bx,y0+STEP);drawn+=2;break;
+          }
+        }
+      }
+      c.stroke();
+    }
+
+    /* summit markers on the two Gaussian peaks */
+    mark(W*0.3,H*0.28,'▲','1 842');
+    mark(W*0.72,H*0.66,'▲','1 310');
+
+    /* hover readout */
+    if(hover.x>=0){
+      var h=height(hover.x,hover.y);
+      var m=Math.round(h*interval*1.6*amp+1200);
+      c.strokeStyle='rgba(180,83,9,.5)';c.lineWidth=1;
+      c.beginPath();c.moveTo(hover.x,0);c.lineTo(hover.x,H);
+      c.moveTo(0,hover.y);c.lineTo(W,hover.y);c.stroke();
+      c.fillStyle='rgba(180,83,9,.9)';
+      c.font='11px ui-monospace,monospace';c.textAlign='left';
+      c.fillText(m+' m',hover.x+8,hover.y-8);
+    }
+
+    document.getElementById('sL').textContent=drawn.toLocaleString();
+    var lo2=Math.round(-2.6*amp*interval*1.6+1200);
+    var hi2=Math.round(2.6*amp*interval*1.6+1200);
+    document.getElementById('sR').textContent=lo2+'–'+hi2+' m';
+  }
+  function mark(x,y,g,txt){
+    c.fillStyle='rgba(180,83,9,.85)';
+    c.font='12px ui-monospace,monospace';c.textAlign='center';
+    c.fillText(g,x,y-8);
+    c.fillStyle='rgba(29,43,36,.75)';
+    c.font='9px ui-monospace,monospace';
+    c.fillText(txt,x,y+14);
+  }
+
+  cv.addEventListener('pointermove',function(e){
+    var r=cv.getBoundingClientRect();
+    hover.x=e.clientX-r.left;hover.y=e.clientY-r.top;
+    render();
+  });
+  cv.addEventListener('pointerleave',function(){hover.x=-1;render();});
+
+  document.getElementById('ridge').addEventListener('input',function(){
+    ridge=+this.value;document.getElementById('ridgeV').textContent=ridge;
+    build();render();
+  });
+  document.getElementById('relief').addEventListener('input',function(){
+    relief=+this.value;document.getElementById('reliefV').textContent=relief;
+    build();render();
+  });
+  document.getElementById('interval').addEventListener('input',function(){
+    interval=+this.value;document.getElementById('intervalV').textContent=interval;
+    document.getElementById('sI').textContent=interval+' m';
+    render();
+  });
+  document.getElementById('newland').addEventListener('click',function(){
+    seed=Math.random()*1000;build();render();
+  });
+  var sb=document.getElementById('shade');
+  sb.addEventListener('click',function(){
+    shading=!shading;
+    sb.style.background=shading?'var(--teal)':'rgba(15,118,110,.12)';
+    sb.style.color=shading?'var(--paper)':'';
+    render();
+  });
+
+  addEventListener('resize',function(){clearTimeout(window.__r);window.__r=setTimeout(resize,140)});
+  resize();
+})();
+</script>
+</body>
+</html>

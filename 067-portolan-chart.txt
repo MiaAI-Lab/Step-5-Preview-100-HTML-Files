@@ -1,0 +1,89 @@
+# THE CHART — parchment, rhumb lines and a route
+
+## Short title
+Portolan Chart
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a portolan-style chart on
+parchment — invented coastline, compass rose with named winds, rhumb lines to the edge of
+the paper, a dashed route and a log — where the ink weight and the fading are the
+controls. No external dependencies whatsoever — no CDN, no web fonts, no external
+images, no JS libraries. All CSS and JavaScript inline, works offline by double-clicking,
+responsive, valid HTML5.
+
+Artistic direction: parchment and sepia. Ground #2b2418, panel a cream gradient, ink
+#4a3520 with verdigris #2f6b6b and cinnabar #a8452c as the two accents, land #cfe0cf.
+Serif headings with italic accent words, uppercase .1em–.4em kickers, monospace figures.
+
+The chart is an SVG on a 900 × 620 viewBox built at load from one mulberry32 seed. The
+sea is paved with wavy hairline graticules. The coast is one closed path built from a
+smoothed random walk of fifty-four points — the same point cloud that gives a coastline
+its bays — plus a smaller second island. Mountains are hachures, not contours: nine short
+strokes per peak, getting longer at the summit, which is how height was read before
+contours existed. A river runs as a verdigris polyline, and twenty-six little conifer
+marks stand in for woodland.
+
+The compass rose at 150, 470 has thirty-two spokes — cardinals, ordinals and half-winds
+at different lengths — with the eight-point star overdrawing them, the four wind letters
+outside the ring and the sixteen named Mediterranean winds (Tramontana, Greco, Levante,
+Sirocco, Ostro, Libeccio, Ponente, Maestro) printed inside it. Sixteen rhumb lines run
+from the rose to beyond the edge of the paper: a constant bearing, drawn as a ruler
+across the sea, which is what a navigator actually followed.
+
+The route joins the places with a dashed path that crawls along itself with a
+stroke-dashoffset animation — portolan courses were dashes, and the dash length was a
+rough measure of a day's sail. Five places are clickable and each writes a titled log
+entry with an italic quotation into the side panel; the selected place is marked, and only
+one can be open at a time. In the margin sits a sea monster and the words hic sunt
+dracones.
+
+Controls: Ink weight and Faded both re-weigh and re-fade the whole sheet. Every stroke
+records its relative weight and its own opacity when it is drawn, so raising the ink
+makes the coastline heavier than the hairlines by the same ratio it started with, and
+fading the paper ages everything at once without flattening the hierarchy. Chart the
+route and Draw the rose toggle their layers.
+
+Layout: nav, centred hero, a two-column chart and log panel, a readout row (places,
+rhumb lines, route, compass, ink), then two three-cell note rows on the rose, rhumb lines,
+the route, faded, mountains and the blank, then a footer. One column under 900px, links
+hidden under 780px.
+
+Interaction: click a place to read its log, toggle the route and the rose, and drag the
+ink and faded sliders to watch the sheet age under your hands. Nothing here is a picture
+of parchment: it is a CSS radial gradient, a seeded coastline and one ink colour.
+
+## One-paragraph description of the intended design
+A portolan chart drawn in SVG from a single seed — smoothed-random-walk coastline, hachure
+mountains, verdigris river, forest marks, a thirty-two-spoke compass rose with the sixteen
+named winds printed inside it and sixteen rhumb lines running off the paper — with five
+clickable places that write titled log entries into a side panel, a dashed route that
+crawls along itself, a sea monster in the margin, and ink weight and fading sliders that
+re-weigh and age the whole sheet without flattening the drawing's hierarchy.
+
+## Major visual techniques used
+- Coastline from a smoothed random walk over fifty-four points, which is what gives a
+  coast its bays and headlands without drawing them by hand
+- Hachures instead of contours: nine short strokes per peak, longer toward the summit,
+  so height is read from density of marks
+- Compass rose built as thirty-two spokes at three lengths, with an eight-point star
+  overdrawing them and the sixteen named winds printed in the ring
+- Rhumb lines as straight bearings to beyond the viewBox, one per point of the rose
+- Dashed route animated with stroke-dashoffset, so the course crawls the way a
+  portolan's dashes were meant to read
+- Every stroke records its relative weight and its own opacity at creation, so the ink
+  and faded sliders can reweigh and age the sheet without flattening hierarchy
+- Land as one flat tint under the ink, which is how a chart worked: colour under, ink over
+- Parchment as a CSS radial gradient plus an inset shadow, with no texture file
+- Five places as one group with a single open selection, each writing to the same panel
+- Sea monster and hic sunt dracones in the margin, drawn as two bezier paths
+- Graticule hairlines generated from summed sines so they read as drawn rather than
+  plotted
+- Log entries written into the existing paragraph rather than replacing the panel, so
+  the panel never rebuilds
+
+## Intended interaction model
+A chart to read and to age. Visitors click the places along the route and read what the
+log says about each one, turn the route and the rose on and off, and drag the ink and
+faded sliders to make the sheet heavier or older. The coastline, the rose and the route
+are all generated from one number, so the whole chart is reproducible.

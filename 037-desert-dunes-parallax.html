@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ERG — Nine Hundred Kilometres of Sand</title>
+<style>
+  :root{
+    --ink:#f5ece0;
+    --dim:rgba(245,236,224,.55);
+    --line:rgba(245,236,224,.14);
+    --sun:#ffcf7a;
+    --dune:#c98b4e;
+    --shadow:#7a4a2a;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --serif:"Iowan Old Style",Palatino,Georgia,serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden}
+  body{background:#160d07;color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+  .sky{
+    position:fixed;inset:0;z-index:0;
+    background:
+      radial-gradient(50% 34% at 68% 26%,rgba(255,190,110,.30),transparent 68%),
+      radial-gradient(60% 40% at 30% 70%,rgba(200,90,60,.16),transparent 70%),
+      linear-gradient(180deg,#2a1508 0%,#5a2c14 26%,#9c4a20 48%,#c9742e 64%,#d98a40 74%,#8a4a22 100%);
+  }
+  #cv{position:fixed;inset:0;z-index:1;display:block}
+
+  .ui{position:fixed;inset:0;z-index:3;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(18px,3.4vw,40px)}
+  .top{display:flex;justify-content:space-between;align-items:flex-start;gap:18px}
+  .k{font-family:var(--mono);font-size:9px;letter-spacing:.34em;text-transform:uppercase;color:var(--sun)}
+  h1{font-family:var(--serif);font-weight:400;font-style:italic;font-size:clamp(28px,5.4vw,64px);line-height:.98;letter-spacing:-.02em;margin:10px 0 0}
+  h1 b{font-style:normal;font-weight:400;color:var(--sun)}
+  .top p{margin:12px 0 0;font-size:12px;line-height:1.75;max-width:32ch;color:var(--dim)}
+  .mtr{text-align:right;font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);line-height:2.4}
+  .mtr b{display:block;font-size:15px;color:var(--sun);font-weight:400;letter-spacing:.02em}
+
+  .bottom{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+  .tray{
+    pointer-events:auto;display:flex;gap:clamp(8px,1.3vw,16px);flex-wrap:wrap;align-items:center;
+    background:rgba(40,20,10,.6);border:1px solid var(--line);border-radius:16px;
+    padding:11px clamp(12px,1.8vw,20px);backdrop-filter:blur(14px)
+  }
+  .g{display:flex;align-items:center;gap:8px}
+  .kk{font-family:var(--mono);font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
+  .vv{font-family:var(--mono);font-size:9.5px;color:var(--sun);min-width:26px;font-variant-numeric:tabular-nums}
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;width:64px;height:14px;background:transparent;cursor:pointer
+  }
+  input[type=range]::-webkit-slider-runnable-track{height:2px;background:var(--line);border-radius:2px}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;border-radius:50%;background:var(--sun);margin-top:-5px;border:0;box-shadow:0 0 10px rgba(255,207,122,.7)}
+  input[type=range]::-moz-range-track{height:2px;background:var(--line);border-radius:2px}
+  input[type=range]::-moz-range-thumb{width:11px;height:11px;border:0;border-radius:50%;background:var(--sun)}
+  button{
+    pointer-events:auto;font-family:var(--mono);font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;
+    background:rgba(255,207,122,.12);border:1px solid rgba(255,207,122,.36);color:var(--ink);
+    padding:9px 13px;border-radius:999px;cursor:pointer;transition:background .2s,color .2s
+  }
+  button:hover{background:var(--sun);color:#3a2408}
+  button.on{background:var(--sun);color:#3a2408}
+  .hint{font-family:var(--mono);font-size:8.5px;letter-spacing:.22em;text-transform:uppercase;color:rgba(245,236,224,.4);pointer-events:none}
+
+  @media (max-width:760px){.top p,.mtr,.hint{display:none}.ui{padding:14px}}
+</style>
+</head>
+<body>
+<div class="sky"></div>
+<canvas id="cv"></canvas>
+
+<div class="ui">
+  <div class="top">
+    <div>
+      <div class="k">Grand Erg Oriental · 46°N 6°E</div>
+      <h1>Nine hundred<br><b>kilometres</b> of sand.</h1>
+      <p>Nothing here moves except the wind, and the wind only leaves evidence. Each
+      ridge is a decision made once and kept for a season.</p>
+    </div>
+    <div class="mtr">
+      Wind<b id="mW">SW 18 kt</b>
+      Ridges<b id="mR">7</b>
+      Grain<b id="mG">0.21 mm</b>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <div class="tray">
+      <div class="g"><span class="kk">Wind</span><input type="range" id="wind" min="0" max="100" value="38" aria-label="Wind strength"><span class="vv" id="windV">38</span></div>
+      <div class="g"><span class="kk">Ridges</span><input type="range" id="ridges" min="3" max="11" value="7" aria-label="Ridge count"><span class="vv" id="ridgesV">7</span></div>
+      <div class="g"><span class="kk">Relief</span><input type="range" id="relief" min="10" max="100" value="58" aria-label="Relief"><span class="vv" id="reliefV">58</span></div>
+      <button id="drift" class="on">Drift</button>
+      <button id="storm">Sandstorm</button>
+    </div>
+    <div class="hint">Drag to walk the dune line</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var cv=document.getElementById('cv'),c=cv.getContext('2d');
+  var W,H,DPR=Math.min(devicePixelRatio||1,2);
+  var ridges=[];
+  var wind=38,want=7,relief=58,drift=true,storm=false;
+  var pan=0,panT=0;
+  var t=0;
+
+  /* one ridge: a set of summed sines giving a dune crest + a long shadow slope */
+  function mk(i,n){
+    return {
+      x: (i+0.5)/n,
+      amp: 0.06+Math.random()*0.10,
+      f1: 0.6+Math.random()*1.6,
+      f2: 1.8+Math.random()*2.6,
+      p1: Math.random()*6.283,
+      p2: Math.random()*6.283,
+      lag: 0.12+i*0.05
+    };
+  }
+  function build(){
+    ridges=[];
+    for(var i=0;i<want;i++)ridges.push(mk(i,want));
+  }
+  function resize(){
+    W=innerWidth;H=innerHeight;
+    cv.width=W*DPR;cv.height=H*DPR;cv.style.width=W+'px';cv.style.height=H+'px';
+    c.setTransform(DPR,0,0,DPR,0,0);
+    build();
+  }
+
+  /* ridge height at screen x for ridge r */
+  function yAt(r,x){
+    /* each ridge sits lower and slightly further into the frame than the last */
+    var base=H*(0.22+r*0.085);
+    var wf=wind/100;
+    var amp=relief/100;
+    var s=Math.sin(x*0.006*r.f1+r.p1+t*0.0002*(drift?1:0))*r.amp*H*amp;
+    s+=Math.sin(x*0.014*r.f2+r.p2-t*0.0004*(drift?1:0)*wf)*r.amp*H*0.42*amp;
+    s+=Math.sin(x*0.03+r.p1*2)*r.amp*H*0.10*amp;
+    return base+s;
+  }
+
+  function draw(){
+    t+=0.016;
+    c.setTransform(DPR,0,0,DPR,0,0);
+    c.clearRect(0,0,W,H);
+
+    pan+=(panT-pan)*0.05;
+    var ox=pan*W*0.35;
+
+    /* the sun */
+    var sx=W*0.68+ox*0.15, sy=H*0.24;
+    var sg=c.createRadialGradient(sx,sy,0,sx,sy,Math.max(W,H)*0.44);
+    sg.addColorStop(0,'rgba(255,225,170,.55)');
+    sg.addColorStop(.10,'rgba(255,190,110,.32)');
+    sg.addColorStop(1,'rgba(255,160,80,0)');
+    c.fillStyle=sg;c.fillRect(0,0,W,H);
+    c.fillStyle='rgba(255,244,214,.95)';
+    c.beginPath();c.arc(sx,sy,Math.max(14,H*0.028),0,6.283);c.fill();
+
+    var i,r,x,y;
+    /* draw ridges back to front */
+    for(r=0;r<ridges.length;r++){
+      var lg=c.createLinearGradient(0,H*0.30,0,H*1.05);
+      /* far ridges are paler and cooler, near ridges darker and warmer */
+      var d=r/Math.max(1,ridges.length-1);
+      lg.addColorStop(0,'rgb('+Math.round(230-d*70)+','+Math.round(180-d*70)+','+Math.round(135-d*60)+')');
+      lg.addColorStop(.35,'rgb('+Math.round(215-d*70)+','+Math.round(150-d*65)+','+Math.round(105-d*50)+')');
+      lg.addColorStop(1,'rgb('+Math.round(140-d*60)+','+Math.round(84-d*40)+','+Math.round(48-d*25)+')');
+      /* build the ridge outline once */
+      c.beginPath();
+      c.moveTo(-20,H+10);
+      for(x=-20;x<=W+20;x+=7){
+        y=yAt(ridges[r],x-ox*ridges[r].lag);
+        c.lineTo(x,isFinite(y)?y:H);
+      }
+      c.lineTo(W+20,H+10);
+      c.closePath();
+      c.fillStyle=lg;
+      c.fill();
+
+      /* the windward shadow on each crest */
+      c.save();
+      c.clip();
+      /* a soft dark band just under the crest */
+      for(x=-20;x<=W+20;x+=7){
+        y=yAt(ridges[r],x-ox*ridges[r].lag);
+        if(!isFinite(y))continue;
+        var gg=c.createLinearGradient(0,y,0,y+40);
+        gg.addColorStop(0,'rgba(90,45,20,'+(0.36*(1-r/ridges.length)).toFixed(2)+')');
+        gg.addColorStop(1,'rgba(90,45,20,0)');
+        c.fillStyle=gg;
+        c.fillRect(x-4,y,11,44);
+      }
+      c.restore();
+    }
+
+    /* wind-blown sand streaming over the crests */
+    if(wind>10){
+      c.save();
+      c.globalCompositeOperation='lighter';
+      var wf=wind/100;
+      var n=Math.round(wf*160);
+      for(i=0;i<n;i++){
+        var seed2=(i*9301+49297)%233280;
+        var rr=seed2/233280;
+        var yy=H*(0.45+rr*0.5);
+        var xx=((t*(30+wf*90)*(0.5+rr)+rr*W*3)%(W+200))-100;
+        var len=6+wf*40*rr;
+        c.strokeStyle='rgba(255,220,170,'+(0.03+wf*0.14*rr).toFixed(3)+')';
+        c.lineWidth=0.8;
+        c.beginPath();c.moveTo(xx,yy);c.lineTo(xx+len,yy-1);c.stroke();
+      }
+      c.restore();
+    }
+
+    /* a sandstorm hazes the whole frame */
+    if(storm){
+      var hz=c.createLinearGradient(0,0,0,H);
+      hz.addColorStop(0,'rgba(220,170,110,.26)');
+      hz.addColorStop(1,'rgba(200,140,80,.18)');
+      c.fillStyle=hz;c.fillRect(0,0,W,H);
+    }
+
+    document.getElementById('mW').textContent=(storm?'SW '+(30+wind/100*30|0):'SW '+(6+wind/100*30|0))+' kt';
+    document.getElementById('mR').textContent=ridges.length;
+    document.getElementById('mG').textContent=(0.16+wind/100*0.14).toFixed(2)+' mm';
+    requestAnimationFrame(draw);
+  }
+
+  var drag=false,lx=0;
+  cv.addEventListener('pointerdown',function(e){drag=true;lx=e.clientX;cv.setPointerCapture(e.pointerId);});
+  cv.addEventListener('pointermove',function(e){
+    if(!drag)return;
+    panT+=(e.clientX-lx)*0.004;
+    panT=Math.max(-1,Math.min(1,panT));
+    lx=e.clientX;
+  });
+  ['pointerup','pointercancel'].forEach(function(t2){cv.addEventListener(t2,function(){drag=false;})});
+
+  document.getElementById('wind').addEventListener('input',function(){
+    wind=+this.value;document.getElementById('windV').textContent=wind;
+  });
+  document.getElementById('ridges').addEventListener('input',function(){
+    want=+this.value;document.getElementById('ridgesV').textContent=want;
+    build();
+  });
+  document.getElementById('relief').addEventListener('input',function(){
+    relief=+this.value;document.getElementById('reliefV').textContent=relief;
+  });
+  var db=document.getElementById('drift');
+  db.addEventListener('click',function(){drift=!drift;this.classList.toggle('on',drift);});
+  var sb=document.getElementById('storm');
+  sb.addEventListener('click',function(){
+    storm=!storm;this.classList.toggle('on',storm);
+    document.getElementById('wind').value=storm?88:38;
+    wind=+document.getElementById('wind').value;
+    document.getElementById('windV').textContent=wind;
+  });
+
+  addEventListener('resize',function(){clearTimeout(window.__r);window.__r=setTimeout(resize,140)});
+  resize();
+  requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>

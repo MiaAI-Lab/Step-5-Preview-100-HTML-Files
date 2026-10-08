@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Byte Storm — a cabinet that is fighting itself</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:#0a0812;color:#e8e4f7;
+  font:15px/1.62 ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+.serif{font-family:ui-serif,Georgia,"Times New Roman",serif}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.wrap{width:min(1100px,92vw);margin:0 auto}
+nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0 14px;
+  border-bottom:1px solid rgba(232,228,247,.14)}
+nav .brand{font-family:ui-serif,Georgia,serif;font-size:19px}
+nav .brand i{font-style:italic;color:#ff2e88}
+nav ul{display:flex;gap:26px;list-style:none;margin:0;padding:0;font-size:11px;
+  letter-spacing:.24em;text-transform:uppercase;color:#8f8aa8}
+nav a{color:inherit;text-decoration:none}nav a:hover{color:#ff2e88}
+@media(max-width:780px){nav ul{display:none}}
+header.hero{padding:50px 0 22px;text-align:center}
+header.hero .kicker{font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:#ff2e88;
+  margin:0 0 14px}
+header.hero h1{font-family:ui-serif,Georgia,serif;font-weight:400;
+  font-size:clamp(32px,5.6vw,62px);line-height:1.05;margin:0 0 16px}
+header.hero h1 em{font-style:italic;color:#2ee8ff}
+header.hero p{max-width:60ch;margin:0 auto;color:#9d97b8}
+.cab{position:relative;border:1px solid rgba(232,228,247,.16);border-radius:16px;
+  overflow:hidden;background:#06040c;margin-bottom:18px}
+.cab canvas{display:block;width:100%;height:auto}
+.cab .cap{position:absolute;left:14px;top:12px;font-size:10px;letter-spacing:.26em;
+  text-transform:uppercase;color:rgba(232,228,247,.5);pointer-events:none}
+.dock{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;justify-content:space-between;
+  border-top:1px solid rgba(232,228,247,.14);border-bottom:1px solid rgba(232,228,247,.14);
+  padding:16px 0;margin-bottom:32px}
+.dock label{display:grid;gap:7px;font-size:10px;letter-spacing:.26em;text-transform:uppercase;
+  color:#8f8aa8;min-width:150px}
+input[type=range]{width:100%;accent-color:#ff2e88}
+.btn{background:#ff2e88;color:#2a0517;border:0;border-radius:8px;padding:11px 15px;
+  font:inherit;font-size:12px;font-weight:700;letter-spacing:.08em;cursor:pointer;margin:0 6px 6px 0}
+.btn.ghost{background:transparent;color:#e8e4f7;border:1px solid rgba(232,228,247,.24)}
+.btn:hover{filter:brightness(1.07)}
+.readout{display:flex;flex-wrap:wrap;gap:12px 26px;margin-bottom:40px;
+  border-top:1px solid rgba(232,228,247,.14);padding-top:16px}
+.readout div{min-width:86px}
+.readout dt{font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:#8f8aa8;margin:0 0 4px}
+.readout dd{margin:0;font-size:20px;font-family:ui-monospace,Menlo,monospace;color:#2ee8ff}
+.cells{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-bottom:46px}
+@media(max-width:820px){.cells{grid-template-columns:1fr}}
+.cell{border-top:1px solid rgba(232,228,247,.14);padding-top:16px}
+.cell .fig{font-family:ui-serif,Georgia,serif;font-size:38px;color:#ff2e88;line-height:1;margin-bottom:8px}
+.cell h3{font-family:ui-serif,Georgia,serif;font-weight:400;font-style:italic;font-size:21px;margin:0 0 8px}
+.cell p{margin:0;color:#9d97b8;font-size:14px}
+footer{border-top:1px solid rgba(232,228,247,.14);padding:22px 0 54px;display:flex;
+  justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:11px;letter-spacing:.2em;
+  text-transform:uppercase;color:#6f6a8c}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="brand">Byte <i>Storm</i></div>
+    <ul>
+      <li><a href="#cab">Cabinet</a></li>
+      <li><a href="#dock">Faults</a></li>
+      <li><a href="#notes">Notes</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <p class="kicker">Scanlines · chroma split · dropped frames</p>
+    <h1 class="serif">The cabinet is<br>fighting <em>itself</em></h1>
+    <p>Every artefact here is a real failure, not a filter. The scanlines are the beam
+       missing lines. The colour split is a mistimed decoder. The tear is a frame that
+       arrived while the tube was still showing the last one.</p>
+  </header>
+
+  <section class="cab" id="cab">
+    <canvas id="c" width="960" height="540"></canvas>
+    <p class="cap">a playable shmup, if you can see it</p>
+  </section>
+
+  <section class="dock" id="dock">
+    <label for="tear">Tear <input id="tear" type="range" min="0" max="100" value="34"></label>
+    <label for="chroma">Chroma split <input id="chroma" type="range" min="0" max="100" value="42"></label>
+    <label for="block">Block noise <input id="block" type="range" min="0" max="100" value="26"></label>
+    <div>
+      <button class="btn" id="coin">Insert coin</button>
+      <button class="btn ghost" id="reset">Fix the monitor</button>
+    </div>
+  </section>
+
+  <dl class="readout">
+    <div><dt>Score</dt><dd id="rS">0</dd></div>
+    <div><dt>Wave</dt><dd id="rW">1</dd></div>
+    <div><dt>Hull</dt><dd id="rH">100%</dd></div>
+    <div><dt>Dropped</dt><dd id="rD">0</dd></div>
+    <div><dt>Rolls</dt><dd id="rR">0</dd></div>
+    <div><dt>Vertical hold</dt><dd id="rV">locked</dd></div>
+  </dl>
+
+  <section class="cells">
+    <div class="cell">
+      <div class="fig serif">i</div>
+      <h3>Vertical roll</h3>
+      <p>The field sync lets go and the picture slides until it rolls off the top of the
+         tube and comes back at the bottom. Nothing is broken about the picture; only
+         about where it is being put.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">ii</div>
+      <h3>Chroma</h3>
+      <p>Colour is carried on a subcarrier and decoded by timing it. Mistime it and the
+         chroma lands on the wrong part of the picture, so every edge grows a coloured
+         ghost that follows the luminance.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">iii</div>
+      <h3>Blocks</h3>
+      <p>Compressed video moves in macroblocks, and a lost packet is a whole block the
+         decoder cannot fill in — so it repeats the last one it had, and the picture
+         freezes in a rectangle.</p>
+    </div>
+  </section>
+
+  <section class="cells" id="notes">
+    <div class="cell">
+      <div class="fig serif">iv</div>
+      <h3>Scanlines</h3>
+      <p>Draw the beam, blank the gap. One dark line for every two rows of pixels is what a
+         real tube shows, and it is why the picture has less contrast than a flat panel
+         would.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">v</div>
+      <h3>Tear</h3>
+      <p>A tear is two halves of two different frames in one picture. The slider is how far
+         down the picture the seam travels, and how far the halves are displaced.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">vi</div>
+      <h3>Coin</h3>
+      <p>The game is underneath all of it. Insert a coin and you get one hull and twelve
+         waves; the faults are a monitor problem, not a game problem, and the score keeps
+         climbing either way.</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>Byte Storm · one canvas, no files</span>
+    <span class="mono">CRT · 240p · 4:3 in a 16:9 mask</span>
+  </footer>
+</div>
+<script>
+(function(){
+"use strict";
+var cv=document.getElementById('c'),ctx=cv.getContext('2d');
+var W=cv.width,H=cv.height;
+var tear=34,chroma=42,block=26,t=0;
+var score=0,wave=1,hull=100,dropped=0,rolls=0,rolling=0,playing=false;
+var bullets=[],foes=[],bits=[],stars=[];
+var ship={x:W/2,y:H*0.82,vx:0,fire:0};
+var keys={};
+for(var i=0;i<70;i++)stars.push({x:Math.random()*W,y:Math.random()*H,
+  z:0.3+Math.random()*0.7,ph:Math.random()*6.28});
+/* ---------- a shmup, drawn as vector shapes ---------- */
+function reset(){
+  bullets=[];foes=[];bits=[];score=0;wave=1;hull=100;dropped=0;rolls=0;
+  ship.x=W/2;ship.y=H*0.82;playing=true;
+  for(var i2=0;i2<6;i2++)spawnFoe();
+}
+function spawnFoe(){
+  foes.push({x:40+Math.random()*(W-80),y:-30-Math.random()*120,
+    vx:(Math.random()-.5)*40,vy:40+wave*6+Math.random()*30,
+    hp:2+Math.floor(wave/3),ph:Math.random()*6.28,r:16});
+}
+function stepGame(dt){
+  if(!playing)return;
+  if(keys.ArrowLeft||keys.a)ship.x-=300*dt;
+  if(keys.ArrowRight||keys.d)ship.x+=300*dt;
+  if(keys.ArrowUp||keys.w)ship.y-=260*dt;
+  if(keys.ArrowDown||keys.s)ship.y+=260*dt;
+  ship.x=Math.max(20,Math.min(W-20,ship.x));
+  ship.y=Math.max(H*0.35,Math.min(H-30,ship.y));
+  ship.fire-=dt;
+  if(keys[' ']&&ship.fire<=0){
+    bullets.push({x:ship.x,y:ship.y-18,vy:-520});ship.fire=0.14;
+  }
+  for(var b=bullets.length-1;b>=0;b--){
+    bullets[b].y+=bullets[b].vy*dt;
+    if(bullets[b].y<-10)bullets.splice(b,1);
+  }
+  for(var f=foes.length-1;f>=0;f--){
+    var o=foes[f];
+    o.y+=o.vy*dt;o.x+=o.vx*dt+Math.sin(t*2+o.ph)*30*dt;
+    if(o.x<20||o.x>W-20)o.vx*=-1;
+    if(o.y>H+40){spawnFoe();foes.splice(f,1);continue;}
+    /* the bullets hit */
+    for(var q=bullets.length-1;q>=0;q--){
+      if(Math.hypot(bullets[q].x-o.x,bullets[q].y-o.y)<o.r+4){
+        bullets.splice(q,1);o.hp--;
+        if(o.hp<=0){
+          score+=100*wave;
+          for(var k=0;k<10;k++)bits.push({x:o.x,y:o.y,
+            vx:(Math.random()-.5)*260,vy:(Math.random()-.5)*260,life:0.6});
+          foes.splice(f,1);spawnFoe();
+        }
+        break;
+      }
+    }
+    /* the ship hits */
+    if(Math.hypot(ship.x-o.x,ship.y-o.y)<o.r+12){
+      hull-=14;o.hp=0;
+      for(var k2=0;k2<16;k2++)bits.push({x:o.x,y:o.y,
+        vx:(Math.random()-.5)*320,vy:(Math.random()-.5)*320,life:0.8});
+      foes.splice(f,1);spawnFoe();
+      if(hull<=0){hull=0;playing=false;}
+    }
+  }
+  for(var p=bits.length-1;p>=0;p--){
+    var s=bits[p];
+    s.x+=s.vx*dt;s.y+=s.vy*dt;s.life-=dt;
+    if(s.life<=0)bits.splice(p,1);
+  }
+  for(var st=stars.length-1;st>=0;st--){
+    stars[st].y+=40*stars[st].z*dt;
+    if(stars[st].y>H){stars[st].y=0;stars[st].x=Math.random()*W;}
+  }
+}
+/* ---------- the game picture, drawn into an offscreen buffer ---------- */
+var game=document.createElement('canvas');
+game.width=W;game.height=H;
+var g=game.getContext('2d');
+function drawGame(){
+  g.fillStyle='#06040c';g.fillRect(0,0,W,H);
+  /* a parallax field of stars */
+  for(var i=0;i<stars.length;i++){
+    var s=stars[i];
+    g.fillStyle='rgba(232,228,247,'+(0.15+s.z*0.5)+')';
+    g.fillRect(s.x,s.y,s.z*2,s.z*3);
+  }
+  /* the ship: a delta with an engine flame */
+  g.fillStyle='#2ee8ff';
+  g.beginPath();
+  g.moveTo(ship.x,ship.y-16);g.lineTo(ship.x-13,ship.y+12);g.lineTo(ship.x+13,ship.y+12);
+  g.closePath();g.fill();
+  g.fillStyle='rgba(255,46,136,'+(0.5+Math.random()*0.5)+')';
+  g.beginPath();g.moveTo(ship.x-5,ship.y+12);g.lineTo(ship.x,ship.y+26+Math.random()*8);
+  g.lineTo(ship.x+5,ship.y+12);g.closePath();g.fill();
+  /* the bullets */
+  g.fillStyle='#ffcf5c';
+  for(var b=0;b<bullets.length;b++)g.fillRect(bullets[b].x-1.5,bullets[b].y-8,3,10);
+  /* the foes: rotating hexes with a hit colour */
+  for(var f=0;f<foes.length;f++){
+    var o=foes[f];
+    g.save();g.translate(o.x,o.y);g.rotate(t*1.4+o.ph);
+    g.fillStyle=o.hp>2?'#ff2e88':'#ff8a5c';
+    g.beginPath();
+    for(var k=0;k<6;k++){
+      var a=k*Math.PI/3;
+      var X=Math.cos(a)*o.r,Y=Math.sin(a)*o.r;
+      if(k===0)g.moveTo(X,Y);else g.lineTo(X,Y);
+    }
+    g.closePath();g.fill();g.restore();
+  }
+  /* debris */
+  for(var p=0;p<bits.length;p++){
+    var s2=bits[p];
+    g.fillStyle='rgba(255,207,92,'+Math.max(0,s2.life)+')';
+    g.fillRect(s2.x-1.5,s2.y-1.5,3,3);
+  }
+}
+/* ---------- the monitor faults, applied to the game picture ---------- */
+function scanlines(){
+  /* draw the beam, blank the gap: one dark line every two rows */
+  ctx.fillStyle='rgba(0,0,0,.34)';
+  for(var y=0;y<H;y+=3)ctx.fillRect(0,y,W,1);
+}
+function chromaSplit(px){
+  /* mistimed decoder: the chroma channel lands offset from the luminance, so every
+     edge grows a coloured ghost */
+  if(px<=0)return;
+  ctx.globalCompositeOperation='screen';
+  ctx.globalAlpha=px/140;
+  ctx.drawImage(game,-px,0);
+  ctx.drawImage(game,px*1.6,0);
+  ctx.globalAlpha=1;
+  ctx.globalCompositeOperation='source-over';
+}
+function tearLine(){
+  var seam=((t*40)% (H+160))-80;
+  var d=(H*0.5+Math.sin(t*3)*H*0.5)*tear/100;
+  if(d<1)return;
+  /* the seam: two halves of two frames displaced */
+  var above=Math.max(0,seam), below=Math.max(0,H-seam-1);
+  if(above>0){
+    ctx.drawImage(game,0,0,W,above,-d,0,W,above);
+  }
+  if(below>0){
+    ctx.drawImage(game,0,seam,W,below,d,seam,W,below);
+  }
+  /* the seam itself is a bright line, because the beam is uncapped there */
+  ctx.fillStyle='rgba(232,228,247,.35)';
+  ctx.fillRect(0,seam,W,1.5);
+}
+function blockNoise(){
+  var a=block/100;
+  if(a<=0.01)return;
+  /* a lost macroblock is a rectangle the decoder fills with the last one it had */
+  ctx.globalAlpha=0.3+a*0.6;
+  for(var i=0;i<5;i++){
+    var bx=Math.random()<a*0.6?(Math.random()*W)|0:0;
+    if(!bx)continue;
+    var by=(Math.random()*H)|0, bw=(8+Math.random()*40)|0, bh=(8+Math.random()*24)|0;
+    ctx.drawImage(game,bx,by,bw,bh, bx+(Math.random()-.5)*20,by+(Math.random()-.5)*12,bw,bh);
+  }
+  ctx.globalAlpha=1;
+}
+function roll(){
+  if(rolling<=0)return;
+  /* the field sync lets go: the picture slides */
+  var off=((rolling*160)%(H*2))-H;
+  ctx.drawImage(game,0,off);
+}
+function draw(){
+  drawGame();
+  ctx.fillStyle='#06040c';ctx.fillRect(0,0,W,H);
+  if(rolling>0){roll();}
+  else{
+    ctx.drawImage(game,0,0);
+    tearLine();
+  }
+  chromaSplit(chroma);
+  scanlines();
+  blockNoise();
+  /* the mask: a 4:3 tube inside a 16:9 bezel */
+  ctx.strokeStyle='rgba(0,0,0,.7)';ctx.lineWidth=1;
+  var mw=W*0.055;
+  ctx.fillStyle='#06040c';
+  ctx.fillRect(0,0,mw,H);ctx.fillRect(W-mw,0,mw,H);
+  ctx.strokeStyle='rgba(232,228,247,.12)';
+  ctx.strokeRect(mw+2,2,W-mw*2-4,H-4);
+  /* the HUD, inside the mask */
+  ctx.fillStyle='#2ee8ff';ctx.font='14px ui-monospace,Menlo,monospace';
+  ctx.textAlign='left';ctx.textBaseline='top';
+  ctx.fillText('SCORE '+String(score).padStart(6,'0'),mw+12,8);
+  ctx.textAlign='right';
+  ctx.fillText('WAVE '+wave+'   HULL '+Math.round(hull)+'%',W-mw-12,8);
+  /* the attract text, when there is no coin in */
+  if(!playing){
+    ctx.fillStyle='rgba(232,228,247,.8)';ctx.font='28px ui-serif,Georgia,serif';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText('INSERT COIN',W/2,H/2);
+    ctx.font='12px ui-monospace,Menlo,monospace';
+    ctx.fillText('arrows to fly · space to fire',W/2,H/2+26);
+  }
+}
+
+/* ---------- controls, keys, loop ---------- */
+function bind(id,fn){var el=document.getElementById(id);
+  el.addEventListener('input',function(){fn(+el.value);});}
+bind('tear',function(v){tear=v;});
+bind('chroma',function(v){chroma=v;});
+bind('block',function(v){block=v;});
+document.getElementById('coin').addEventListener('click',reset);
+document.getElementById('reset').addEventListener('click',function(){
+  tear=0;chroma=0;block=0;rolling=0;
+  document.getElementById('rV').textContent='locked';
+});
+/* the vertical hold slips when the block noise is high, and the picture rolls */
+window.addEventListener('keydown',function(e){
+  keys[e.key]=true;
+  if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].indexOf(e.key)>=0)e.preventDefault();
+  if(e.key==='r')rolling=0;
+});
+window.addEventListener('keyup',function(e){keys[e.key]=false;});
+function readout(){
+  document.getElementById('rS').textContent=score;
+  document.getElementById('rW').textContent=wave;
+  document.getElementById('rH').textContent=Math.round(hull)+'%';
+  document.getElementById('rD').textContent=dropped;
+  document.getElementById('rR').textContent=rolls;
+  document.getElementById('rV').textContent=
+    rolling>0?'rolling':block>72?'drifting':'locked';
+}
+/* ---------- loop ---------- */
+var last=0,frames=0,holdTimer=0;
+function loop(ts){
+  var dt=last?Math.min(.05,(ts-last)/1000):0;last=ts;
+  t+=dt;
+  /* the frame budget: the monitor drops frames under load */
+  if(block>60&&Math.random()<block/1200){dropped++;}
+  /* the vertical hold slips when the block noise is high */
+  if(block>68){
+    holdTimer+=dt;
+    if(holdTimer>2.4){rolling=0.8;rolls++;holdTimer=0;}
+  }
+  rolling=Math.max(0,rolling-dt);
+  stepGame(dt);
+  /* the wave rises with the score */
+  var want=1+Math.floor(score/2000);
+  if(want>wave){wave=want;}
+  draw();
+  if(++frames%6===0)readout();
+  requestAnimationFrame(loop);
+}
+draw();readout();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

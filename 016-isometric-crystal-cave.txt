@@ -1,0 +1,79 @@
+# THE GEODE — A Chamber of Slow Light
+
+## Short title
+Isometric Crystal Cave
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: an interactive crystal
+cave called THE GEODE. No external dependencies whatsoever — no CDN, no web fonts,
+no external images, no external SVG files, no JavaScript libraries. All CSS and
+JavaScript inline, works offline by double-clicking, responsive, valid HTML5.
+
+Artistic direction: a dark geode chamber lit from within. The ground is a radial
+gradient from violet #1a1030 through #0d0819 to near-black, with a CSS radial
+vignette on top. Inside it, sixteen to twenty-six crystal shards stand at random
+positions, each drawn as a tall hexagonal prism — a six-point path with a pointed
+base and a chamfered shoulder — filled with a three-stop HSL gradient that is
+bright on the upper-left and nearly transparent on the lower-right, stroked with a
+thin bright edge in its own hue, crossed by internal cleavage lines (two diagonals
+and a vertical spine), and crowned with a soft specular radial pip near its tip.
+Each shard carries its own hue from a five-colour set (violet 268, teal 172, rose
+344, gold 42, blue 200), its own saturation and lightness, and its own slow
+sinoidal drift.
+
+The depth system: shards are assigned a layer from 0 to 1 and sorted so the far
+ones draw first. Each shard's parallax response to the pointer is multiplied by its
+layer value plus a base lag, so near crystals swing a long way and distant ones
+barely move — the chamber has real depth. A depth slider overlays a near-black wash
+whose alpha rises to 0.55, so pushing depth up genuinely buries the chamber in
+darkness. A light slider scales every gradient's alpha, edge brightness and
+specular pip together, and above 40% adds a violet bloom over the whole viewport.
+Ninety dust motes float on their own per-mote phase and layer-scaled parallax.
+
+Layout: a full-viewport canvas with a floating UI overlay (pointer-events pass
+through except on controls). Top-left is a monospace chamber label above an italic
+serif headline whose second line carries a teal→violet→rose gradient clipped to the
+text, plus a short paragraph. Top-right is a monospace legend showing the live
+facet count, depth value and light percentage. Bottom is a glass tray with three
+sliders — Depth, Light and Drift — and a "New chamber" button that regenerates the
+whole arrangement, beside a monospace hint.
+
+Interaction: moving the pointer looks around the chamber (eased, so the crystals
+answer with a slight delay); dragging horizontally rotates every shard by a small
+layer-scaled amount so the whole chamber turns; the wheel pushes the camera in and
+out between 0.5× and 2.4×, scaling shard size and parallax together. The three
+sliders retune the running scene live, and "New chamber" rebuilds it. On narrow
+screens the paragraph, legend and hint hide so the crystals fill the device.
+
+## One-paragraph description of the intended design
+A dark geode chamber of hexagonal crystal shards, each with its own hue, drift and
+parallax lag, so the room has real depth: moving the pointer looks around it,
+dragging turns it, the wheel pushes into it, and depth, light and drift sliders
+bury, brighten and stir the whole cave live.
+
+## Major visual techniques used
+- Hexagonal crystal prisms drawn as six-point paths with pointed base and chamfered
+  shoulder
+- Three-stop HSL body gradients with alpha driven by the light slider
+- Thin bright edge strokes in each shard's own hue, dimmed by layer
+- Internal cleavage lines: two diagonals plus a vertical spine
+- Specular pip from a radial gradient near each shard's tip
+- Layer-sorted drawing order with per-layer parallax lag for real depth
+- Eased pointer look-around, drag rotation and wheel zoom (0.5×–2.4×)
+- Depth as a full-viewport near-black wash at up to 0.55 alpha
+- Violet bloom overlay above 40% light
+- 90 dust motes on independent phases with layer-scaled parallax
+- Procedural chamber regeneration with randomised count, position, size, hue,
+  saturation, lightness, rotation and drift
+- Italic serif headline with a gradient-clipped second line against 8.5px tracked
+  monospace labels
+- Floating glass tray with backdrop-filter blur; paragraph, legend and hint hidden
+  under 760px
+
+## Intended interaction model
+A place to look around. Visitors move the pointer to shift their viewpoint through
+the chamber, drag to turn it, scroll to push deeper into it, and use the three
+sliders to change how dark, how bright and how restless the cave is. "New chamber"
+throws the whole arrangement away and grows another. Nothing on the page has a
+correct state.

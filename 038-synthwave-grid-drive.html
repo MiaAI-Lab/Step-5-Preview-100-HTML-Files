@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OUTRUN — Highway 88, Night Shift</title>
+<style>
+  :root{
+    --bg:#0a0212;
+    --ink:#ffeaf7;
+    --dim:rgba(255,234,247,.55);
+    --line:rgba(255,234,247,.14);
+    --neon:#ff3ea5;
+    --neon2:#3ee0ff;
+    --sun1:#ff9a3c;
+    --sun2:#ff3ea5;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+  .haze{
+    position:fixed;inset:0;z-index:0;
+    background:
+      radial-gradient(60% 40% at 50% 76%,rgba(255,62,165,.18),transparent 70%),
+      radial-gradient(50% 36% at 50% 40%,rgba(62,224,255,.10),transparent 70%),
+      linear-gradient(180deg,#0a0212 0%,#170632 42%,#2c0a4a 68%,#4a0f42 100%);
+  }
+  #cv{position:fixed;inset:0;z-index:1;display:block}
+
+  .ui{position:fixed;inset:0;z-index:3;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(18px,3.4vw,40px)}
+  .top{display:flex;justify-content:space-between;align-items:flex-start;gap:18px}
+  .k{font-family:var(--mono);font-size:9px;letter-spacing:.34em;text-transform:uppercase;color:var(--neon2)}
+  h1{font-family:var(--sans);font-weight:200;font-size:clamp(28px,5.4vw,64px);line-height:.98;letter-spacing:-.02em;margin:10px 0 0;text-transform:uppercase}
+  h1 b{font-weight:600;background:linear-gradient(100deg,var(--neon),var(--neon2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .top p{margin:12px 0 0;font-size:12px;line-height:1.75;max-width:32ch;color:var(--dim)}
+  .mtr{text-align:right;font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);line-height:2.4}
+  .mtr b{display:block;font-size:15px;color:var(--neon2);font-weight:400;letter-spacing:.02em}
+
+  .bottom{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+  .tray{
+    pointer-events:auto;display:flex;gap:clamp(8px,1.3vw,16px);flex-wrap:wrap;align-items:center;
+    background:rgba(24,6,42,.62);border:1px solid var(--line);border-radius:16px;
+    padding:11px clamp(12px,1.8vw,20px);backdrop-filter:blur(14px)
+  }
+  .g{display:flex;align-items:center;gap:8px}
+  .kk{font-family:var(--mono);font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
+  .vv{font-family:var(--mono);font-size:9.5px;color:var(--neon2);min-width:34px;font-variant-numeric:tabular-nums}
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;width:64px;height:14px;background:transparent;cursor:pointer
+  }
+  input[type=range]::-webkit-slider-runnable-track{height:2px;background:var(--line);border-radius:2px}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;border-radius:50%;background:var(--neon);margin-top:-5px;border:0;box-shadow:0 0 10px rgba(255,62,165,.7)}
+  input[type=range]::-moz-range-track{height:2px;background:var(--line);border-radius:2px}
+  input[type=range]::-moz-range-thumb{width:11px;height:11px;border:0;border-radius:50%;background:var(--neon)}
+  button{
+    pointer-events:auto;font-family:var(--mono);font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;
+    background:rgba(255,62,165,.14);border:1px solid rgba(255,62,165,.4);color:var(--ink);
+    padding:9px 13px;border-radius:999px;cursor:pointer;transition:background .2s,color .2s
+  }
+  button:hover{background:var(--neon);color:#1c0517}
+  button.on{background:var(--neon);color:#1c0517}
+  .hint{font-family:var(--mono);font-size:8.5px;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,234,247,.4);pointer-events:none}
+
+  @media (max-width:760px){.top p,.mtr,.hint{display:none}.ui{padding:14px}}
+</style>
+</head>
+<body>
+<div class="haze"></div>
+<canvas id="cv"></canvas>
+
+<div class="ui">
+  <div class="top">
+    <div>
+      <div class="k">Highway 88 · night shift · 02:14</div>
+      <h1>Destination<br><b>nowhere.</b></h1>
+      <p>Perspective is a promise the horizon keeps breaking. The grid is infinite
+      in one direction only.</p>
+    </div>
+    <div class="mtr">
+      Speed<b id="mS">88</b>
+      Distance<b id="mD">0 km</b>
+      Lane<b id="mL">—</b>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <div class="tray">
+      <div class="g"><span class="kk">Speed</span><input type="range" id="sp" min="10" max="200" value="88" aria-label="Speed"><span class="vv" id="spV">88</span></div>
+      <div class="g"><span class="kk">Steer</span><input type="range" id="st" min="-100" max="100" value="0" aria-label="Steering"><span class="vv" id="stV">0</span></div>
+      <div class="g"><span class="kk">Fog</span><input type="range" id="fg" min="0" max="100" value="46" aria-label="Fog"><span class="vv" id="fgV">46</span></div>
+      <button id="sun" class="on">Sun</button>
+      <button id="mountains" class="on">Peaks</button>
+    </div>
+    <div class="hint">Arrow keys to drive · hold shift to brake</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var cv=document.getElementById('cv'),c=cv.getContext('2d');
+  var W,H,DPR=Math.min(devicePixelRatio||1,2);
+  var speed=88,steer=0,fog=46,showSun=true,showPeaks=true;
+  var x=0,dist=0;
+  var keys={};
+
+  function resize(){
+    W=innerWidth;H=innerHeight;
+    cv.width=W*DPR;cv.height=H*DPR;cv.style.width=W+'px';cv.style.height=H+'px';
+    c.setTransform(DPR,0,0,DPR,0,0);
+  }
+
+  var MOUNT=[
+    {h:0.20,w:0.16,x:0.14},{h:0.30,w:0.20,x:0.33},{h:0.16,w:0.13,x:0.50},
+    {h:0.26,w:0.17,x:0.66},{h:0.12,w:0.11,x:0.80},{h:0.18,w:0.14,x:0.92}
+  ];
+
+  function draw(){
+    var dt=0.016;
+    dist+=speed*dt/1000;
+    x+=steer*dt*0.9;
+    /* keyboard steering */
+    if(keys['ArrowLeft']||keys['a'])steer-=0.9;
+    if(keys['ArrowRight']||keys['d'])steer+=0.9;
+    if(keys['ArrowUp']||keys['w'])speed=Math.min(200,speed+0.8);
+    if(keys['ArrowDown']||keys['s'])speed=Math.max(10,speed-0.8);
+    if(keys['Shift'])speed=Math.max(10,speed-2.2);
+    steer*=(keys['ArrowLeft']||keys['ArrowRight']||keys['a']||keys['d'])?0.99:0.96;
+
+    c.setTransform(DPR,0,0,DPR,0,0);
+    c.clearRect(0,0,W,H);
+
+    var horizon=H*0.52;
+    var sunX=W*0.5+x*0.5, sunY=horizon-H*0.10;
+    var fogF=fog/100;
+
+    /* sky above the horizon */
+    var sky=c.createLinearGradient(0,0,0,horizon);
+    sky.addColorStop(0,'#0a0212');
+    sky.addColorStop(.55,'#1d0733');
+    sky.addColorStop(1,'#480c46');
+    c.fillStyle=sky;c.fillRect(0,0,W,horizon);
+
+    /* the sun: a disc with horizontal slats cut out of it */
+    if(showSun){
+      var R=Math.min(W,H)*0.17;
+      var sg=c.createLinearGradient(0,sunY-R,0,sunY+R);
+      sg.addColorStop(0,'#fff3b0');
+      sg.addColorStop(.45,'#ff9a3c');
+      sg.addColorStop(1,'#ff3ea5');
+      c.save();
+      c.beginPath();c.arc(sunX,sunY,R,0,6.283);c.clip();
+      c.fillStyle=sg;c.fillRect(sunX-R,sunY-R,R*2,R*2);
+      /* the slats, thicker toward the bottom */
+      c.fillStyle='rgba(10,2,18,.85)';
+      for(var i=0;i<7;i++){
+        var t=i/7;
+        var yy=sunY-R*0.7+t*R*1.4;
+        var hh=(0.02+t*0.075)*R;
+        c.fillRect(sunX-R,yy,R*2,hh);
+      }
+      c.restore();
+      /* its glow */
+      var gg=c.createRadialGradient(sunX,sunY,R*0.6,sunX,sunY,R*3.4);
+      gg.addColorStop(0,'rgba(255,120,60,.28)');
+      gg.addColorStop(1,'rgba(255,60,140,0)');
+      c.fillStyle=gg;c.fillRect(0,0,W,horizon);
+    }
+
+    /* mountains */
+    if(showPeaks){
+      c.fillStyle='#1a0430';
+      c.beginPath();
+      c.moveTo(0,horizon+2);
+      for(var m=0;m<MOUNT.length;m++){
+        var pk=MOUNT[m];
+        var px=(pk.x*W + x*0.22*pk.w*10 + W)%W;
+        var ph=H*pk.h*(0.7+pk.w);
+        c.lineTo(px-pk.w*W/2,horizon+2);
+        c.lineTo(px,horizon+2-ph);
+        c.lineTo(px+pk.w*W/2,horizon+2);
+      }
+      c.lineTo(W,horizon+2);
+      c.closePath();c.fill();
+      /* neon ridge lines */
+      c.strokeStyle='rgba(255,62,165,.55)';c.lineWidth=1.4;c.stroke();
+    }
+
+    /* the grid floor */
+    var floor=c.createLinearGradient(0,horizon,0,H);
+    floor.addColorStop(0,'#2a0740');
+    floor.addColorStop(.4,'#180731');
+    floor.addColorStop(1,'#08010f');
+    c.fillStyle=floor;c.fillRect(0,horizon,W,H-horizon);
+
+    /* horizon glow line */
+    var hg=c.createLinearGradient(0,horizon-6,0,horizon+10);
+    hg.addColorStop(0,'rgba(62,224,255,0)');
+    hg.addColorStop(.5,'rgba(62,224,255,.55)');
+    hg.addColorStop(1,'rgba(255,62,165,0)');
+    c.fillStyle=hg;c.fillRect(0,horizon-6,W,16);
+
+    /* perspective grid: horizontal lines rushing toward the viewer */
+    c.save();
+    c.lineWidth=1.1;
+    var lineGap=2.2;
+    var off=(dist*40)%lineGap;
+    for(var k=0;k<26;k++){
+      var z=k/26;                        /* 0 far, 1 near */
+      var pz=((k+off/lineGap)/26);
+      var yy=horizon+Math.pow(pz,2.9)*(H-horizon);
+      if(yy<horizon||yy>H)continue;
+      var a=(0.05+pz*0.5)*(1-fogF*0.45);
+      c.strokeStyle='rgba(255,62,165,'+a.toFixed(3)+')';
+      c.beginPath();c.moveTo(0,yy);c.lineTo(W,yy);c.stroke();
+    }
+    /* vertical lines converging on the vanishing point */
+    var vp=W*0.5+x*0.5;
+    for(var v=-14;v<=14;v++){
+      var sx=vp+v*W*0.075;
+      c.strokeStyle='rgba(62,224,255,'+((0.06+(1-Math.abs(v)/14)*0.20)*(1-fogF*0.4)).toFixed(3)+')';
+      c.beginPath();c.moveTo(sx,horizon);c.lineTo(vp+v*W*0.42,H);c.stroke();
+    }
+    c.restore();
+
+    /* road markings scrolling toward us */
+    c.fillStyle='rgba(255,240,180,.5)';
+    for(var d=0;d<10;d++){
+      var zz=(d/10 + (dist*0.9)%0.1);
+      var yy2=horizon+Math.pow(zz,2.6)*(H-horizon);
+      var wdt=(0.006+zz*0.02)*W;
+      if(yy2<horizon||yy2>H)continue;
+      c.globalAlpha=Math.min(1,zz*2.2);
+      c.fillRect(W*0.5-wdt/2,yy2,wdt,(0.004+zz*0.012)*H);
+    }
+    c.globalAlpha=1;
+
+    /* the car: a low wedge seen from behind, with two tail lights */
+    var carW=W*0.10, carH=carW*0.42;
+    var cy2=H*0.88+Math.sin(dist*30)*1.2;
+    c.fillStyle='rgba(20,4,36,.95)';
+    c.beginPath();
+    c.moveTo(W*0.5-carW/2,cy2);
+    c.lineTo(W*0.5-carW*0.34,cy2-carH*0.5);
+    c.lineTo(W*0.5+carW*0.34,cy2-carH*0.5);
+    c.lineTo(W*0.5+carW/2,cy2);
+    c.closePath();c.fill();
+    /* tail lights */
+    c.fillStyle='#ff2d55';
+    c.shadowColor='#ff2d55';c.shadowBlur=18;
+    c.fillRect(W*0.5-carW*0.42,cy2-carH*0.36,carW*0.16,carH*0.13);
+    c.fillRect(W*0.5+carW*0.26,cy2-carH*0.36,carW*0.16,carH*0.13);
+    c.shadowBlur=0;
+    /* a light bar under */
+    c.fillStyle='rgba(255,255,255,.12)';
+    c.fillRect(W*0.5-carW*0.5,cy2-carH*0.06,carW,carH*0.05);
+
+    /* fog over everything */
+    if(fogF>0){
+      var fl=c.createLinearGradient(0,horizon-H*0.05,0,H);
+      fl.addColorStop(0,'rgba(72,12,70,'+(fogF*0.55).toFixed(3)+')');
+      fl.addColorStop(.4,'rgba(40,8,50,'+(fogF*0.22).toFixed(3)+')');
+      fl.addColorStop(1,'rgba(10,2,18,'+(fogF*0.10).toFixed(3)+')');
+      c.fillStyle=fl;c.fillRect(0,0,W,H);
+    }
+
+    /* scanlines for the CRT feel */
+    c.fillStyle='rgba(0,0,0,.14)';
+    for(var s2=0;s2<H;s2+=3)c.fillRect(0,s2,W,1);
+
+    document.getElementById('mS').textContent=Math.round(speed);
+    document.getElementById('mD').textContent=dist.toFixed(1)+' km';
+    document.getElementById('mL').textContent=Math.abs(steer)<4?'centre':(steer<0?'left '+Math.round(-steer):'right '+Math.round(steer));
+    requestAnimationFrame(draw);
+  }
+
+  document.addEventListener('keydown',function(e){
+    keys[e.key]=true;
+    if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].indexOf(e.key)>=0)e.preventDefault();
+  });
+  document.addEventListener('keyup',function(e){keys[e.key]=false});
+
+  document.getElementById('sp').addEventListener('input',function(){
+    speed=+this.value;document.getElementById('spV').textContent=speed;
+  });
+  document.getElementById('st').addEventListener('input',function(){
+    steer=+this.value;document.getElementById('stV').textContent=steer;
+  });
+  document.getElementById('fg').addEventListener('input',function(){
+    fog=+this.value;document.getElementById('fgV').textContent=fog;
+  });
+  var sb=document.getElementById('sun');
+  sb.addEventListener('click',function(){showSun=!showSun;this.classList.toggle('on',showSun);});
+  var mb=document.getElementById('mountains');
+  mb.addEventListener('click',function(){showPeaks=!showPeaks;this.classList.toggle('on',showPeaks);});
+
+  addEventListener('resize',function(){clearTimeout(window.__r);window.__r=setTimeout(resize,140)});
+  resize();
+  requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+# ENDGAME — Study No. 14, White to Play
+
+## Short title
+Chess Endgame Study
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: an interactive chess
+endgame study called ENDGAME. No external dependencies whatsoever — no CDN, no web
+fonts, no external images, no external SVG files, no JavaScript libraries. All CSS
+and JavaScript inline, works offline by double-clicking, responsive, valid HTML5.
+
+Artistic direction: a wooden chess table in a library. Warm paper #e9e2d2 board
+surround, ink #1c1a16, cream squares #f0e9d8 and olive-brown squares #8a7f68,
+drawing-red #a8321f for accents and cobalt #1c3f8f for legal-move markers. The
+board is a wood-framed CSS grid with a heavy #5a4a34 border and a large soft drop
+shadow; the pieces are Unicode chess glyphs — white pieces in warm white with a
+brown drop-shadow filter, black pieces in near-black — so there is not a single
+image or font on the page. Typography is a high-contrast serif for display and
+9–9.5px wide-tracked monospace for every label.
+
+The engine is real: a full move generator. Kings step one square, rooks and bishops
+slide until blocked, queens combine both, knights jump in eight L-shapes, pawns step
+forward one, double-step from their start rank, and capture diagonally — each
+capture stopping at the first occupied square and sliding stopping at any
+occupation. No check detection, which is honest for a study and stated in the copy.
+Clicking a piece of the side to move selects it and draws every legal destination:
+empty squares get a translucent blue dot, captures get a red ring. Clicking a
+destination moves the piece, records the ply, and passes the turn. The last move is
+marked with a red inset on the destination square.
+
+Three controls: Reset restores the study position (white king and rook, black king
+and rook, white to move), Flip reverses the board rendering so black is at the
+bottom, and Hint appends the study's key move to the position panel. The move list
+renders in algebraic form, one row per full move with white and black columns, auto
+scrolling to the newest ply.
+
+Layout: a nav with a serif brand. A centred hero with a red eyebrow, a serif
+headline with one italic red word, and a paragraph. Then a two-column table: the
+board with its file letters beneath, and a sidebar with a "To move" status strip, a
+scrolling ply list, a position card showing the FEN string (with a hint appended
+when requested), and the three tool buttons. Then a second hero-style block on the
+theme of the study. Then a ruled monospace footer.
+
+Interaction: click to select a piece, click again to move it; the board flips; the
+study resets; the hint is one-shot and disables itself. The layout collapses to one
+column under 820px and the board scales with min(70vw, 440px).
+
+## One-paragraph description of the intended design
+A library chess table for a white-to-play study: a wood-framed CSS grid rendered in
+cream and olive, Unicode glyphs as the pieces, and a real move generator underneath
+— kings stepping, rooks and bishops sliding, knights jumping, pawns double-stepping
+from their start rank — so clicking a piece draws every legal destination as a blue
+dot or a red capture ring, and the algebraic ply list records the line you play.
+
+## Major visual techniques used
+- Wood-framed board from a CSS grid with a heavy border and a large soft drop shadow
+- Pieces as Unicode chess glyphs coloured by side, with a brown drop-shadow filter
+- Cream and olive square colouring by (row + file) parity
+- Full move generator: slide-until-blocked for rooks/bishops/queens, L-jumps for
+  knights, one-square steps for kings, pawn forward/double/capture logic
+- Legal destinations rendered as translucent blue dots (empty) or red rings
+  (captures) via ::after pseudo-elements
+- Selection state as an inset cobalt box-shadow; last move as an inset red box-shadow
+- Board flip by reversing the rendering order of rows and files
+- Algebraic ply list in a three-column grid (move number, white, black),
+  auto-scrolled
+- FEN position string displayed in the side card, extended by the hint
+- One-shot hint button that disables itself after use
+- Fluid board width (min(70vw, 440px)) with file letters in an 8-column grid
+- Serif display with one italic red word against 9px tracked monospace
+- Two-column table collapsing under 820px
+
+## Intended interaction model
+A study to be played. Visitors click a piece to see its legal moves, click a
+destination to play it, and watch the algebraic record build up turn by turn. Reset
+returns to the study position, Flip turns the board around, and Hint reveals the
+first move of the intended line once. The board is the whole interface — there is
+no engine move in reply, only the rules of movement.

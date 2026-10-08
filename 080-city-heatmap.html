@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Heat Map — a day of a city, hour by hour</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:#0b0c12;color:#e9ecf7;
+  font:15px/1.62 ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+.serif{font-family:ui-serif,Georgia,"Times New Roman",serif}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.wrap{width:min(1120px,92vw);margin:0 auto}
+nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0 14px;
+  border-bottom:1px solid rgba(233,236,247,.14)}
+nav .brand{font-family:ui-serif,Georgia,serif;font-size:19px}
+nav .brand i{font-style:italic;color:#8fd0ff}
+nav ul{display:flex;gap:26px;list-style:none;margin:0;padding:0;font-size:11px;
+  letter-spacing:.24em;text-transform:uppercase;color:#8790ad}
+nav a{color:inherit;text-decoration:none}nav a:hover{color:#8fd0ff}
+@media(max-width:780px){nav ul{display:none}}
+header.hero{padding:52px 0 24px;text-align:center}
+header.hero .kicker{font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:#8fd0ff;
+  margin:0 0 14px}
+header.hero h1{font-family:ui-serif,Georgia,serif;font-weight:400;
+  font-size:clamp(32px,5.6vw,64px);line-height:1.05;margin:0 0 16px}
+header.hero h1 em{font-style:italic;color:#ffd479}
+header.hero p{max-width:60ch;margin:0 auto;color:#98a0bd}
+.map{position:relative;border:1px solid rgba(233,236,247,.16);border-radius:16px;
+  overflow:hidden;background:#0a0b12;margin-bottom:18px}
+.map canvas{display:block;width:100%;height:auto}
+.map .cap{position:absolute;left:14px;top:12px;font-size:10px;letter-spacing:.26em;
+  text-transform:uppercase;color:rgba(233,236,247,.5);pointer-events:none}
+.map .clock{position:absolute;right:14px;top:12px;font-family:ui-monospace,Menlo,monospace;
+  font-size:14px;color:rgba(255,212,121,.95);pointer-events:none;letter-spacing:.06em}
+.dock{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;justify-content:space-between;
+  border-top:1px solid rgba(233,236,247,.14);border-bottom:1px solid rgba(233,236,247,.14);
+  padding:16px 0;margin-bottom:32px}
+.dock label{display:grid;gap:7px;font-size:10px;letter-spacing:.26em;text-transform:uppercase;
+  color:#8790ad;min-width:150px}
+input[type=range]{width:100%;accent-color:#8fd0ff}
+.btn{background:#8fd0ff;color:#04222c;border:0;border-radius:8px;padding:11px 15px;
+  font:inherit;font-size:12px;font-weight:700;letter-spacing:.08em;cursor:pointer;margin:0 6px 6px 0}
+.btn.ghost{background:transparent;color:#e9ecf7;border:1px solid rgba(233,236,247,.24)}
+.btn:hover{filter:brightness(1.07)}
+.scalebar{display:flex;align-items:center;gap:10px;margin-bottom:32px}
+.scalebar .g{height:10px;flex:1;border-radius:5px;
+  background:linear-gradient(90deg,#0d1b3e,#1b4a8f,#2f8fc9,#5ec9b0,#ffd479,#ff7a5c)}
+.scalebar span{font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:#8790ad}
+.readout{display:flex;flex-wrap:wrap;gap:12px 26px;margin-bottom:40px;
+  border-top:1px solid rgba(233,236,247,.14);padding-top:16px}
+.readout div{min-width:84px}
+.readout dt{font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:#8790ad;margin:0 0 4px}
+.readout dd{margin:0;font-size:20px;font-family:ui-monospace,Menlo,monospace;color:#ffd479}
+.cells{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-bottom:46px}
+@media(max-width:820px){.cells{grid-template-columns:1fr}}
+.cell{border-top:1px solid rgba(233,236,247,.14);padding-top:16px}
+.cell .fig{font-family:ui-serif,Georgia,serif;font-size:38px;color:#8fd0ff;line-height:1;margin-bottom:8px}
+.cell h3{font-family:ui-serif,Georgia,serif;font-weight:400;font-style:italic;font-size:21px;margin:0 0 8px}
+.cell p{margin:0;color:#98a0bd;font-size:14px}
+footer{border-top:1px solid rgba(233,236,247,.14);padding:22px 0 54px;display:flex;
+  justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:11px;letter-spacing:.2em;
+  text-transform:uppercase;color:#6a7290}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="brand">Heat <i>Map</i></div>
+    <ul>
+      <li><a href="#map">Map</a></li>
+      <li><a href="#dock">Hour</a></li>
+      <li><a href="#notes">Notes</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <p class="kicker">One city · twenty-four hours · five districts</p>
+    <h1 class="serif">A city is never<br>the same <em>twice</em></h1>
+    <p>Every district has its own clock. The market is loud at six and dead at two, the
+       financial district is the other way round, and the park is only busy when both the
+       weather and the daylight agree. Drag the hour and watch the whole shape change.</p>
+  </header>
+
+  <section class="map" id="map">
+    <canvas id="c" width="1000" height="560"></canvas>
+    <p class="cap">five districts · activity 0–100 · cell = one block</p>
+    <div class="clock" id="clock">13:00</div>
+  </section>
+
+  <div class="scalebar">
+    <span>quiet</span><div class="g"></div><span>busy</span>
+  </div>
+
+  <section class="dock" id="dock">
+    <label for="hour">Hour <input id="hour" type="range" min="0" max="24" value="13"></label>
+    <label for="weather">Weather <input id="weather" type="range" min="0" max="100" value="55"></label>
+    <label for="event">Event <input id="event" type="range" min="0" max="100" value="18"></label>
+    <div>
+      <button class="btn" id="play">Run the day</button>
+      <button class="btn ghost" id="peak">Find the peak</button>
+    </div>
+  </section>
+
+  <dl class="readout">
+    <div><dt>City mean</dt><dd id="rM">—</dd></div>
+    <div><dt>Busiest</dt><dd id="rB">—</dd></div>
+    <div><dt>Quietest</dt><dd id="rQ">—</dd></div>
+    <div><dt>Peak hour</dt><dd id="rP">—</dd></div>
+    <div><dt>Spread</dt><dd id="rS">—</dd></div>
+    <div><dt>Cells</dt><dd id="rC">—</dd></div>
+  </dl>
+
+  <section class="cells">
+    <div class="cell">
+      <div class="fig serif">i</div>
+      <h3>Each cell</h3>
+      <p>The map is a grid and every cell holds one number between nought and a hundred. It
+         is not drawn, it is coloured: the same palette, five stops, chosen by the value —
+         which is what a real choropleth does.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">ii</div>
+      <h3>Five clocks</h3>
+      <p>A district is not a colour, it is a curve. Each one has a different peak, a
+         different width and a different baseline, and a park that is additionally
+         suppressed by rain and cold.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">iii</div>
+      <h3>The event</h3>
+      <p>Slide the event in and one district lights up while the others fall back slightly,
+         which is what a real event does to a city: it does not raise the whole map, it
+         moves people into one part of it.</p>
+    </div>
+  </section>
+
+  <section class="cells" id="notes">
+    <div class="cell">
+      <div class="fig serif">iv</div>
+      <h3>Find the peak</h3>
+      <p>The button sweeps all twenty-four hours and all five districts and returns the
+         busiest moment, so the peak is measured rather than asserted.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">v</div>
+      <h3>Weather</h3>
+      <p>Rain and cold empty the streets, but not the financial district — indoors is
+         indoors. Weather moves outdoor numbers only, which is the honest part.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">vi</div>
+      <h3>The day</h3>
+      <p>Run the day and the hour advances on its own; every district changes every frame,
+         and the map is a picture of a pattern rather than of a place.</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>Heat Map · one canvas, no files</span>
+    <span class="mono">5 districts · 24 hours</span>
+  </footer>
+</div>
+<script>
+(function(){
+"use strict";
+var cv=document.getElementById('c'),ctx=cv.getContext('2d');
+var W=cv.width,H=cv.height;
+var COLS=20,ROWS=11;
+var hour=13,weather=55,event=18,running=false,t=0;
+/* five districts, each a curve: peak hour, width, baseline, amplitude, outdooredness */
+var DISTRICTS=[
+ {n:'Old Market',x:0,y:0,w:0.42,h:0.5,peak:7,width:2.1,base:14,amp:78,out:1},
+ {n:'Financial',x:0.42,y:0,w:0.58,h:0.42,peak:10.5,width:2.6,base:22,amp:70,out:0.25},
+ {n:'Riverside Park',x:0,y:0.5,w:0.42,h:0.5,peak:17,width:2.9,base:8,amp:66,out:1},
+ {n:'The Docks',x:0.42,y:0.42,w:0.58,h:0.3,peak:19,width:3.1,base:6,amp:52,out:0.8},
+ {n:'University',x:0,y:0.42,w:0.42,h:0.16,peak:21,width:2.4,base:10,amp:58,out:0.7}
+];
+/* the university is a thin strip: merge it into the market/park layout by giving it
+   its own band across the bottom */
+DISTRICTS[4].x=0;DISTRICTS[4].y=0.78;DISTRICTS[4].w=1;DISTRICTS[4].h=0.22;
+/* the value of a district at an hour: a gaussian on the hour, times weather, plus event */
+function bell(h,peak,width){
+  var d=Math.abs(h-peak);
+  if(d>12)d=24-d;
+  return Math.exp(-(d*d)/(2*width*width));
+}
+function districtValue(d,h,wx,ev){
+  var v=d.base+d.amp*bell(h,d.peak,d.width);
+  /* weather moves outdoor numbers only */
+  var wf=1-(wx/100)*0.62*d.out;
+  v*=wf;
+  /* the event moves people into one district: the docks, here */
+  if(d===DISTRICTS[3])v+=ev*0.55;
+  else v-=ev*0.22;
+  /* life is never zero */
+  v+=3;
+  return Math.max(0,Math.min(100,v));
+}
+/* a stable per-cell offset so blocks differ inside a district */
+var CELLS=[];
+function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;
+  var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;
+  return((t^t>>>14)>>>0)/4294967296;};}
+var rnd=mulberry(5150);
+for(var i=0;i<COLS*ROWS;i++)CELLS.push(rnd());
+function districtAt(cx,cy){
+  for(var d=0;d<DISTRICTS.length;d++){
+    var D=DISTRICTS[d];
+    var x0=D.x*COLS,y0=D.y*ROWS,x1=x0+D.w*COLS,y1=y0+D.h*ROWS;
+    if(cx>=x0&&cx<x1&&cy>=y0&&cy<y1)return D;
+  }
+  return DISTRICTS[0];
+}
+/* the palette: five stops, sampled by the value */
+var STOPS=[[13,27,62],[27,74,143],[47,143,201],[94,201,176],[255,212,121],[255,122,92]];
+function colour(v){
+  var f=v/100*(STOPS.length-1),i=Math.min(STOPS.length-2,Math.floor(f)),k=f-i;
+  var A=STOPS[i],B=STOPS[i+1];
+  return 'rgb('+Math.round(A[0]+(B[0]-A[0])*k)+','+Math.round(A[1]+(B[1]-A[1])*k)+
+    ','+Math.round(A[2]+(B[2]-A[2])*k)+')';
+}
+function draw(){
+  var cw=W/COLS,ch=H/ROWS;
+  var sum=0,best={v:-1,n:''},worst={v:1e9,n:''};
+  for(var cy=0;cy<ROWS;cy++){
+    for(var cx=0;cx<COLS;cx++){
+      var i=cy*COLS+cx,D=districtAt(cx,cy);
+      var base=districtValue(D,hour,weather,event);
+      /* the block-level variation is a function of the cell and the district curve */
+      var v=base*(0.55+CELLS[i]*0.6);
+      v=Math.max(0,Math.min(100,v));
+      sum+=v;
+      if(v>best.v){best.v=v;best.n=D.n;}
+      if(v<worst.v){worst.v=v;worst.n=D.n;}
+      ctx.fillStyle=colour(v);
+      ctx.fillRect(cx*cw+0.7,cy*ch+0.7,cw-1.4,ch-1.4);
+      /* a value in the busiest cells, so the map can be read */
+      if(v>72){
+        ctx.fillStyle='rgba(10,12,20,.85)';
+        ctx.font='9px ui-monospace,Menlo,monospace';
+        ctx.fillText(String(Math.round(v)),cx*cw+4,cy*ch+13);
+      }
+    }
+  }
+  /* district labels */
+  DISTRICTS.forEach(function(D){
+    ctx.fillStyle='rgba(233,236,247,.85)';
+    ctx.font='11px ui-monospace,Menlo,monospace';
+    var x=(D.x+0.012)*COLS*(W/COLS),y=(D.y+0.03)*ROWS*(H/ROWS)+8;
+    ctx.fillText(D.n.toUpperCase(),x,y);
+    var v=districtValue(D,hour,weather,event);
+    ctx.fillStyle='rgba(255,212,121,.95)';
+    ctx.fillText(Math.round(v)+'',x,y+14);
+  });
+  /* the current hour, drawn as a bar under the map */
+  ctx.fillStyle='rgba(255,212,121,.85)';
+  ctx.fillRect(hour/24*W,H-4,W/24,4);
+  return {mean:sum/(COLS*ROWS),best:best,worst:worst};
+}
+
+/* ---------- controls, readout ---------- */
+function bind(id,fn){var el=document.getElementById(id);
+  el.addEventListener('input',function(){fn(+el.value);});}
+bind('hour',function(v){hour=v;});
+bind('weather',function(v){weather=v;});
+bind('event',function(v){event=v;});
+var playBtn=document.getElementById('play');
+playBtn.addEventListener('click',function(){
+  running=!running;
+  playBtn.textContent=running?'Stop the day':'Run the day';
+});
+document.getElementById('peak').addEventListener('click',function(){
+  /* sweep all 24 hours and all districts, so the peak is measured not asserted */
+  var bestV=-1,bestH=0,bestD='';
+  for(var h=0;h<24;h+=0.25){
+    for(var d=0;d<DISTRICTS.length;d++){
+      var v=districtValue(DISTRICTS[d],h,weather,event);
+      if(v>bestV){bestV=v;bestH=h;bestD=DISTRICTS[d].n;}
+    }
+  }
+  hour=bestH;
+  document.getElementById('hour').value=bestH;
+  var hh=Math.floor(bestH),mm=Math.round((bestH-hh)*60);
+  document.getElementById('rP').textContent=(hh<10?'0':'')+hh+':'+(mm<10?'0':'')+mm;
+  document.getElementById('rB').textContent=bestD;
+});
+function readout(st){
+  document.getElementById('rM').textContent=st.mean.toFixed(1);
+  document.getElementById('rB').textContent=st.best.n;
+  document.getElementById('rQ').textContent=st.worst.n;
+  var hh=Math.floor(hour),mm=Math.round((hour-hh)*60);
+  if(mm===60){hh=(hh+1)%24;mm=0;}
+  document.getElementById('clock').textContent=(hh<10?'0':'')+hh+':'+(mm<10?'0':'')+mm;
+  /* spread: how far apart the busiest and quietest districts are right now */
+  var lo=1e9,hi=-1;
+  DISTRICTS.forEach(function(D){
+    var v=districtValue(D,hour,weather,event);
+    if(v>hi)hi=v;if(v<lo)lo=v;});
+  document.getElementById('rS').textContent=(hi-lo).toFixed(0)+' pts';
+  document.getElementById('rC').textContent=(COLS*ROWS);
+}
+/* ---------- loop ---------- */
+var last=0,st;
+function loop(ts){
+  var dt=last?Math.min(.05,(ts-last)/1000):0;last=ts;
+  if(running){
+    hour=(hour+dt*0.5)%24;
+    document.getElementById('hour').value=hour;
+  }
+  st=draw();readout(st);
+  requestAnimationFrame(loop);
+}
+if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches){running=false;}
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

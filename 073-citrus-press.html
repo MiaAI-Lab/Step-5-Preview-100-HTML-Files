@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Grove &amp; Press — citrus you have to work for</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:#fff8ec;color:#2b2118;
+  font:15px/1.62 ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+.serif{font-family:ui-serif,Georgia,"Times New Roman",serif}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.wrap{width:min(1100px,92vw);margin:0 auto}
+nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0 14px;
+  border-bottom:1px solid rgba(43,33,24,.2)}
+nav .brand{font-family:ui-serif,Georgia,serif;font-size:19px}
+nav .brand i{font-style:italic;color:#ff6a13}
+nav ul{display:flex;gap:26px;list-style:none;margin:0;padding:0;font-size:11px;
+  letter-spacing:.24em;text-transform:uppercase;color:#8b7c66}
+nav a{color:inherit;text-decoration:none}nav a:hover{color:#ff6a13}
+@media(max-width:780px){nav ul{display:none}}
+header.hero{padding:56px 0 34px;text-align:center}
+header.hero .kicker{font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:#ff6a13;
+  margin:0 0 14px}
+header.hero h1{font-family:ui-serif,Georgia,serif;font-weight:400;
+  font-size:clamp(34px,5.8vw,66px);line-height:1.05;margin:0 0 16px}
+header.hero h1 em{font-style:italic;color:#3f7d3a}
+header.hero p{max-width:58ch;margin:0 auto;color:#6b5c48}
+/* ---------- press ---------- */
+.press{display:grid;grid-template-columns:1fr 250px;gap:24px;align-items:start;
+  border-top:1px solid rgba(43,33,24,.2);border-bottom:1px solid rgba(43,33,24,.2);
+  padding:24px 0 28px;margin-bottom:38px}
+@media(max-width:900px){.press{grid-template-columns:1fr}}
+.fruit{position:relative;border-radius:18px;padding:18px;
+  background:radial-gradient(90% 80% at 50% 30%,#fff3d8,#ffe9bd 60%,#f8d79b);
+  border:1px solid rgba(43,33,24,.18);display:grid;place-items:center}
+.fruit svg{width:min(300px,70%);height:auto}
+.panel{border:1px solid rgba(43,33,24,.2);border-radius:12px;padding:18px;background:#fffdf6}
+.panel h2{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:#8b7c66;
+  margin:0 0 12px;font-weight:600}
+.variety{display:grid;gap:6px;margin-bottom:16px}
+.var{display:flex;align-items:center;gap:9px;width:100%;text-align:left;background:#fff8ec;
+  border:1px solid rgba(43,33,24,.2);border-radius:999px;padding:9px 13px;font:inherit;
+  font-size:13px;color:#2b2118;cursor:pointer}
+.var[aria-pressed="true"]{border-color:#ff6a13;background:#fff0dd}
+.var i{width:16px;height:16px;border-radius:50%;flex:none}
+.btn{width:100%;background:#ff6a13;color:#fff8ec;border:0;border-radius:9px;padding:14px;
+  font:inherit;font-size:13px;font-weight:700;letter-spacing:.08em;cursor:pointer;
+  user-select:none;touch-action:none}
+.btn.ghost{background:transparent;color:#2b2118;border:1px solid rgba(43,33,24,.3)}
+.btn:active{transform:translateY(1px)}
+label.slider{display:block;font-size:10px;letter-spacing:.26em;text-transform:uppercase;
+  color:#8b7c66;margin:14px 0 7px}
+input[type=range]{width:100%;accent-color:#ff6a13}
+.readout{display:flex;flex-wrap:wrap;gap:12px 28px;margin-bottom:40px;
+  border-top:1px solid rgba(43,33,24,.2);padding-top:16px}
+.readout div{min-width:86px}
+.readout dt{font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:#8b7c66;margin:0 0 4px}
+.readout dd{margin:0;font-size:21px;font-family:ui-monospace,Menlo,monospace;color:#ff6a13}
+/* ---------- recipe ---------- */
+.recipe{display:grid;grid-template-columns:1fr 250px;gap:24px;align-items:start;margin-bottom:42px}
+@media(max-width:900px){.recipe{grid-template-columns:1fr}}
+.rows{border:1px solid rgba(43,33,24,.2);border-radius:12px;overflow:hidden}
+.row{display:flex;justify-content:space-between;gap:12px;padding:13px 16px;
+  border-bottom:1px solid rgba(43,33,24,.12);font-size:14px}
+.row:last-child{border-bottom:0}
+.row span{color:#6b5c48}
+.row b{font-family:ui-monospace,Menlo,monospace;color:#2b2118;font-weight:500}
+.glasswrap{display:grid;place-items:center;padding:10px 0}
+.glasswrap svg{width:150px;height:auto}
+.cells{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-bottom:46px}
+@media(max-width:820px){.cells{grid-template-columns:1fr}}
+.cell{border-top:1px solid rgba(43,33,24,.22);padding-top:16px}
+.cell .fig{font-family:ui-serif,Georgia,serif;font-size:38px;color:#3f7d3a;line-height:1;margin-bottom:8px}
+.cell h3{font-family:ui-serif,Georgia,serif;font-weight:400;font-style:italic;font-size:21px;margin:0 0 8px}
+.cell p{margin:0;color:#6b5c48;font-size:14px}
+footer{border-top:1px solid rgba(43,33,24,.2);padding:22px 0 54px;display:flex;
+  justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:11px;letter-spacing:.2em;
+  text-transform:uppercase;color:#8b7c66}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="brand">Grove &amp; <i>Press</i></div>
+    <ul>
+      <li><a href="#press">Press</a></li>
+      <li><a href="#recipe">Recipe</a></li>
+      <li><a href="#notes">Notes</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <p class="kicker">Pressed to order · nothing diluted</p>
+    <h1 class="serif">One fruit,<br>one <em>glass</em></h1>
+    <p>No concentrate, no water added. A glass here is the whole of what came out of the
+       fruit, which is why the press is the slowest machine in the building.</p>
+  </header>
+
+  <section class="press" id="press">
+    <div class="fruit">
+      <svg id="fruit" viewBox="-120 -120 240 240" role="img" aria-label="A whole citrus fruit"></svg>
+    </div>
+    <aside class="panel">
+      <h2>Variety</h2>
+      <div class="variety" id="varieties"></div>
+      <button class="btn" id="sq">Hold to squeeze</button>
+      <label class="slider" for="size">Size <input id="size" type="range" min="70" max="130" value="100"></label>
+      <button class="btn ghost" id="cut">Halve it</button>
+    </aside>
+  </section>
+
+  <dl class="readout">
+    <div><dt>Pressed</dt><dd id="rP">0%</dd></div>
+    <div><dt>Variety</dt><dd id="rV">orange</dd></div>
+    <div><dt>Yield</dt><dd id="rY">—</dd></div>
+    <div><dt>Glass</dt><dd id="rG">empty</dd></div>
+    <div><dt>Pressed today</dt><dd id="rT">0</dd></div>
+  </dl>
+
+  <section class="recipe" id="recipe">
+    <div class="rows" id="rows"></div>
+    <div class="glasswrap">
+      <svg id="glass" viewBox="-60 -80 120 160" role="img" aria-label="A glass of juice"></svg>
+    </div>
+  </section>
+
+  <section class="cells">
+    <div class="cell">
+      <div class="fig serif">i</div>
+      <h3>Segments</h3>
+      <p>Every fruit here is drawn from its real anatomy: rind, pith, then eight or ten
+         segments of pulp around a white core, each one a vesicle sac full of juice.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">ii</div>
+      <h3>Yield</h3>
+      <p>How much juice a fruit gives depends on the variety and on how big it is, and
+         those are the only two variables in this panel. A large Valencia is worth nearly
+         twice a small lime.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">iii</div>
+      <h3>Rind</h3>
+      <p>The oil sits in the coloured layer, which is why a twist over the glass does more
+         than a squeeze. The zest in this recipe is measured in the same units as the juice.</p>
+    </div>
+  </section>
+
+  <section class="cells" id="notes">
+    <div class="cell">
+      <div class="fig serif">iv</div>
+      <h3>Press</h3>
+      <p>Hold the button and the fruit deforms under the ram, the pulp darkens, and the
+         glass fills to whatever the fruit gives. It stops when the fruit is spent, not
+         when you want it to.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">v</div>
+      <h3>Colour</h3>
+      <p>Blood orange goes red because of anthocyanin, which only develops when the fruit
+         ripens on cool nights. The same species, the same segment count, a different
+         pigment.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">vi</div>
+      <h3>Season</h3>
+      <p>Everything here is winter fruit. Navels keep on the tree for months, which is why
+         the press runs from November to April and closes for the summer.</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>Grove &amp; Press · one SVG, no files</span>
+    <span class="mono">no concentrate · no added water</span>
+  </footer>
+</div>
+<script>
+(function(){
+"use strict";
+var NS='http://www.w3.org/2000/svg';
+function E(n,a){var e=document.createElementNS(NS,n);
+  for(var k in a)if(a.hasOwnProperty(k))e.setAttribute(k,a[k]);return e;}
+var fruitSvg=document.getElementById('fruit'),glassSvg=document.getElementById('glass');
+var VARIETIES=[
+ {id:'orange',n:'Valencia orange',rind:'#ff9b1f',rind2:'#e96f06',pulp:'#ffb83d',pith:'#ffd98a',
+  segments:10,yield:52,note:'sweet · few seeds'},
+ {id:'lemon',n:'Eureka lemon',rind:'#ffd21f',rind2:'#e5a800',pulp:'#ffe066',pith:'#fff0b0',
+  segments:9,yield:34,note:'sharp · thin rind'},
+ {id:'pink',n:'Ruby grapefruit',rind:'#ffcf4d',rind2:'#f0a83a',pulp:'#ff9a7a',pith:'#ffd9a8',
+  segments:12,yield:74,note:'bitter · big'},
+ {id:'blood',n:'Tarocco blood',rind:'#ff8a3c',rind2:'#d94f10',pulp:'#e0455a',pith:'#ffb59a',
+  segments:11,yield:48,note:'berry · rare'},
+ {id:'lime',n:'Key lime',rind:'#bcd63a',rind2:'#8fae1c',pulp:'#e2f08a',pith:'#eef6c0',
+  segments:10,yield:22,note:'floral · small'}
+];
+var cur=VARIETIES[0],size=1,halved=false,pressed=0,darken=0,today=0,squeezing=false;
+var vars=document.getElementById('varieties');
+function buildVarieties(){
+  vars.innerHTML='';
+  VARIETIES.forEach(function(v){
+    var b=document.createElement('button');
+    b.className='var';b.setAttribute('aria-pressed',String(v===cur));
+    b.innerHTML='<i style="background:'+v.rind+'"></i><span>'+v.n+
+      '<br><small style="color:#8b7c66;font-size:11px">'+v.note+'</small></span>';
+    b.addEventListener('click',function(){
+      cur=v;pressed=0;halved=false;
+      [].slice.call(vars.children).forEach(function(o){
+        o.setAttribute('aria-pressed',String(o===b));});
+      drawFruit();drawGlass();readout();
+    });
+    vars.appendChild(b);
+  });
+}
+buildVarieties();
+/* ---------- the fruit ---------- */
+function drawFruit(){
+  fruitSvg.innerHTML='';
+  var rind=E('radialGradient',{id:'rind'});
+  [[0,'#fff'],[.28,cur.rind],[.75,cur.rind],[1,cur.rind2]].forEach(function(st){
+    rind.appendChild(E('stop',{offset:st[0],'stop-color':st[1]}));});
+  var defs=E('defs');defs.appendChild(rind);fruitSvg.appendChild(defs);
+  if(!halved){
+    /* whole: a shaded sphere with a dimple and a leaf */
+    fruitSvg.appendChild(E('circle',{cx:0,cy:4,r:100*size,fill:'url(#rind)',
+      stroke:cur.rind2,'stroke-width':1.5}));
+    /* the pore texture: a dotted ring pattern, like real peel */
+    for(var i=0;i<70;i++){
+      var a=i*0.897,r=Math.sqrt(i/70)*96*size;
+      fruitSvg.appendChild(E('circle',{cx:Math.cos(a)*r,cy:4+Math.sin(a)*r,
+        r:1.3,fill:cur.rind2,opacity:.28}));
+    }
+    fruitSvg.appendChild(E('circle',{cx:0,cy:-96*size,r:9*size,fill:cur.rind2,opacity:.55}));
+    /* leaf and stem */
+    fruitSvg.appendChild(E('path',{d:'M0 -96 q 26 -34 58 -30 q -20 30 -58 30 Z',
+      fill:'#3f7d3a',transform:'scale('+size+')'}));
+    fruitSvg.appendChild(E('rect',{x:-3,y:-112*size,width:6,height:18,rx:3,fill:'#6b4a22',
+      transform:'scale(1)'}));
+  }else{
+    /* halved: rind ring, pith, then pulp segments around a core */
+    fruitSvg.appendChild(E('circle',{cx:0,cy:0,r:100*size,fill:cur.rind,
+      stroke:cur.rind2,'stroke-width':2}));
+    fruitSvg.appendChild(E('circle',{cx:0,cy:0,r:92*size,fill:cur.pith}));
+    fruitSvg.appendChild(E('circle',{cx:0,cy:0,r:80*size,fill:cur.pulp,
+      opacity:1-darken*0.35}));
+    var n=cur.segments;
+    for(var k=0;k<n;k++){
+      var a2=k*Math.PI*2/n;
+      var seg=E('path',{
+        d:'M0 0 L '+(Math.cos(a2-0.14)*78*size)+' '+(Math.sin(a2-0.14)*78*size)+
+          ' A '+(78*size)+' '+(78*size)+' 0 0 1 '+(Math.cos(a2+0.14)*78*size)+' '+
+          (Math.sin(a2+0.14)*78*size)+' Z',
+        fill:'none',stroke:'rgba(255,255,255,'+(0.45+darken*0.2)+')','stroke-width':1.6});
+      fruitSvg.appendChild(seg);
+      /* the vesicle line down the middle of each segment */
+      fruitSvg.appendChild(E('line',{
+        x1:Math.cos(a2)*8*size,y1:Math.sin(a2)*8*size,
+        x2:Math.cos(a2)*70*size,y2:Math.sin(a2)*70*size,
+        stroke:'rgba(255,255,255,.35)','stroke-width':.9}));
+    }
+    fruitSvg.appendChild(E('circle',{cx:0,cy:0,r:10*size,fill:cur.pith}));
+    /* the squeeze ram, from above */
+    if(squeezing){
+      fruitSvg.appendChild(E('rect',{x:-70*size,y:-118,width:140*size,height:16,rx:6,
+        fill:'#2b2118',opacity:.8,transform:'translate(0,'+(-pressed*20)+')'}));
+    }
+  }
+}
+/* ---------- the glass ---------- */
+function drawGlass(){
+  glassSvg.innerHTML='';
+  /* the glass body */
+  glassSvg.appendChild(E('path',{d:'M-34 -60 L 34 -60 L 26 60 Q 0 72 -26 60 Z',
+    fill:'rgba(255,255,255,.5)',stroke:'#2b2118','stroke-width':1.8}));
+  var fillTo=-60+120*(pressed/100)*0.86;
+  if(fillTo>-60){
+    /* juice: a rounded body clipped to the glass */
+    var clip=E('clipPath',{id:'gclip'});
+    clip.appendChild(E('path',{d:'M-34 -60 L 34 -60 L 26 60 Q 0 72 -26 60 Z'}));
+    var defs=E('defs');defs.appendChild(clip);glassSvg.appendChild(defs);
+    var g=E('g',{'clip-path':'url(#gclip)'});
+    g.appendChild(E('rect',{x:-40,y:fillTo,width:80,height:160-fillTo,fill:cur.pulp,
+      opacity:0.95}));
+    /* pulp flecks */
+    for(var i=0;i<18;i++){
+      var fx=(Math.random()-.5)*50, fy=fillTo+Math.random()*(60-fillTo+60)*0.9;
+      g.appendChild(E('circle',{cx:fx,cy:fy,r:1+Math.random()*2,fill:'#fff',opacity:.35}));
+    }
+    /* the meniscus */
+    g.appendChild(E('ellipse',{cx:0,cy:fillTo,rx:34,ry:4,fill:'#fff',opacity:.25}));
+    glassSvg.appendChild(g);
+  }
+  /* ice, when there is enough in the glass */
+  if(pressed>45){
+    [[-8,fillTo+18],[10,fillTo+30],[-2,fillTo+42]].forEach(function(p){
+      if(p[1]>40)return;
+      glassSvg.appendChild(E('rect',{x:p[0],y:p[1],width:12,height:12,rx:3,
+        fill:'rgba(255,255,255,.55)',stroke:'rgba(255,255,255,.8)','stroke-width':.8,
+        transform:'rotate(18 '+p[0]+' '+p[1]+')'}));
+    });
+  }
+  /* a twist of zest on the rim */
+  glassSvg.appendChild(E('path',{d:'M30 -58 q 18 -6 20 8 q -14 6 -20 -8 Z',
+    fill:cur.rind,stroke:cur.rind2,'stroke-width':.8,opacity:.9}));
+}
+/* ---------- the squeeze ---------- */
+var sq=document.getElementById('sq');
+function start(){
+  squeezing=true;pressed=0;today++;
+  document.getElementById('rT').textContent=today;
+  drawFruit();
+}
+sq.addEventListener('pointerdown',function(e){
+  e.preventDefault();start();sq.setPointerCapture(e.pointerId);
+});
+sq.addEventListener('pointerup',function(){squeezing=false;drawFruit();});
+sq.addEventListener('pointercancel',function(){squeezing=false;drawFruit();});
+document.getElementById('cut').addEventListener('click',function(){
+  halved=!halved;drawFruit();
+});
+document.getElementById('size').addEventListener('input',function(e){
+  size=+e.target.value/100;drawFruit();readout();
+});
+/* ---------- readout ---------- */
+function yieldML(){
+  return Math.round(cur.yield*size);
+}
+function readout(){
+  document.getElementById('rP').textContent=Math.round(pressed)+'%';
+  document.getElementById('rV').textContent=cur.id;
+  document.getElementById('rY').textContent=Math.round(yieldML()*pressed/100)+' ml';
+  var g=document.getElementById('rG');
+  g.textContent=pressed>45?'full':pressed>12?'pouring':'empty';
+}
+var rows=document.getElementById('rows');
+function buildRows(){
+  var y=yieldML(),z=Math.round(y*0.06+1);
+  var data=[['Juice, pressed just now',Math.round(y)+' ml'],
+    ['Zest, one twist',z+' g'],
+    ['Sugar, to taste',(cur.id==='lemon'||cur.id==='lime'?12:4)+' g'],
+    ['Ice',(cur.id==='lemon'||cur.id==='lime'?2:4)+' cubes'],
+    ['Segments in the fruit',cur.segments+''],
+    ['Fruits used today',today+'']];
+  rows.innerHTML='';
+  data.forEach(function(r){
+    var d=document.createElement('div');d.className='row';
+    d.innerHTML='<span>'+r[0]+'</span><b>'+r[1]+'</b>';
+    rows.appendChild(d);
+  });
+}
+/* ---------- loop: the press works while you hold ---------- */
+var last=0;
+function loop(ts){
+  var dt=last?Math.min(.05,(ts-last)/1000):0;last=ts;
+  if(squeezing&&pressed<100){
+    pressed=Math.min(100,pressed+dt*(30+size*20));
+    darken=Math.min(1,pressed/100);
+    drawFruit();drawGlass();readout();buildRows();
+  }
+  requestAnimationFrame(loop);
+}
+drawFruit();drawGlass();buildRows();readout();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

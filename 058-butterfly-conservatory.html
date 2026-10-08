@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Conservatory — butterflies drawn from parameters</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:#f6f1e4;color:#22262e;
+  font:15px/1.6 ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+.serif{font-family:ui-serif,Georgia,"Times New Roman",serif}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.wrap{width:min(1120px,92vw);margin:0 auto}
+nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0 14px;
+  border-bottom:1px solid rgba(34,38,46,.18)}
+nav .brand{font-family:ui-serif,Georgia,serif;font-size:19px}
+nav .brand i{font-style:italic;color:#c8553d}
+nav ul{display:flex;gap:26px;list-style:none;margin:0;padding:0;font-size:11px;
+  letter-spacing:.24em;text-transform:uppercase;color:#7b7466}
+nav a{color:inherit;text-decoration:none}nav a:hover{color:#c8553d}
+@media(max-width:780px){nav ul{display:none}}
+header.hero{padding:70px 0 44px;text-align:center}
+header.hero .kicker{font-size:11px;letter-spacing:.4em;text-transform:uppercase;
+  color:#c8553d;margin:0 0 16px}
+header.hero h1{font-family:ui-serif,Georgia,serif;font-weight:400;
+  font-size:clamp(36px,6.2vw,74px);line-height:1.04;margin:0 0 20px;letter-spacing:-.01em}
+header.hero h1 em{font-style:italic;color:#b98a2f}
+header.hero p{max-width:58ch;margin:0 auto;color:#5c5749}
+/* ---------- collection ---------- */
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;
+  border-top:1px solid rgba(34,38,46,.18);border-bottom:1px solid rgba(34,38,46,.18);
+  padding:16px 0;margin-bottom:34px}
+.bar h2{font-family:ui-serif,Georgia,serif;font-weight:400;font-size:22px;margin:0}
+.bar .acts{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid rgba(34,38,46,.3);background:transparent;color:#22262e;border-radius:999px;
+  padding:8px 16px;font:inherit;font-size:12px;letter-spacing:.1em;cursor:pointer;
+  transition:background .18s,color .18s,border-color .18s}
+.btn:hover{background:#22262e;color:#f6f1e4}
+.btn[aria-pressed="true"]{background:#c8553d;border-color:#c8553d;color:#fff8ee}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-bottom:56px}
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.grid{grid-template-columns:1fr}}
+.card{border:1px solid rgba(34,38,46,.2);border-radius:14px;padding:20px 18px 18px;
+  background:#fbf7ec;position:relative;overflow:hidden;transition:transform .3s,box-shadow .3s}
+.card:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(34,38,46,.12)}
+.card .frame{display:grid;place-items:center;height:150px;perspective:600px;margin-bottom:14px}
+.card svg{width:190px;height:auto;overflow:visible;
+  transform-origin:50% 50%;animation:flap var(--beat,2.6s) ease-in-out infinite}
+.card:hover svg{animation-play-state:paused;transform:scaleX(1)}
+.card .name{font-family:ui-serif,Georgia,serif;font-size:18px;margin:0 0 4px}
+.card .name i{font-style:italic}
+.card .host{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#8d8676;margin:0 0 12px}
+.card .tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-size:10px;letter-spacing:.14em;text-transform:uppercase;border:1px solid rgba(34,38,46,.25);
+  border-radius:999px;padding:3px 9px;color:#5c5749}
+/* pinned when released */
+.card.flying{position:fixed;z-index:60;pointer-events:none;background:#fbf7ec;
+  box-shadow:0 18px 40px rgba(34,38,46,.18)}
+@keyframes flap{
+  0%,100%{transform:scaleX(1) translateY(0)}
+  50%{transform:scaleX(.42) translateY(-4px)}
+}
+/* ---------- notes ---------- */
+.cells{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-bottom:50px}
+@media(max-width:820px){.cells{grid-template-columns:1fr}}
+.cell{border-top:1px solid rgba(34,38,46,.22);padding-top:16px}
+.cell .fig{font-family:ui-serif,Georgia,serif;font-size:40px;color:#b98a2f;line-height:1;margin-bottom:8px}
+.cell h3{font-family:ui-serif,Georgia,serif;font-weight:400;font-style:italic;font-size:21px;margin:0 0 8px}
+.cell p{margin:0;color:#5c5749;font-size:14px}
+footer{border-top:1px solid rgba(34,38,46,.18);padding:22px 0 58px;display:flex;
+  justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:11px;letter-spacing:.2em;
+  text-transform:uppercase;color:#8d8676}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="brand">Conser<i>vatory</i></div>
+    <ul>
+      <li><a href="#collection">Collection</a></li>
+      <li><a href="#plate">Plate</a></li>
+      <li><a href="#notes">Notes</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <p class="kicker">Pinned · not pasted</p>
+    <h1 class="serif">Six wings,<br>drawn from <em>numbers</em></h1>
+    <p>Nothing in this case is an image. Each wing is a cubic path, each band an arc
+       clipped to it, each eyespot a pair of rings — and the beat of every wing is its
+       own number, so no two insects flap alike.</p>
+  </header>
+
+  <div class="bar" id="collection">
+    <h2>The Collection</h2>
+    <div class="acts">
+      <button class="btn" id="venation" aria-pressed="false">Venation</button>
+      <button class="btn" id="still" aria-pressed="false">Hold still</button>
+      <button class="btn" id="release" aria-pressed="false">Release</button>
+    </div>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <section class="cells" id="plate">
+    <div class="cell">
+      <div class="fig serif">i</div>
+      <h3>Wings</h3>
+      <p>Two beziers for the forewing, three for the hindwing, a tail where the
+         species has one. Scale the control points and the whole silhouette changes
+         without redrawing anything.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">ii</div>
+      <h3>Bands</h3>
+      <p>Arcs are drawn through the wing and then clipped by it, so a band always
+         follows the outline. Count and radius are per species, never shared.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">iii</div>
+      <h3>Eyespots</h3>
+      <p>Concentric rings with a pale pupil, clipped to the hindwing and offset
+         toward the margin. They are the reason predators aim for the wrong end.</p>
+    </div>
+  </section>
+
+  <section class="cells" id="notes">
+    <div class="cell">
+      <div class="fig serif">iv</div>
+      <h3>Beat</h3>
+      <p>Wingbeat is a per-card number written into a custom property. Rest it and
+         the wings stop mid-cycle; release it and they leave the case entirely.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">v</div>
+      <h3>Host</h3>
+      <p>A larva eats one plant family and nothing else, so the specimen card names
+         its host before it names its colours.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">vi</div>
+      <h3>Paper</h3>
+      <p>The case is a cream ground with hairlines and cinnabar, the way a specimen
+         drawer is labelled — nothing here needs a dark room to be legible.</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>Conservatory · vector only · no files loaded</span>
+    <span class="mono">6 species · beziers &amp; clips</span>
+  </footer>
+</div>
+<script>
+(function(){
+"use strict";
+var NS='http://www.w3.org/2000/svg';
+function E(n,a){var e=document.createElementNS(NS,n);
+  for(var k in a)if(a.hasOwnProperty(k))e.setAttribute(k,a[k]);return e;}
+function P(d,a){var p=E('path',a||{});p.setAttribute('d',d);return p;}
+
+var SPECIES=[
+  {name:'Morpho Peleides',host:'Leguminosae',scale:1.0,beat:2.4,tail:0,
+   base:'#6c8ef2',band:'#2c3f8f',spot:'#f2e3c8',spotRing:'#2b3550',vein:'#dfe7ff',tags:['iridescent','rainforest']},
+  {name:'Aglais Io',host:'Urtica dioica',scale:.86,beat:3.1,tail:0,
+   base:'#e8a13c',band:'#3a2a1c',spot:'#f6e6c8',spotRing:'#8c1f1f',vein:'#5a3a1a',tags:['peacock','garden']},
+  {name:'Papilio Machaon',host:'Foeniculum',scale:1.06,beat:2.0,tail:1,
+   base:'#f0d98a',band:'#22262e',spot:'#c8553d',spotRing:'#8c1f1f',vein:'#4a4a3a',tags:['swallowtail','tail']},
+  {name:'Danaus Plexippus',host:'Asclepias',scale:.94,beat:2.9,tail:0,
+   base:'#e59a3c',band:'#22262e',spot:'#f6efe0',spotRing:'#22262e',vein:'#3a2a18',tags:['monarch','migrant']},
+  {name:'Heliconius Erato',host:'Passiflora',scale:.9,beat:3.6,tail:0,
+   base:'#22262e',band:'#c8553d',spot:'#f6e6c8',spotRing:'#e8e2d2',vein:'#c8553d',tags:['tiger','warning']},
+  {name:'Attacus Atlas',host:'Cinnamomum',scale:1.18,beat:4.4,tail:0,
+   base:'#b98a2f',band:'#5c3a1c',spot:'#f2ead6',spotRing:'#c8553d',vein:'#e3d3a8',tags:['moth','nocturnal']}
+];
+
+/* fore and hind wing paths, scaled by the species factor */
+function paths(s){
+  var f='M0,0 C '+(26*s)+','+(-30*s)+' '+(74*s)+','+(-46*s)+' '+(108*s)+','+(-30*s)
+    +' C '+(128*s)+','+(-20*s)+' '+(118*s)+','+(-2*s)+' '+(88*s)+',8 C '+(54*s)+',16 20,10 0,0 Z';
+  var h='M0,3 C '+(24*s)+',12 '+(48*s)+',26 '+(48*s)+',50 C '+(48*s)+',72 '+(24*s)+',80 '+(12*s)+',62 C 2,50 0,26 0,3 Z';
+  var t=s?'M'+(-6*s)+',58 C '+(-10*s)+',78 '+(-6*s)+',92 '+(6*s)+',86 C '+(-2*s)+',74 0,64 0,58 Z':'';
+  return {f:f,h:h,t:t};
+}
+function build(sp,i){
+  var svg=E('svg',{viewBox:'-140 -110 280 220',role:'img','aria-label':sp.name});
+  var p=paths(sp.scale),u=sp.scale*100;
+  /* wing shapes as reusable definitions */
+  var defs=E('defs');
+  var cf=E('clipPath',{id:'cf'+i}),ch=E('clipPath',{id:'ch'+i});
+  cf.appendChild(P(p.f));ch.appendChild(P(p.h));
+  defs.appendChild(cf);defs.appendChild(ch);
+  var g=E('linearGradient',{id:'g'+i,x1:'0',y1:'0',x2:'1',y2:'1'});
+  [[0,'#fff'],[.35,sp.base],[1,sp.band]].forEach(function(s){
+    g.appendChild(E('stop',{offset:s[0],'stop-color':s[1]}));});
+  defs.appendChild(g);
+  svg.appendChild(defs);
+  var wing=E('g',{});
+  [-1,1].forEach(function(m){
+    var side=E('g',{transform:'scale('+m+',1)'});
+    /* hind wing first so the forewing sits over it */
+    side.appendChild(P(p.h,{fill:'url(#g'+i+')'}));
+    var hclip=E('g',{'clip-path':'url(#ch'+i+')'});
+    for(var b=1;b<=3;b++){
+      hclip.appendChild(E('circle',{cx:u*.5,cy:u*.5,r:u*(.2+b*.14),fill:'none',
+        stroke:sp.band,'stroke-width':2+b*.8,opacity:.85}));
+    }
+    hclip.appendChild(E('circle',{cx:u*.6,cy:u*.44,r:u*.13,fill:sp.spot}));
+    hclip.appendChild(E('circle',{cx:u*.6,cy:u*.44,r:u*.06,fill:sp.spotRing}));
+    side.appendChild(hclip);
+    if(sp.tail)side.appendChild(P(p.t,{fill:sp.base,stroke:sp.band,'stroke-width':1}));
+    /* forewing */
+    side.appendChild(P(p.f,{fill:'url(#g'+i+')'}));
+    var fclip=E('g',{'clip-path':'url(#cf'+i+')'});
+    for(var c=1;c<=4;c++){
+      fclip.appendChild(E('path',{d:'M0 '+(-10*c)+' Q '+(u*.6)+' '+(-10*c-16)+' '+u+' '+(-10*c),
+        fill:'none',stroke:sp.band,'stroke-width':2.4-c*.3,opacity:.9}));
+    }
+    side.appendChild(fclip);
+    /* venation */
+    var v=E('g',{'clip-path':'url(#cf'+i+')',opacity:'0'});
+    for(var k=0;k<5;k++){
+      v.appendChild(E('path',{d:'M0 0 L '+(u*(.7+k*.1))+' '+(-u*.5+k*u*.1),
+        stroke:sp.vein,'stroke-width':'.7',fill:'none',opacity:'.9'}));
+    }
+    side.appendChild(v);
+    side.appendChild(P(p.f,{fill:'none',stroke:sp.band,'stroke-width':1.2,opacity:.75}));
+    wing.appendChild(side);
+  });
+  svg.appendChild(wing);
+  /* body */
+  svg.appendChild(E('ellipse',{cx:0,cy:6,rx:4,ry:30,fill:'#22262e'}));
+  svg.appendChild(E('circle',{cx:0,cy:-26,r:4.4,fill:'#22262e'}));
+  [-1,1].forEach(function(m){
+    svg.appendChild(E('path',{d:'M0 -28 C '+(10*m)+' -44 '+(16*m)+' -52 '+(24*m)+' -48',
+      stroke:'#22262e','stroke-width':1.6,fill:'none'}));
+  });
+  svg.setAttribute('style','--beat:'+sp.beat+'s');
+  return svg;
+}
+var grid=document.getElementById('grid'),cards=[];
+SPECIES.forEach(function(sp,i){
+  var c=document.createElement('article');c.className='card';
+  var frame=document.createElement('div');frame.className='frame';
+  frame.appendChild(build(sp,i));
+  var nm=document.createElement('h3');nm.className='name';
+  nm.innerHTML='<i>'+sp.name.split(' ')[0]+'</i> '+sp.name.split(' ')[1];
+  var host=document.createElement('p');host.className='host';host.textContent='host · '+sp.host;
+  var tags=document.createElement('div');tags.className='tags';
+  sp.tags.forEach(function(t){var s=document.createElement('span');s.className='tag';s.textContent=t;tags.appendChild(s);});
+  c.appendChild(frame);c.appendChild(nm);c.appendChild(host);c.appendChild(tags);
+  grid.appendChild(c);cards.push({el:c,sp:sp,svg:c.querySelector('svg'),
+    ph:Math.random()*6.28,sp2:26+Math.random()*22,x:0,y:0,flown:false});
+});
+
+/* ---------------- the three toggles ---------------- */
+var veinOn=false,stillOn=false,flyOn=false;
+function toggle(id,fn){
+  var b=document.getElementById(id);
+  b.addEventListener('click',function(){
+    var on=b.getAttribute('aria-pressed')!=='true';
+    b.setAttribute('aria-pressed',String(on));fn(on);
+  });
+}
+toggle('venation',function(on){
+  veinOn=on;
+  cards.forEach(function(c){
+    var groups=c.el.querySelectorAll('g[opacity="0"]');
+    for(var i=0;i<groups.length;i++)groups[i].setAttribute('opacity','1');
+  });
+});
+toggle('still',function(on){
+  stillOn=on;
+  cards.forEach(function(c){
+    c.svg.style.animationPlayState=on?'paused':'running';
+    c.el.style.transform='';
+  });
+});
+function parkAll(){
+  flyOn=false;
+  cards.forEach(function(c){
+    c.el.classList.remove('flying');
+    c.el.style.transform='';
+    c.svg.style.animationPlayState=stillOn?'paused':'running';
+  });
+}
+toggle('release',function(on){
+  flyOn=on;
+  if(!on){parkAll();return;}
+  var first=cards[0].el.getBoundingClientRect();
+  var w=first.width,h=first.height;
+  cards.forEach(function(c,i){
+    var r=c.el.getBoundingClientRect();
+    c.w=w;c.h=h;c.x=r.left;c.y=r.top;c.flown=true;
+    c.el.classList.add('flying');
+    c.el.style.width=w+'px';c.el.style.height=h+'px';
+    c.el.style.left='0px';c.el.style.top='0px';
+    c.el.style.transform='translate('+c.x+'px,'+c.y+'px)';
+  });
+});
+/* drift the released ones */
+var last=0;
+function fly(ts){
+  var dt=last?Math.min(.05,(ts-last)/1000):0;last=ts;
+  flyNow+=dt;
+  if(flyOn){
+    cards.forEach(function(c){
+      if(!c.flown)return;
+      var t=flyNow*c.sp2/60;
+      c.y+=Math.sin(t*1.7+c.ph)*10*dt;
+      c.x+=Math.cos(t*1.1+c.ph*.6)*36*dt;
+      if(c.x>window.innerWidth-c.w-8)c.x=8;
+      if(c.x<8)c.x=window.innerWidth-c.w-8;
+      if(c.y>window.innerHeight-c.h-8)c.y=8;
+      if(c.y<8)c.y=window.innerHeight-c.h-8;
+      c.el.style.transform='translate('+c.x.toFixed(1)+'px,'+c.y.toFixed(1)+'px) rotate('+
+        (Math.sin(t+c.ph)*7).toFixed(1)+'deg)';
+    });
+  }
+  requestAnimationFrame(fly);
+}
+var flyNow=0;
+requestAnimationFrame(fly);
+})();
+</script>
+</body>
+</html>

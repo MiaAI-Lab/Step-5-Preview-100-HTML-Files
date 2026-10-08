@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MERIDIAN — Small-Batch Roastery, Est. 2014</title>
+<style>
+  :root{
+    --paper:#f7f1e6;
+    --paper2:#efe5d5;
+    --ink:#241c14;
+    --dim:rgba(36,28,20,.6);
+    --line:rgba(36,28,20,.16);
+    --espresso:#3b2416;
+    --crema:#c98a4b;
+    --mint:#5c7a5e;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    --sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--paper);color:var(--ink);font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;overflow-x:hidden
+  }
+  ::selection{background:var(--espresso);color:var(--paper)}
+
+  /* paper grain over everything */
+  .tex{
+    position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.35;mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' seed='9'/></filter><rect width='240' height='240' filter='url(%23n)' opacity='.28'/></svg>");
+  }
+
+  nav{
+    position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;
+    gap:16px;flex-wrap:wrap;padding:22px clamp(18px,4vw,44px)
+  }
+  .brand{font-family:var(--serif);font-size:19px;letter-spacing:.3em;text-transform:uppercase}
+  nav ul{display:flex;gap:clamp(12px,2.2vw,30px);list-style:none;margin:0;padding:0}
+  nav a{color:var(--dim);text-decoration:none;font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;transition:color .2s}
+  nav a:hover{color:var(--ink)}
+
+  .hero{
+    position:relative;z-index:2;display:grid;grid-template-columns:1.05fr .95fr;
+    gap:clamp(24px,5vw,64px);align-items:center;
+    padding:clamp(24px,6vw,80px) clamp(18px,4vw,44px)
+  }
+  .hero .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.32em;text-transform:uppercase;color:var(--crema);display:block;margin-bottom:22px}
+  .hero h1{font-family:var(--serif);font-weight:400;font-size:clamp(34px,6.4vw,84px);line-height:.96;letter-spacing:-.03em;margin:0 0 24px}
+  .hero h1 i{font-style:italic;color:var(--crema)}
+  .hero p{font-size:14.5px;line-height:1.8;color:var(--dim);max-width:42ch;margin:0 0 30px}
+  .row{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+  .btn{
+    display:inline-block;background:var(--espresso);color:var(--paper);text-decoration:none;
+    font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;
+    padding:17px 30px;border-radius:999px;transition:transform .28s,box-shadow .28s;
+    box-shadow:0 16px 34px -18px rgba(59,36,22,.9)
+  }
+  .btn:hover{transform:translateY(-3px);box-shadow:0 24px 44px -18px rgba(59,36,22,1)}
+  .btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line);box-shadow:none}
+  .btn.ghost:hover{border-color:var(--ink);box-shadow:none}
+
+  /* the cup, in CSS */
+  .cup{
+    position:relative;aspect-ratio:1;display:grid;place-items:center;
+    background:
+      radial-gradient(50% 40% at 50% 40%,rgba(201,138,75,.16),transparent 70%),
+      radial-gradient(80% 70% at 50% 90%,rgba(59,36,22,.10),transparent 70%);
+    border-radius:50%
+  }
+  .saucer{
+    position:absolute;bottom:6%;width:66%;height:9%;border-radius:50%;
+    background:linear-gradient(180deg,#fffaf0,#e6dac6);
+    box-shadow:0 14px 30px -14px rgba(59,36,22,.7)
+  }
+  .body{
+    position:absolute;bottom:14%;width:44%;height:46%;
+    background:linear-gradient(170deg,#fdf8ee 0%,#f2e7d5 60%,#e0d2ba);
+    border-radius:6% 6% 44% 44%/4% 4% 34% 34%;
+    box-shadow:inset -12px -6px 20px rgba(59,36,22,.14),inset 8px 6px 16px rgba(255,255,255,.7),0 16px 28px -16px rgba(59,36,22,.6)
+  }
+  .body::after{
+    content:"";position:absolute;inset:0;opacity:.45;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='k'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='4'/></filter><rect width='120' height='120' filter='url(%23k)' opacity='.35'/></svg>");
+    border-radius:inherit
+  }
+  .rim{
+    position:absolute;bottom:58%;width:44%;height:7%;border-radius:50%;
+    background:radial-gradient(ellipse at 40% 30%,#fffdf7,#d9ccb6);
+    box-shadow:0 3px 8px rgba(59,36,22,.3)
+  }
+  .coffee{
+    position:absolute;bottom:59.4%;width:39%;height:5.2%;border-radius:50%;
+    background:radial-gradient(ellipse at 42% 34%,#6b4326,#3b2416 60%,#2a190f);
+    box-shadow:inset 0 2px 4px rgba(0,0,0,.6)
+  }
+  .handle{
+    position:absolute;bottom:28%;left:calc(50% + 21%);width:15%;height:18%;
+    border:7px solid #f2e7d5;border-radius:0 50% 50% 0;border-left:0;
+    box-shadow:4px 4px 10px -6px rgba(59,36,22,.6)
+  }
+  .steam{position:absolute;bottom:64%;width:30%;height:26%}
+  .steam i{
+    position:absolute;bottom:0;width:2px;height:100%;border-radius:2px;
+    background:linear-gradient(180deg,rgba(201,138,75,0),rgba(201,138,75,.35));
+    transform-origin:50% 100%;animation:rise 4s ease-in-out infinite
+  }
+  @keyframes rise{
+    0%{transform:scaleY(.2) translateY(10px);opacity:0}
+    30%{opacity:.8}
+    100%{transform:scaleY(1) translateY(-14px);opacity:0}
+  }
+
+  /* ---------- menu ---------- */
+  .menu{padding:clamp(30px,6vw,70px) clamp(18px,4vw,44px);position:relative;z-index:2}
+  .sect{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:34px}
+  .sect h2{font-family:var(--serif);font-weight:400;font-size:clamp(24px,3.8vw,44px);letter-spacing:-.02em;margin:0}
+  .sect span{font-family:var(--mono);font-size:9.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--dim)}
+  .items{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
+  .items article{background:var(--paper);padding:28px 26px;transition:background .35s}
+  .items article:hover{background:var(--paper2)}
+  .items .n{font-family:var(--mono);font-size:9px;letter-spacing:.24em;color:var(--crema)}
+  .items h3{font-family:var(--serif);font-weight:400;font-size:22px;margin:12px 0 12px;letter-spacing:-.01em}
+  .items p{margin:0;font-size:13px;line-height:1.8;color:var(--dim)}
+  .items .foot{
+    display:flex;justify-content:space-between;align-items:baseline;margin-top:20px;
+    padding-top:14px;border-top:1px dashed var(--line);font-family:var(--mono);font-size:10.5px
+  }
+  .items .foot b{color:var(--espresso);font-weight:400}
+
+  /* ---------- process ---------- */
+  .proc{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin:clamp(24px,5vw,50px) clamp(18px,4vw,44px);position:relative;z-index:2}
+  .proc div{background:var(--paper);padding:30px 26px}
+  .proc b{display:block;font-family:var(--serif);font-weight:400;font-size:44px;color:var(--crema);line-height:1;margin-bottom:12px}
+  .proc h4{font-family:var(--mono);font-size:9px;letter-spacing:.24em;text-transform:uppercase;margin:0 0 12px}
+  .proc p{margin:0;font-size:12.5px;line-height:1.85;color:var(--dim)}
+
+  footer{border-top:1px solid var(--line);padding:28px clamp(18px,4vw,44px) 48px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);position:relative;z-index:2}
+
+  @media (max-width:900px){.hero{grid-template-columns:1fr}.items,.proc{grid-template-columns:1fr}}
+  @media (max-width:600px){.items,.proc{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="tex"></div>
+
+<nav>
+  <div class="brand">Meridian</div>
+  <ul>
+    <li><a href="#beans">Beans</a></li>
+    <li><a href="#process">Roasting</a></li>
+    <li><a href="#visit">Visit</a></li>
+  </ul>
+</nav>
+
+<section class="hero">
+  <div>
+    <span class="k">Small-batch roastery · est. 2014</span>
+    <h1>Roasted on<br>Tuesday, <i>gone</i><br>by Friday.</h1>
+    <p>We buy one lot at a time from three farms and one cooperative, roast it
+    twice a week, and sell it until it is finished. Then we buy another.</p>
+    <div class="row">
+      <a class="btn" href="#beans">See this week</a>
+      <a class="btn ghost" href="#visit">Find the shop</a>
+    </div>
+  </div>
+  <div class="cup">
+    <div class="steam">
+      <i style="left:22%;animation-delay:0s"></i>
+      <i style="left:42%;animation-delay:1.1s"></i>
+      <i style="left:62%;animation-delay:2.2s"></i>
+      <i style="left:80%;animation-delay:.5s"></i>
+    </div>
+    <div class="handle"></div>
+    <div class="body"></div>
+    <div class="rim"></div>
+    <div class="coffee"></div>
+    <div class="saucer"></div>
+  </div>
+</section>
+
+<section class="menu" id="beans">
+  <div class="sect"><h2>On the bar this week</h2><span>Roasted Tuesday 6th · 1.2 kg total</span></div>
+  <div class="items">
+    <article>
+      <span class="n">01 · Ethiopia</span>
+      <h3>Guji Natural</h3>
+      <p>Peach, jasmine, a long finish that turns to black tea. WASDE lot 14, dried
+      on raised beds for eighteen days.</p>
+      <div class="foot"><span>Filter</span><b>£17.50 / 250g</b></div>
+    </article>
+    <article>
+      <span class="n">02 · Colombia</span>
+      <h3>Huila Washed</h3>
+      <p>Red apple, caramel, brown sugar. The one we drink all day, the one we give
+      to people who say they do not like coffee.</p>
+      <div class="foot"><span>Any</span><b>£15.00 / 250g</b></div>
+    </article>
+    <article>
+      <span class="n">03 · Rwanda</span>
+      <h3>Nyamasheke</h3>
+      <p>Plum, orange zest, a syrupy body. A cooperative of 380 farmers, and a lot we
+      can only ever buy small.</p>
+      <div class="foot"><span>Espresso</span><b>£19.00 / 250g</b></div>
+    </article>
+  </div>
+</section>
+
+<section class="proc" id="process">
+  <div><b>1</b><h4>Buy</h4><p>One lot at a time, enough to last three weeks. We pay 2.4× the commodity price, which is still less than the farm deserves.</p></div>
+  <div><b>2</b><h4>Roast</h4><p>Two mornings a week on a 5 kg drum. Every profile is written by hand and abandoned when the beans say otherwise.</p></div>
+  <div><b>3</b><h4>Rest</h4><p>Four days minimum for filter, nine for espresso. Then it is at its best for eleven more, and then it is not.</p></div>
+  <div><b>4</b><h4>Go</h4><p>Bags leave the shop the same day they are filled, with the roast date on the front and nothing on the back.</p></div>
+</section>
+
+<section class="menu" id="visit">
+  <div class="sect"><h2>The shop</h2><span>14 Kiln Lane · Tue–Sat from eight</span></div>
+</section>
+
+<footer>
+  <span>© Meridian Coffee</span>
+  <span>Open Tue–Sat, 8 until the beans run out</span>
+  <span>Roasted at 04:40, every Tuesday and Friday</span>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  /* randomise the steam phase a touch so no two visits are identical */
+  document.querySelectorAll('.steam i').forEach(function(el,i){
+    el.style.animationDuration=(3.4+i*0.35).toFixed(2)+'s';
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DRAWING 07-A — The Meridian Pavilion, Annotated</title>
+<style>
+  :root{
+    --blue:#10367a;
+    --blue-d:#0a2450;
+    --paper:#f2f6ff;
+    --line:#2f5fbf;
+    --dim:rgba(47,95,191,.42);
+    --red:#c0392b;
+    --amber:#e0a326;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden}
+  body{background:var(--blue);color:var(--paper);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+  #dwg{position:fixed;inset:0;z-index:0;display:block}
+  .fade{position:fixed;inset:0;z-index:1;pointer-events:none;
+    background:radial-gradient(120% 100% at 50% 45%,transparent 45%,rgba(10,36,80,.6))}
+
+  .ui{position:fixed;inset:0;z-index:2;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(16px,3vw,34px)}
+  .top{display:flex;justify-content:space-between;align-items:flex-start;gap:18px}
+  .k{font-family:var(--mono);font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--amber)}
+  h1{font-family:var(--mono);font-weight:400;font-size:clamp(17px,2.8vw,30px);letter-spacing:.06em;margin:10px 0 0;text-transform:uppercase}
+  .top p{margin:12px 0 0;font-size:12px;line-height:1.8;max-width:36ch;color:rgba(242,246,255,.72)}
+  .stamp{
+    text-align:right;font-family:var(--mono);font-size:9px;letter-spacing:.2em;
+    text-transform:uppercase;color:rgba(242,246,255,.65);line-height:2.2
+  }
+  .stamp b{display:block;font-size:14px;color:var(--amber);font-weight:400}
+
+  .bottom{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+  .tray{
+    pointer-events:auto;display:flex;gap:clamp(8px,1.3vw,16px);flex-wrap:wrap;align-items:center;
+    background:rgba(10,36,80,.7);border:1px solid rgba(242,246,255,.2);border-radius:12px;
+    padding:11px clamp(12px,1.8vw,20px);backdrop-filter:blur(12px)
+  }
+  .g{display:flex;align-items:center;gap:8px}
+  .kk{font-family:var(--mono);font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;color:rgba(242,246,255,.6)}
+  .vv{font-family:var(--mono);font-size:9.5px;color:var(--amber);min-width:34px;font-variant-numeric:tabular-nums}
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;width:66px;height:14px;background:transparent;cursor:pointer
+  }
+  input[type=range]::-webkit-slider-runnable-track{height:2px;background:rgba(242,246,255,.3);border-radius:2px}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;border-radius:50%;background:var(--amber);margin-top:-5px;border:0}
+  input[type=range]::-moz-range-track{height:2px;background:rgba(242,246,255,.3);border-radius:2px}
+  input[type=range]::-moz-range-thumb{width:11px;height:11px;border:0;border-radius:50%;background:var(--amber)}
+  button{
+    pointer-events:auto;font-family:var(--mono);font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;
+    background:rgba(224,163,38,.14);border:1px solid rgba(224,163,38,.45);color:var(--paper);
+    padding:9px 13px;border-radius:4px;cursor:pointer;transition:background .2s,color .2s
+  }
+  button:hover{background:var(--amber);color:#0a2450}
+  button.on{background:var(--amber);color:#0a2450}
+  .hint{font-family:var(--mono);font-size:8.5px;letter-spacing:.2em;text-transform:uppercase;color:rgba(242,246,255,.45);pointer-events:none}
+
+  @media (max-width:760px){.top p,.stamp,.hint{display:none}.ui{padding:14px}}
+</style>
+</head>
+<body>
+<canvas id="dwg"></canvas>
+<div class="fade"></div>
+
+<div class="ui">
+  <div class="top">
+    <div>
+      <div class="k">Sheet 07-A · issue for tender</div>
+      <h1>The Meridian Pavilion</h1>
+      <p>Plans, section and elevation of a small reading room. The construction
+      lines draw themselves; the annotated dimensions settle once the outline is
+      complete.</p>
+    </div>
+    <div class="stamp">
+      Drawn by<b>A. Vance</b>
+      Scale 1:50 @ A1<br>Checked · R. Okonjo
+    </div>
+  </div>
+
+  <div class="bottom">
+    <div class="tray">
+      <div class="g"><span class="kk">Speed</span><input type="range" id="sp" min="1" max="100" value="34" aria-label="Draw speed"><span class="vv" id="spV">34</span></div>
+      <div class="g"><span class="kk">Grid</span><input type="range" id="gr" min="0" max="100" value="70" aria-label="Grid density"><span class="vv" id="grV">70</span></div>
+      <button id="dims" class="on">Dimensions</button>
+      <button id="labels" class="on">Labels</button>
+      <button id="replay">Replay</button>
+    </div>
+    <div class="hint">Watch it draw · hover a room for its name</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var cv=document.getElementById('dwg'),c=cv.getContext('2d');
+  var W,H,DPR=Math.min(devicePixelRatio||1,2);
+  var sp=34,gr=70,showDims=true,showLabels=true;
+  var prog=0,lastT=0;
+  var hover=null;
+
+  /* the drawing, as polylines in a 0..1 normalised space */
+  var INNER=[
+    [[0,0],[1,0],[1,0.62],[0,0.62],[0,0]],
+    /* reading room divider */
+    [[0.42,0],[0.42,0.62]],
+    /* alcove */
+    [[0.42,0.3],[0.86,0.3],[0.86,0.62]],
+    /* entrance notch */
+    [[0.62,0.62],[0.78,0.62]],
+    /* hatch zone boundary */
+    [[0,0.62],[0.42,0.62]]
+  ];
+  var ROOMS=[
+    {n:'READING ROOM',a:18.4,x:0.21,y:0.30},
+    {n:'STACK ALCOVE',a:9.2,x:0.64,y:0.46},
+    {n:'ENTRANCE',a:5.1,x:0.70,y:0.56},
+    {n:'ORIENTATION',a:6.8,x:0.21,y:0.55}
+  ];
+
+  function resize(){
+    W=innerWidth;H=innerHeight;
+    cv.width=W*DPR;cv.height=H*DPR;cv.style.width=W+'px';cv.style.height=H+'px';
+    c.setTransform(DPR,0,0,DPR,0,0);
+  }
+  function box(){
+    var m=Math.min(W,H);
+    var w=Math.min(W*0.62,m*0.86), h=w*0.62;
+    var x=(W-w)/2, y=(H-h)/2;
+    return {x:x,y:y,w:w,h:h};
+  }
+  function P(p,b){return [b.x+p[0]*b.w, b.y+p[1]*b.h]}
+
+  function paper(){
+    var g=c.createLinearGradient(0,0,W,H);
+    g.addColorStop(0,'#123a80');g.addColorStop(.5,'#10367a');g.addColorStop(1,'#0a2450');
+    c.fillStyle=g;c.fillRect(0,0,W,H);
+    /* two fixed faint blotches so the sheet reads as aged stock */
+    var b1=c.createRadialGradient(W*0.22,H*0.24,0,W*0.22,H*0.24,Math.max(W,H)*0.5);
+    b1.addColorStop(0,'rgba(255,255,255,.028)');b1.addColorStop(1,'rgba(255,255,255,0)');
+    c.fillStyle=b1;c.fillRect(0,0,W,H);
+    var b2=c.createRadialGradient(W*0.78,H*0.8,0,W*0.78,H*0.8,Math.max(W,H)*0.45);
+    b2.addColorStop(0,'rgba(10,36,80,.22)');b2.addColorStop(1,'rgba(10,36,80,0)');
+    c.fillStyle=b2;c.fillRect(0,0,W,H);
+  }
+  function grid(b){
+    var step=Math.max(18,36-gr*0.22);
+    c.strokeStyle='rgba(242,246,255,.07)';c.lineWidth=1;
+    for(var x=step;x<W;x+=step){c.beginPath();c.moveTo(x+.5,0);c.lineTo(x+.5,H);c.stroke();}
+    for(var y=step;y<H;y+=step){c.beginPath();c.moveTo(0,y+.5);c.lineTo(W,y+.5);c.stroke();}
+    /* border frame */
+    c.strokeStyle='rgba(242,246,255,.5)';c.lineWidth=1.4;
+    c.strokeRect(14,14,W-28,H-28);
+    c.strokeStyle='rgba(242,246,255,.22)';c.lineWidth=1;
+    c.strokeRect(24,24,W-48,H-48);
+  }
+
+  /* draw a polyline up to fraction f of its total length */
+  function poly(pts,b,f,style,wid){
+    c.strokeStyle=style;c.lineWidth=wid||1.4;c.lineJoin='round';c.lineCap='round';
+    var total=0,segs=[];
+    for(var i=0;i<pts.length-1;i++){
+      var a=P(pts[i],b),b2=P(pts[i+1],b);
+      var d=Math.hypot(b2[0]-a[0],b2[1]-a[1]);
+      segs.push({a:a,b:b2,d:d});total+=d;
+    }
+    var want=total*f,done=0;
+    c.beginPath();
+    for(var j=0;j<segs.length;j++){
+      var s=segs[j];
+      if(done>=want)break;
+      if(done+s.d<=want){
+        c.moveTo(s.a[0],s.a[1]);c.lineTo(s.b[0],s.b[1]);done+=s.d;
+      }else{
+        var t=(want-done)/s.d;
+        c.moveTo(s.a[0],s.a[1]);
+        c.lineTo(s.a[0]+(s.b[0]-s.a[0])*t, s.a[1]+(s.b[1]-s.a[1])*t);
+        done=want;
+      }
+    }
+    c.stroke();
+  }
+
+  function dim(x1,y1,x2,y2,txt,off){
+    c.strokeStyle='rgba(224,163,38,.75)';c.lineWidth=1;
+    c.beginPath();c.moveTo(x1,y1);c.lineTo(x2,y2);c.stroke();
+    /* witness ticks */
+    var dx=x2-x1,dy=y2-y1,L=Math.hypot(dx,dy);
+    if(L>1){
+      var nx=-dy/L*5, ny=dx/L*5;
+      c.beginPath();
+      c.moveTo(x1+nx,y1+ny);c.lineTo(x1-nx,y1-ny);
+      c.moveTo(x2+nx,y2+ny);c.lineTo(x2-nx,y2-ny);
+      c.stroke();
+    }
+    c.fillStyle='rgba(224,163,38,.9)';
+    c.font='9px ui-monospace,monospace';c.textAlign='center';c.textBaseline='middle';
+    c.save();c.translate((x1+x2)/2,(y1+y2)/2+off);c.fillText(txt,0,0);c.restore();
+    c.textBaseline='alphabetic';
+  }
+
+  function render(t){
+    var dt=Math.min(50,t-lastT||16);lastT=t;
+    if(prog<1)prog=Math.min(1,prog+dt*0.00022*(sp/34));
+    var b=box();
+    paper();grid(b);
+
+    /* outline: first 45% of progress */
+    var f1=Math.min(1,prog/0.45);
+    c.strokeStyle='rgba(242,246,255,.95)';
+    poly(INNER[0],b,f1,'rgba(242,246,255,.95)',2.2);
+
+    /* interior walls: 45%-80% */
+    var f2=Math.max(0,Math.min(1,(prog-0.45)/0.35));
+    for(var i=1;i<INNER.length;i++){
+      var fi=Math.max(0,Math.min(1,(f2-(i-1)*0.22)/0.6));
+      if(fi>0)poly(INNER[i],b,fi,'rgba(242,246,255,.6)',1.3);
+    }
+    /* hatch: 78%-95% */
+    var f3=Math.max(0,Math.min(1,(prog-0.78)/0.17));
+    c.strokeStyle='rgba(242,246,255,.22)';c.lineWidth=0.7;
+    /* hatch the left bay with diagonal lines that appear in sequence */
+    var hb={x:b.x,y:b.y,w:b.w*0.42,h:b.h*0.62};
+    c.save();
+    c.beginPath();
+    c.rect(hb.x,hb.y,hb.w,hb.h);
+    c.clip();
+    c.strokeStyle='rgba(242,246,255,.18)';c.lineWidth=0.7;
+    var n2=Math.floor((hb.w+hb.h)/7);
+    var shown=Math.floor(n2*f3);
+    c.beginPath();
+    for(var k=0;k<shown;k++){
+      var off=k*7;
+      c.moveTo(hb.x+off,hb.y);
+      c.lineTo(hb.x+off-hb.h,hb.y+hb.h);
+    }
+    c.stroke();
+    c.restore();
+
+    /* door swing arc */
+    var f4=Math.max(0,Math.min(1,(prog-0.9)/0.1));
+    if(f4>0){
+      var door=P([0.62,0.62],b), r=b.h*0.19;
+      c.strokeStyle='rgba(224,163,38,.8)';c.lineWidth=1.2;
+      c.beginPath();c.arc(door[0],door[1],r,-Math.PI/2,-Math.PI/2+Math.PI*f4);c.stroke();
+      c.beginPath();c.moveTo(door[0],door[1]);
+      c.lineTo(door[0]+Math.cos(-Math.PI/2+Math.PI*f4)*r, door[1]+Math.sin(-Math.PI/2+Math.PI*f4)*r);
+      c.stroke();
+    }
+
+    /* dimensions once complete */
+    if(prog>0.92&&showDims){
+      var a1=Math.min(1,(prog-0.92)/0.08);
+      c.globalAlpha=a1;
+      dim(b.x,b.y-16,b.x+b.w,b.y-16,(b.w/24).toFixed(2)+' m',0);
+      dim(b.x-16,b.y,b.x-16,b.y+b.h,(b.h/24).toFixed(2)+' m',0);
+      /* room dimensions */
+      dim(b.x,b.y+b.h+16,b.x+b.w*0.42,b.y+b.h+16,'7.35 m',0);
+      dim(b.x+b.w*0.42,b.y+b.h+16,b.x+b.w,b.y+b.h+16,'9.80 m',0);
+      c.globalAlpha=1;
+    }
+
+    /* labels */
+    if(showLabels&&prog>0.86){
+      var a2=Math.min(1,(prog-0.86)/0.14);
+      c.globalAlpha=a2;
+      for(var r2=0;r2<ROOMS.length;r2++){
+        var rm=ROOMS[r2];
+        var px=b.x+rm.x*b.w, py=b.y+rm.y*b.h;
+        c.fillStyle='rgba(242,246,255,.85)';
+        c.font='8px ui-monospace,monospace';c.textAlign='center';
+        c.fillText(rm.n,px,py);
+        c.fillStyle='rgba(224,163,38,.8)';
+        c.fillText(rm.a+' m²',px,py+11);
+        if(hover&&hover.n===rm.n){
+          c.strokeStyle='rgba(224,163,38,.7)';c.lineWidth=1;
+          c.strokeRect(px-38,py-14,76,30);
+        }
+      }
+      c.globalAlpha=1;
+    }
+
+    /* section mark */
+    if(prog>0.95){
+      c.strokeStyle='rgba(192,57,43,.85)';c.lineWidth=1.2;
+      var sy=b.y+b.h*0.5;
+      c.beginPath();
+      c.moveTo(b.x-40,sy);c.lineTo(b.x+b.w+40,sy);
+      c.stroke();
+      /* arrows */
+      c.beginPath();
+      c.moveTo(b.x-40,sy);c.lineTo(b.x-28,sy-5);c.lineTo(b.x-28,sy+5);c.closePath();c.fillStyle='rgba(192,57,43,.85)';c.fill();
+      c.beginPath();
+      c.moveTo(b.x+b.w+40,sy);c.lineTo(b.x+b.w+28,sy-5);c.lineTo(b.x+b.w+28,sy+5);c.closePath();c.fill();
+      c.fillStyle='rgba(192,57,43,.85)';c.font='9px ui-monospace,monospace';
+      c.fillText('A',b.x-52,sy+3);
+      c.fillText('A',b.x+b.w+42,sy+3);
+    }
+
+    requestAnimationFrame(render);
+  }
+
+  cv.addEventListener('pointermove',function(e){
+    var r=cv.getBoundingClientRect(),b=box();
+    var x=e.clientX-r.left,y=e.clientY-r.top;
+    hover=null;
+    for(var i=0;i<ROOMS.length;i++){
+      var rm=ROOMS[i];
+      var px=b.x+rm.x*b.w, py=b.y+rm.y*b.h;
+      if(Math.abs(x-px)<44&&Math.abs(y-py)<18)hover=rm;
+    }
+    cv.style.cursor=hover?'pointer':'default';
+  });
+  cv.addEventListener('pointerleave',function(){hover=null;});
+
+  document.getElementById('sp').addEventListener('input',function(){
+    sp=+this.value;document.getElementById('spV').textContent=sp;
+  });
+  document.getElementById('gr').addEventListener('input',function(){
+    gr=+this.value;document.getElementById('grV').textContent=gr;
+  });
+  var db=document.getElementById('dims');
+  db.addEventListener('click',function(){showDims=!showDims;this.classList.toggle('on',showDims);});
+  var lb=document.getElementById('labels');
+  lb.addEventListener('click',function(){showLabels=!showLabels;this.classList.toggle('on',showLabels);});
+  document.getElementById('replay').addEventListener('click',function(){prog=0;});
+
+  addEventListener('resize',function(){clearTimeout(window.__r);window.__r=setTimeout(resize,140)});
+  resize();
+  requestAnimationFrame(render);
+})();
+</script>
+</body>
+</html>

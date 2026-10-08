@@ -1,0 +1,85 @@
+# RAIN ON GLASS — Platform 4, 23:40
+
+## Short title
+Rain on Glass
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: an atmospheric
+rain-on-a-train-window simulation called RAIN ON GLASS. No external dependencies
+whatsoever — no CDN, no web fonts, no external images, no external SVG files, no
+JavaScript libraries. All CSS and JavaScript inline, works offline by
+double-clicking, responsive, valid HTML5.
+
+Artistic direction: a night carriage window seen from the inside. Behind the glass
+is a blurred night: a stack of three offset radial glows (warm amber, cool blue,
+rose) over a deep navy vertical gradient, masked with a fine vertical bar pattern
+suggesting window frames, plus twenty-six out-of-focus bokeh discs in nine-pixel
+blur that gently pulse and scale on staggered alternating loops. In front of it, a
+canvas holds the water: a soft milky condensation wash whose alpha rises toward the
+bottom of the pane, a static fog speckle of ninety large 5%-alpha white blobs, and
+up to 220 drops.
+
+Each drop is drawn as a lens rather than a circle: a soft radial-gradient body
+(pale white at the top-left through near-transparent), a thin rim stroke, a
+rotated elliptical specular highlight, and a second smaller sparkle on the opposite
+side for drops above four pixels. Drops grow to a target radius, then either sit
+stuck to the dust on the pane or begin to run downward — small ones creep at a
+quarter speed, heavy ones slide, wobbling side to side on a sine. Running drops
+shed tiny new drops behind them and merge with any drop they touch, taking the
+square root of the combined areas so they grow the way real coalescing water does.
+New drops spawn from the top edge at a rate set by the Density slider.
+
+The wipe: dragging a finger across the pane pushes circular "wipe trail" markers
+into a list, each of which decays over about 170 frames while its radius grows, so
+the cleared area slowly fogs over again. Any drop inside a wiped circle immediately
+starts running, which is what makes the interaction feel physical — you clear a
+path and the water above it finds the path.
+
+Layout: a full-viewport canvas over the bokeh night with a floating UI overlay
+whose pointer-events pass through except on the controls. Top-left is a monospace
+carriage label above an italic serif headline with one line in warm amber, plus a
+short paragraph. Top-right is a monospace meter stack showing outside temperature,
+rain intensity and speed, all recomputing every frame. Bottom is a glass tray with
+three sliders — Density (spawn and seed rate), Size (drop radius scale) and Fog
+(condensation strength) — plus "Wipe the pane" and a Downpour/Drizzle toggle, and a
+monospace hint.
+
+Interaction: drag anywhere on the pane to clear a path through the water; the drops
+above the path will start running down it. Density re-seeds the drop count live,
+Size rescales every drop's target radius, and Fog thickens or clears the
+condensation. "Wipe the pane" clears forty random circles at once, and the toggle
+switches between heavy rain and a slow drizzle. On narrow screens the paragraph,
+meters and hint hide.
+
+## One-paragraph description of the intended design
+A night train window from the inside: a blurred amber-and-blue bokeh night behind a
+canvas of condensation, milky fog and lens-shaped drops that sit on the dust, run
+down the pane when they get heavy, merge when they touch, shed smaller drops behind
+them — and start running again wherever you drag a finger through the water.
+
+## Major visual techniques used
+- Blurred night built from three offset radial colour glows over a navy vertical
+  gradient, with a fine repeating-linear-gradient bar mask
+- Twenty-six bokeh discs in a nine-pixel CSS blur, pulsing and scaling on staggered
+  alternating keyframes
+- Condensation as a vertical linear gradient whose alpha rises toward the bottom
+- Static fog speckle from ninety large low-alpha white radial blobs
+- Lens-shaped drops: soft radial body, rim stroke, rotated elliptical specular and a
+  second opposite sparkle above a size threshold
+- Drop lifecycle: growth to a target radius, stuck-or-running state, speed scaled by
+  weight, side-to-side sine wobble
+- Coalescing by area: merged radius = √(r₁² + r₂²), capped
+- Trailing drop shedding behind running drops, capped at 220 total
+- Wipe trails as decaying, expanding circles that release every drop inside them
+- GlobalCompositeOperation 'source-over' layering with clearRect per frame
+- Live meters (temperature, intensity) recomputed each frame with random walk
+- Density slider that re-seeds the population live
+- Italic serif headline with one warm-amber line against 8.5px tracked monospace
+- Floating glass tray with backdrop-filter blur; extras hidden under 760px
+
+## Intended interaction model
+A tactile, ambient scene. Visitors drag through the water to clear the pane and
+watch it fog back over, and use three sliders plus a wipe button and a rain toggle
+to set how heavy the night is. There is no goal and no state to reach — the pane is
+always somewhere between clear and fogged, and the drops keep finding each other.

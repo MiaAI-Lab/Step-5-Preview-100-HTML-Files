@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Wheel — a pot from one profile</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:#efe9e0;color:#2f2a24;
+  font:15px/1.62 ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+.serif{font-family:ui-serif,Georgia,"Times New Roman",serif}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.wrap{width:min(1100px,92vw);margin:0 auto}
+nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0 14px;
+  border-bottom:1px solid rgba(47,42,36,.2)}
+nav .brand{font-family:ui-serif,Georgia,serif;font-size:19px}
+nav .brand i{font-style:italic;color:#b4552d}
+nav ul{display:flex;gap:26px;list-style:none;margin:0;padding:0;font-size:11px;
+  letter-spacing:.24em;text-transform:uppercase;color:#857a6b}
+nav a{color:inherit;text-decoration:none}nav a:hover{color:#b4552d}
+@media(max-width:780px){nav ul{display:none}}
+header.hero{padding:54px 0 28px;text-align:center}
+header.hero .kicker{font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:#b4552d;
+  margin:0 0 14px}
+header.hero h1{font-family:ui-serif,Georgia,serif;font-weight:400;
+  font-size:clamp(34px,5.8vw,66px);line-height:1.05;margin:0 0 16px}
+header.hero h1 em{font-style:italic;color:#4a6b52}
+header.hero p{max-width:58ch;margin:0 auto;color:#6a5f52}
+.wheel{position:relative;border:1px solid rgba(47,42,36,.22);border-radius:16px;
+  overflow:hidden;background:radial-gradient(90% 80% at 50% 25%,#f6f2ea,#ded5c7 70%,#c9bfae);
+  margin-bottom:18px}
+.wheel canvas{display:block;width:100%;height:auto;touch-action:none;cursor:crosshair}
+.wheel .cap{position:absolute;left:14px;top:12px;font-size:10px;letter-spacing:.26em;
+  text-transform:uppercase;color:rgba(47,42,36,.5);pointer-events:none}
+.dock{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;justify-content:space-between;
+  border-top:1px solid rgba(47,42,36,.2);border-bottom:1px solid rgba(47,42,36,.2);
+  padding:16px 0;margin-bottom:32px}
+.dock label{display:grid;gap:7px;font-size:10px;letter-spacing:.26em;text-transform:uppercase;
+  color:#857a6b;min-width:160px}
+input[type=range]{width:100%;accent-color:#b4552d}
+.btn{background:#2f2a24;color:#f6f2ea;border:0;border-radius:8px;padding:11px 15px;
+  font:inherit;font-size:12px;font-weight:600;letter-spacing:.08em;cursor:pointer;margin:0 6px 6px 0}
+.btn.ghost{background:transparent;color:#2f2a24;border:1px solid rgba(47,42,36,.3)}
+.btn:hover{filter:brightness(1.1)}
+.readout{display:flex;flex-wrap:wrap;gap:12px 28px;margin-bottom:40px;
+  border-top:1px solid rgba(47,42,36,.2);padding-top:16px}
+.readout div{min-width:84px}
+.readout dt{font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:#857a6b;margin:0 0 4px}
+.readout dd{margin:0;font-size:20px;font-family:ui-monospace,Menlo,monospace;color:#b4552d}
+.swatches{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.sw{width:30px;height:30px;border-radius:50%;border:2px solid transparent;cursor:pointer;
+  box-shadow:inset 0 -6px 10px rgba(0,0,0,.25)}
+.sw[aria-pressed="true"]{border-color:#2f2a24;transform:scale(1.12)}
+.cells{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-bottom:46px}
+@media(max-width:820px){.cells{grid-template-columns:1fr}}
+.cell{border-top:1px solid rgba(47,42,36,.25);padding-top:16px}
+.cell .fig{font-family:ui-serif,Georgia,serif;font-size:38px;color:#4a6b52;line-height:1;margin-bottom:8px}
+.cell h3{font-family:ui-serif,Georgia,serif;font-weight:400;font-style:italic;font-size:21px;margin:0 0 8px}
+.cell p{margin:0;color:#6a5f52;font-size:14px}
+footer{border-top:1px solid rgba(47,42,36,.2);padding:22px 0 54px;display:flex;
+  justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:11px;letter-spacing:.2em;
+  text-transform:uppercase;color:#857a6b}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="brand">The <i>Wheel</i></div>
+    <ul>
+      <li><a href="#wheel">Wheel</a></li>
+      <li><a href="#glaze">Glaze</a></li>
+      <li><a href="#notes">Notes</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <p class="kicker">One profile · one revolution</p>
+    <h1 class="serif">A pot is a curve<br>that went <em>around</em></h1>
+    <p>Everything on the left is one line. Throw a vessel by hand and that line is the only
+       decision you make: pull it out, narrow it, and the same rotation gives you a bowl,
+       a bottle or a cylinder.</p>
+  </header>
+
+  <section class="wheel" id="wheel">
+    <canvas id="c" width="760" height="480"></canvas>
+    <p class="cap">drag the profile · the wheel spins to the right</p>
+  </section>
+
+  <section class="dock" id="glaze">
+    <div>
+      <div class="swatches" id="swatches"></div>
+      <label class="slider" for="fire">Firing <input id="fire" type="range" min="0" max="100" value="60"></label>
+    </div>
+    <label for="wall">Wall thickness <input id="wall" type="range" min="1" max="14" value="6"></label>
+    <label for="spin">Spin <input id="spin" type="range" min="0" max="40" value="18"></label>
+    <div>
+      <button class="btn" id="bowl">Bowl</button>
+      <button class="btn ghost" id="bottle">Bottle</button>
+      <button class="btn ghost" id="cylinder">Cylinder</button>
+      <button class="btn ghost" id="collapse">Collapse</button>
+    </div>
+  </section>
+
+  <dl class="readout">
+    <div><dt>Profile points</dt><dd id="rP">—</dd></div>
+    <div><dt>Height</dt><dd id="rH">—</dd></div>
+    <div><dt>Max radius</dt><dd id="rR">—</dd></div>
+    <div><dt>Volume</dt><dd id="rV">—</dd></div>
+    <div><dt>Glaze</dt><dd id="rG">tenmoku</dd></div>
+    <div><dt>Cone</dt><dd id="rC">6</dd></div>
+  </dl>
+
+  <section class="cells">
+    <div class="cell">
+      <div class="fig serif">i</div>
+      <h3>The profile</h3>
+      <p>A pot is stored here as a list of radii at even heights, which is exactly what a
+         turner reads off the wheel. Drag any point and the vessel changes at that height
+         and nowhere else.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">ii</div>
+      <h3>The revolution</h3>
+      <p>The drawing is an ellipsed silhouette with a specular highlight on the left and a
+         shaded falloff to the right, plus a shadowed interior visible inside the mouth. No
+         mesh, no projection — just the projection a pot actually makes.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">iii</div>
+      <h3>Wall</h3>
+      <p>The interior is the profile pulled inward by the wall thickness, so a thick-walled
+         pot has little room and a thin one has a lot. That is the whole relationship
+         between volume and weight.</p>
+    </div>
+  </section>
+
+  <section class="cells" id="notes">
+    <div class="cell">
+      <div class="fig serif">iv</div>
+      <h3>Glaze</h3>
+      <p>Five glazes with real behaviour: tenmoku breaks to brown on the edges, celadon
+         greens in reduction, shino blisters, and a clear glaze that just shows the clay.
+         Firing deepens all of them.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">v</div>
+      <h3>Firing</h3>
+      <p>Cone 06 to cone 10. A low firing leaves a pot porous and bright; a high one makes
+         it dense and dark. The slider moves the whole palette one way.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">vi</div>
+      <h3>Collapse</h3>
+      <p>Go too far and the wall gives: the profile sags, the vessel loses its neck and
+         becomes a puddle. Every potter has done this and every potter has done it by
+         going too far.</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>The Wheel · one canvas, no files</span>
+    <span class="mono">profile · revolution · glaze</span>
+  </footer>
+</div>
+<script>
+(function(){
+"use strict";
+var cv=document.getElementById('c'),ctx=cv.getContext('2d');
+var W=cv.width,H=cv.height;
+var N=22;                    /* profile points */
+var prof=new Float32Array(N);/* radius at each height, 0..1 of max radius */
+var wall=6,spin=18,fire=60,glazeIdx=0,t=0,drag=-1;
+var CLAY='#c98c5e';
+var GLAZES=[
+ {n:'tenmoku',c:'#3a2a20',c2:'#6b4a2e',edge:'#8a5a34'},
+ {n:'celadon',c:'#8fae94',c2:'#5d7f66',edge:'#c3d8c0'},
+ {n:'shino',c:'#e8dcc0',c2:'#c9b48c',edge:'#f2ead6'},
+ {n:'copper red',c:'#a83a2a',c2:'#7a2418',edge:'#d4705a'},
+ {n:'clear',c:'#d8c3a5',c2:'#b4916c',edge:'#e8d8bf'}
+];
+function setProfile(kind){
+  var i;
+  for(i=0;i<N;i++){
+    var u=i/(N-1);
+    if(kind==='bowl')prof[i]=0.20+0.80*Math.pow(u,0.7);
+    else if(kind==='bottle')prof[i]=0.30+0.42*Math.sin(u*Math.PI*0.9)+0.18*u;
+    else if(kind==='cylinder')prof[i]=0.55+0.05*Math.sin(u*3);
+    else prof[i]=0.35+0.35*Math.sin(u*2.4);
+  }
+}
+setProfile('bowl');
+/* the surface colour: the clay under a clear glaze, the glaze otherwise, and the
+   firing darkens everything */
+function parse(c){
+  if(c.charAt(0)==='#'){
+    return [parseInt(c.slice(1,3),16),parseInt(c.slice(3,5),16),parseInt(c.slice(5,7),16)];
+  }
+  var m=c.match(/[\d.]+/g);
+  return m?[+m[0],+m[1],+m[2]]:[0,0,0];
+}
+function mix(a,b,k){
+  var A=parse(a),B=parse(b);
+  return 'rgb('+Math.round(A[0]+(B[0]-A[0])*k)+','+Math.round(A[1]+(B[1]-A[1])*k)+
+    ','+Math.round(A[2]+(B[2]-A[2])*k)+')';
+}
+function bodyColor(){
+  var g=GLAZES[glazeIdx],k=fire/100;
+  var base=glazeIdx===4?mix(CLAY,'#8a6242',k*0.7):mix(g.c,g.c2,k*0.55);
+  return base;
+}
+function draw(){
+  var g=GLAZES[glazeIdx];
+  ctx.clearRect(0,0,W,H);
+  var cx=W*0.5,base=H*0.90,hh=H*0.72,maxR=W*0.30;
+  /* the wheel head */
+  var wg=ctx.createRadialGradient(cx,base+8,10,cx,base+8,W*0.5);
+  wg.addColorStop(0,'rgba(47,42,36,.22)');wg.addColorStop(1,'rgba(47,42,36,0)');
+  ctx.fillStyle=wg;ctx.beginPath();ctx.ellipse(cx,base+10,W*0.46,H*0.10,0,0,6.3);ctx.fill();
+  /* the profile, right side, as a filled silhouette */
+  var i;
+  function py(u){return base-u*hh;}
+  ctx.save();
+  /* shadow under the pot */
+  ctx.fillStyle='rgba(47,42,36,.25)';
+  ctx.beginPath();ctx.ellipse(cx,base+6,prof[N-1]*maxR*1.05,H*0.035,0,0,6.3);ctx.fill();
+  /* the exterior: a horizontal gradient from light on the left to shade on the right */
+  var lg=ctx.createLinearGradient(cx-maxR,0,cx+maxR,0);
+  var col=bodyColor();
+  lg.addColorStop(0,mix(g.edge,'#ffffff',0.35));
+  lg.addColorStop(0.28,col);
+  lg.addColorStop(0.62,mix(col,'#000000',0.18));
+  lg.addColorStop(1,mix(col,'#000000',0.45));
+  ctx.fillStyle=lg;
+  ctx.beginPath();
+  for(i=0;i<N;i++){var u=i/(N-1);
+    ctx.lineTo(cx+prof[i]*maxR,py(u));}
+  for(i=N-1;i>=0;i--){var u2=i/(N-1);
+    ctx.lineTo(cx-prof[i]*maxR,py(u2));}
+  ctx.closePath();ctx.fill();
+  /* the mouth: an ellipse, with the interior visible inside it */
+  var mr=prof[0]*maxR, my=py(0);
+  ctx.beginPath();ctx.ellipse(cx,my,mr,mr*0.30,0,0,6.3);
+  ctx.fillStyle=mix(bodyColor(),'#000000',0.55);ctx.fill();
+  ctx.strokeStyle=mix(g.edge,'#000000',0.25);ctx.lineWidth=1.4;ctx.stroke();
+  /* the interior, drawn as the profile pulled in by the wall thickness */
+  ctx.beginPath();
+  for(i=0;i<N;i++){var u3=i/(N-1);
+    var r=Math.max(0,prof[i]*maxR-wall);
+    ctx.lineTo(cx+r,py(u3)+ (i===0?mr*0.30:0));}
+  for(i=N-1;i>=0;i--){var u4=i/(N-1);
+    var r2=Math.max(0,prof[i]*maxR-wall);
+    ctx.lineTo(cx-r2,py(u4)+ (i===0?mr*0.30:0));}
+  ctx.closePath();
+  var ig=ctx.createLinearGradient(cx-mr,0,cx+mr,0);
+  ig.addColorStop(0,mix(col,'#ffffff',0.18));
+  ig.addColorStop(1,mix(col,'#000000',0.6));
+  ctx.fillStyle=ig;ctx.fill();
+  /* a throwing ring or two, like finger marks left on the wall */
+  ctx.strokeStyle='rgba(255,255,255,.10)';ctx.lineWidth=1.2;
+  for(var r3=1;r3<=2;r3++){
+    var ry=py(r3*0.28);
+    ctx.beginPath();ctx.ellipse(cx,ry,prof[Math.floor((N-1)*r3*0.28)]*maxR,
+      prof[Math.floor((N-1)*r3*0.28)]*maxR*0.06,0,Math.PI,0);ctx.stroke();
+  }
+  ctx.restore();
+  /* the profile line itself, draggable */
+  ctx.strokeStyle='rgba(47,42,36,.75)';ctx.lineWidth=1.6;
+  ctx.beginPath();
+  for(i=0;i<N;i++){var u5=i/(N-1);
+    var X=cx+prof[i]*maxR,Y=py(u5);
+    if(i===0)ctx.moveTo(X,Y);else ctx.lineTo(X,Y);}
+  ctx.stroke();
+  for(i=0;i<N;i++){
+    var u6=i/(N-1),hx=cx+prof[i]*maxR,hy=py(u6);
+    ctx.beginPath();ctx.arc(hx,hy,drag===i?5:3.2,0,6.3);
+    ctx.fillStyle=drag===i?'#b4552d':'rgba(47,42,36,.8)';ctx.fill();
+  }
+  /* the spinning wheel: motion marks either side */
+  if(spin>0){
+    ctx.strokeStyle='rgba(47,42,36,'+(0.05+spin/220)+')';ctx.lineWidth=2;
+    for(var s=0;s<3;s++){
+      var a=t*(spin/18)*(1+s*0.3);
+      ctx.beginPath();
+      ctx.arc(cx,base+10,maxR*(1.1+s*0.35),0.3+a*0.5,1.9+a*0.5);
+      ctx.stroke();
+    }
+  }
+}
+/* ---------- dragging the profile ---------- */
+function at(ev){
+  var r=cv.getBoundingClientRect();
+  var cx=W*0.5,base=H*0.90,hh=H*0.72,maxR=W*0.30;
+  var x=(ev.clientX-r.left)*(W/r.width),y=(ev.clientY-r.top)*(H/r.height);
+  var u=(base-y)/hh;
+  var i=Math.round(u*(N-1));
+  if(i<0||i>N-1)return -1;
+  return i;
+}
+cv.addEventListener('pointerdown',function(ev){
+  drag=at(ev);if(drag>=0){cv.setPointerCapture(ev.pointerId);move(ev);}
+});
+cv.addEventListener('pointermove',function(ev){if(drag>=0)move(ev);});
+function move(ev){
+  if(drag<0)return;
+  var r=cv.getBoundingClientRect();
+  var cx=W*0.5,maxR=W*0.30;
+  var x=(ev.clientX-r.left)*(W/r.width);
+  var v=Math.max(0.04,Math.min(1,(x-cx)/maxR));
+  prof[drag]=v;
+  readout();
+}
+function end(){drag=-1;}
+cv.addEventListener('pointerup',end);
+cv.addEventListener('pointercancel',end);
+
+/* ---------- glaze swatches, controls, readout ---------- */
+var sw=document.getElementById('swatches');
+GLAZES.forEach(function(g,i){
+  var b=document.createElement('button');
+  b.className='sw';b.title=g.n;
+  b.style.background='radial-gradient(circle at 35% 30%,'+g.edge+','+g.c+' 60%,'+g.c2+')';
+  b.setAttribute('aria-pressed',String(i===0));
+  b.addEventListener('click',function(){
+    glazeIdx=i;
+    [].slice.call(sw.children).forEach(function(o){
+      o.setAttribute('aria-pressed',String(o===b));});
+    document.getElementById('rG').textContent=g.n;
+  });
+  sw.appendChild(b);
+});
+function bind(id,fn){var el=document.getElementById(id);
+  el.addEventListener('input',function(){fn(+el.value);});}
+bind('fire',function(v){
+  fire=v;
+  document.getElementById('rC').textContent=(v>85?'10':v>65?'9':v>45?'7':v>25?'04':'06');
+});
+bind('wall',function(v){wall=v;});
+bind('spin',function(v){spin=v;});
+document.getElementById('bowl').addEventListener('click',function(){setProfile('bowl');readout();});
+document.getElementById('bottle').addEventListener('click',function(){setProfile('bottle');readout();});
+document.getElementById('cylinder').addEventListener('click',function(){setProfile('cylinder');readout();});
+document.getElementById('collapse').addEventListener('click',function(){
+  /* the wall gives: every point sags toward the same radius and the pot becomes a puddle */
+  for(var i=0;i<N;i++)prof[i]=prof[i]*0.4+0.30;
+  readout();
+});
+function readout(){
+  document.getElementById('rP').textContent=N;
+  var hh=H*0.72;
+  document.getElementById('rH').textContent=Math.round(hh)+' mm';
+  var maxR=W*0.30,mx=0;
+  for(var i=0;i<N;i++)if(prof[i]>mx)mx=prof[i];
+  document.getElementById('rR').textContent=Math.round(mx*maxR)+' mm';
+  /* volume by discs, using the interior radius */
+  var v=0,maxR2=W*0.30;
+  for(var k=1;k<N;k++){
+    var r0=Math.max(0,prof[k-1]*maxR2-wall),r1=Math.max(0,prof[k]*maxR2-wall);
+    v+=Math.PI*(r0*r0+r0*r1+r1*r1)/3*(hh/(N-1));
+  }
+  document.getElementById('rV').textContent=Math.round(v/1000)+' cl';
+}
+/* ---------- loop ---------- */
+var last=0;
+function loop(ts){
+  var dt=last?Math.min(.05,(ts-last)/1000):0;last=ts;
+  t+=dt*(spin>0?1:0.15);
+  draw();requestAnimationFrame(loop);
+}
+readout();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

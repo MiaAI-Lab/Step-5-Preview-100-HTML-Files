@@ -1,0 +1,82 @@
+# STORM LIGHT — a coast that has to be watched
+
+## Short title
+Lighthouse Storm
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a lighthouse in bad weather,
+where a single rotating beam is the only thing that finds anything, and where the weather
+sliders decide whether it finds anything at all. No external dependencies whatsoever — no
+CDN, no web fonts, no external images, no JS libraries. All CSS and JavaScript inline,
+works offline by double-clicking, responsive, valid HTML5.
+
+Artistic direction: a night coast. Ground #050a14, canvas #04060e, hairlines
+rgba(232,240,251,.14), body #e8f0fb with muted #93a4bd, lamp-amber #ffd479 as the accent
+and a cold cyan #7fd4ff for readouts. Serif headings with italic accent words, uppercase
+.2em–.4em kickers, monospace figures.
+
+The scene is one canvas at 980 × 540. The sea is three layers of summed sines whose
+amplitude and speed rise with the swell slider, each layer darker than the one behind, with
+foam marks drawn only on the crests of the front layer. A tapered tower with two red bands
+sits on a rock outcrop, with a lantern room and a lamp that glows from a radial gradient.
+
+The beam is a wedge from the lamp, drawn by translating to the lamp and rotating by the
+beam angle, with a linear gradient that fades out along its length. It makes one revolution
+every ten seconds, and the light's character is three flashes per revolution. Press Signal
+SOS and the beam is gated by a real Morse timing — dot units of one, dashes of three, the
+gaps between them — so the wedge itself blinks ··· ——— ··· on the sea.
+
+The boat is the point of the whole picture. It is drawn dark, and it only becomes visible
+when the beam's angle agrees with its bearing from the lamp within three degrees, at which
+moment a soft spotlight appears around it. Rain is a set of streaks blown sideways by the
+wind, and sprayed foam speckles the crests. Steam the glass lays a condensation wash and a
+set of blurred blobs over the whole scene and halves the reported visibility.
+
+Controls: wind, rain, swell, Signal SOS and Steam the glass. Readout: wind in knots, sea
+state by name with wave height, visibility in kilometres derived from the rain and the
+steam, the beam's character, the signal state and the current bearing in degrees from
+north.
+
+Layout: nav, centred hero, the scene with a live signal overlay, a dock of three sliders
+and two buttons, a readout row, then two three-cell note rows on character, sea state,
+visibility, steam, bearing and storm, then a footer.
+
+Interaction: the beam turns from the moment the page opens and the boat is found and lost
+every ten seconds. Visitors set the swell to build or flatten the sea, blow the rain
+sideways, signal SOS to watch the light spell, and steam the glass to lose half the
+visibility and see how little that leaves.
+
+## One-paragraph description of the intended design
+A night coast on canvas where three sine layers of sea, a tapered tower with two red bands
+and a single rotating beam that makes one revolution every ten seconds with a three-flash
+character — gated into real Morse timing when SOS is signalled — reveal a boat only in the
+three degrees where the beam's angle agrees with the boat's bearing, with wind blowing the
+rain sideways, swell setting the sea state and height, and steamed glass halving the
+visibility and washing the scene.
+
+## Major visual techniques used
+- Sea as three layers of summed sines with per-layer amplitude, speed and wavenumber, so
+  the swell slider changes depth as well as size
+- Foam drawn only where the crest exceeds a threshold, which is what crest foam is
+- Beam as a radial wedge by translating to the lamp and rotating, with a gradient along
+  its length rather than a solid colour
+- Beam visibility gated by a Morse timing sequence built from dot and dash units with
+  gaps, so the light itself spells
+- Boat visibility from the angle between the beam and the boat's bearing, so the reveal is
+  geometric rather than scripted
+- Lamp glow and boat spotlight as radial gradients, so nothing needs a filter
+- Rain as streaks whose slant is the wind and whose speed is the drop's own, recycled at
+  the bottom
+- Spray as speckle on the crests, positioned from the same wave function
+- Steamed glass as a translucent wash plus blurred radial blobs, halving the reported
+  visibility rather than only decorating
+- Bearing read every eighth frame from the same beam angle the drawing uses
+- Sea state named from the swell and paired with a wave height derived from it
+- Reduced-motion honoured by starting the weather calm rather than by stopping the light
+
+## Intended interaction model
+A coast to watch. The beam is already turning and the boat is already being found and
+lost; visitors build the sea, blow the rain sideways, make the light spell SOS, and steam
+the glass to see how much of the view that costs. Nothing here is aimed or scripted — the
+beam reveals what it happens to cross, exactly as a real one does.

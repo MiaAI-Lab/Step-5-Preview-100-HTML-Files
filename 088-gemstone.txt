@@ -1,0 +1,79 @@
+# LAPIDARY — a stone, a cut, a refractive index
+
+## Short title
+Gemstone Cutter
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a gemstone on a bench, cut and
+lit by one moving point of light, where rays refract by Snell's law, past the critical
+angle they reflect back in, and dispersion splits their colour. No external dependencies
+whatsoever — no CDN, no web fonts, no external images, no JS libraries. All CSS and
+JavaScript inline, works offline by double-clicking, responsive, valid HTML5.
+
+Artistic direction: a dark room with one bulb. Ground #0c0a14, canvas #07050e, hairlines
+rgba(239,234,249,.14), body #efeaf9 with muted #9d95b8, ice blue #9fd8ff as the accent and
+lilac #e8b8ff for the primary action. Serif headings with italic accent words, uppercase
+.2em–.4em kickers, monospace figures.
+
+The stone is drawn as facets: sixteen crown trapezoids from the girdle to the table and
+sixteen pavilion triangles down to the culet, each brightened by how much its midpoint
+faces the light. The table size slider scales the crown's inner ring, and the pavilion
+slider moves the culet down and the pavilion's angle with it.
+
+The light is a single point on an orbit, and from it ten rays are walked. Each step
+refracts on entering by Snell's law, and on leaving it either escapes — in which case the
+exit angle determines its colour through dispersion — or reflects back in past the critical
+angle, which is computed as arcsine of one over the species' index. So the rays genuinely
+stay inside a well-cut diamond and leak out of a shallow one, and the colours are a
+consequence of the geometry rather than a palette.
+
+Eight species with their real refractive index, dispersion and typical yield: diamond,
+ruby, sapphire, emerald, zircon, moissanite, spinel and garnet. Six cut shapes. Controls:
+six cuts, eight species, pavilion angle, table, light angle, Turn the stone and Show the
+fire. Readout: index, critical angle, brilliance, fire, yield and species.
+
+Layout: nav, centred hero, the stone canvas with a live spec overlay, a dock of two chip
+rows, three sliders and two buttons, a readout row, then two three-cell note rows on total
+internal reflection, dispersion, yield, the pavilion, the table and fire, then a footer.
+
+Interaction: pick a species and its index and critical angle change, so the rays behave
+differently immediately. Drag the pavilion angle and watch the light stop leaking out the
+back and start leaking out the side past the window; drag the light around; turn the stone
+to see the facets come and go; and show the fire to see every ray leave in the colour its
+own dispersion gives it.
+
+## One-paragraph description of the intended design
+A gemstone on canvas drawn as sixteen crown and sixteen pavilion facets brightened by their
+facing toward a single orbiting point of light, from which ten rays are walked step by step
+— refracting by Snell's law on entry, and on exit either escaping with a colour set by the
+dispersion or reflecting back in past a critical angle of arcsine one over the species'
+index — with eight species at their real refractive indices, six cut shapes, pavilion angle
+and table sliders, and the fire mode that draws each ray in the colour its own dispersion
+produces.
+
+## Major visual techniques used
+- Facets as sixteen crown trapezoids and sixteen pavilion triangles, each brightened by
+  the cosine between its midpoint and the light direction
+- Table size scaling the crown's inner ring, so the crown visibly re-forms
+- Pavilion angle moving the culet down the axis by (48 − pavilion), so the cut is a
+  parameter and not a picture
+- Rays traced stepwise, refracting by Snell's law at each interface
+- Critical angle computed as arcsine of one over the index, and past it the ray reflects
+  instead of escaping, which is why a well-cut stone keeps its light
+- Dispersion colour from the exit angle's deviation, with red bent least and violet most
+- Brilliance as a window around the ideal pavilion angle for the species, so the readout
+  is a real measurement of the cut
+- Critical angle and index printed as a live spec overlay from the same numbers the rays
+  use
+- Girdle outline as a closed path of the cut's own proportions, so each cut shape is a
+  different outline
+- Light as a radial gradient glow at the end of an orbit set by the angle slider
+- Stroked stone body as a gradient through the species' own hue
+
+## Intended interaction model
+A stone to cut and to light. Visitors pick a species and the physics changes, drag the
+pavilion angle and watch the light stop leaking out the back and start leaking out the side,
+widen or narrow the table, move the light around the stone, turn the stone to see the facets
+come and go, and show the fire to see each ray leave in the colour its own dispersion gives
+it. Nothing on screen is a preset: the rays are traced and the colours are computed.

@@ -1,0 +1,100 @@
+# SPECTRA — A Generative Audio Instrument
+
+## Short title
+Spectrum Visualizer
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a generative audio
+instrument and live spectrum visualiser called SPECTRA. No external dependencies
+whatsoever — no CDN, no web fonts, no external images, no external SVG files, no
+JavaScript libraries. All CSS and JavaScript inline, works offline by
+double-clicking, responsive, valid HTML5. No audio files are used either: every
+sound is synthesised in the page with the Web Audio API.
+
+Audio engine: OscillatorNodes only. On start, the page builds a graph — master
+gain → global lowpass biquad (Q=5) → a DynamicsCompressorNode → an AnalyserNode →
+destination — with a 0.07 Hz LFO modulating the filter frequency by 45% of the
+cutoff so the whole piece continuously opens and closes. A "wash" is generated at
+runtime by filling a two-channel 2.2-second impulse buffer with decaying noise,
+feeding it to a ConvolverNode, and returning it through a wet gain that floats at
+half the preset's drift value. Four "figures" are defined, each with its own root
+frequency, pentatonic/minor scale, four-chord progression, filter cutoff and
+drift level: Threnody (D2), Cinder (C#2), Aqua (G3) and Procession (F2).
+
+The sequencer runs on ctx.currentTime, scheduling sixteenth notes: a sawtooth bass
+on beats 1 and 11, a triangle/sine pad chord at the top of each bar with the chord
+root doubled an octave up, a sine arpeggio stepping through the scale every other
+sixteenth, and percussion built from code — a pitch-swept sine kick, a high-passed
+noise burst snare, and a shorter brighter high hat. Tempo eases toward the slider
+value so changes are never abrupt.
+
+Visuals: one full-viewport canvas, cleared to transparent over a CSS radial-glow
+field that drifts and scales. From the analyser's frequency data it draws (a) a
+96-spoke spectrum ring around the centre with round-capped radial strokes that
+alternate between the palette's two colours and lengthen with amplitude, (b) a
+mirrored inner ring of short backwards spokes, (c) a 1.3px waveform across the
+middle of the screen, (d) 26 orbiting dots on elliptical paths whose speed and
+size swell with the bass energy, and (e) a soft radial pulse at the centre whose
+radius tracks the frequency bin at 10. The palette swaps per figure: pink/violet,
+orange/red, teal/blue and amber/pink.
+
+Layout: a fixed UI overlay with pointer-events passing through except on controls.
+Top-left is the brand line in 10px tracked monospace above a 200-weight sans
+headline with one word carrying a three-stop gradient clipped to the text, and a
+short explanatory paragraph. Top-right is a monospace meter stack showing root
+note, tempo and a live peak readout. Bottom is a glass tray (backdrop-filter blur)
+holding three custom-styled range sliders — Bpm (60–170), Cut (120–7000 Hz) and
+Drift (0–100) — plus Pause and "Next figure" buttons, and beside it a row of four
+preset pills. Everything is behind a full-screen start gate featuring a double
+counter-rotating dashed ring (required because browsers block audio until a user
+gesture).
+
+Colour palette: near-black violet #08060f ground, pink #ff4d8d, violet #7b5bff,
+teal #3ee0d0, amber #ffc857 on off-white #f2ecff.
+
+Interaction: click "Start the signal" to build the audio graph and fade the master
+gain in over 1.2 seconds; the gate then fades and hides itself. Pause/Play fades
+the master down and up and rewrites its own label. "Next figure" and the four
+preset pills advance the sequencer to a different figure, swapping the visual
+palette, the cutoff and the drift, and re-highlighting the pill in that figure's
+colour. The three sliders retune the running synthesis in real time, and moving the
+pointer horizontally modulates the filter's Q between −4 and +12, so the sound
+literally reacts to where you are on the screen. On narrow screens the paragraph
+and the meters hide and the tray wraps.
+
+## One-paragraph description of the intended design
+A browser-native instrument: four generative pieces built from nothing but
+oscillators, noise buffers and filters, surrounded by a ring spectrum, a mirrored
+inner ring, a centre waveform, bass-driven orbiting dots and a pulsing core that
+all read from the same analyser — pink, violet, teal and amber, behind glass
+controls that retune the synthesis as you drag them.
+
+## Major visual techniques used
+- Web Audio graph built from scratch: OscillatorNodes, a global lowpass biquad
+  modulated by a 0.07 Hz LFO, a DynamicsCompressorNode, a ConvolverNode fed by a
+  runtime-generated decaying-noise impulse response, and an AnalyserNode
+- Sixteenth-note sequencer scheduled against ctx.currentTime with a sawtooth bass,
+  triangle/sine pad, sine arpeggio and three synthesised drum voices
+- Tempo that eases toward the slider value rather than snapping
+- 96-spoke radial spectrum ring with round caps, alternating palette colours and
+  per-spoke alpha from amplitude
+- Mirrored inner ring of backwards spokes using negative angular steps
+- Oscilloscope waveform drawn as a 4px-stepped polyline across the viewport
+- Bass-reactive orbiting dot field on elliptical paths
+- Radial centre pulse whose radius tracks a specific frequency bin
+- Multi-palette system swapped per preset, also driving the UI highlight colours
+- Drifting, scaling CSS radial-gradient background behind a transparent canvas
+- Custom-styled range inputs with webkit and moz pseudo-elements
+- Start gate with a double counter-rotating dashed ring, required for audio
+  autoplay policy, that fades via opacity and visibility
+- 200-weight display type with a three-stop gradient-clipped word against 8.5px
+  tracked monospace labels
+
+## Intended interaction model
+An instrument. The visitor presses start to let the generators begin, then listens
+and watches; hovering the screen bends the filter resonance, and the four preset
+pills (or "Next figure") move the piece between Threnody, Cinder, Aqua and
+Procession, swapping both the sound and the colour world. The tempo, cutoff and
+drift sliders retune the running synthesis live, and Pause stops the sequencer
+without killing the visual, which keeps reading the analyser's decaying tail.

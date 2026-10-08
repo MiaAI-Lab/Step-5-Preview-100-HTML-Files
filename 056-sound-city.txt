@@ -1,0 +1,84 @@
+# SOUND CITY — a town you can hear
+
+## Short title
+Sound City
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a musical city on a grid,
+where buildings are instruments and a playhead walking left to right decides when
+each one sounds. No external dependencies whatsoever — no CDN, no web fonts, no
+external images, no JS libraries. All CSS and JavaScript inline, works offline by
+double-clicking, responsive, valid HTML5.
+
+Artistic direction: a night town. Panel #12151f on ground #0e1017, hairlines at
+rgba(220,230,255,.11), body text #dfe4f5 with muted #9aa4c8. Two accents, amber
+#ffd166 for the playhead and spires and sky cyan #7fd4ff for readouts and parks, and
+a rose #ff8fa3 for works. Serif headings, monospace figures, small-caps uppercase
+eyebrows at .2em–.42em tracking.
+
+The grid is 20 columns by 12 rows on canvas, sized to the container width with DPR
+scaling and centred with computed offsets. Lots are drawn as dark panels with a
+2.5px-coloured outline, a 4×4 field of lit windows whose on/off pattern is derived
+deterministically from the lot coordinates, and a cross-hatch for spires. Parks are
+a translucent cyan wash with four drifting dots. The playhead is a horizontal amber
+gradient band with a 2px leading edge; behind it sits the whole grid stroked at 7%
+alpha.
+
+Build menu: house (marimba, high), spire (bell, long), works (bass drum, low),
+park (chime, drift), and bulldoze. Every instrument is synthesised with the Web Audio
+API: houses are triangle waves on a pentatonic scale chosen by lot coordinate,
+spires are two sine partials an octave apart with a two-second decay, works are
+filtered noise with a fast lowpass sweep, parks are short detuned triangle chimes.
+Play/Stop, a tempo slider from 60 to 180, and a Town button that lays out a preset
+plan. The readout counts blocks, houses, spires, works, parks and the current bar.
+
+Layout: nav with serif brand and three links, centred hero with amber eyebrow and an
+italic cyan word in the headline, the bench as a two-column grid of menu and canvas,
+then two three-cell rows of instruments and notes with large cyan serif figures, then
+a footer with the grid size in mono. One column under 900px with the menu border moved
+to the bottom; the menu links drop out under 760px.
+
+Interaction: pick a tool, then press and drag on the grid to paint lots of that type;
+drag with the right button or choose bulldoze to clear. Pressing Play resumes the
+AudioContext (which browsers hold closed until a gesture asks for it) and starts a
+sixteenth-note scheduler with a lookahead guard so the playhead cannot run away when
+a tab is backgrounded. A preset Town button fills the grid so there is something to
+hear immediately, and the readout tally updates as you build.
+
+## One-paragraph description of the intended design
+A night town on a 20-by-12 grid where every lot you lay down is an instrument — houses
+sound as marimba, spires as bells, works as a bass drum, parks as chimes — and an
+amber playhead sweeping left to right plays whatever column it crosses, so the layout
+you draw is literally the arrangement you hear, with a live count of what you have
+built and a tempo slider that moves the whole thing.
+
+## Major visual techniques used
+- Canvas grid sized from the container width with DPR scaling and computed offsets,
+  so the grid stays aligned at every viewport
+- Lots as dark panels with a 2.5px coloured outline and a 4×4 field of lit windows
+  whose pattern is derived deterministically from the lot coordinates
+- Spires crossed with a thin amber hatch, parks as a translucent wash with drifting
+  dots animated off a shared clock
+- Playhead as a horizontal amber gradient band with a 2px leading edge, plus the
+  full grid stroked behind at 7% alpha
+- Web Audio synthesis with no samples: triangle-wave marimba, two-partial sine bell,
+  noise buffer with a swept lowpass, and a detuned triangle chime
+- Pentatonic pitch selection from lot coordinates so neighbouring houses harmonise
+- Sixteenth-note scheduler with a lookahead guard that caps catch-up steps
+- AudioContext created and resumed only inside the Play click, which is what keeps
+  a browser from refusing to start
+- Tool menu using aria-pressed for its selected state rather than a class toggle
+- Pointer capture plus last-cell tracking so a drag paints lots without repeats
+  and keeps working when the pointer leaves the canvas
+- Right-click bulldozing that prevents the context menu instead of being a
+  separate tool
+- Two-column bench collapsing to one column under 900px, menu border moved to the
+  bottom, menu links hidden under 760px
+
+## Intended interaction model
+A toy you play by ear. Visitors choose a building from the menu, drag across the
+grid to lay out a town, press Play and listen to the columns as the playhead crosses
+them, drag the tempo to change the feel, and bulldoze or right-click to clear lots
+that do not sound right. The preset Town button is there so the first press of Play
+always has something to say.

@@ -1,0 +1,85 @@
+# INKBLOOM — A Studio for Wet Ink
+
+## Short title
+Liquid Ink Bloom Studio
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: an interactive
+generative "wet ink" studio on warm paper called INKBLOOM. No external anything —
+no CDN, no web fonts, no external images, no external SVG files, no JavaScript
+libraries. All CSS and JavaScript inline, opens offline by double-click, responsive,
+valid HTML5.
+
+Artistic direction: sumi-e / watercolour studio. The background is warm
+hand-made paper: a stack of soft radial gradients in cream and sand, overlaid with
+a very fine paper-fibre texture generated from an inline SVG feTurbulence data-URI
+set to multiply blend. All ink is drawn on a transparent canvas above that paper
+using multiply blending so pigments darken each other the way real washes do.
+
+The generative engine: each "bloom" is an organism, not a stamped image. Its
+outline is a closed 46-segment curve whose radius is multiplied by a cheap
+analytic noise — three sine lobes at different frequencies and phases — so the
+edge is irregular and organic, and the phase drifts slowly over time so the blot
+appears to keep swelling and crawling. Each bloom is drawn as three concentric
+noisy blobs filled with radial gradients (a wide pale wash, a mid tone, a denser
+inner ring), plus a saturated dark heart, plus two to four satellite droplets that
+drift outward on their own angles. Blooms grow from their initial radius toward a
+random maximum, then fade out after a couple of seconds. Clicking drops one;
+dragging lays a trail of them spaced by distance; the "Auto" switch grows them by
+itself at random positions.
+
+Controls: five pigment swatches (sumi black, indigo, sanguine, viridian, ochre),
+three sliders (Flow = drop size, Bleed = edge noise amplitude, Speed = growth),
+and three buttons — Auto toggle, "New sheet" to clear, and "Keep" which composites
+the canvas over a paper gradient into an offscreen canvas and downloads it as a
+PNG (fully offline, no server).
+
+Typography: an italic serif for the studio title ("Wet ink, left alone."), a system
+sans for the body note, and a 9px wide-tracked monospace for every control label —
+like the labels inked on a real studio tray. A small rotated red-seal-style box
+with the character 墨 sits in the corner as a chop mark.
+
+Layout: full-bleed canvas with a floating glass control bar pinned to the bottom
+centre, a fixed text block top-left that steps aside (its paragraph hides) on
+narrow screens, and the seal top-right. Nothing scrolls; the whole page is the
+paper.
+
+Interaction: pointer down drops a bloom and starts painting; pointer move adds
+blooms along the drag path; pointer up ends it. Touch works because touch-action
+is none and pointer events are used throughout. The palette, sliders and buttons
+update live variables used by the very next bloom. Respect prefers-reduced-motion.
+
+## One-paragraph description of the intended design
+A calm generative studio where pigment behaves like pigment: five warm inks are
+dropped onto textured paper as living organisms with noise-warped, slowly
+swelling outlines, layered multiply washes, drifting satellite droplets and a dark
+saturated heart — all grown on canvas in real time and paintable with a finger or
+a mouse, with a floating glass tray of controls and a "Keep" button that prints
+the sheet to a PNG.
+
+## Major visual techniques used
+- Canvas generative art: 46-segment noise-warped closed curves built from three
+  summed sine lobes with drifting phase
+- Layered radial-gradient fills at three radii plus a saturated core, drawn with
+  globalCompositeOperation = 'multiply' so washes darken realistically
+- Drifting satellite droplets on independent angles and radii
+- Growth-and-decay lifecycle per organism with distance-spaced drag painting
+- Warm paper built from stacked radial gradients plus an inline SVG
+  feTurbulence data-URI fibre texture in multiply blend
+- Floating glass control tray with backdrop-filter blur and saturate
+- Custom-styled range inputs (webkit + moz pseudo-elements) and circular pigment
+  swatches with ring focus states
+- Offscreen canvas compositing and PNG export via toDataURL + a synthetic anchor
+  click — no server, no library
+- Italic serif display type against 9px wide-tracked monospace control labels
+- Rotated "chop" mark with a double inset border as a decorative seal
+- Non-scrolling fixed layout with the description paragraph dropping away under
+  720px; prefers-reduced-motion honoured
+
+## Intended interaction model
+A paint toy with a gallery sensibility. Visitors click or drag to lay wet ink,
+choose a pigment, tune how far it bleeds and how fast it grows, and either let the
+Auto switch compose for them or clear the sheet and start again. "Keep" exports
+the composition as a PNG so a good one can be kept. There is no scroll and no
+other navigation — the page is a single sheet of paper.

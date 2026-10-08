@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bloom — a flower that opens petal by petal</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:#f7f1ee;color:#33272a;
+  font:15px/1.62 ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+.serif{font-family:ui-serif,Georgia,"Times New Roman",serif}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.wrap{width:min(1120px,92vw);margin:0 auto}
+nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0 14px;
+  border-bottom:1px solid rgba(51,39,42,.18)}
+nav .brand{font-family:ui-serif,Georgia,serif;font-size:19px}
+nav .brand i{font-style:italic;color:#c4596b}
+nav ul{display:flex;gap:26px;list-style:none;margin:0;padding:0;font-size:11px;
+  letter-spacing:.24em;text-transform:uppercase;color:#8d7a7c}
+nav a{color:inherit;text-decoration:none}nav a:hover{color:#c4596b}
+@media(max-width:780px){nav ul{display:none}}
+header.hero{padding:56px 0 30px;text-align:center}
+header.hero .kicker{font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:#c4596b;
+  margin:0 0 14px}
+header.hero h1{font-family:ui-serif,Georgia,serif;font-weight:400;
+  font-size:clamp(34px,5.8vw,66px);line-height:1.04;margin:0 0 18px}
+header.hero h1 em{font-style:italic;color:#4d7a54}
+header.hero p{max-width:58ch;margin:0 auto;color:#6d5c60}
+.bloom{position:relative;border:1px solid rgba(51,39,42,.18);border-radius:18px;
+  overflow:hidden;background:radial-gradient(80% 80% at 50% 92%,#eef0e2,#dfe4d2 60%,#c9d2c0);
+  margin-bottom:18px}
+.bloom canvas{display:block;width:100%;height:auto}
+.bloom .cap{position:absolute;left:14px;top:12px;font-size:10px;letter-spacing:.26em;
+  text-transform:uppercase;color:rgba(51,39,42,.45);pointer-events:none}
+.dock{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;justify-content:space-between;
+  border-top:1px solid rgba(51,39,42,.18);border-bottom:1px solid rgba(51,39,42,.18);
+  padding:16px 0;margin-bottom:32px}
+.dock label{display:grid;gap:7px;font-size:10px;letter-spacing:.26em;text-transform:uppercase;
+  color:#8d7a7c;min-width:150px}
+input[type=range]{width:100%;accent-color:#c4596b}
+.btn{background:#c4596b;color:#fff4f4;border:0;border-radius:8px;padding:11px 15px;
+  font:inherit;font-size:12px;font-weight:700;letter-spacing:.08em;cursor:pointer;margin:0 6px 6px 0}
+.btn.ghost{background:transparent;color:#33272a;border:1px solid rgba(51,39,42,.28)}
+.btn:hover{filter:brightness(1.07)}
+.cols{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.cols button{width:30px;height:30px;border-radius:50%;border:2px solid transparent;cursor:pointer}
+.cols button[aria-pressed="true"]{border-color:#33272a;transform:scale(1.12)}
+.readout{display:flex;flex-wrap:wrap;gap:12px 26px;margin-bottom:40px;
+  border-top:1px solid rgba(51,39,42,.18);padding-top:16px}
+.readout div{min-width:84px}
+.readout dt{font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:#8d7a7c;margin:0 0 4px}
+.readout dd{margin:0;font-size:20px;font-family:ui-monospace,Menlo,monospace;color:#4d7a54}
+.cells{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-bottom:46px}
+@media(max-width:820px){.cells{grid-template-columns:1fr}}
+.cell{border-top:1px solid rgba(51,39,42,.2);padding-top:16px}
+.cell .fig{font-family:ui-serif,Georgia,serif;font-size:38px;color:#4d7a54;line-height:1;margin-bottom:8px}
+.cell h3{font-family:ui-serif,Georgia,serif;font-weight:400;font-style:italic;font-size:21px;margin:0 0 8px}
+.cell p{margin:0;color:#6d5c60;font-size:14px}
+footer{border-top:1px solid rgba(51,39,42,.18);padding:22px 0 54px;display:flex;
+  justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:11px;letter-spacing:.2em;
+  text-transform:uppercase;color:#8d7a7c}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="brand">Bloom <i>Order</i></div>
+    <ul>
+      <li><a href="#bloom">Bloom</a></li>
+      <li><a href="#dock">Petals</a></li>
+      <li><a href="#notes">Notes</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <p class="kicker">Phyllotaxis · 137.5 degrees</p>
+    <h1 class="serif">Every flower is one<br><em>rotation</em> repeated</h1>
+    <p>A bud is a stack of primordia and each one sits a fixed angle from the last. Set the
+       angle to the golden one and the stack opens into a head with no gaps and no overlaps;
+       set it to anything else and the pattern breaks up.</p>
+  </header>
+
+  <section class="bloom" id="bloom">
+    <canvas id="c" width="1000" height="620"></canvas>
+    <p class="cap">head · stem · two leaves · the same rotation repeated</p>
+  </section>
+
+  <section class="dock" id="dock">
+    <div>
+      <div class="cols" id="cols"></div>
+      <div class="cols" id="species"></div>
+    </div>
+    <label for="angle">Divergence <input id="angle" type="range" min="90" max="190" value="137"></label>
+    <label for="size">Petal size <input id="size" type="range" min="20" max="140" value="62"></label>
+    <label for="open">Open <input id="open" type="range" min="0" max="100" value="70"></label>
+    <div>
+      <button class="btn" id="grow">Grow it</button>
+      <button class="btn ghost" id="reset">Back to a bud</button>
+    </div>
+  </section>
+
+  <dl class="readout">
+    <div><dt>Primordia</dt><dd id="rP">0</dd></div>
+    <div><dt>Whorls</dt><dd id="rW">—</dd></div>
+    <div><dt>Coverage</dt><dd id="rC">—</dd></div>
+    <div><dt>Angle</dt><dd id="rA">137.5°</dd></div>
+    <div><dt>Head</dt><dd id="rH">—</dd></div>
+    <div><dt>Stem</dt><dd id="rG">—</dd></div>
+  </dl>
+
+  <section class="cells">
+    <div class="cell">
+      <div class="fig serif">i</div>
+      <h3>The golden angle</h3>
+      <p>137.5 degrees is 360 divided by the golden ratio squared. It is the one angle that
+         never lines up with a previous primordium, which is why a sunflower head packs the
+         most seeds into the same space as anything else.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">ii</div>
+      <h3>Symmetry</h3>
+      <p>Daisies are ray florets on a golden-angle disc, roses are a golden-angle spiral seen
+         from above, and a buttercup's five petals are the same primordia with a much smaller
+         number. The angle is the whole design.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">iii</div>
+      <h3>Opening</h3>
+      <p>A bud is not a small flower. The primordia are all there, stacked, and opening is
+         each one moving outward and rotating the head until the youngest are on the outside
+         and the oldest are in the middle.</p>
+    </div>
+  </section>
+
+  <section class="cells" id="notes">
+    <div class="cell">
+      <div class="fig serif">iv</div>
+      <h3>Coverage</h3>
+      <p>The number in the corner is the fraction of the head covered by petals. At the
+         golden angle it approaches the best packing there is; pushed away from it, holes
+         appear and the head stops looking like a flower.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">v</div>
+      <h3>Growth</h3>
+      <p>Grow it adds primordia one at a time at the current angle, so you can watch the
+         pattern fall into place and then fall apart when you move the slider mid-growth.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">vi</div>
+      <h3>Colour</h3>
+      <p>Petals are shaded by their order, not by a single hue, so the head reads as a
+         three-dimensional head with the oldest at the centre and the youngest at the rim.</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>Bloom · one canvas, no files</span>
+    <span class="mono">137.5° · golden angle</span>
+  </footer>
+</div>
+<script>
+(function(){
+"use strict";
+var cv=document.getElementById('c'),ctx=cv.getContext('2d');
+var W=cv.width,H=cv.height;
+var angle=137.5,psize=62,opening=70,t=0,growing=false,grew=0;
+var SPECIES=[
+ {n:'Sunflower',c1:'#f2c53d',c2:'#d99b1f',core:'#5a3b1c',n:220,rays:34},
+ {n:'Rose',c1:'#e0738a',c2:'#b03f57',core:'#8a2b42',n:180,rays:0},
+ {n:'Daisy',c1:'#fbfaf2',c2:'#e8e6d2',core:'#f2c53d',n:144,rays:21},
+ {n:'Poppy',c1:'#d93a2b',c2:'#9c2118',core:'#2b1810',n:120,rays:0},
+ {n:'Lavender',c1:'#9a86d4',c2:'#6d55a8',core:'#4a3d70',n:90,rays:0}
+];
+var sp=SPECIES[0];
+function mix(a,b,k){
+  var A=[parseInt(a.slice(1,3),16),parseInt(a.slice(3,5),16),parseInt(a.slice(5,7),16)];
+  var B=[parseInt(b.slice(1,3),16),parseInt(b.slice(3,5),16),parseInt(b.slice(5,7),16)];
+  return 'rgb('+Math.round(A[0]+(B[0]-A[0])*k)+','+Math.round(A[1]+(B[1]-A[1])*k)+
+    ','+Math.round(A[2]+(B[2]-A[2])*k)+')';
+}
+/* the head: primordia on a golden-angle spiral */
+var primordia=[];
+function rebuild(){
+  primordia=[];
+  var n=sp.n,i;
+  for(i=0;i<n;i++)primordia.push(i);
+}
+rebuild();
+function draw(){
+  /* the ground */
+  var g=ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'#e6eadb');g.addColorStop(1,'#c9d2c0');
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  var cx=W*0.5,cy=H*0.44;
+  /* a shadow behind the head */
+  ctx.fillStyle='rgba(51,39,42,.10)';
+  ctx.beginPath();ctx.ellipse(cx+14,cy+18,psize*2.6,psize*2.4,0,0,6.3);ctx.fill();
+  /* the stem */
+  ctx.strokeStyle='#4d7a54';ctx.lineWidth=9;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(cx,H);
+  ctx.bezierCurveTo(cx-14,H*0.78,cx+16,cy+psize*2.3,cx,cy+psize*1.7);
+  ctx.stroke();
+  /* two leaves */
+  leaf(cx-6,cy+psize*2.5,-1);
+  leaf(cx+8,cy+psize*2.1,1);
+  /* the head: petals drawn oldest first so the youngest sit on top */
+  var open=opening/100;
+  var maxR=psize*2.5*(0.35+open*0.65);
+  var i;
+  for(i=0;i<primordia.length;i++){
+    var k=primordia[i];
+    var a=k*angle*Math.PI/180;
+    var r=Math.sqrt((k+0.5)/primordia.length)*maxR;
+    var petal=psize*(0.42+open*0.75)*(1-k/primordia.length*0.35);
+    var shade=k/primordia.length;
+    ctx.save();
+    ctx.translate(cx+Math.cos(a)*r,cy+Math.sin(a)*r);
+    ctx.rotate(a+Math.PI/2);
+    /* a petal: an ellipse with a gradient from the tip to the base */
+    var pg=ctx.createLinearGradient(0,-petal,0,petal*0.6);
+    pg.addColorStop(0,mix(sp.c1,sp.c2,0.35+shade*0.5));
+    pg.addColorStop(0.5,mix(sp.c1,sp.c2,shade));
+    pg.addColorStop(1,mix(sp.c2,'#ffffff',0.15));
+    ctx.fillStyle=pg;
+    ctx.beginPath();ctx.ellipse(0,0,petal*0.46,petal,0,0,6.3);ctx.fill();
+    /* a vein down the middle */
+    ctx.strokeStyle=mix(sp.c2,'#ffffff',0.4);ctx.lineWidth=0.8;
+    ctx.beginPath();ctx.moveTo(0,-petal*0.8);ctx.lineTo(0,petal*0.5);ctx.stroke();
+    ctx.restore();
+  }
+  /* ray florets, if the species has them */
+  if(sp.rays){
+    for(var f=0;f<sp.rays;f++){
+      var fa=f/sp.rays*Math.PI*2+t*0.06;
+      var fx=cx+Math.cos(fa)*psize*1.4, fy=cy+Math.sin(fa)*psize*1.4;
+      ctx.fillStyle='#fdfaf0';
+      ctx.beginPath();ctx.ellipse(fx,fy,psize*0.34,psize*0.12,fa,0,6.3);ctx.fill();
+      ctx.strokeStyle=mix(sp.c2,'#ffffff',0.4);ctx.lineWidth=0.6;ctx.stroke();
+    }
+  }
+  /* the disc */
+  var dg=ctx.createRadialGradient(cx,cy,psize*0.1,cx,cy,psize);
+  dg.addColorStop(0,mix(sp.core,'#ffffff',0.3));
+  dg.addColorStop(1,sp.core);
+  ctx.fillStyle=dg;
+  ctx.beginPath();ctx.arc(cx,cy,psize*(0.6+opening/300),0,6.3);ctx.fill();
+  /* seeds on the disc, on the same spiral, because that is what they are */
+  ctx.fillStyle='rgba(0,0,0,.28)';
+  for(var s=0;s<40;s++){
+    var sa=s*angle*Math.PI/180,sr=Math.sqrt((s+0.5)/40)*psize*0.55;
+    ctx.beginPath();ctx.arc(cx+Math.cos(sa)*sr,cy+Math.sin(sa)*sr,1.1,0,6.3);ctx.fill();
+  }
+}
+function leaf(x,y,dir){
+  ctx.save();ctx.translate(x,y);ctx.scale(dir,1);
+  var lg=ctx.createLinearGradient(0,0,46,-14);
+  lg.addColorStop(0,'#4d7a54');lg.addColorStop(1,'#6a9a63');
+  ctx.fillStyle=lg;
+  ctx.beginPath();
+  ctx.moveTo(0,0);
+  ctx.quadraticCurveTo(28,-30,50,-16);
+  ctx.quadraticCurveTo(30,6,0,0);
+  ctx.closePath();ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,.28)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(2,-1);ctx.quadraticCurveTo(26,-14,46,-15);ctx.stroke();
+  ctx.restore();
+}
+
+/* ---------- controls, readout ---------- */
+var cols=document.getElementById('cols');
+SPECIES.forEach(function(s,i){
+  var b=document.createElement('button');
+  b.title=s.n;
+  b.style.background='radial-gradient(circle at 35% 30%,'+s.c1+','+s.c2+')';
+  b.setAttribute('aria-pressed',String(i===0));
+  b.addEventListener('click',function(){
+    sp=s;rebuild();primordia=[];
+    [].slice.call(cols.children).forEach(function(o){
+      o.setAttribute('aria-pressed',String(o===b));});
+    document.getElementById('rH').textContent=s.n;
+  });
+  cols.appendChild(b);
+});
+function bind(id,fn){var el=document.getElementById(id);
+  el.addEventListener('input',function(){fn(+el.value);});}
+bind('angle',function(v){angle=v;});
+bind('size',function(v){psize=v;});
+bind('open',function(v){opening=v;});
+document.getElementById('grow').addEventListener('click',function(){
+  growing=!growing;
+  if(growing&&primordia.length>=sp.n)primordia=[];
+});
+document.getElementById('reset').addEventListener('click',function(){
+  primordia=[];grew=0;growing=false;
+});
+/* how well the head covers the disc, by counting petals whose centres land near
+   an already-placed petal */
+function coverage(){
+  var n=primordia.length;
+  if(n<20)return 0;
+  var maxR=psize*2.5*(0.35+opening/100*0.65);
+  var pts=[],i;
+  for(i=0;i<n;i++){
+    var a=i*angle*Math.PI/180,r=Math.sqrt((i+0.5)/n)*maxR;
+    pts.push([Math.cos(a)*r,Math.sin(a)*r]);
+  }
+  var hit=0;
+  for(i=0;i<n;i++){
+    for(var j=i+1;j<n;j++){
+      var dx=pts[i][0]-pts[j][0],dy=pts[i][1]-pts[j][1];
+      if(dx*dx+dy*dy<(psize*0.8)*(psize*0.8)){hit++;break;}
+    }
+  }
+  return hit/n;
+}
+function readout(){
+  document.getElementById('rP').textContent=primordia.length;
+  document.getElementById('rW').textContent=(primordia.length/5).toFixed(1);
+  document.getElementById('rC').textContent=(coverage()*100).toFixed(0)+'%';
+  document.getElementById('rA').textContent=angle.toFixed(1)+'°';
+  document.getElementById('rG').textContent=opening+'%';
+}
+/* ---------- loop ---------- */
+var last=0;
+function loop(ts){
+  var dt=last?Math.min(.05,(ts-last)/1000):0;last=ts;
+  t+=dt;
+  if(growing&&primordia.length<sp.n)primordia.push(primordia.length);
+  draw();readout();
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

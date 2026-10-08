@@ -1,0 +1,90 @@
+# HOLO FOIL — light that is printed, not lit
+
+## Short title
+Hologram Foil
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a holographic foil card, where
+the diffraction grid is CSS gradients and the tilt is real 3D, so the colours come from
+geometry rather than from a picture of iridescence. No external dependencies whatsoever
+— no CDN, no web fonts, no external images, no JS libraries. All CSS and JavaScript
+inline, works offline by double-clicking, responsive, valid HTML5.
+
+Artistic direction: a dark print shop. Ground #0b0910, panel #120f1a, hairlines
+rgba(241,236,247,.14), body #f1ecf7 with muted #a49cae, mint #8be9d0 and pink #ff9ecb as
+the two accents. Serif headings with italic accent words, uppercase .2em–.4em kickers,
+monospace readouts.
+
+The card: a 5:7 rounded panel inside a perspective stage, rotated on X and Y by three
+custom properties written from the pointer, with transform-style preserve-3d. Under the
+foil sits the art: a conic gradient in mint, violet, pink and amber that reads as a
+printed hologram, with two rings and a serif title over it.
+
+The foil itself is three stacked repeating gradients — the screen — composited with
+mix-blend-mode: color-dodge so it adds light to the art instead of covering it. Its
+background-position is driven by the same custom properties as the tilt, at 180 and -240
+pixels per unit, so moving the pointer moves the diffraction pattern. Over that, a
+specular radial-gradient blob follows the pointer under mix-blend-mode: screen, scaled by
+the gloss slider. Over that again, a one-pixel repeating linear-gradient at half opacity
+with overlay gives the printed stock its tooth.
+
+Five foil patterns — linear, cross, radial, lenticular and shatter — each a different
+stack of repeating-linear, repeating-conic and conic gradients, at the number of lines
+per unit a real screen would use. Emboss drops the same layer to overlay at a quarter
+opacity, which is what embossing does to a foil: it stops glinting and starts reading as
+part of the stock.
+
+Panel: five pattern chips with captions, a tilt slider (0–30 degrees), a gloss slider
+(0–100), Emboss, and Spin the press which turns the card continuously on a slow
+Lissajous so the foil does under a lamp what it does under a moving eye. Readout: current
+angle, elevation, foil name, gloss and finish.
+
+Layout: nav, centred hero, a two-column stage of card and panel, a readout row, two
+three-cell note rows on the grid, the blend, the tilt, the shine, embossed and stock,
+then a footer. One column under 900px, links hidden under 780px.
+
+Interaction: move the pointer across the stage and the card tilts with the foil offset
+against the rotation, which is what makes the colour sweep. Choose a foil to change the
+screen; move tilt to change how far it swings; move gloss to change how much specular
+the lamination gives; press Emboss to flatten the foil into the stock; press Spin the
+press to let the card turn itself.
+
+## One-paragraph description of the intended design
+A holographic foil card on a dark print-shop page: a 5:7 panel inside a perspective stage
+that tilts on two axes to the pointer, with the printed art under three stacked repeating
+gradients composited with color-dodge and offset by the same variables that drive the
+tilt, a specular blob under a screen blend, and a one-pixel stock gradient over the top —
+five switchable foil screens, a tilt slider, a gloss slider, an Emboss mode that drops
+the foil to overlay, and a spin mode that turns the card itself.
+
+## Major visual techniques used
+- Three CSS custom properties (--mx, --my, --rx, --ry, --shine) as the single source of
+  truth for tilt, foil offset and specular position
+- Real 3D with perspective on the stage, rotateX/rotateY on the card and
+  transform-style preserve-3d, rather than a skew fake
+- Foil as stacked repeating-linear and repeating-conic gradients at print-screen
+  densities, composited with mix-blend-mode color-dodge so it adds light
+- The same custom properties used inside the foil's background-position, so the foil
+  moves against the tilt exactly as a diffraction grid does
+- Specular blob as a radial-gradient under mix-blend-mode screen whose opacity is the
+  gloss slider
+- Printed stock as a one-pixel repeating-linear-gradient under overlay, for substrate
+  tooth without a texture
+- isolation: isolate on the card and the stack so the blends contain themselves
+- Five foils as arrays of gradient strings joined into one background-image, so a
+  pattern change is one property write
+- Emboss as a class that swaps the blend mode and drops the opacity, which is the
+  physical difference between foiled and embossed stock
+- Spin driven off the frame delta on a Lissajous pair, so the turn is smooth and
+  cheap, and pointer input takes over the moment it comes back
+- Angle and elevation read back from the same numbers that generate the transform,
+  so the readout cannot disagree with the picture
+- Card width in min() with an aspect-ratio, so the panel keeps its proportion at any
+  viewport without a resize handler
+
+## Intended interaction model
+A card you turn over in the light. Visitors move the pointer across the stage to tilt the
+card and sweep the diffraction pattern, pick a foil to change the screen, move tilt and
+gloss to change how physical it looks, emboss it into the stock, or press Spin the press
+and watch it do the same thing on its own under a lamp.

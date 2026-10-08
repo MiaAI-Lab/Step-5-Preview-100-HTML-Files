@@ -1,0 +1,88 @@
+# MOBILE — a sculpture that answers the room
+
+## Short title
+Mobile Sculpture
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a hanging mobile built in the
+DOM, where every arm is an integrated pendulum rather than a timed animation, and where
+the air current is a control. No external dependencies whatsoever — no CDN, no web
+fonts, no external images, no JS libraries. All CSS and JavaScript inline, works offline
+by double-clicking, responsive, valid HTML5.
+
+Artistic direction: sheet metal on cream. Ground #f2efe6, room a cream gradient with an
+inset shadow, ink #26241f, vermilion #c0392b and teal #1f5f6e as the two accents with
+ochre #d8a326 and black for the metal surfaces. Serif headings with italic accent words,
+uppercase .1em–.4em kickers, monospace readouts.
+
+The sculpture is nested DOM, not canvas. Each arm is a pivot — an absolutely positioned
+div at a coordinate inside its parent — containing a rod that rotates about its own
+origin. Because the rotation lives on the rod and the position lives on the pivot, a
+child arm inherits its parent's rotation for free through the cascade, which is the whole
+mechanism of a real mobile. The bar is a 3px rounded rule; shapes hang from strings below
+it at fractions of its length.
+
+Three layouts, so Rehang gives a genuinely different piece: a four-branch one, a
+five-surface one and a six-surface one with an extra level. Surfaces are discs, squares,
+triangles (clip-path) and half-discs in the four Calder colours.
+
+Each arm is integrated, not animated: restoring torque from gravity and its own length,
+plus a forcing term that pushes it at its own frequency and phase so the piece never
+repeats a pose, with damping applied as a per-frame power of the damping factor. Touching
+a surface adds angular momentum to its arm — a click pushes it one way, a drag keeps
+adding — and that momentum then propagates down the branch.
+
+Controls: air current, gravity and damping sliders, plus A breeze (a gust and an
+impulse to every arm), Still air (wind to zero, so the piece dies) and Rehang. Readout:
+arms, surfaces, the largest current angle in degrees, and a rough energy figure summed
+from angle times angular velocity.
+
+Layout: nav, centred hero, the room with the sculpture hanging from a cord, a dock with
+the three sliders and three buttons, a readout row, then two three-cell note rows on the
+pivot, the period, the air, balance, colour and the touch, then a footer.
+
+Interaction: the piece is already moving. Visitors drag the air current and watch the
+rhythm change, drag the gravity to make everything faster or slower, kill the damping to
+let it run, click or drag a surface to send a branch swinging, take a gust, or rehang the
+whole thing into a different composition.
+
+## One-paragraph description of the intended design
+A hanging mobile in nested DOM where every arm is an integrated pendulum — gravity and
+its own length set the restoring torque, an air current forces it at its own frequency,
+and damping bleeds it off — hung from a pivot inside its parent so a child inherits its
+parent's rotation for free, with clickable and draggable surfaces that add angular
+momentum to their branch, three rehangable layouts in Calder's four-muted-primary
+palette, and air, gravity and damping sliders plus a gust and a still-air button.
+
+## Major visual techniques used
+- Pivot-and-rod split, so translation and rotation live on different elements and
+  nesting supplies the inheritance a real mobile relies on
+- Children positioned as absolute coordinates inside the parent rod, so the whole tree
+  is written once and only rotation is ever updated
+- Shapes hung from strings whose lengths are a fraction of the surface size, so small
+  things hang close and large things hang low
+- Discs, squares, half-discs and a clip-path triangle as the four surface types, all
+  flat colour with no shadows
+- Integration rather than animation: restoring torque from gravity over arm length, a
+  forcing term at per-arm frequency and phase, and damping as a power of the damping
+  factor so it is frame-rate independent
+- Phase-randomised forcing per arm, which is what stops the piece from ever repeating a
+  pose
+- Click and drag both add angular momentum to the arm that owns the surface, so input
+  enters the simulation rather than overriding it
+- Three layout functions returning different trees, chosen by an index so Rehang
+  cycles compositions
+- A 3px rounded bar and a 1px hairline string, which are the only two marks needed to
+  make a metal rod and a thread
+- Energy readout summed from angle times angular velocity across all arms, so the
+  number is a property of the simulation
+- Cream room with an inset shadow, so the sculpture reads as hung in a real space
+- Shorter arms on lower branches, which is what keeps the composition inside the room
+
+## Intended interaction model
+Something to disturb. The mobile runs on its own the moment the page opens; visitors
+change the air, the gravity and the damping, take a gust, let the air go still and watch
+it stop, or grab a surface and swing a branch. Rehang rebuilds the piece as a different
+composition with the same physics, and every reading in the panel comes from the same
+integrator that moves the rods.

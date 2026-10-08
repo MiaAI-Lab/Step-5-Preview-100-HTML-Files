@@ -1,0 +1,86 @@
+# PLANKTON — a bay that lights up when you touch it
+
+## Short title
+Bioluminescence
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a bay of dinoflagellates that
+flash when disturbed and never otherwise, with the flash spreading as a wavefront through
+the bloom. No external dependencies whatsoever — no CDN, no web fonts, no external images,
+no JS libraries. All CSS and JavaScript inline, works offline by double-clicking,
+responsive, valid HTML5.
+
+Artistic direction: a black bay. Ground #04070e, canvas #02040a, hairlines
+rgba(230,240,255,.14), body #e6f0ff with muted #8d9ab8, aqua #5ff0d0 as the accent and a
+cold blue #8fbcff for the figures. Serif headings with italic accent words, uppercase
+.2em–.4em kickers, monospace figures.
+
+The bloom is a set of cells, each with a position, a drift and a lit value between zero
+and one. Nothing is drawn glowing until a cell's lit value is positive: the body of the
+bloom is a dull brown scatter that you would never notice.
+
+A disturbance is a wavefront — a circle that expands at a speed set by the spread slider,
+whose life decays — and it lights every cell it crosses, within a band of sixteen pixels
+either side of its radius. So the flash is not a picture of a wave, it is a wave: the cells
+it has reached are bright and the rest are dark, and the boundary between them moves
+outward. The cells at the point of contact light immediately.
+
+Four species, each with its real emission wavelength in nanometres, its own quantum yield,
+and its own tint: Lingulodinium at 474, Noctiluca at 470, Pyrocystis at 476, Vargula at
+464, Periphylla at 465. Four waters — calm bay, rippled, surf and moonlit — each with its
+own current and its own level of ambient glow, and the moonlit one draws a moon.
+
+The species' wavelength is also drawn: a real spectrum bar computed from wavelength to
+RGB through the standard piecewise approximation, so 474 nm really is blue and the species
+label under it is the number the bar was centred on.
+
+Controls: five species, four waters, cell density, spread, afterglow, Strike a paddle and
+Still water. Readout: cells lit, total cells, wavelength, species, quantum yield and
+whether the bay is currently lit or merely mechanical.
+
+Layout: nav, centred hero, the bay canvas with its caption, a dock of two chip rows, three
+sliders and two buttons, a readout row, then two three-cell note rows on the chemistry, the
+trigger, blue, the bloom, afterglow and still water, then a footer.
+
+Interaction: the bay is dark and stays dark. Drag through it and every cell you touch
+lights, and the front spreads outward at the speed you set; strike a paddle for a single
+impulse; raise the density until the bay is visibly brown in the daylight and bright blue
+in the flash; switch the species and the tint and the wavelength change together; and press
+Still water to put it back to black.
+
+## One-paragraph description of the intended design
+A dark bay of density-controlled cells that are drawn as a dull brown scatter until a
+disturbance expands a wavefront through them at a spread-set speed, lighting every cell
+within sixteen pixels of its radius so the flash is the boundary between lit and unlit
+cells moving outward — with five species at their real emission wavelengths and quantum
+yields, each with its own tint, four waters with different currents and ambient glow, a
+real wavelength-to-RGB spectrum bar, and a drag that acts as a hand through the water.
+
+## Major visual techniques used
+- Cells lit by an expanding wavefront band, so the flash is a real propagating front rather
+  than a painted glow
+- Body of the bloom drawn as a dull brown scatter, so the unlit state is genuinely dark
+- Additive radial gradients per lit cell with a white core into the species' tint, which is
+  what a point source in water looks like
+- Cell emission decaying per cell at a rate set by the afterglow slider
+- Wavefronts also drawn as thin bright rings, so the front is visible even in sparse water
+- Five species as data: wavelength, quantum yield and tint, so the readout and the drawing
+  change together
+- Wavelength-to-RGB through the standard piecewise approximation, so the spectrum bar is
+  real and 474 nm really is blue
+- Four waters with different currents and ambient glow, including a moonlit one
+- Cells drifting on the water's current and wrapping at the edges, so the bloom is alive
+  even when nothing is lit
+- Point of contact lighting immediately plus the expanding front, which is the two-stage
+  flash a real disturbance produces
+- Still water clearing the waves and the lit cells, so the bay can be returned to black
+- Aqua accent on a near-black ground, so the only saturated colour in the page is the light
+  itself
+
+## Intended interaction model
+Water you disturb. Visitors drag a hand through the bay and the cells they touch light,
+then the front spreads outward and lights the rest; they strike a paddle for one impulse,
+set the density so the bloom is thick or thin, set the spread so the front is fast or slow,
+choose a species and see both the tint and the wavelength change, and press Still water to
+put the bay back to black. Nothing glows until something touches it.

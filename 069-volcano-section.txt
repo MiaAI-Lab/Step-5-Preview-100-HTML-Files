@@ -1,0 +1,84 @@
+# THE VENT — a volcano that builds pressure
+
+## Short title
+Volcano Section
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a cross-section of an active
+volcano with a chamber, a conduit and a vent, where pressure builds and releases and the
+lava that comes out sets into rock on the flanks. No external dependencies whatsoever —
+no CDN, no web fonts, no external images, no JS libraries. All CSS and JavaScript inline,
+works offline by double-clicking, responsive, valid HTML5.
+
+Artistic direction: basalt at night. Ground #120f0e, canvas #0a0808, hairlines
+rgba(240,231,226,.14), body #f0e7e2 with muted #a89a93, magma orange #ff8a3c with hot
+amber #ffd05c and a warning #ff5a2a. Serif headings with italic accent words, uppercase
+.1em–.4em kickers, monospace readouts and diagram labels.
+
+The mountain is a profile from a seeded walk — a cone with a crater at the centre — and
+everything is drawn against it with a groundY function that interpolates the profile, so
+lava, bombs and labels all know where the surface is. Under it a chamber glows with a
+radial gradient whose size and brightness follow how full it is, and the conduit is a
+thick translucent line from the chamber to the vent.
+
+The physics: pressure rises toward a set point set by how full the chamber is and how
+much gas is dissolved, and when it passes one the vent opens for a length set by the gas
+content, throwing bombs, ash and lava, and the pressure drops to a third. Lava particles
+run downhill by sampling the slope of the profile either side of them, cool at a rate set
+by the cooling slider, and when they stop they set: their trail is kept as rock and the
+particle is dropped, so the edifice grows outward and stays built. Bombs are ballistic and
+land as blocks. Ash is drawn as soft radial puffs that fade with their remaining life.
+
+Controls: viscosity (how fast lava runs and how sticky the melt is), gas (how much is
+dissolved and therefore how violent), cooling (how fast lava sets), Force the vent (a
+pressure bump), Go quiet (drain the gas and seal), and clicking the mountain, which adds
+magma to the chamber.
+
+Readout: pressure as a percentage that turns hot above eighty, chamber fullness, the
+number of eruptions, total lava length in metres summed from all live flows, and the
+state — quiet or erupting.
+
+Layout: nav, centred hero, the section canvas with a diagram caption, a dock with three
+sliders and two buttons, a readout row, then two three-cell note rows on the chamber,
+viscosity, cooling, ash, seismic and quiet, then a footer.
+
+Interaction: the system runs on its own and vents on its own schedule. Visitors click the
+mountain to keep the chamber topped up, force the vent to see it now, set the viscosity
+low to watch runny lava travel right down the flanks and set into a broad shield, or set
+it high to see short sticky flows that never leave the summit. Go quiet stops everything.
+
+## One-paragraph description of the intended design
+A volcano cross-section on canvas where a seeded cone profile gives every particle a real
+ground to land on, a magma chamber fills under a conduit, pressure builds toward a set
+point driven by chamber fullness and dissolved gas until it exceeds one and the vent opens
+— throwing ballistic bombs, fading ash and lava that runs downhill by sampling the
+profile's slope, cools, and sets into rock that stays on the flanks — with viscosity, gas
+and cooling sliders, a click that adds magma, and a readout of pressure, chamber fullness,
+eruption count and total lava length.
+
+## Major visual techniques used
+- Mountain profile generated once from a seeded walk and interpolated by a groundY
+  function, so every particle and label shares one definition of the surface
+- Slope sampled either side of a lava particle to get its downhill direction, which is
+  what makes the flow follow the mountain rather than a scripted path
+- Lava cooling as a heat term that only drains once the particle has stopped moving, so
+  fast flows travel before they crust over
+- Set lava: the trail is transferred into a rock layer and the particle dropped, so the
+  edifice accumulates instead of flickering
+- Ash as radial gradients composited with 'lighter' and faded by remaining life
+- Bombs as ballistic particles with a velocity streak, landing as small blocks
+- Chamber and vent glow as radial gradients whose alpha follows fullness and venting
+- Sky heated by the eruption by mixing the top gradient stop with the heat term
+- Tremor line whose amplitude is the pressure, drawn as a sine along the bottom of the
+  frame
+- Diagram labels in monospace placed on the chamber, conduit and vent, so the picture
+  reads as a section rather than a scene
+- Eruption state surfaced once, in one place, and cleared when venting ends
+- Fixed canvas resolution with CSS scaling, so the profile's shape holds at any width
+
+## Intended interaction model
+Something you feed and then watch fail. Visitors click the mountain to keep magma coming,
+drag the gas up to make the next one violent, drop the viscosity to let lava run all the
+way down, or force the vent and see whether the lid held. Go quiet lets it all relax, and
+every number in the panel is the number the drawing is using.

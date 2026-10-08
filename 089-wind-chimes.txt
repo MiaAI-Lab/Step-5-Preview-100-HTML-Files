@@ -1,0 +1,84 @@
+# WIND CHIMES — hang tubes until they strike you
+
+## Short title
+Wind Chimes
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a set of hanging tubes driven by
+the wind and integrated as pendulums, struck when they swing into their clapper, each
+sounding its own inharmonic partials. No external dependencies whatsoever — no CDN, no web
+fonts, no external images, no JS libraries. All CSS and JavaScript inline, works offline
+by double-clicking, responsive, valid HTML5.
+
+Artistic direction: a garden at night. Ground #0d1210, canvas #080d0b, hairlines
+rgba(230,240,234,.14), body #e6f0ea with muted #93a49b, brass #c8b06a as the accent and a
+mint #8fd0b0 for the figures. Serif headings with italic accent words, uppercase .2em–.4em
+kickers, monospace figures.
+
+The set hangs from a bar: eight tubes, longest and lowest on the left to shortest and
+highest on the right, each with its own cord, gradient body, hole at the top, a highlight
+and a clapper. Between them a moon and wind streaks.
+
+Each tube is integrated as a pendulum with its own period, driven by a sine at its own rate
+and phase, so the set never twice strikes the same phrase. When the swing passes a
+threshold it hits the clapper and rings.
+
+The sound is synthesised from the material's real inharmonic ratios. Every material has its
+own set — aluminium at 1, 2.76, 5.40 and 8.93; copper at 1, 2.74, 5.34 and 8.80; bamboo
+quieter and shorter; steel and brass and glass each slightly different — and each partial
+is a separate oscillator with its own envelope whose duration falls off across the series.
+The clang slider mixes the upper partials toward square waves and adds a noise transient,
+which is the difference between a wind chime and a bell.
+
+Four scales: pentatonic, whole tone, the Japanese hirajoshi and pelog, each with its own
+base frequency and semitone pattern. Six materials. Controls: scale, material, wind, decay,
+clang, A gust and Hang a set. Readout: tubes ringing, the last strike's frequency in hertz,
+the longest tube, and the three overtone ratios for the current material.
+
+Layout: nav, centred hero, the garden canvas with its caption, a dock of two chip rows,
+three sliders and two buttons, a readout row, then two three-cell note rows on
+inharmonicity, timbre, the scale, the wind, decay and hanging a set, then a footer.
+
+Interaction: the set is already swinging and already ringing. Visitors raise the wind and
+the strikes come faster, click a tube to ring it directly, drag across the set to push the
+wind by hand, take a gust, switch the material to hear the ratios change, switch the scale
+to retune everything, and move decay and clang to go from a dry bamboo to a long clanging
+bell.
+
+## One-paragraph description of the intended design
+A hanging set of eight tubes on canvas, each integrated as a pendulum with its own period
+and phase and driven by a wind sine, striking its clapper past a swing threshold and
+sounding the material's real inharmonic partials — aluminium at 1, 2.76, 5.40 and 8.93,
+copper, bamboo, steel, brass and glass each with their own set — as separate oscillators
+with envelopes that fall off across the series, with a clang slider that mixes them toward
+square waves and adds a noise transient, four scales, and a readout that reports the
+current material's overtone ratios.
+
+## Major visual techniques used
+- Tubes as gradients across their width, with a hole at the top and a highlight down the
+  side, so they read as hollow metal
+- Each tube swung by rotating its own drawing about its suspension point
+- Clapper drawn as a small circle offset by the swing, so the strike is visible
+- Strike flash as a white band alpha-fading on the tube, which is what a hit looks like
+- Pendulum integration with a period derived from the tube's length, so long tubes swing
+  slowly and short ones chatter
+- Strike threshold with hysteresis — struck on the way out, released on the way back — so
+  a tube rings once per swing rather than every frame
+- Each inharmonic partial as its own oscillator with a duration that falls off across the
+  series, which is what makes a tube sound like a tube
+- Clang as a shift toward square waves on the upper partials plus a decaying noise
+  transient
+- Material ratios as data, so switching material changes the sound and the readout together
+- Four scales as semitone arrays, so retuning is one swap and every tube re-derives
+- Wind streaks as quadratic curves whose alpha is the wind, so the air is visible
+- Click-to-strike by nearest tube within ninety pixels, and drag-as-wind by pushing
+  velocity on tubes you pass over
+- AudioContext created and resumed only inside a user gesture
+
+## Intended interaction model
+A set that plays itself. The wind is already blowing and the tubes already ring; visitors
+raise the wind, take a gust, click a tube, drag through the set to stir it, change the
+material to hear the ratios change and the readout follow, switch the scale to retune, and
+move decay and clang from dry bamboo to long clanging metal. The page is never silent
+unless the wind is at zero and nothing is touched.

@@ -1,0 +1,84 @@
+# SIGHT REDUCTION — a line of position from two stars
+
+## Short title
+Star Navigation
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a sextant sight reduced into a
+circle of position on a plotting sheet, with the real corrections — dip, index error and
+refraction — applied to the reading. No external dependencies whatsoever — no CDN, no web
+fonts, no external images, no JS libraries. All CSS and JavaScript inline, works offline
+by double-clicking, responsive, valid HTML5.
+
+Artistic direction: a night deck. Ground #0a1016, hairlines rgba(230,238,246,.14), body
+#e6eef6 with muted #93a4b4, brass #e8c46a as the accent and a cold cyan #7fd4ff for the
+figures. Serif headings with italic accent words, uppercase .2em–.4em kickers, monospace
+figures.
+
+The deck is one canvas: a night sky, the observed star at its measured altitude above a
+summed-sine sea, a sextant drawn at the pivot — an indexed arc with a degree scale, an
+index arm carrying the mirror, a half-silvered horizon glass at the centre, and the index
+error drawn as the dashed offset between the mirror's line and the star. Inset bottom-right
+is a plotting sheet.
+
+The plotting sheet is an offscreen canvas: a graticule of longitude and latitude lines, and
+each sight drawn as a circle of position centred on that star's substellar point, with the
+radius from the zenith distance. Two circles cross and the crossing is marked with a
+reticle, and the readout says whether you have one circle or a crossing.
+
+The corrections are the real ones. Dip is 1.76 times the square root of the height of eye
+in metres, in minutes of arc, so four metres is about 3.6 minutes and it is always
+subtracted. Index error is a fixed offset you measured at the dock, in minutes of arc.
+Refraction uses Bennett's formula for the observed altitude. The corrected altitude, the
+zenith distance, and the distance to the substellar point in nautical miles — one minute
+of arc is one nautical mile — all fall out of that.
+
+Controls: eight bodies to observe, a mounting row (steady, heaving, rolling), the star's
+altitude, the swell, the index error, Take the sight and Clear the chart. Readout: measured
+altitude, corrected altitude, observer height, dip, zenith distance, and the fix state.
+
+Layout: nav, centred hero, the deck canvas with the reading overlay, a dock of two chip
+rows, three sliders and two buttons, a readout row, then two three-cell note rows on dip,
+index error, intercept, the instrument, swell and the chart, then a footer.
+
+Interaction: choose a body, set its altitude, add an index error and watch the dashed line
+move, and take the sight — the circle appears on the sheet. Take a second and a third and
+the crossing appears; the readout changes from one circle to crossing. Set the mounting to
+rolling and the frame rocks while the reading stays put, which is the point of the
+instrument.
+
+## One-paragraph description of the intended design
+A sextant on a night deck, drawn as an indexed arc with a degree scale, an index arm, a
+half-silvered horizon glass and a dashed index-error line over a summed-sine sea — with an
+inset plotting sheet where each sight becomes a circle of position on a graticule centred
+on the star's substellar point and two circles crossing into a marked fix — and where dip,
+index error and Bennett refraction are the real corrections applied to the reading, and the
+distance to the substellar point is the zenith distance in minutes of arc read as nautical
+miles.
+
+## Major visual techniques used
+- Indexed arc drawn from the pivot with its own degree scale and ticks, so the
+  instrument reads as a measuring device
+- Index error as the dashed offset between the mirror's line and the star, so the
+  correction is visible rather than asserted
+- Dip as 1.76 times the square root of height of eye in metres, in minutes of arc
+- Index error in minutes of arc, subtracted from the measured altitude
+- Refraction by Bennett's formula on the observed altitude, in minutes of arc
+- Distance to the substellar point as the zenith distance in minutes of arc, because one
+  nautical mile is one minute of arc — the unit equivalence the whole method rests on
+- Sea as three summed sines, with swell lines offset downward from the same function
+- Plotting sheet as an offscreen canvas clipped into the corner of the main canvas
+- Circles of position with radius from the zenith distance, each centred on its star's
+  substellar point placed at a different azimuth
+- Fix reticle drawn only when there are two or more circles
+- Mounting row that rocks the frame around the pivot while the reading is unchanged,
+  which is the whole reason a sextant beats a quadrant
+- Eight bodies with their own glare colour, from the Sun to Acrux
+- Eight-body palette as a single shade per body, so a change repaints the star
+
+## Intended interaction model
+A sight to reduce. Visitors pick a body, set its altitude, add the index error they would
+have measured at the dock, and take the sight; a circle appears on the plotting sheet. Take
+a second and the crossing appears and the readout changes. Rock the mounting to see that
+the reading does not move, and clear the sheet for a new set.

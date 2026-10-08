@@ -1,0 +1,86 @@
+# REEF — A Garden That Builds Itself
+
+## Short title
+Coral Reef L-System
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: an interactive coral
+reef grown from an L-system, called REEF. No external dependencies whatsoever — no
+CDN, no web fonts, no external images, no external SVG files, no JavaScript
+libraries. All CSS and JavaScript inline, works offline by double-clicking, responsive,
+valid HTML5.
+
+Artistic direction: a shallow tropical reef at midday. The sea is a vertical
+gradient from bright #0a3a4c at the surface through #062736 and #03151c to
+#020e14, with a warm sun wash in the upper right and a teal wash low on the left.
+Coral is drawn in warm pink (#e88c78) and pale cream tips (#ffd6aa), against a
+green-teal seabed. Seventy warm motes drift through the water column in additive
+blend, so the whole frame picks up scattered light. Type is an italic serif
+headline with one amber line, against 8.5–9.5px tracked monospace.
+
+The growth: a recursive `branch()` function. Each call draws one segment from (x,y)
+at angle a with a stroke width proportional to how close the branch is to the trunk
+(d/depth × 4.2), then recurses twice — once at a − angle, once at a + angle — on a
+child length of len × (decay/100). Branches at depth ≤ 2 get a second, narrower,
+warmer stroke inside them so the tips glow. A third straight-on shoot appears at
+27% of branches, decided by a hash of the branch's own x/y position rather than a
+random draw, so the shape is identical every frame and only re-rolls when you press
+Re-seed or resize. Five to nine root trunks are seeded across the seabed, each with
+its own starting length and a small angular lean, growing up from a seabed drawn as
+a sine-wobbled filled path.
+
+The sway: each branch's angle is offset by sin(t·0.7 + generation·1.3 + x·0.01) ×
+0.05 × (depth fraction + 0.3), so deeper branches swing more than the trunk and the
+whole reef breathes in a wave from root to tip. Turning Sway off freezes it into a
+static drawing.
+
+The current: dragging horizontally accumulates a target current value (clamped to
+±1.4) which eases toward the actual at 0.03 per frame; every mote's x advances by
+current × 0.7 per frame, so dragging literally pushes the particles sideways
+through the water.
+
+Layout: a full-viewport canvas over the sea gradient with a floating UI overlay
+whose pointer-events pass through except on the controls. Top-left is a monospace
+label above an italic serif headline with one amber line, plus a short paragraph
+explaining the L-system. Top-right is a monospace meter stack showing the live
+branch count, the current depth and the current value. Bottom is a glass tray with
+three sliders — Depth (recursion 1–6), Angle (6–90°) and Decay (length falloff
+40–90%) — plus Sway and Re-seed buttons, and a monospace hint.
+
+Interaction: the reef grows and sways on its own. Depth, Angle and Decay reshape it
+live — the branch count in the meter jumps as depth increases, since each level
+roughly trebles the population. Sway freezes or resumes the breathing. Re-seed
+throws away the trunks and grows a different arrangement. Dragging steers the
+current and pushes the motes. On narrow screens the paragraph, meters and hint hide.
+
+## One-paragraph description of the intended design
+A reef that draws itself: five to nine trunks on a wobbled seabed, each splitting
+into two branches per level with a stroke width that tapers toward the tips and a
+third shoot on a quarter of branches, all swaying on a generation-weighted sine
+wave from root to tip, while a steerable current pushes seventy motes of scattered
+light sideways through the water.
+
+## Major visual techniques used
+- Recursive L-system branching with angle, length decay and depth-limited
+  stroke-width taper
+- Deterministic third-shoot selection via a position hash (sin x·12.9898 +
+  y·78.233 × 43758.5453) so the shape is stable frame to frame
+- Generation-weighted sway: sin(t·0.7 + gen·1.3 + x·0.01) scaled by depth fraction,
+  so tips move more than trunks
+- Double-stroke tips: a wide coral-coloured stroke plus a narrower warm cream core
+  at depth ≤ 2
+- Sine-wobbled seabed filled with a vertical gradient
+- Seventy motes in additive blend drifting on a per-mote phase and speed
+- Eased current (0.03 lerp) accumulated from horizontal drag and clamped to ±1.4
+- Root trunks seeded across the width with individual length and lean
+- Live branch counter incremented inside the recursion
+- Warm sun wash and teal depth wash as radial gradients over the sea
+- Italic serif headline with one amber line against 8.5px tracked monospace
+- Floating glass tray with backdrop-filter blur; extras hidden under 760px
+
+## Intended interaction model
+A growing thing you can steer. Visitors watch the reef breathe, then change how
+deep it branches, at what angle, and how fast it thins — watching the branch count
+climb — freeze the sway to look at the drawing, re-seed for a different reef, or
+drag sideways to push the current and the drifting motes through the water.

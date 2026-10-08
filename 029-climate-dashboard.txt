@@ -1,0 +1,83 @@
+# THERMAL — A Century of Surface Temperature
+
+## Short title
+Climate Dashboard
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a climate data dashboard
+called THERMAL, presenting 146 years of global surface temperature anomaly. No
+external dependencies whatsoever — no CDN, no web fonts, no external images, no
+external SVG files, no JavaScript libraries. All CSS and JavaScript inline, works
+offline by double-clicking, responsive, valid HTML5.
+
+Artistic direction: a serious scientific instrument panel, dark and precise. Ground
+#0b1114, panels #121b1f, hairline separators at 12% white, text #e6f0ed, and a
+four-stop diverging colour ramp used for every value on the page: cold blue
+#2a6fb5 below −0.4, cool cyan #38a3c4 from −0.4 to 0, warm amber #e8a33d from 0 to
++0.8, hot red #d9442b above +0.8. Every label is 8.5–9.5px wide-tracked monospace
+in uppercase; every number is 300-weight sans at up to 42px. Nothing is rounded
+beyond 2px.
+
+The data: a deterministic pseudo-random walk (a seeded linear congruential
+generator, so the page is identical on every load) from 1880 to 2026, biased upward
+over time so the curve rises from about −0.2°C to about +1.4°C — the shape of the
+real record. The same ramp function colours every representation of it.
+
+The visualisations, all hand-drawn on canvas:
+1. An annual anomaly chart — one vertical bar per year, each bar filled in its ramp
+   colour at an alpha scaled by magnitude, over a gridded plot with y-axis labels
+   at 0.4° intervals and an emphasised zero line. A white 11-point rolling mean line
+   runs over the bars with round joins, ending in a white dot with a red glow.
+2. A rate-of-change bar list, one row per decade, with 1.2s eased width transitions.
+3. An emissions-by-sector bar list with matching formatting.
+4. A sea-level area chart — 140 points following a t^1.55 curve with jitter, filled
+   with a vertical gradient from cyan to transparent and stroked in light cyan,
+   over a gridded plot with 40mm/20mm/0mm labels.
+5. A 146-block year grid strip where every block is one year in its ramp colour,
+   lifting and brightening on hover with a tooltip giving the year and its value.
+
+Layout: a nav with a monospace brand (one word in hot red) and three links. A hero
+with an amber eyebrow, a 300-weight headline up to 64px with one 600-weight hot-red
+word, and a paragraph. A four-cell KPI row built from 1px gaps showing the current
+anomaly, decadal rate, coldest recent year and warmest ten years, each number
+coloured by whether it is good news or bad. Then a 1.6fr/1fr two-panel row for the
+anomaly chart and the decade bars, then another for emissions and sea level, then
+the year grid. Then a ruled monospace footer that states plainly that the data is
+synthetic.
+
+Interaction: the charts render on load and re-render on resize. The bar fills animate
+in with a 1.2s ease on the first frame. The year grid is the one exploratory
+element — hovering a block lifts it, brightens it and shows its exact value. There
+are no controls; the page is a report, and its only interaction is inspection.
+
+## One-paragraph description of the intended design
+A dark instrument panel reporting a synthetic-but-shaped 146-year temperature
+record: one canvas bar per year in a four-stop diverging ramp with a glowing rolling
+mean, decade and sector bar lists that fill in on load, a gradient-filled sea-level
+area chart, and a 146-block year grid that lifts and reports its value under your
+cursor — every label in tracked uppercase monospace, every number in thin sans.
+
+## Major visual techniques used
+- Deterministic LCG pseudo-random walk so the dataset is identical on every load
+  but still looks organic
+- Four-stop diverging colour ramp applied consistently to bars, grid blocks and
+  legends
+- Canvas bar chart with gridded plot, y-axis labels, emphasised zero line and
+  per-bar alpha from magnitude
+- 11-point rolling mean polyline with round joins and a glowing head dot
+- Gradient-filled area chart from a t^1.55 curve with jitter, stroked in light cyan
+- HTML bar lists with 1.2s eased width transitions driven on the first frame
+- 146-block year grid with hover lift, brightness boost and title-tooltip values
+- KPI row built from 1px gaps over a hairline background, each number coloured by
+  valence (red = bad, amber = mid, cyan = cool)
+- 300-weight display numerals against 8.5px tracked uppercase monospace labels
+- Two-panel 1.6fr/1fr grid rows, collapsing to one column under 900px and KPIs to
+  two under the same breakpoint
+- DPR-aware canvas sizing with debounced re-render on resize
+
+## Intended interaction model
+A report to be read and inspected. The visitor scrolls through the panels and hovers
+the year grid to check individual years; everything else renders itself on load and
+re-renders on resize. There are no controls to operate and no filters to apply — the
+dashboard presents one dataset, fixed, in five different encodings.

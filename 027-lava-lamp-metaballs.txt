@@ -1,0 +1,86 @@
+# MAGMA — A Slow Lamp of Rising Wax
+
+## Short title
+Lava Lamp Metaballs
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a lava lamp simulation
+called MAGMA. No external dependencies whatsoever — no CDN, no web fonts, no
+external images, no external SVG files, no JavaScript libraries. All CSS and
+JavaScript inline, works offline by double-clicking, responsive, valid HTML5.
+
+Artistic direction: a dark room with one lamp. The ground is near-black
+violet #0a0510 with a warm orange radial at the lamp's height and a magenta bloom
+at the base. The lamp itself is drawn on canvas as a tapered vessel: a closed path
+from a narrow shoulder at the top, out through two cubic béziers to a rounded
+bottom and back, filled with a vertical four-stop gradient of translucent magenta,
+crimson and orange. A hairline rim stroke at 18% pink-white gives the glass its
+edge, and a metallic cap and a dark base sit above and below the vessel.
+
+The wax: up to forty-four blobs, each a closed 26-segment noise-ish circle (two
+summed sines at 3× and 5× with a per-blob phase) filled with a radial gradient
+whose hue is derived from the blob's own temperature — hot wax is bright orange at
+hue ~32, cool wax is deep magenta at ~hue 170 of a 300° span — plus a rotated
+elliptical specular. Every blob carries a temperature, a velocity, a drift and a
+phase. Each frame it is pushed upward by buoyancy (temperature − 0.5) × heat × drag,
+its velocity damps at 0.96, its temperature is warmed by the bulb below and cooled
+by the top of the vessel according to its depth, and it bounces off the vessel walls
+— whose width at a given height is computed by a function that narrows toward the
+top, so blobs squeeze into the neck. Blobs that reach the top teleport to the bottom
+as hot wax, and blobs that fall past the base wrap to the top as cool.
+
+The merging: for every overlapping pair of blobs, a bright additive neck stroke is
+drawn in 'lighter' blend, with alpha and width driven by how deeply the two
+overlap — so when two blobs meet they appear to fuse with a bright filament
+between them rather than merely touching. All wax is clipped to the vessel path so
+nothing escapes the glass. A wide orange radial glow blooms at the base, scaled by
+heat.
+
+Layout: a full-viewport canvas with a floating UI overlay whose pointer-events pass
+through except on the controls. Top-left is a monospace model label above an italic
+serif headline with one line in orange, plus a short paragraph. Top-right is a
+monospace meter stack showing the bulb wattage, blob count and heat percentage.
+Bottom is a glass tray with three sliders — Heat (buoyancy strength), Viscosity
+(damping, 0–92%) and Blobs (6–44) — plus a Night cycle toggle that ramps heat up
+and down in a loop, and a Stir button.
+
+Interaction: clicking inside the vessel pushes every nearby blob away from the
+cursor, adds vertical velocity, and warms it up — the lamp visibly reacts to being
+touched. Stir kicks every blob's velocity and drift and warms them. Heat and
+Viscosity change the model live: high heat with low viscosity makes fast fat
+blobs, high viscosity makes a slow gloom that barely moves. Night cycle animates
+the heat slider continuously so the lamp pulses over about nine seconds. On narrow
+screens the paragraph, meters and hint hide.
+
+## One-paragraph description of the intended design
+A lava lamp that runs on a real little model: noisy wax blobs with their own
+temperatures, warm at the bulb and cool at the neck, rising by buoyancy and
+damped by a viscosity slider, fusing with bright additive filaments wherever they
+overlap, all clipped inside a tapered glass vessel that glows orange at its base
+and can be stirred by a fingertip.
+
+## Major visual techniques used
+- Tapered vessel path from cubic béziers, used both as the fill silhouette and as
+  the canvas clip for the wax
+- Vessel width as a function of height so blobs squeeze into the narrowing neck
+- Noisy blob outlines from two summed sines (3× and 5×) with a per-blob phase
+- Temperature-driven colour: hue interpolated from bright orange to deep magenta
+- Buoyancy integration with velocity damping and depth-dependent heating/cooling
+- Wrap-around teleportation of blobs at the top and bottom of the vessel
+- Additive merge filaments ('lighter' blend) with alpha and width from overlap depth
+- Wide orange base glow radial whose alpha scales with heat
+- Metallic cap and dark base drawn as trapezoid paths
+- Click-to-stir with a distance-weighted push, vertical impulse and warming
+- Night cycle that animates the heat slider continuously in a ramp
+- Viscosity as a global drag factor on rise, drift and wobble
+- Live meters for wattage, blob count and heat
+- Italic serif headline with one orange line against 8.5px tracked monospace
+- Floating glass tray with backdrop-filter blur; extras hidden under 760px
+
+## Intended interaction model
+A simulation you can disturb. Visitors watch the wax rise and fall, click inside
+the lamp to push it around and warm it, press Stir to churn it, and set how
+vigorous it all is with the heat and viscosity sliders or how much wax there is
+with the blob count. The Night cycle hands the lamp over to a slow automatic pulse
+so it can be left running as ambience.

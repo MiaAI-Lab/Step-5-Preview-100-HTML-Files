@@ -1,0 +1,83 @@
+# CURRENTS — a flow field you can stir
+
+## Short title
+Currents
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a flow field visualisation
+where thousands of particles are advected by a direction field and paint the sheet they
+cross, with every parameter of the field exposed. No external dependencies whatsoever —
+no CDN, no web fonts, no external images, no JS libraries. All CSS and JavaScript
+inline, works offline by double-clicking, responsive, valid HTML5.
+
+Artistic direction: a deep current at night. Ground #060912, canvas #04060d, hairlines
+rgba(232,238,247,.13), body #e8eef7 with muted #98a4b5, cyan #5ad9e4 for readouts and
+sand #ffb37a for figures. Serif headings with italic accent words, uppercase .1em–.4em
+kickers, monospace figures.
+
+The field is a scalar angle built from two sines at different scales plus a
+turbulence-weighted pair of cross terms, which is the cheapest honest turbulence there
+is. Direction is that angle times the golden angle, so consecutive directions are never
+repeated. Two thousand particles each read the direction where they stand, take one
+step of flow×0.12, and draw a hairline; the picture is the accumulated history of those
+decisions, and nothing in it is a preset curve.
+
+Every frame the sheet is washed with a translucent ground so old streams fade at one
+rate everywhere rather than per particle. Segments are bucketed by speed into four
+Path2D objects and stroked additive, one colour pass per bucket — so line colour is a
+speed map rather than a particle property, and a filament changes hue as it accelerates.
+
+Four sliders: Flow (step length), Turbulence (weight of the cross terms), Scale (the
+spatial frequency of the field) and Drag (how strongly particles within 220 units are
+pulled toward the cursor). Three palettes — thermal, ice and ink. Show the field turns
+on a 48-unit lattice of arrows sampled from the same function, so the numbers can be
+seen rather than only traced. New sheet wipes the canvas and reseeds. Clicking the
+canvas injects two hundred particles at the pointer.
+
+Readout: live particle count, whether the arrow lattice is on, mean speed across the
+field, and total seeded. Layout: nav, centred hero, the full-width field, a dock of four
+sliders, palette chips and two buttons, a readout row, then two three-cell rows of notes
+on advection, the field, drag, palette, arrows and decay, then a footer. Two-up dock
+under 820px, links hidden under 780px.
+
+Interaction: the field runs immediately. Visitors drag through it to leave a wake that
+keeps moving after the pointer has gone, click to inject a burst of dye, nudge the scale
+and turbulence sliders to change the topology of the whole sheet, and switch palettes to
+read the speed map in a different key.
+
+## One-paragraph description of the intended design
+A flow field on canvas where two thousand particles each read a direction built from
+summed sines, step along it and leave a hairline behind, so the sheet fills with
+streams that are the history of the field rather than drawn curves — coloured by speed
+in one of three palettes, washed each frame so trails fade evenly, stirrable by dragging
+a cursor that pulls nearby particles toward it, injectable by clicking, and readable as
+an arrow lattice on demand.
+
+## Major visual techniques used
+- Direction from a scalar angle multiplied by the golden angle, so consecutive
+  directions are never the same and the field never looks periodic
+- Turbulence as a weighted sum of cross terms at double the spatial frequency, which
+  costs nothing and vortices the sheet
+- Advection at a fraction of the unit direction per step, so speed is a property of the
+  field and the flow slider together
+- Segments bucketed by speed into four Path2D objects, then stroked in four colour
+  passes additive — a speed map with four state changes instead of two thousand
+- Additive compositing so overlapping filaments brighten instead of covering
+- One translucent ground wash per frame, which fades everything at the same rate
+- Particles recycled in place when they age out or leave the sheet, so the count is
+  stable and no allocation happens mid-frame
+- Cursor drag as an inverse-distance pull inside a 220-unit radius scaled by the drag
+  slider, which leaves a visible wake
+- Click seeding that injects a burst of particles at the pointer in a 60-unit disc
+- Arrow lattice drawn from the same direction function as the particles, so the
+  debug view and the picture cannot disagree
+- Fixed internal canvas resolution with CSS scaling, keeping the field's spatial
+  frequency stable at every width
+- Live mean speed computed from the same per-particle speed value used for colour
+
+## Intended interaction model
+A sheet you stir. The field is already moving when the page opens; dragging through it
+leaves a wake, clicking injects dye, and the four sliders change the physics of the
+whole field rather than a single trace. Show the field exposes the underlying direction
+as arrows, and New sheet starts again from black.

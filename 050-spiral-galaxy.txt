@@ -1,0 +1,86 @@
+# SPIRAL — A Galaxy, Set Turning
+
+## Short title
+Spiral Galaxy
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: an interactive spiral
+galaxy model called SPIRAL. No external dependencies whatsoever — no CDN, no web
+fonts, no external images, no external SVG files, no JavaScript libraries. All CSS
+and JavaScript inline, works offline by double-clicking, responsive, valid HTML5.
+
+Artistic direction: deep space, mostly dark. A CSS void (#03040e → #05061a →
+#02030a) with a violet glow at the disc's centre and a pink bloom high right. On
+the canvas, a wide two-stop halo sits over the whole disc; a warm core bulge —
+a four-stop radial from warm white through amber to transparent, squashed vertically
+by the tilt — sits at the centre; and up to three thousand stars are drawn in
+additive blend.
+
+The galaxy's arms are a true logarithmic spiral. Each star carries a fraction f
+from core to rim, an arm index, and a spread offset. Its angle is
+log(radius)/winding + armOffset + spread + time, which is the actual equation of a
+logarithmic spiral, so the Winding slider genuinely changes how tightly the arms
+curl. Each star's radius uses a power curve so stars cluster toward the rim, and
+crucially the rotation term is the same for every radius — a flat rotation curve,
+which is what real galaxies do, and which is why the arms wind tighter with distance
+while the material turns together. One hundred and sixty dust particles are drawn
+in multiply blend as elongated ellipses inside the arms, so the lanes read as dark
+rather than bright, and they rotate at a slower rate than the stars which produces
+a genuine shear between the light and the dust.
+
+Each star's hue is chosen from three (a blue-white, a cooler blue, and a warm amber
+— thirty per cent of stars, so the arms have a colour gradient), its size from a
+random range, its alpha from its distance from the core, its twinkle from its own
+phase and speed, and the brighter stars get a five-times-radius halo gradient.
+
+Layout: a full-viewport canvas over the void with a floating UI overlay whose
+pointer-events pass through except on the controls. Top-left is a monospace model
+label above an italic serif headline with one line in warm amber, plus a short
+paragraph about density waves. Top-right is a monospace meter stack showing star
+count, arm count and rotation speed in km/s. Bottom is a glass tray with four
+sliders — Spin (0–100), Arms (1–5), Winding (10–90) and Stars (200–3000) — plus a
+Dust toggle and a Core burst button, and a monospace hint.
+
+Interaction: dragging vertically tilts the disc between 0.05 (edge-on) and 1.0
+(face-on), easing toward the target, which is the single most dramatic control —
+the galaxy opens from a line to a full disc. Scrolling zooms between 0.5× and 2.6×.
+The four sliders reshape it live: more arms, tighter winding, more stars, faster
+spin. Dust toggles the dark lanes off. Core burst flashes a decaying warm wash over
+the body. On narrow screens the paragraph, meters and hint hide.
+
+## One-paragraph description of the intended design
+A galaxy that obeys the real equation: up to three thousand stars placed on a
+logarithmic spiral (angle = log(r)/winding) with a flat rotation curve so the arms
+wind tighter outward while the material turns together, one hundred and sixty dark
+dust lanes in multiply blend rotating slower than the stars to produce genuine
+shear, a warm squashed core bulge, and three star colours — tiltable from edge-on to
+face-on and zoomable.
+
+## Major visual techniques used
+- True logarithmic spiral geometry: angle = ln(radius)/winding + armOffset + spread
+- Flat rotation curve — the same rotation term at every radius, as in real galaxies
+- One to five arms via a shared angular offset of 2π/armCount
+- Power-curve radius distribution so stars cluster toward the rim
+- Additive blending ('lighter') for stars and halos so overlaps bloom
+- Multiply blending for dust lanes so they read as dark, not light
+- Slower dust rotation than star rotation, producing real shear between light and dust
+- Per-star hue from three values (blue-white, cool blue, warm amber at 30%) giving a
+  colour gradient across the arms
+- Per-star twinkle phase and speed, and alpha from distance to the core
+- Five-times-radius halo gradients on the brightest stars
+- Core bulge as a four-stop radial squashed vertically by the tilt factor
+- Wide two-stop disc halo behind everything
+- Vertical drag tilt from 0.05 (edge-on) to 1.0 (face-on), eased toward target
+- Wheel zoom clamped between 0.5× and 2.6×
+- Decaying core-burst flash driven by an interval that writes to the body background
+- Live star count, arm count and derived rotation speed
+- Italic serif headline with one amber line against 8.5px tracked monospace
+- Floating glass tray with backdrop-filter blur; extras hidden under 760px
+
+## Intended interaction model
+A galaxy you can turn over. Visitors drag vertically to tip the disc between
+edge-on and face-on — the one gesture that transforms the page — and scroll to
+zoom. The four sliders reshape it live: more or fewer arms, tighter or looser
+winding, more or fewer stars, faster or slower spin. Dust toggles the dark lanes,
+and Core burst flashes the nucleus. Everything recomputes from data each frame.

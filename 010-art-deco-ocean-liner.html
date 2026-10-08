@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SS AURELIA — Southampton to Rio, 1931</title>
+<style>
+  :root{
+    --deep:#062a3a;
+    --deep2:#0a1f33;
+    --ink:#04161f;
+    --cream:#f4ead6;
+    --gold:#c8a04a;
+    --gold-lt:#e6cd8b;
+    --coral:#d96a4f;
+    --teal:#1f6f7a;
+    --sans:"Futura","Century Gothic","Avenir Next",Avenir,"Segoe UI",Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--deep);color:var(--cream);font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;
+  }
+  /* background art */
+  .bg{position:fixed;inset:0;z-index:0;
+    background:
+      radial-gradient(90% 70% at 78% 18%,rgba(217,106,79,.22),transparent 60%),
+      radial-gradient(80% 60% at 12% 88%,rgba(31,111,122,.3),transparent 62%),
+      linear-gradient(170deg,var(--deep2),var(--deep) 45%,var(--ink));
+  }
+  .rays{
+    position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.3;mix-blend-mode:screen;
+    background:repeating-conic-gradient(from 200deg at 78% 12%,
+      rgba(230,205,139,.13) 0deg 3deg, transparent 3deg 11deg);
+    mask-image:radial-gradient(60% 60% at 78% 12%,#000 0%,transparent 72%);
+    -webkit-mask-image:radial-gradient(60% 60% at 78% 12%,#000 0%,transparent 72%);
+    animation:sweep 24s linear infinite;
+  }
+  @keyframes sweep{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+  .grain{
+    position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.16;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' seed='5'/></filter><rect width='200' height='200' filter='url(%23g)'/></svg>");
+  }
+
+  .wrap{position:relative;z-index:2;max-width:1180px;margin:0 auto;padding:0 clamp(18px,4vw,44px)}
+
+  /* ---------- rule + head ---------- */
+  .rule{
+    height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.7
+  }
+  .deco{display:flex;align-items:center;justify-content:center;gap:14px;padding:clamp(20px,4vw,38px) 0}
+  .deco i{width:7px;height:7px;background:var(--gold);transform:rotate(45deg);display:block}
+  .deco span{font-family:var(--mono);font-size:9px;letter-spacing:.5em;text-transform:uppercase;color:var(--gold);opacity:.85}
+
+  /* ---------- hero ---------- */
+  .hero{padding:clamp(20px,5vw,60px) 0 clamp(30px,6vw,70px);text-align:center;position:relative}
+  .fan{
+    position:absolute;left:50%;top:-40px;transform:translateX(-50%);width:min(680px,92vw);height:340px;
+    pointer-events:none;opacity:.55;
+  }
+  .hero .eyebrow{
+    font-family:var(--mono);font-size:9.5px;letter-spacing:.42em;text-transform:uppercase;color:var(--gold-lt);
+    display:block;margin-bottom:26px
+  }
+  h1{
+    font-family:var(--sans);font-weight:400;text-transform:uppercase;
+    font-size:clamp(40px,10.5vw,150px);line-height:.87;letter-spacing:.06em;margin:0;
+    color:var(--cream);
+    text-shadow:0 0 60px rgba(200,160,74,.28);
+  }
+  h1 .thin{
+    display:block;font-size:.44em;letter-spacing:.5em;color:var(--gold-lt);margin-top:.34em;font-weight:400
+  }
+  .sub{
+    font-family:var(--mono);font-size:clamp(9.5px,1.3vw,12px);letter-spacing:.4em;text-transform:uppercase;
+    color:rgba(244,234,214,.72);margin:34px 0 0;line-height:2.4
+  }
+  .sub b{color:var(--coral);font-weight:400}
+
+  /* ---------- panel grid ---------- */
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(200,160,74,.3);margin:clamp(34px,6vw,70px) 0}
+  .cell{background:rgba(6,42,58,.55);padding:clamp(22px,3vw,34px) clamp(18px,2.4vw,28px);position:relative;overflow:hidden}
+  .cell::before{
+    content:"";position:absolute;inset:0;opacity:.09;pointer-events:none;
+    background:repeating-linear-gradient(135deg,var(--gold) 0 1px,transparent 1px 9px);
+  }
+  .cell .n{font-family:var(--mono);font-size:9px;letter-spacing:.34em;color:var(--gold);text-transform:uppercase}
+  .cell h3{
+    font-family:var(--sans);font-weight:400;font-size:clamp(18px,2.2vw,26px);letter-spacing:.16em;
+    text-transform:uppercase;margin:14px 0 12px;line-height:1.3
+  }
+  .cell p{margin:0;font-size:12.5px;line-height:1.86;color:rgba(244,234,214,.7)}
+  .cell .price{
+    margin-top:18px;padding-top:14px;border-top:1px solid rgba(200,160,74,.32);
+    display:flex;justify-content:space-between;align-items:baseline;
+    font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--gold-lt)
+  }
+  .cell .price b{font-family:var(--sans);font-size:24px;letter-spacing:.02em;color:var(--cream);font-weight:400}
+
+  /* ---------- itinerary ---------- */
+  .itin{display:grid;grid-template-columns:1fr 1fr;gap:clamp(26px,5vw,64px);padding:clamp(34px,6vw,72px) 0}
+  .itin h2{
+    font-family:var(--sans);font-weight:400;font-size:clamp(20px,2.6vw,30px);letter-spacing:.24em;
+    text-transform:uppercase;margin:0 0 26px
+  }
+  table{width:100%;border-collapse:collapse}
+  td{padding:13px 0;border-bottom:1px solid rgba(200,160,74,.24);font-size:12.5px;vertical-align:baseline}
+  td.t{font-family:var(--mono);width:74px;color:var(--gold-lt);letter-spacing:.06em}
+  td.p{font-family:var(--mono);width:66px;text-align:right;color:rgba(244,234,214,.5);font-size:11px}
+  tr:hover td{color:var(--cream)}
+  tr:hover td.t{color:var(--coral)}
+  .decklist{list-style:none;margin:0;padding:0}
+  .decklist li{
+    padding:13px 0;border-bottom:1px solid rgba(200,160,74,.24);font-size:12.5px;
+    display:flex;gap:14px;align-items:baseline;color:rgba(244,234,214,.8)
+  }
+  .decklist b{font-family:var(--mono);font-size:10px;color:var(--gold);letter-spacing:.2em;min-width:26px}
+
+  /* ---------- CTA ---------- */
+  .cta{
+    text-align:center;padding:clamp(40px,7vw,90px) clamp(20px,4vw,50px);
+    border:1px solid rgba(200,160,74,.42);position:relative;
+    background:linear-gradient(160deg,rgba(217,106,79,.1),rgba(6,42,58,.4));
+  }
+  .cta::before,.cta::after{
+    content:"";position:absolute;width:18px;height:18px;border:1px solid var(--gold-lt)
+  }
+  .cta::before{top:-1px;left:-1px;border-right:0;border-bottom:0}
+  .cta::after{bottom:-1px;right:-1px;border-left:0;border-top:0}
+  .cta h2{font-family:var(--sans);font-weight:400;font-size:clamp(22px,4vw,46px);letter-spacing:.2em;text-transform:uppercase;margin:0 0 18px}
+  .cta p{margin:0 auto 30px;max-width:46ch;font-size:13px;line-height:1.9;color:rgba(244,234,214,.72)}
+  .btn{
+    display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.3em;text-transform:uppercase;
+    color:var(--ink);background:linear-gradient(120deg,var(--gold-lt),var(--gold));
+    padding:16px 34px;border:0;cursor:pointer;text-decoration:none;
+    transition:transform .3s,box-shadow .3s;box-shadow:0 14px 34px -14px rgba(200,160,74,.7)
+  }
+  .btn:hover{transform:translateY(-3px);box-shadow:0 22px 44px -14px rgba(200,160,74,.95)}
+
+  footer{
+    display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
+    padding:clamp(26px,5vw,48px) 0 clamp(34px,6vw,60px);
+    font-family:var(--mono);font-size:9px;letter-spacing:.26em;text-transform:uppercase;color:rgba(244,234,214,.5)
+  }
+
+  @media (max-width:900px){.grid{grid-template-columns:1fr}.itin{grid-template-columns:1fr}}
+  @media (prefers-reduced-motion:reduce){.rays{animation:none}}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="rays" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<div class="wrap">
+  <div class="deco"><i></i><span>Cunard Aurelia Line</span><i></i></div>
+
+  <header class="hero">
+    <svg class="fan" viewBox="0 0 680 340" aria-hidden="true">
+      <g fill="none" stroke="#c8a04a" stroke-width="1" opacity=".9">
+        <path d="M40 320 L340 40 L640 320"/>
+        <path d="M100 320 L340 108 L580 320"/>
+        <path d="M160 320 L340 176 L520 320"/>
+        <path d="M220 320 L340 244 L460 320"/>
+        <path d="M280 320 L340 300 L400 320"/>
+      </g>
+      <circle cx="340" cy="40" r="7" fill="#e6cd8b"/>
+      <circle cx="340" cy="40" r="16" fill="none" stroke="#d96a4f" stroke-width="1"/>
+    </svg>
+    <span class="eyebrow">Maiden voyage · 14 November 1931</span>
+    <h1>Aurelia<span class="thin">Southampton → Rio</span></h1>
+    <p class="sub">Twelve days · 61,000 tons · <b>£ 42</b> return<br>The fastest way south, if you are not in a hurry to arrive.</p>
+  </header>
+
+  <div class="rule"></div>
+
+  <section class="grid">
+    <article class="cell">
+      <span class="n">Accommodation 01</span>
+      <h3>Promenade Class</h3>
+      <p>An outside cabin on B deck with a porthole you can open, a brass bed,
+      and a steward who remembers how you take your tea. Six cabins only; they go
+      first.</p>
+      <div class="price"><span>RETURN</span><b>£ 42</b></div>
+    </article>
+    <article class="cell">
+      <span class="n">Accommodation 02</span>
+      <h3>Sun Deck Suite</h3>
+      <p>Two rooms and a private veranda above the boat deck, with the smoking
+      room at one end and the lido at the other. Includes a permanent place at the
+      captain's table.</p>
+      <div class="price"><span>RETURN</span><b>£ 96</b></div>
+    </article>
+    <article class="cell">
+      <span class="n">Accommodation 03</span>
+      <h3>Tourist Third</h3>
+      <p>Four berths, no porthole, and the company of everyone interesting on
+      board. The dining saloon is the same room, the food is the same kitchen.</p>
+      <div class="price"><span>RETURN</span><b>£ 18</b></div>
+    </article>
+  </section>
+
+  <section class="itin">
+    <div>
+      <h2>Passage</h2>
+      <table>
+        <tbody>
+          <tr><td class="t">14 NOV</td><td>Southampton · weigh anchor 17:00</td><td class="p">0 mi</td></tr>
+          <tr><td class="t">16 NOV</td><td>Bay of Biscay · the ship's orchestra plays on</td><td class="p">780 mi</td></tr>
+          <tr><td class="t">19 NOV</td><td>Madeira · Flores, four hours ashore</td><td class="p">2,410 mi</td></tr>
+          <tr><td class="t">22 NOV</td><td>Crossing the line · Neptune boards at dawn</td><td class="p">3,950 mi</td></tr>
+          <tr><td class="t">25 NOV</td><td>Bahia · breakfast on deck under the stars</td><td class="p">5,180 mi</td></tr>
+          <tr><td class="t">26 NOV</td><td>Rio de Janeiro · alongside 09:00</td><td class="p">5,640 mi</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <h2>Aboard</h2>
+      <ul class="decklist">
+        <li><b>01</b><span>The Grand Stair — three decks, gilded plaster, no lifts anywhere.</span></li>
+        <li><b>02</b><span>Smoking Room, aft, with a ceiling painted to look like a night sky.</span></li>
+        <li><b>03</b><span>Verandah Grill for ices at four, served by men in white.</span></li>
+        <li><b>04</b><span>A swimming pool, seawater, heated to 24°C by the engines.</span></li>
+        <li><b>05</b><span>Boat Deck for the whole length — four laps to the mile.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="cta">
+    <h2>Book a berth</h2>
+    <p>Twenty pounds deposit holds a cabin for fourteen days. Full balance at the
+    purser's window, Southampton Terminus, before four on the afternoon of sailing.</p>
+    <a class="btn" href="#" id="book">Reserve a cabin</a>
+  </section>
+
+  <footer>
+    <span>SS Aurelia · 61,418 gross tons</span>
+    <span>Official No. 148902</span>
+    <span>Southampton · Madeira · Bahia · Rio</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  document.getElementById('book').addEventListener('click',function(e){
+    e.preventDefault();
+    this.textContent='Deposit received ✓';
+    this.style.pointerEvents='none';
+  });
+  /* gentle marquee of the route in the footer area, CSS only via existing CSS */
+})();
+</script>
+</body>
+</html>

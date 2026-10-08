@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Engine Room — two hundred years of gauges</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:#12100c;color:#f0e7d4;
+  font:15px/1.62 ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+.serif{font-family:ui-serif,Georgia,"Times New Roman",serif}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.wrap{width:min(1120px,92vw);margin:0 auto}
+nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0 14px;
+  border-bottom:1px solid rgba(240,231,212,.14)}
+nav .brand{font-family:ui-serif,Georgia,serif;font-size:19px}
+nav .brand i{font-style:italic;color:#e0a63c}
+nav ul{display:flex;gap:26px;list-style:none;margin:0;padding:0;font-size:11px;
+  letter-spacing:.24em;text-transform:uppercase;color:#9c9078}
+nav a{color:inherit;text-decoration:none}nav a:hover{color:#e0a63c}
+@media(max-width:780px){nav ul{display:none}}
+header.hero{padding:52px 0 22px;text-align:center}
+header.hero .kicker{font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:#e0a63c;
+  margin:0 0 14px}
+header.hero h1{font-family:ui-serif,Georgia,serif;font-weight:400;
+  font-size:clamp(32px,5.6vw,64px);line-height:1.05;margin:0 0 16px}
+header.hero h1 em{font-style:italic;color:#8fd0c0}
+header.hero p{max-width:60ch;margin:0 auto;color:#a2947a}
+.wall{position:relative;border:1px solid rgba(240,231,212,.16);border-radius:16px;
+  overflow:hidden;background:#0b0a07;margin-bottom:18px}
+.wall canvas{display:block;width:100%;height:auto}
+.wall .cap{position:absolute;left:14px;top:12px;font-size:10px;letter-spacing:.26em;
+  text-transform:uppercase;color:rgba(240,231,212,.5);pointer-events:none}
+.dock{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;justify-content:space-between;
+  border-top:1px solid rgba(240,231,212,.14);border-bottom:1px solid rgba(240,231,212,.14);
+  padding:16px 0;margin-bottom:32px}
+.dock label{display:grid;gap:7px;font-size:10px;letter-spacing:.26em;text-transform:uppercase;
+  color:#9c9078;min-width:150px}
+input[type=range]{width:100%;accent-color:#e0a63c}
+.btn{background:#e0a63c;color:#221604;border:0;border-radius:8px;padding:11px 15px;
+  font:inherit;font-size:12px;font-weight:700;letter-spacing:.08em;cursor:pointer;margin:0 6px 6px 0}
+.btn.ghost{background:transparent;color:#f0e7d4;border:1px solid rgba(240,231,212,.24)}
+.btn:hover{filter:brightness(1.07)}
+.readout{display:flex;flex-wrap:wrap;gap:12px 26px;margin-bottom:40px;
+  border-top:1px solid rgba(240,231,212,.14);padding-top:16px}
+.readout div{min-width:86px}
+.readout dt{font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:#9c9078;margin:0 0 4px}
+.readout dd{margin:0;font-size:20px;font-family:ui-monospace,Menlo,monospace;color:#8fd0c0}
+.readout dd.hot{color:#e05a3c}
+.cells{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-bottom:46px}
+@media(max-width:820px){.cells{grid-template-columns:1fr}}
+.cell{border-top:1px solid rgba(240,231,212,.16);padding-top:16px}
+.cell .fig{font-family:ui-serif,Georgia,serif;font-size:38px;color:#e0a63c;line-height:1;margin-bottom:8px}
+.cell h3{font-family:ui-serif,Georgia,serif;font-weight:400;font-style:italic;font-size:21px;margin:0 0 8px}
+.cell p{margin:0;color:#a2947a;font-size:14px}
+footer{border-top:1px solid rgba(240,231,212,.14);padding:22px 0 54px;display:flex;
+  justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:11px;letter-spacing:.2em;
+  text-transform:uppercase;color:#7d715f}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="brand">Engine <i>Room</i></div>
+    <ul>
+      <li><a href="#wall">Wall</a></li>
+      <li><a href="#dock">Order</a></li>
+      <li><a href="#notes">Notes</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <p class="kicker">Bourdon tube · diaphragm · mercury column</p>
+    <h1 class="serif">A gauge is a machine<br>that <em>forgets</em></h1>
+    <p>Before plastics, before electronics, every number on a wall arrived by something
+       flexing, something boiling, or a column of mercury climbing a glass tube. Nothing on
+       this wall is digital, and nothing on it moves unless something real does.</p>
+  </header>
+
+  <section class="wall" id="wall">
+    <canvas id="c" width="1000" height="520"></canvas>
+    <p class="cap">five gauges · brass, glass and a lot of patina</p>
+  </section>
+
+  <section class="dock" id="dock">
+    <label for="throttle">Throttle <input id="throttle" type="range" min="0" max="100" value="48"></label>
+    <label for="load">Load <input id="load" type="range" min="0" max="100" value="55"></label>
+    <label for="wear">Wear <input id="wear" type="range" min="0" max="100" value="30"></label>
+    <div>
+      <button class="btn" id="blow">Blow the safety</button>
+      <button class="btn ghost" id="service">Service the lot</button>
+    </div>
+  </section>
+
+  <dl class="readout">
+    <div><dt>Boiler</dt><dd id="rB">—</dd></div>
+    <div><dt>RPM</dt><dd id="rR">—</dd></div>
+    <div><dt>Vacuum</dt><dd id="rV">—</dd></div>
+    <div><dt>Lube oil</dt><dd id="rO">—</dd></div>
+    <div><dt>Coolant</dt><dd id="rC">—</dd></div>
+    <div><dt>Condition</dt><dd id="rS">—</dd></div>
+  </dl>
+
+  <section class="cells">
+    <div class="cell">
+      <div class="fig serif">i</div>
+      <h3>The tube</h3>
+      <p>A Bourdon tube is a flat coil that tries to straighten when pressure goes in. That
+         is the whole mechanism: pressure becomes a curl, the curl pulls a linkage, and the
+         linkage swings a needle past a printed scale.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">ii</div>
+      <h3>Hysteresis</h3>
+      <p>Worn gauges do not come back down the way they went up. The wear slider is how far
+         the needle lags on the way back, which is why an old gauge is read at the end of a
+         run and not during it.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">iii</div>
+      <h3>Safety valve</h3>
+      <p>Above the red line the valve lifts and the boiler vents. The needle does not stop
+         at the red line; it drops, and the steam goes somewhere less useful.</p>
+    </div>
+  </section>
+
+  <section class="cells" id="notes">
+    <div class="cell">
+      <div class="fig serif">iv</div>
+      <h3>The column</h3>
+      <p>The vacuum gauge is a mercury column: a U-tube with a scale behind it. It is honest
+         in a way a needle never is, because you can see the liquid move.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">v</div>
+      <h3>Glass</h3>
+      <p>The coolant level is sight glass — a thick tube with the liquid inside it and a
+         shadow on the wall behind. Some things need a number and some need a window.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">vi</div>
+      <h3>Service</h3>
+      <p>Service the lot resets the wear, but wear also comes back as the engine runs, so the
+         gauges drift again. Nothing here stays calibrated for long.</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>Engine Room · one canvas, no files</span>
+    <span class="mono">psi · bar · inHg · °C</span>
+  </footer>
+</div>
+<script>
+(function(){
+"use strict";
+var cv=document.getElementById('c'),ctx=cv.getContext('2d');
+var W=cv.width,H=cv.height;
+var throttle=48,load=55,wear=30,t=0;
+var venting=0;
+/* the state, with hysteresis: a needle chases a target and lags by the wear */
+var state={
+  boiler:{v:0,min:0,max:180,unit:'psi',red:150,tick:20,label:'BOILER',sub:'psi'},
+  rpm:{v:0,min:0,max:1200,unit:'rpm',red:1000,tick:200,label:'ENGINE',sub:'rpm'},
+  vac:{v:0,min:0,max:30,unit:'inHg',red:0,tick:5,label:'VACUUM',sub:'inHg'},
+  oil:{v:0,min:0,max:100,unit:'psi',red:0,tick:20,label:'LUBE OIL',sub:'psi'},
+  water:{v:0,min:0,max:120,unit:'°C',red:105,tick:20,label:'COOLANT',sub:'°C'}
+};
+/* the mercury column reads its own scale */
+var column=0;
+function mix(a,b,k){
+  var A=[parseInt(a.slice(1,3),16),parseInt(a.slice(3,5),16),parseInt(a.slice(5,7),16)];
+  var B=[parseInt(b.slice(1,3),16),parseInt(b.slice(3,5),16),parseInt(b.slice(5,7),16)];
+  return 'rgb('+Math.round(A[0]+(B[0]-A[0])*k)+','+Math.round(A[1]+(B[1]-A[1])*k)+
+    ','+Math.round(A[2]+(B[2]-A[2])*k)+')';
+}
+/* ---------- the wall ---------- */
+function wall(){
+  var g=ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'#221d15');g.addColorStop(1,'#100e0a');
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  /* riveted plate seams */
+  ctx.strokeStyle='rgba(0,0,0,.4)';ctx.lineWidth=2;
+  for(var y=0;y<H;y+=64){
+    ctx.beginPath();ctx.moveTo(0,y+1);ctx.lineTo(W,y+1);ctx.stroke();
+    for(var x=(y/64%2)*33;x<W;x+=66){
+      ctx.fillStyle='rgba(240,231,212,.05)';
+      ctx.beginPath();ctx.arc(x,y,3.4,0,6.3);ctx.fill();
+    }
+  }
+  /* a light from the upper left */
+  var lg=ctx.createRadialGradient(W*0.2,0,20,W*0.2,0,W*0.9);
+  lg.addColorStop(0,'rgba(255,230,180,.10)');
+  lg.addColorStop(1,'rgba(255,230,180,0)');
+  ctx.fillStyle=lg;ctx.fillRect(0,0,W,H);
+}
+/* ---------- a dial ---------- */
+function dial(g,x,y,r,key){
+  var s=state[key],f=(s.v-s.min)/(s.max-s.min);
+  var a0=Math.PI*0.75,a1=Math.PI*2.25;
+  var ang=a0+(a1-a0)*f;
+  /* the case */
+  var cg=ctx.createRadialGradient(x-r*0.3,y-r*0.4,r*0.1,x,y,r);
+  cg.addColorStop(0,'#c9a35a');cg.addColorStop(0.7,'#8a6a2c');cg.addColorStop(1,'#4a3818');
+  ctx.fillStyle=cg;
+  ctx.beginPath();ctx.arc(x,y,r,0,6.3);ctx.fill();
+  ctx.strokeStyle='rgba(0,0,0,.5)';ctx.lineWidth=2;ctx.stroke();
+  /* the face */
+  ctx.fillStyle='#efe6cd';
+  ctx.beginPath();ctx.arc(x,y,r*0.86,0,6.3);ctx.fill();
+  /* the red line */
+  var rf=(s.red-s.min)/(s.max-s.min);
+  if(rf>0&&rf<1){
+    ctx.strokeStyle='#c0392b';ctx.lineWidth=3.5;
+    ctx.beginPath();ctx.arc(x,y,r*0.82,a0+(a1-a0)*rf,a0+(a1-a0)*rf+0.001);ctx.stroke();
+  }
+  /* the ticks and the numbers */
+  ctx.strokeStyle='#3a3020';ctx.lineWidth=1.4;
+  ctx.fillStyle='#3a3020';ctx.font=(r*0.14)+'px ui-monospace,Menlo,monospace';
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  var n=(s.max-s.min)/s.tick;
+  for(var i=0;i<=n;i++){
+    var v=s.min+i*s.tick,f2=(v-s.min)/(s.max-s.min),ta=a0+(a1-a0)*f2;
+    var x1=x+Math.cos(ta)*r*0.74,y1=y+Math.sin(ta)*r*0.74;
+    var x2=x+Math.cos(ta)*r*0.82,y2=y+Math.sin(ta)*r*0.82;
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+    var lx=x+Math.cos(ta)*r*0.58,ly=y+Math.sin(ta)*r*0.58;
+    ctx.fillText(String(Math.round(v)),lx,ly);
+  }
+  /* the label */
+  ctx.fillStyle='#5a4c32';ctx.font=(r*0.16)+'px ui-monospace,Menlo,monospace';
+  ctx.fillText(s.label,x,y+r*0.06);
+  ctx.font=(r*0.12)+'px ui-monospace,Menlo,monospace';
+  ctx.fillStyle='#8a7a58';
+  ctx.fillText(s.sub,x,y+r*0.24);
+  /* the needle, with a counterweight and a shadow */
+  ctx.save();
+  ctx.translate(x,y);ctx.rotate(ang);
+  ctx.fillStyle='rgba(0,0,0,.25)';
+  ctx.beginPath();ctx.moveTo(-r*0.14,3);ctx.lineTo(r*0.78,-2.4);ctx.lineTo(r*0.78,2.4);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#2b2118';
+  ctx.beginPath();ctx.moveTo(-r*0.2,0);ctx.lineTo(r*0.8,-2.4);ctx.lineTo(r*0.8,2.4);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#2b2118';
+  ctx.beginPath();ctx.arc(-r*0.1,0,r*0.1,0,6.3);ctx.fill();
+  ctx.restore();
+  ctx.fillStyle='#8a6a2c';
+  ctx.beginPath();ctx.arc(x,y,r*0.07,0,6.3);ctx.fill();
+  /* glass: a specular sweep */
+  ctx.save();
+  ctx.beginPath();ctx.arc(x,y,r*0.86,0,6.3);ctx.clip();
+  var gg=ctx.createLinearGradient(x-r,y-r,x+r*0.4,y+r);
+  gg.addColorStop(0,'rgba(255,255,255,.28)');
+  gg.addColorStop(0.45,'rgba(255,255,255,0)');
+  ctx.fillStyle=gg;ctx.fillRect(x-r,y-r,r*2,r*2);
+  ctx.restore();
+}
+/* ---------- the mercury column ---------- */
+function mercuryColumn(x,y,w,h){
+  /* the board behind it */
+  ctx.fillStyle='#1a1610';
+  ctx.fillRect(x-w*0.6,y-20,w*1.7,h+40);
+  /* the U tube, drawn as a path with a thick stroke */
+  ctx.strokeStyle='rgba(200,220,240,.22)';ctx.lineWidth=14;ctx.lineCap='round';
+  ctx.beginPath();
+  ctx.moveTo(x,y);
+  ctx.lineTo(x,y+h*0.62);
+  ctx.quadraticCurveTo(x,y+h,x+w*0.5,y+h);
+  ctx.quadraticCurveTo(x+w,y+h*0.62,x+w,y+h*0.3);
+  ctx.stroke();
+  /* the mercury, in the near limb, at a height from the column reading */
+  ctx.strokeStyle='#c8ccd4';ctx.lineWidth=10;
+  ctx.beginPath();
+  ctx.moveTo(x,y+ (h*0.62-column*0.5));
+  ctx.lineTo(x,y+h*0.62);
+  ctx.quadraticCurveTo(x,y+h*0.94,x+w*0.5,y+h*0.94);
+  ctx.quadraticCurveTo(x+w,y+h*0.62,x+w,y+h*0.62);
+  ctx.stroke();
+  /* a meniscus highlight */
+  ctx.strokeStyle='rgba(255,255,255,.7)';ctx.lineWidth=2;
+  ctx.beginPath();
+  ctx.moveTo(x-4,y+(h*0.62-column*0.5));
+  ctx.lineTo(x+4,y+(h*0.62-column*0.5));
+  ctx.stroke();
+  /* the scale */
+  ctx.fillStyle='#efe6cd';ctx.font='11px ui-monospace,Menlo,monospace';
+  ctx.textAlign='left';ctx.textBaseline='middle';
+  for(var i=0;i<=6;i++){
+    var yy=y+(h*0.62)*(i/6);
+    ctx.fillText(String(30-i*5),x+w+12,yy);
+    ctx.strokeStyle='#efe6cd';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(x+w+4,yy);ctx.lineTo(x+w+10,yy);ctx.stroke();
+  }
+  ctx.fillStyle='#efe6cd';
+  ctx.fillText('VACUUM',x-4,y-8);
+}
+/* ---------- the sight glass ---------- */
+function sightGlass(x,y,w,h){
+  /* the wall behind, with a shadow */
+  ctx.fillStyle='rgba(0,0,0,.35)';
+  ctx.fillRect(x-6,y-6,w+12,h+12);
+  /* the glass */
+  ctx.strokeStyle='rgba(200,220,240,.3)';ctx.lineWidth=9;
+  ctx.beginPath();ctx.moveTo(x+w/2,y);ctx.lineTo(x+w/2,y+h);ctx.stroke();
+  /* the coolant inside it */
+  var level=h*(0.35+state.water.v/state.water.max*0.5);
+  ctx.strokeStyle='#6ac0a0';ctx.lineWidth=5;
+  ctx.beginPath();ctx.moveTo(x+w/2,y+h-level);ctx.lineTo(x+w/2,y+h);ctx.stroke();
+  /* the scale */
+  ctx.fillStyle='#efe6cd';ctx.font='10px ui-monospace,Menlo,monospace';
+  ctx.textAlign='left';ctx.textBaseline='middle';
+  for(var i=0;i<=4;i++){
+    ctx.fillText(String(4-i),x+w+10,y+h*(i/4));
+  }
+  ctx.fillStyle='#efe6cd';
+  ctx.fillText('COOLANT',x-18,y-10);
+  /* a glass shine */
+  ctx.strokeStyle='rgba(255,255,255,.5)';ctx.lineWidth=1.6;
+  ctx.beginPath();ctx.moveTo(x+w/2-3,y+10);ctx.lineTo(x+w/2-3,y+h-30);ctx.stroke();
+}
+
+/* ---------- physics and controls ---------- */
+function targets(){
+  /* the throttle and the load drive the engine; wear makes everything slow */
+  var w=wear/100;
+  var b=throttle*1.55-load*0.35+w*22+8;
+  var r=throttle*8-load*2.2+w*180;
+  var v=load*0.24-load*0.05;
+  var o=8+throttle*0.6-w*10;
+  var c=40+throttle*0.55+load*0.2-w*18;
+  if(venting>0)b*=0.55;      /* the safety valve lifts and the boiler vents */
+  return{boiler:b,rpm:r,vac:v,oil:o,water:c};
+}
+function step(dt){
+  var tg=targets();
+  /* a needle chases its target, and lags more the more worn the gauge is */
+  for(var k in state){
+    var s=state[k];
+    var lag=1-(wear/100)*0.72;
+    s.v+=(tg[k]-s.v)*dt*(1.4+Math.random()*0.7)*lag;
+    if(s.v<s.min)s.v=s.min;
+    if(s.v>s.max)s.v=s.max;
+  }
+  /* the mercury column: slow, heavy, and honest */
+  column+=(state.vac.v-column)*dt*0.55;
+  /* wear comes back as the engine runs */
+  wear=Math.min(100,wear+dt*(throttle/100)*0.35);
+  venting=Math.max(0,venting-dt);
+}
+function bind(id,fn){var el=document.getElementById(id);
+  el.addEventListener('input',function(){fn(+el.value);});}
+bind('throttle',function(v){throttle=v;});
+bind('load',function(v){load=v;});
+bind('wear',function(v){wear=v;});
+document.getElementById('blow').addEventListener('click',function(){
+  venting=2.2;state.boiler.v=state.boiler.max;
+});
+document.getElementById('service').addEventListener('click',function(){
+  wear=4;
+});
+function readout(){
+  var b=document.getElementById('rB');
+  b.textContent=Math.round(state.boiler.v)+' psi';
+  b.classList.toggle('hot',state.boiler.v>150);
+  document.getElementById('rR').textContent=Math.round(state.rpm.v);
+  document.getElementById('rV').textContent=state.vac.v.toFixed(1)+' inHg';
+  document.getElementById('rO').textContent=Math.round(state.oil.v)+' psi';
+  document.getElementById('rC').textContent=Math.round(state.water.v)+' °C';
+  var st=wear>75?'worn out':wear>55?'service overdue':wear>35?'fair':'good';
+  document.getElementById('rS').textContent=st+(venting>0?' · venting':'');
+}
+/* ---------- loop ---------- */
+var last=0;
+function draw(){
+  wall();
+  /* three dials along the top, one lower left */
+  dial(0,W*0.2,H*0.36,88,'boiler');
+  dial(0,W*0.5,H*0.36,88,'rpm');
+  dial(0,W*0.8,H*0.36,88,'oil');
+  /* the mercury column and the sight glass */
+  mercuryColumn(W*0.15,H*0.74,W*0.09,110);
+  sightGlass(W*0.52,H*0.80,16,110);
+  /* a brass plaque */
+  ctx.fillStyle='#8a6a2c';
+  ctx.fillRect(W*0.72,H*0.72,180,58);
+  ctx.fillStyle='#f0e7d4';ctx.font='10px ui-monospace,Menlo,monospace';
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText('HORIZONTAL COMPOUND',W*0.72+90,H*0.72+22);
+  ctx.fillText('BUILT 1891 · No. 217',W*0.72+90,H*0.72+38);
+  /* steam when the valve lifts */
+  if(venting>0){
+    ctx.fillStyle='rgba(240,231,212,'+(0.1*Math.min(1,venting))+')';
+    for(var i=0;i<26;i++){
+      var sx=W*0.2+Math.sin(t+i)*30, sy=H*0.36-90-i*8;
+      ctx.beginPath();ctx.arc(sx,sy,14+i,0,6.3);ctx.fill();
+    }
+  }
+}
+function loop(ts){
+  var dt=last?Math.min(.05,(ts-last)/1000):0;last=ts;
+  t+=dt;step(dt);draw();readout();
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

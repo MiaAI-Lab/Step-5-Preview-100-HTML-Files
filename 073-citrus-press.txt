@@ -1,0 +1,83 @@
+# GROVE &amp; PRESS — citrus you have to work for
+
+## Short title
+Citrus Press
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a citrus press where the fruit
+is drawn from its real anatomy, the variety and size set the yield, and holding a button
+squeezes it into a glass. No external dependencies whatsoever — no CDN, no web fonts, no
+external images, no JS libraries. All CSS and JavaScript inline, works offline by
+double-clicking, responsive, valid HTML5.
+
+Artistic direction: a warm room. Ground #fff8ec, panels #fffdf6, hairlines
+rgba(43,33,24,.2), ink #2b2118 with muted #6b5c48, one accent orange #ff6a13 and a leaf
+green #3f7d3a. Serif headings with italic accent words, uppercase .2em–.4em kickers,
+monospace figures. Nothing here is dark.
+
+Five varieties — Valencia orange, Eureka lemon, Ruby grapefruit, Tarocco blood orange and
+Key lime — each with its own rind, rind shadow, pulp and pith colours, its own segment
+count and its own real yield in millilitres. The variety panel is aria-pressed chips with
+a colour swatch and a two-word tasting note.
+
+The fruit is SVG. Whole, it is a shaded sphere with a peel pore texture — seventy dots
+placed on a golden-angle spiral so they read as peel — a dimple at the top, a stem and a
+leaf. Halved, it is rind, pith, pulp and then the segments: the real number of them for
+that variety, each a filled wedge, each with a vesicle line down the middle, around a
+white core. Hold the squeeze button and a dark ram slides down onto the halved fruit while
+the pulp darkens.
+
+The glass is a clipped SVG: juice fills from the bottom at a rate set by how hard you
+press, with pulp flecks, a meniscus, ice cubes once it is more than half full, and a twist
+of zest on the rim. The recipe rows underneath recompute from the same variety and size:
+juice, zest, sugar (more for the sharp ones), ice, segment count, and fruits used today.
+
+Controls: the variety chips, a hold-to-squeeze button, a size slider from 70 to 130
+percent, and Halve it. Readout: pressed percentage, variety, yield in millilitres, whether
+the glass is empty, pouring or full, and fruits pressed today.
+
+Layout: nav, centred hero, a two-column press of fruit and panel, a readout row, a
+two-column recipe of amounts and glass, then two three-cell note rows on segments, yield,
+rind, the press, colour and season, then a footer. One column under 900px, links hidden
+under 780px.
+
+Interaction: pick a variety, set the size, and hold the squeeze button — the ram comes
+down, the fruit darkens and the glass fills to whatever that fruit actually gives, and the
+recipe numbers follow. Halve it to see the anatomy, and change variety to change the whole
+page's palette.
+
+## One-paragraph description of the intended design
+A citrus press on a warm cream page where five varieties each carry their own colours,
+segment count and real yield, the fruit is drawn as a shaded sphere with a golden-angle
+peel texture or as a halved cross-section with its real number of segments and vesicle
+lines, and holding the squeeze button brings a ram down onto it while a glass fills to
+that fruit's yield with pulp flecks, ice and a twist of zest, and the recipe rows recompute
+from the same two variables.
+
+## Major visual techniques used
+- Fruit anatomy drawn in the right order: rind, pith, pulp, segments, core, so the
+  cross-section is real rather than a stylised wedge
+- Peel texture as seventy dots on a golden-angle spiral, which is the same distribution
+  a real fruit's pores follow
+- Segment count and wedge angles computed from the variety, not hard-coded per fruit
+- Vesicle lines drawn down the middle of each segment, which is what makes pulp read
+  as pulp
+- Juice inside the glass clipped by the glass outline, so the fill can never leave
+  the vessel
+- Meniscus as an ellipse at the fill line, and pulp flecks scattered inside the clip
+- Ice cubes appearing past a threshold of the fill, so the glass changes state
+- Ram as a rounded rect translated by the press percentage, so the squeeze is visible
+  from the top-down view
+- Yield as millilitres derived from the variety and the size slider, so the readout and
+  the glass agree
+- Recipe rows recomputed from the same two variables as the drawing
+- Variety chips as aria-pressed with a colour swatch and a tasting note
+- Squeeze rate made a function of the size slider, so a bigger fruit presses slower and
+  gives more
+
+## Intended interaction model
+A press you work. Visitors choose a variety, set the size, hold the button and watch the
+ram come down and the glass fill to what that fruit really gives, halve the fruit to see
+the anatomy, and read the recipe numbers as they change. Changing the variety repaints the
+whole page's accents, because there is nothing here that is not derived from the fruit.

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HOTARU — A Field at Dusk</title>
+<style>
+  :root{
+    --bg:#060d0a;
+    --ink:#e8f5ec;
+    --dim:rgba(232,245,236,.55);
+    --line:rgba(232,245,236,.14);
+    --glow:#ffe873;
+    --glow2:#9dff6b;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --serif:"Iowan Old Style",Palatino,Georgia,serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+  .field{
+    position:fixed;inset:0;z-index:0;
+    background:
+      radial-gradient(70% 44% at 50% 96%,rgba(90,140,80,.30),transparent 66%),
+      radial-gradient(50% 34% at 22% 88%,rgba(120,150,90,.20),transparent 62%),
+      linear-gradient(180deg,#050d14 0%,#08161a 42%,#0a1a14 72%,#0d2016 100%);
+  }
+  #cv{position:fixed;inset:0;z-index:1;display:block}
+
+  .ui{position:fixed;inset:0;z-index:3;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(18px,3.4vw,40px)}
+  .top{display:flex;justify-content:space-between;align-items:flex-start;gap:18px}
+  .k{font-family:var(--mono);font-size:9px;letter-spacing:.34em;text-transform:uppercase;color:var(--glow2)}
+  h1{font-family:var(--serif);font-weight:400;font-style:italic;font-size:clamp(28px,5.4vw,64px);line-height:.98;letter-spacing:-.02em;margin:10px 0 0}
+  h1 b{font-style:normal;font-weight:400;color:var(--glow)}
+  .top p{margin:12px 0 0;font-size:12px;line-height:1.75;max-width:32ch;color:var(--dim)}
+  .mtr{text-align:right;font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);line-height:2.4}
+  .mtr b{display:block;font-size:15px;color:var(--glow);font-weight:400;letter-spacing:.02em}
+
+  .bottom{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+  .tray{
+    pointer-events:auto;display:flex;gap:clamp(8px,1.3vw,16px);flex-wrap:wrap;align-items:center;
+    background:rgba(8,20,16,.62);border:1px solid var(--line);border-radius:16px;
+    padding:11px clamp(12px,1.8vw,20px);backdrop-filter:blur(14px)
+  }
+  .g{display:flex;align-items:center;gap:8px}
+  .kk{font-family:var(--mono);font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
+  .vv{font-family:var(--mono);font-size:9.5px;color:var(--glow);min-width:26px;font-variant-numeric:tabular-nums}
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;width:64px;height:14px;background:transparent;cursor:pointer
+  }
+  input[type=range]::-webkit-slider-runnable-track{height:2px;background:var(--line);border-radius:2px}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;border-radius:50%;background:var(--glow);margin-top:-5px;border:0;box-shadow:0 0 10px rgba(255,232,115,.7)}
+  input[type=range]::-moz-range-track{height:2px;background:var(--line);border-radius:2px}
+  input[type=range]::-moz-range-thumb{width:11px;height:11px;border:0;border-radius:50%;background:var(--glow)}
+  button{
+    pointer-events:auto;font-family:var(--mono);font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;
+    background:rgba(255,232,115,.12);border:1px solid rgba(255,232,115,.36);color:var(--ink);
+    padding:9px 13px;border-radius:999px;cursor:pointer;transition:background .2s,color .2s
+  }
+  button:hover{background:var(--glow);color:#1a1a06}
+  .hint{font-family:var(--mono);font-size:8.5px;letter-spacing:.22em;text-transform:uppercase;color:rgba(232,245,236,.4);pointer-events:none}
+
+  @media (max-width:760px){.top p,.mtr,.hint{display:none}.ui{padding:14px}}
+</style>
+</head>
+<body>
+<div class="field"></div>
+<canvas id="cv"></canvas>
+
+<div class="ui">
+  <div class="top">
+    <div>
+      <div class="k">Luciola · 300 beetles · dusk</div>
+      <h1>There is a field<br><b>that answers back.</b></h1>
+      <p>Each beetle drifts on its own slow wander and pulses on its own clock. Move
+      through them and the nearest ones will answer.</p>
+    </div>
+    <div class="mtr">
+      Lit<b id="mLit">0</b>
+      Nearest<b id="mNear">—</b>
+      Phase<b id="mPh">0.00</b>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <div class="tray">
+      <div class="g"><span class="kk">Count</span><input type="range" id="cnt" min="20" max="600" value="300" aria-label="Firefly count"><span class="vv" id="cntV">300</span></div>
+      <div class="g"><span class="kk">Rate</span><input type="range" id="rate" min="2" max="24" value="9" aria-label="Flash rate"><span class="vv" id="rateV">9</span></div>
+      <div class="g"><span class="kk">Wander</span><input type="range" id="wnd" min="0" max="100" value="44" aria-label="Wander amount"><span class="vv" id="wndV">44</span></div>
+      <button id="sync">Synchronise</button>
+      <button id="dawn">Dawn</button>
+    </div>
+    <div class="hint">Move the pointer to disturb them</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var cv=document.getElementById('cv'),c=cv.getContext('2d');
+  var W,H,DPR=Math.min(devicePixelRatio||1,2);
+  var flies=[];
+  var cnt=300,rate=9,wander=44;
+  var mx=0.5,my=0.5,pmx=0.5,pmy=0.5;
+  var grass=[];
+  var dawnAmt=0;
+
+  function mk(){
+    return {
+      x:Math.random()*W, y:H*0.42+Math.random()*H*0.55,
+      vx:(Math.random()-.5)*0.4, vy:(Math.random()-.5)*0.3,
+      r:1.4+Math.random()*1.8,
+      ph:Math.random()*6.283,
+      sp:0.4+Math.random()*0.8,
+      drift:(Math.random()-.5)*0.02,
+      bob:Math.random()*6.283
+    };
+  }
+  function build(){
+    flies=[];
+    for(var i=0;i<cnt;i++)flies.push(mk());
+  }
+  function grassBuild(){
+    grass=[];
+    var n=Math.round(W/9);
+    for(var g=0;g<n;g++){
+      grass.push({x:g*9+Math.random()*5,h:12+Math.random()*44,b:Math.random()*6.283,s:0.5+Math.random()});
+    }
+  }
+  function resize(){
+    W=innerWidth;H=innerHeight;
+    cv.width=W*DPR;cv.height=H*DPR;cv.style.width=W+'px';cv.style.height=H+'px';
+    c.setTransform(DPR,0,0,DPR,0,0);
+    grassBuild();build();
+  }
+
+  var t=0;
+  function draw(){
+    t+=0.016;
+    c.setTransform(DPR,0,0,DPR,0,0);
+    c.clearRect(0,0,W,H);
+    var wf=wander/100;
+    var rateF=rate/100;
+
+    pmx+=(mx-pmx)*0.08; pmy+=(my-pmy)*0.08;
+    var px=pmx*W, py=pmy*H;
+
+    /* grass silhouette at the bottom */
+    c.strokeStyle='rgba(20,44,30,'+(0.5+dawnAmt*0.2).toFixed(2)+')';
+    c.lineWidth=2;
+    c.beginPath();
+    for(var g=0;g<grass.length;g++){
+      var b=grass[g];
+      var sway=Math.sin(t*0.6+b.b)*6;
+      c.moveTo(b.x,H);
+      c.quadraticCurveTo(b.x+sway*0.4,H-b.h*0.55,b.x+sway,H-b.h);
+    }
+    c.stroke();
+
+    var lit=0,near=999;
+    c.save();
+    c.globalCompositeOperation='lighter';
+    for(var i=0;i<flies.length;i++){
+      var f=flies[i];
+      f.b+=0.02*f.sp;
+      if(wf>0){
+        f.vx+=Math.cos(f.b+f.ph)*0.012*wf;
+        f.vy+=Math.sin(f.b*0.8+f.ph)*0.010*wf;
+      }
+      /* flee the pointer a little */
+      var dx=f.x-px, dy=f.y-py;
+      var dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist<160)near=Math.min(near,dist);
+      if(dist>1&&dist<150){
+        var push=(1-dist/150)*0.55;
+        f.vx+=dx/dist*push; f.vy+=dy/dist*push;
+      }
+      f.vx*=0.985; f.vy*=0.985;
+      if(f.vx>6)f.vx=6; if(f.vx<-6)f.vx=-6;
+      if(f.vy>6)f.vy=6; if(f.vy<-6)f.vy=-6;
+      f.x+=f.vx; f.y+=f.vy;
+      if(!isFinite(f.x)||!isFinite(f.y)||!isFinite(f.vx)||!isFinite(f.vy)){
+        f.x=Math.random()*W; f.y=H*0.42+Math.random()*H*0.5;
+        f.vx=0; f.vy=0;
+      }
+      if(f.x<10){f.x=10;f.vx*=-1}
+      if(f.x>W-10){f.x=W-10;f.vx*=-1}
+      if(f.y<H*0.30){f.y=H*0.30;f.vy*=-1}
+      if(f.y>H*0.94){f.y=H*0.94;f.vy*=-1}
+
+      /* the flash: a bright short pulse on a per-beetle clock */
+      f.ph+=rateF*0.10;
+      var p=(Math.sin(f.ph)+1)/2;
+      var flash=Math.pow(p,14);
+      if(flash>0.02){
+        lit++;
+        var R=f.r*7;
+        var g2=c.createRadialGradient(f.x,f.y,0,f.x,f.y,R);
+        g2.addColorStop(0,'rgba(255,244,190,'+(flash*0.85).toFixed(3)+')');
+        g2.addColorStop(0.22,'rgba(255,232,115,'+(flash*0.45).toFixed(3)+')');
+        g2.addColorStop(1,'rgba(255,210,60,0)');
+        c.fillStyle=g2;
+        c.beginPath();c.arc(f.x,f.y,R,0,6.283);c.fill();
+        c.fillStyle='rgba(255,250,225,'+(flash*0.95).toFixed(3)+')';
+        c.beginPath();c.arc(f.x,f.y,f.r*0.7,0,6.283);c.fill();
+      }else{
+        /* a faint amber body so you can see the swarm between flashes */
+        c.fillStyle='rgba(255,220,120,'+(0.10+dawnAmt*0.12).toFixed(3)+')';
+        c.beginPath();c.arc(f.x,f.y,f.r*0.55,0,6.283);c.fill();
+      }
+    }
+    c.restore();
+
+    /* dawn: light the whole screen */
+    if(dawnAmt>0){
+      var dg=c.createLinearGradient(0,0,0,H);
+      dg.addColorStop(0,'rgba(255,190,120,'+(dawnAmt*0.16).toFixed(3)+')');
+      dg.addColorStop(1,'rgba(255,150,90,'+(dawnAmt*0.10).toFixed(3)+')');
+      c.fillStyle=dg;c.fillRect(0,0,W,H);
+    }
+
+    document.getElementById('mLit').textContent=lit;
+    document.getElementById('mNear').textContent=near>500?'—':Math.round(near)+' px';
+    document.getElementById('mPh').textContent=(t%6.283).toFixed(2);
+    requestAnimationFrame(draw);
+  }
+
+  addEventListener('pointermove',function(e){
+    mx=e.clientX/innerWidth; my=e.clientY/innerHeight;
+  });
+
+  document.getElementById('cnt').addEventListener('input',function(){
+    cnt=+this.value;document.getElementById('cntV').textContent=cnt;
+    while(flies.length>cnt)flies.pop();
+    while(flies.length<cnt)flies.push(mk());
+  });
+  document.getElementById('rate').addEventListener('input',function(){
+    rate=+this.value;document.getElementById('rateV').textContent=rate;
+  });
+  document.getElementById('wnd').addEventListener('input',function(){
+    wander=+this.value;document.getElementById('wndV').textContent=wander;
+  });
+  document.getElementById('sync').addEventListener('click',function(){
+    flies.forEach(function(f,i){f.ph=i*0.3;});
+  });
+  var db=document.getElementById('dawn');
+  var dTimer=null;
+  db.addEventListener('click',function(){
+    if(dTimer){clearInterval(dTimer);dTimer=null;dawnAmt=0;this.textContent='Dawn';return;}
+    this.textContent='Dusk';
+    dTimer=setInterval(function(){
+      dawnAmt+=0.02;
+      if(dawnAmt>=1){dawnAmt=0;}
+    },60);
+  });
+
+  addEventListener('resize',function(){clearTimeout(window.__r);window.__r=setTimeout(resize,140)});
+  resize();
+  requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>

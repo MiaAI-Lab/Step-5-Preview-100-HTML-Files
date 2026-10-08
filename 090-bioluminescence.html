@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Plankton — a bay that lights up when you touch it</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:#04070e;color:#e6f0ff;
+  font:15px/1.62 ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+.serif{font-family:ui-serif,Georgia,"Times New Roman",serif}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.wrap{width:min(1100px,92vw);margin:0 auto}
+nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0 14px;
+  border-bottom:1px solid rgba(230,240,255,.14)}
+nav .brand{font-family:ui-serif,Georgia,serif;font-size:19px}
+nav .brand i{font-style:italic;color:#5ff0d0}
+nav ul{display:flex;gap:26px;list-style:none;margin:0;padding:0;font-size:11px;
+  letter-spacing:.24em;text-transform:uppercase;color:#7d8ba8}
+nav a{color:inherit;text-decoration:none}nav a:hover{color:#5ff0d0}
+@media(max-width:780px){nav ul{display:none}}
+header.hero{padding:50px 0 20px;text-align:center}
+header.hero .kicker{font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:#5ff0d0;
+  margin:0 0 14px}
+header.hero h1{font-family:ui-serif,Georgia,serif;font-weight:400;
+  font-size:clamp(32px,5.6vw,62px);line-height:1.05;margin:0 0 16px}
+header.hero h1 em{font-style:italic;color:#8fbcff}
+header.hero p{max-width:60ch;margin:0 auto;color:#8d9ab8}
+.bay{position:relative;border:1px solid rgba(230,240,255,.16);border-radius:16px;
+  overflow:hidden;background:#02040a;margin-bottom:18px}
+.bay canvas{display:block;width:100%;height:auto;touch-action:none;cursor:crosshair}
+.bay .cap{position:absolute;left:14px;top:12px;font-size:10px;letter-spacing:.26em;
+  text-transform:uppercase;color:rgba(230,240,255,.5);pointer-events:none}
+.dock{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;justify-content:space-between;
+  border-top:1px solid rgba(230,240,255,.14);border-bottom:1px solid rgba(230,240,255,.14);
+  padding:16px 0;margin-bottom:32px}
+.dock label{display:grid;gap:7px;font-size:10px;letter-spacing:.26em;text-transform:uppercase;
+  color:#7d8ba8;min-width:150px}
+input[type=range]{width:100%;accent-color:#5ff0d0}
+.btn{background:#5ff0d0;color:#03231d;border:0;border-radius:8px;padding:11px 15px;
+  font:inherit;font-size:12px;font-weight:700;letter-spacing:.08em;cursor:pointer;margin:0 6px 6px 0}
+.btn.ghost{background:transparent;color:#e6f0ff;border:1px solid rgba(230,240,255,.24)}
+.btn:hover{filter:brightness(1.07)}
+.species{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.species button{background:#0a1220;border:1px solid rgba(230,240,255,.16);border-radius:999px;
+  padding:8px 14px;font:inherit;font-size:12px;color:#e6f0ff;cursor:pointer}
+.species button[aria-pressed="true"]{background:#5ff0d0;border-color:#5ff0d0;color:#03231d}
+.readout{display:flex;flex-wrap:wrap;gap:12px 24px;margin-bottom:40px;
+  border-top:1px solid rgba(230,240,255,.14);padding-top:16px}
+.readout div{min-width:88px}
+.readout dt{font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:#7d8ba8;margin:0 0 4px}
+.readout dd{margin:0;font-size:20px;font-family:ui-monospace,Menlo,monospace;color:#8fbcff}
+.cells{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-bottom:46px}
+@media(max-width:820px){.cells{grid-template-columns:1fr}}
+.cell{border-top:1px solid rgba(230,240,255,.14);padding-top:16px}
+.cell .fig{font-family:ui-serif,Georgia,serif;font-size:38px;color:#5ff0d0;line-height:1;margin-bottom:8px}
+.cell h3{font-family:ui-serif,Georgia,serif;font-weight:400;font-style:italic;font-size:21px;margin:0 0 8px}
+.cell p{margin:0;color:#8d9ab8;font-size:14px}
+footer{border-top:1px solid rgba(230,240,255,.14);padding:22px 0 54px;display:flex;
+  justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:11px;letter-spacing:.2em;
+  text-transform:uppercase;color:#5f6c86}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="brand">Plank<i>ton</i></div>
+    <ul>
+      <li><a href="#bay">Bay</a></li>
+      <li><a href="#dock">Species</a></li>
+      <li><a href="#notes">Notes</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <p class="kicker">Luciferin · luciferase · a mechanical trigger</p>
+    <h1 class="serif">Nothing here glows<br>until it is <em>disturbed</em></h1>
+    <p>Bioluminescence is not light storage. A cell makes a luciferin, an enzyme oxidises
+       it, and the reaction emits a photon — and in these dinoflagellates the trigger is
+       mechanical, so a paddle, a wave or a hand will do.</p>
+  </header>
+
+  <section class="bay" id="bay">
+    <canvas id="c" width="1000" height="540"></canvas>
+    <p class="cap">drag through the water · the flash spreads from where you touched it</p>
+  </section>
+
+  <section class="dock" id="dock">
+    <div>
+      <div class="species" id="species"></div>
+      <div class="species" id="water"></div>
+    </div>
+    <label for="dens">Cell density <input id="dens" type="range" min="10" max="100" value="52"></label>
+    <label for="spread">Spread <input id="spread" type="range" min="1" max="100" value="46"></label>
+    <label for="fade">Afterglow <input id="fade" type="range" min="5" max="100" value="44"></label>
+    <div>
+      <button class="btn" id="paddle">Strike a paddle</button>
+      <button class="btn ghost" id="calm">Still water</button>
+    </div>
+  </section>
+
+  <dl class="readout">
+    <div><dt>Cells lit</dt><dd id="rL">0</dd></div>
+    <div><dt>Total</dt><dd id="rT">0</dd></div>
+    <div><dt>Wavelength</dt><dd id="rW">474 nm</dd></div>
+    <div><dt>Species</dt><dd id="rS">Lingulodinium</dd></div>
+    <div><dt>Quantum yield</dt><dd id="rQ">0.09</dd></div>
+    <div><dt>Trigger</dt><dd id="rG">mechanical</dd></div>
+  </dl>
+
+  <section class="cells">
+    <div class="cell">
+      <div class="fig serif">i</div>
+      <h3>The chemistry</h3>
+      <p>A luciferin is oxidised by a luciferase in the presence of oxygen, and the spare
+         energy comes out as a photon. The reaction is cold, efficient, and it needs no
+         light to charge it — which is why nothing here has to be exposed first.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">ii</div>
+      <h3>The trigger</h3>
+      <p>In these cells it is a shear force on the membrane, which opens an ion channel and
+         drops the pH, which activates the luciferase. Mechanical, immediate, and gone in a
+         tenth of a second.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">iii</div>
+      <h3>Blue</h3>
+      <p>Almost everything in the sea glows blue, because blue is the wavelength that
+         travels furthest through water and the one the eye of a shallow predator is tuned
+         to. Deep red would be invisible within a few metres.</p>
+    </div>
+  </section>
+
+  <section class="cells" id="notes">
+    <div class="cell">
+      <div class="fig serif">iv</div>
+      <h3>The bloom</h3>
+      <p>A bloom is a bloom: millions of cells per litre, visible from a boat as a dull red
+         brown by day and a bright blue by night. Density here is the number of cells you
+         can see.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">v</div>
+      <h3>Afterglow</h3>
+      <p>The reaction is fast, so a cell's own emission is short. The afterglow you see is
+         the wave passing through the rest of the bloom and setting off the cells it has not
+         reached yet.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">vi</div>
+      <h3>Still water</h3>
+      <p>Still water is dark water. Nothing flashes, nothing spreads, and the only thing to
+         look at is the bloom itself — which is what the bay is like when nothing disturbs
+         it.</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>Plankton · one canvas, no files</span>
+    <span class="mono">λmax 474 nm · yield 0.09</span>
+  </footer>
+</div>
+<script>
+(function(){
+"use strict";
+var cv=document.getElementById('c'),ctx=cv.getContext('2d');
+var W=cv.width,H=cv.height;
+var dens=52,spread=46,fade=44,t=0;
+var SPECIES=[
+ {n:'Lingulodinium',wl:474,yield:0.09,amp:1.0,tint:[120,255,230]},
+ {n:'Noctiluca',wl:470,yield:0.16,amp:1.4,tint:[140,240,255]},
+ {n:'Pyrocystis',wl:476,yield:0.11,amp:0.9,tint:[100,255,220]},
+ {n:'Vargula',wl:464,yield:0.21,amp:0.8,tint:[150,220,255]},
+ {n:'Periphylla',wl:465,yield:0.08,amp:1.2,tint:[130,200,255]}
+];
+var sp=SPECIES[0];
+var WATERS=[
+ {n:'calm bay',cur:0.1,glow:0.9},
+ {n:'rippled',cur:0.5,glow:0.6},
+ {n:'surf',cur:1.0,glow:0.35},
+ {n:'moonlit',cur:0.25,glow:1.4}
+];
+var wat=WATERS[0];
+var cells=[];
+function makeCells(){
+  cells=[];
+  var n=Math.round(dens*9),i;
+  for(i=0;i<n;i++){
+    cells.push({
+      x:Math.random()*W,y:Math.random()*H,
+      lit:0,ph:Math.random()*6.28,
+      vx:(Math.random()-.5)*0.4,vy:(Math.random()-.5)*0.4
+    });
+  }
+}
+makeCells();
+function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;
+  var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;
+  return((t^t>>>14)>>>0)/4294967296;};}
+/* the wave: a disturbance that spreads outward and sets off the cells it passes */
+var waves=[];
+function disturb(x,y,strength){
+  waves.push({x:x,y:y,r:0,max:Math.max(W,H)*1.1,
+    life:1,strength:strength||1});
+  /* the cells right at the point of contact flash at once */
+  cells.forEach(function(c){
+    var d=Math.hypot(c.x-x,c.y-y);
+    if(d<26)c.lit=Math.max(c.lit,strength);
+  });
+}
+function step(dt){
+  /* the current drifts the cells slowly */
+  cells.forEach(function(c){
+    c.x+=c.vx*wat.cur*dt*20;c.y+=c.vy*wat.cur*dt*20;
+    if(c.x<0)c.x=W;if(c.x>W)c.x=0;
+    if(c.y<0)c.y=H;if(c.y>H)c.y=0;
+    /* each cell's own emission is short */
+    c.lit=Math.max(0,c.lit-dt*(1.6+fade*0.035));
+  });
+  /* each wave spreads and lights the cells it crosses */
+  var speed=60+spread*5;
+  waves.forEach(function(w){
+    w.r+=speed*dt;
+    w.life-=dt*0.55;
+    cells.forEach(function(c){
+      var d=Math.hypot(c.x-w.x,c.y-w.y);
+      if(Math.abs(d-w.r)<16){
+        c.lit=Math.max(c.lit,w.life*w.strength*1.1);
+      }
+    });
+  });
+  for(var i=waves.length-1;i>=0;i--){
+    if(waves[i].life<=0||waves[i].r>waves[i].max)waves.splice(i,1);
+  }
+}
+/* ---------- drawing ---------- */
+function draw(){
+  /* the water: a dark gradient, brighter with the water's glow factor */
+  var k=wat.glow;
+  var g=ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'rgb('+(4*k|0)+','+(8*k|0)+','+(18*k|0)+')');
+  g.addColorStop(1,'rgb('+(2*k|0)+','+(4*k|0)+','+(10*k|0)+')');
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  /* the cells: dark in the body of the bloom, bright where they are lit */
+  ctx.fillStyle='rgba(80,60,50,.35)';
+  cells.forEach(function(c){
+    ctx.fillRect(c.x-1,c.y-1,2,2);
+  });
+  /* the lit cells, additive */
+  ctx.globalCompositeOperation='lighter';
+  cells.forEach(function(c){
+    if(c.lit<=0.01)return;
+    var a=Math.min(1,c.lit);
+    var r=2+a*5;
+    var grd=ctx.createRadialGradient(c.x,c.y,0.5,c.x,c.y,r);
+    var tint=sp.tint;
+    grd.addColorStop(0,'rgba(255,255,255,'+(a*0.95).toFixed(3)+')');
+    grd.addColorStop(0.3,'rgba('+tint[0]+','+tint[1]+','+tint[2]+','+(a*0.7).toFixed(3)+')');
+    grd.addColorStop(1,'rgba('+tint[0]+','+tint[1]+','+tint[2]+',0)');
+    ctx.fillStyle=grd;
+    ctx.beginPath();ctx.arc(c.x,c.y,r,0,6.3);ctx.fill();
+  });
+  /* the wavefronts themselves, as a thin bright ring */
+  waves.forEach(function(w){
+    ctx.strokeStyle='rgba(140,240,255,'+(w.life*0.22).toFixed(3)+')';
+    ctx.lineWidth=1.4;
+    ctx.beginPath();ctx.arc(w.x,w.y,w.r,0,6.3);ctx.stroke();
+  });
+  ctx.globalCompositeOperation='source-over';
+  /* the moon, if this water has one */
+  if(wat===WATERS[3]){
+    var mg=ctx.createRadialGradient(W*0.8,H*0.16,4,W*0.8,H*0.16,120);
+    mg.addColorStop(0,'rgba(220,235,255,.28)');mg.addColorStop(1,'rgba(220,235,255,0)');
+    ctx.fillStyle=mg;ctx.beginPath();ctx.arc(W*0.8,H*0.16,120,0,6.3);ctx.fill();
+  }
+  /* the wavelength, drawn as a small spectrum bar in the corner */
+  var bx=16,by=H-34;
+  for(var i=0;i<60;i++){
+    var wl=440+i*2.4;
+    var col=wlToRGB(wl);
+    ctx.fillStyle='rgba('+col[0]+','+col[1]+','+col[2]+',.7)';
+    ctx.fillRect(bx+i*3,by,3,10);
+  }
+  ctx.fillStyle='rgba(230,240,255,.6)';
+  ctx.font='9px ui-monospace,Menlo,monospace';
+  ctx.textAlign='left';ctx.textBaseline='top';
+  ctx.fillText(sp.wl+' nm',bx,by+14);
+}
+function wlToRGB(wl){
+  var r=0,g=0,b=0;
+  if(wl<440){r=-(wl-440)/60;b=1;}
+  else if(wl<490){g=(wl-440)/50;b=1;}
+  else if(wl<510){g=1;b=-(wl-510)/20;}
+  else if(wl<580){r=-(580-wl)/70;g=1;}
+  else if(wl<645){r=1;g=-(wl-580)/65;}
+  else {r=1;}
+  return [Math.round(r*255),Math.round(g*255),Math.round(b*255)];
+}
+
+/* ---------- controls, readout, loop ---------- */
+var sbox=document.getElementById('species');
+SPECIES.forEach(function(s,i){
+  var b=document.createElement('button');
+  b.textContent=s.n;
+  b.setAttribute('aria-pressed',String(i===0));
+  b.addEventListener('click',function(){
+    sp=s;
+    [].slice.call(sbox.children).forEach(function(o){
+      o.setAttribute('aria-pressed',String(o===b));});
+    document.getElementById('rS').textContent=s.n;
+    document.getElementById('rW').textContent=s.wl+' nm';
+    document.getElementById('rQ').textContent=s.yield.toFixed(2);
+  });
+  sbox.appendChild(b);
+});
+var wbox=document.getElementById('water');
+WATERS.forEach(function(w,i){
+  var b=document.createElement('button');
+  b.textContent=w.n;
+  b.setAttribute('aria-pressed',String(i===0));
+  b.addEventListener('click',function(){
+    wat=w;waves=[];
+    [].slice.call(wbox.children).forEach(function(o){
+      o.setAttribute('aria-pressed',String(o===b));});
+  });
+  wbox.appendChild(b);
+});
+function bind(id,fn){var el=document.getElementById(id);
+  el.addEventListener('input',function(){fn(+el.value);});}
+bind('dens',function(v){dens=v;makeCells();});
+bind('spread',function(v){spread=v;});
+bind('fade',function(v){fade=v;});
+document.getElementById('paddle').addEventListener('click',function(){
+  disturb(W*(0.2+Math.random()*0.6),H*(0.2+Math.random()*0.6),1.2);
+});
+document.getElementById('calm').addEventListener('click',function(){
+  waves=[];cells.forEach(function(c){c.lit=0;});
+  wat=WATERS[0];
+  [].slice.call(wbox.children).forEach(function(o,i){
+    o.setAttribute('aria-pressed',String(i===0));});
+});
+/* dragging through the water is a hand, and it disturbs everything it passes */
+var dragging=false;
+cv.addEventListener('pointerdown',function(e){
+  dragging=true;cv.setPointerCapture(e.pointerId);
+  var r=cv.getBoundingClientRect();
+  disturb((e.clientX-r.left)*(W/r.width),(e.clientY-r.top)*(H/r.height),0.9);
+});
+cv.addEventListener('pointermove',function(e){
+  if(!dragging)return;
+  var r=cv.getBoundingClientRect();
+  var x=(e.clientX-r.left)*(W/r.width),y=(e.clientY-r.top)*(H/r.height);
+  if(Math.random()<0.4)disturb(x,y,0.7);
+});
+function endDrag(){dragging=false;}
+cv.addEventListener('pointerup',endDrag);
+cv.addEventListener('pointercancel',endDrag);
+function readout(){
+  var lit=0;
+  cells.forEach(function(c){if(c.lit>0.05)lit++;});
+  document.getElementById('rL').textContent=lit;
+  document.getElementById('rT').textContent=cells.length;
+  document.getElementById('rG').textContent=waves.length?'lit':'mechanical';
+}
+var last=0;
+function loop(ts){
+  var dt=last?Math.min(.05,(ts-last)/1000):0;last=ts;
+  t+=dt;step(dt);draw();readout();
+  requestAnimationFrame(loop);
+}
+draw();readout();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

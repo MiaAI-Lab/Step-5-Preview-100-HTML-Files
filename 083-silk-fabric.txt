@@ -1,0 +1,78 @@
+# THE BOLT — cloth that has a grain
+
+## Short title
+Silk Fabric
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a bolt of cloth where the weave
+is a real interlacing rule, the yarn has slub, the dye is one of six, and the light follows
+the pointer across the surface. No external dependencies whatsoever — no CDN, no web
+fonts, no external images, no JS libraries. All CSS and JavaScript inline, works offline
+by double-clicking, responsive, valid HTML5.
+
+Artistic direction: a draper's table. Ground #f4f0ea, hairlines rgba(43,39,50,.18), ink
+#2b2732 with muted #6c6474, purple #7a4a8c as the accent and a tan #c2894a for the
+figures. Serif headings with italic accent words, uppercase .2em–.4em kickers, monospace
+figures.
+
+The cloth is one canvas. Every crossing is evaluated: for a warp index and a weft index,
+the weave's own rule — a period of over plus under, shifted by the weave's shift each row —
+decides which yarn is on top. Five weaves: plain, twill, satin, basket and ribbed, each
+with its own over, under, shift and float count. The yarn on top is drawn as a band along
+its own axis with a lighter line down the middle; the yarn underneath is narrower and
+carries a shadow band, so the interlacing reads as depth.
+
+Each thread's thickness is modulated along its own length by a sine whose phase comes from
+its index, which is the slub that makes real yarn real. Light direction is a point the
+pointer moves and the renderer eases toward, so the same cloth catches the light along a
+different axis as you move across it.
+
+Six dyes, each a light and a dark tone: indigo, madder, weld yellow, walnut, charcoal and
+raw silk. Fold the bolt casts one wide shadow across the cloth; drape it lays five soft
+diagonal folds over it. The selvedge is a woven edge down both sides.
+
+Controls: five weaves, six dyes, thread count, yarn slub, sheen, Fold the bolt and Drape
+it. Readout: weave, threads per inch, bias angle from the weave's shift, float length, a
+hand description derived from the float length, and the current shade.
+
+Layout: nav, centred hero, the bolt canvas with its caption, a dock of two chip rows, three
+sliders and two buttons, a readout row, then two three-cell note rows on plain weave,
+twill, satin, the bolt, slub and the fold, then a footer.
+
+Interaction: switch weave and watch the same dyed yarn become poplin, twill, satin or
+basket — the highlight axis moves with it. Change the thread count to go from cheesecloth
+to handkerchief, push the slub up to make it linen, move the pointer to catch the light,
+fold and drape it, and read the hand description change with the float length.
+
+## One-paragraph description of the intended design
+A bolt of cloth on canvas where every crossing is decided by the weave's own rule — a
+period of over plus under, shifted each row — so plain, twill, satin, basket and ribbed
+produce genuinely different interlacings from the same code, drawn as bands along each
+thread's axis with highlights on top and shadows underneath, each thread's thickness
+modulated along its length for slub, lit by a direction the pointer moves, in one of six
+dyes, with fold and drape states and a readout that names the hand from the float length.
+
+## Major visual techniques used
+- Weave as a rule: a period of over plus under, shifted by the weave's shift each row,
+  evaluated per crossing, so one function produces five different cloths
+- Top yarn drawn as a band along its axis with a lighter line down the middle; bottom
+  yarn narrower with a shadow band, so depth comes from the interlacing itself
+- Slub as per-thread phase modulation of thickness along the thread's own length
+- Light as a point the pointer moves and the renderer eases toward, so the catch moves
+  across the cloth as you do
+- Six dyes as light/dark pairs, with every colour on the cloth mixed from that pair, so
+  a dye change is one variable
+- Drape as five soft diagonal gradients composited with multiply
+- Fold as one wide gradient band across the whole bolt
+- Selvedge as two woven edges down the sides
+- Bias angle computed from the weave's shift, so the readout is geometry not prose
+- Hand description derived from the float length, which is the actual reason a satin feels
+  slippery
+- Threads per inch from the density slider in real units
+
+## Intended interaction model
+A bolt to examine. Visitors switch weave to see the same yarn catch light on a different
+axis, change the thread count and the slub to go from cheesecloth to linen, drag the light
+across the surface, fold and drape it, and read the hand description that falls out of the
+float length. Everything on the cloth is derived from four numbers and one rule.

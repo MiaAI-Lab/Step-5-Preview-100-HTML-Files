@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HERBARIUM — Pressed Specimens, 1873–1901</title>
+<style>
+  :root{
+    --paper:#f3eddd;
+    --paper2:#e9e0ca;
+    --ink:#23201a;
+    --dim:rgba(35,32,26,.58);
+    --line:rgba(35,32,26,.18);
+    --stem:#4a5f3a;
+    --leaf:#6b8a4e;
+    --root:#8a6a4a;
+    --red:#a33a2a;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--paper);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  ::selection{background:var(--stem);color:var(--paper)}
+
+  /* paper fibre + fold */
+  .tex{
+    position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.4;mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='260'><filter id='f'><feTurbulence type='fractalNoise' baseFrequency='.7' numOctaves='4' seed='2'/></filter><rect width='260' height='260' filter='url(%23f)' opacity='.3'/></svg>");
+  }
+  .fold{
+    position:fixed;left:50%;top:0;bottom:0;width:1px;z-index:1;pointer-events:none;
+    background:linear-gradient(180deg,transparent,rgba(35,32,26,.16) 8%,rgba(35,32,26,.16) 92%,transparent)
+  }
+
+  nav{position:relative;z-index:2;display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:26px clamp(16px,4vw,44px) 0}
+  .brand{font-family:var(--serif);font-size:19px;letter-spacing:.32em;text-transform:uppercase}
+  nav ul{display:flex;gap:clamp(12px,2.2vw,30px);list-style:none;margin:0;padding:0}
+  nav a{color:var(--dim);text-decoration:none;font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;transition:color .2s}
+  nav a:hover{color:var(--ink)}
+
+  .wrap{max-width:1220px;margin:0 auto;padding:0 clamp(16px,4vw,44px);position:relative;z-index:2}
+
+  .hero{padding:clamp(26px,6vw,72px) 0 clamp(14px,3vw,26px);text-align:center}
+  .hero .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.3em;text-transform:uppercase;color:var(--red);display:block;margin-bottom:22px}
+  .hero h1{font-family:var(--serif);font-weight:400;font-size:clamp(32px,6.6vw,82px);line-height:.96;letter-spacing:-.03em;margin:0 0 20px}
+  .hero h1 i{font-style:italic;color:var(--stem)}
+  .hero p{font-size:14px;line-height:1.8;color:var(--dim);max-width:46ch;margin:0 auto}
+
+  .sheets{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin:clamp(22px,5vw,48px) 0}
+  .sheet{
+    background:var(--paper);padding:clamp(20px,3.4vw,32px);
+    transition:background .5s,transform .6s cubic-bezier(.2,.8,.2,1);cursor:pointer;position:relative
+  }
+  .sheet:hover{background:var(--paper2);transform:translateY(-6px)}
+  /* corner tape */
+  .sheet::before,.sheet::after{
+    content:"";position:absolute;width:34px;height:12px;
+    background:rgba(214,196,150,.5);box-shadow:0 1px 2px rgba(35,32,26,.1)
+  }
+  .sheet::before{top:8px;left:-8px;transform:rotate(-38deg)}
+  .sheet::after{top:8px;right:-8px;transform:rotate(38deg)}
+
+  .plant{position:relative;aspect-ratio:3/4;display:grid;place-items:center;margin-bottom:18px}
+  .plant .sp{position:relative;width:100%;height:100%}
+  /* stalk */
+  .stalk{
+    position:absolute;left:50%;bottom:8%;width:2px;transform:translateX(-50%);
+    background:linear-gradient(180deg,var(--stem),#3a4a2e)
+  }
+  /* leaves: ellipses rotated alternately along the stalk */
+  .leaf{
+    position:absolute;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;
+    background:linear-gradient(150deg,var(--leaf),#4a6a38);
+    transform-origin:0 50%
+  }
+  .leaf.v{background:linear-gradient(150deg,#7a9a58,#54703c)}
+  /* flower head */
+  .head{position:absolute;left:50%;transform:translateX(-50%);display:grid;place-items:center}
+  .petal{
+    position:absolute;border-radius:50%;
+    background:linear-gradient(150deg,var(--pc1),var(--pc2));
+    transform-origin:50% 50%
+  }
+  .core{
+    position:absolute;border-radius:50%;
+    background:radial-gradient(circle at 38% 32%,var(--cc),#8a6a1a)
+  }
+  /* roots */
+  .root{
+    position:absolute;left:50%;top:100%;width:1px;
+    background:linear-gradient(180deg,var(--root),transparent);transform-origin:50% 0
+  }
+
+  .cap b{display:block;font-family:var(--serif);font-style:italic;font-size:clamp(16px,2vw,22px);margin:0 0 8px;letter-spacing:-.01em}
+  .cap span{display:block;font-family:var(--mono);font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);line-height:2.1}
+  .cap i{font-style:normal;color:var(--red)}
+
+  footer{border-top:1px solid var(--line);padding:26px 0 48px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
+
+  @media (max-width:900px){.sheets{grid-template-columns:repeat(2,1fr)}}
+  @media (max-width:560px){.sheets{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="tex"></div>
+<div class="fold"></div>
+
+<nav>
+  <div class="brand">Herbarium</div>
+  <ul>
+    <li><a href="#specimens">Specimens</a></li>
+    <li><a href="#method">Method</a></li>
+  </ul>
+</nav>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="k">Cabinet III · drawers 12 – 16 · pressed 1873–1901</span>
+    <h1>A hundred and<br>four <i>summers,</i><br>flattened.</h1>
+    <p>Each sheet is a single plant, pressed between blotting paper for six weeks,
+    sewn down with linen thread, and labelled in copperplate. Nothing on these
+    sheets was drawn. Everything was real.</p>
+  </header>
+
+  <section class="sheets" id="specimens"></section>
+
+  <section class="hero" id="method">
+    <span class="k">The method · reproduced from the collector's notebook</span>
+    <h1 style="font-size:clamp(22px,3.4vw,42px)">Gathered in flower, never in rain.</h1>
+    <p>The whole plant is taken — root, stem, leaf and flower — and laid on a sheet
+    of absorbent paper with the parts spread so that none overlap. The press is
+    tightened every third day. Six weeks later the plant is dead, permanent, and
+    exactly the shape it was on the day it was found.</p>
+  </section>
+</div>
+
+<footer>
+  <span>© The Thornton Herbarium</span>
+  <span>Sewn with linen thread · 24 sheets per drawer</span>
+  <span>Never mounted with adhesive</span>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  /* each specimen: a CSS-only plant assembled from stalk, leaves, flower and roots */
+  var SPEC=[
+    {n:'Achillea millefolium',c:'Common Yarrow',y:'1873 · July',p:'Oxfordshire',
+     petals:20,pc1:'#fdfaf0',pc2:'#e8dfc8',core:'#f5e9b0',leafPairs:7,leafW:26,leafH:9,stalkH:52,v:true},
+    {n:'Leucanthemum vulgare',c:'Oxeye Daisy',y:'1875 · June',p:'Dorset',
+     petals:21,pc1:'#fffdf6',pc2:'#efeade',core:'#f5e9a8',leafPairs:4,leafW:22,leafH:8,stalkH:60,v:true},
+    {n:'Centaurea cyanus',c:'Cornflower',y:'1878 · August',p:'Norfolk',
+     petals:14,pc1:'#8fa8e8',pc2:'#4a63b8',core:'#c8b8f0',leafPairs:3,leafW:18,leafH:5,stalkH:64,v:false},
+    {n:'Papaver rhoeas',c:'Field Poppy',y:'1881 · June',p:'Kent',
+     petals:4,pc1:'#e8563f',pc2:'#a3281f',core:'#2a1a12',leafPairs:5,leafW:22,leafH:8,stalkH:58,v:false},
+    {n:'Tanacetum vulgare',c:'Tansy',y:'1884 · August',p:'Surrey',
+     petals:30,pc1:'#f5e88a',pc2:'#d4bc4a',core:'#e8d05a',leafPairs:9,leafW:16,leafH:5,stalkH:70,v:true},
+    {n:'Echium vulgare',c:'Viper\u2019s Bugloss',y:'1889 · July',p:'Cornwall',
+     petals:5,pc1:'#7a8fe0',pc2:'#3a4a9a',core:'#e8dcc0',leafPairs:6,leafW:24,leafH:6,stalkH:66,v:false},
+    {n:'Calluna vulgaris',c:'Heather',y:'1892 · September',p:'Yorkshire',
+     petals:24,pc1:'#d8a8d0',pc2:'#a86aa0',core:'#e8c8d8',leafPairs:8,leafW:12,leafH:4,stalkH:54,v:false},
+    {n:'Cichorium intybus',c:'Chicory',y:'1896 · August',p:'Buckinghamshire',
+     petals:18,pc1:'#a8c8f0',pc2:'#6a90d0',core:'#f5e8a0',leafPairs:4,leafW:24,leafH:7,stalkH:62,v:false},
+    {n:'Digitalis purpurea',c:'Foxglove',y:'1901 · July',p:'Devon',
+     petals:9,pc1:'#e0a0c8',pc2:'#b85a98',core:'#f5e8f0',leafPairs:6,leafW:20,leafH:6,stalkH:78,v:true}
+  ];
+
+  function plant(s){
+    var sp=document.createElement('div');
+    sp.className='sp';
+    /* stalk */
+    var st=document.createElement('div');
+    st.className='stalk';
+    st.style.height=s.stalkH+'%';
+    sp.appendChild(st);
+    /* leaves alternating along the stalk */
+    for(var i=0;i<s.leafPairs;i++){
+      var t=0.12+(i/s.leafPairs)*0.72;
+      for(var side=0;side<2;side++){
+        var l=document.createElement('div');
+        l.className='leaf'+(s.v&&i%2?' v':'');
+        l.style.width=s.leafW+'px';
+        l.style.height=s.leafH+'px';
+        l.style.left='50%';
+        l.style.bottom=(8+t*s.stalkH*0.92)+'%';
+        l.style.transformOrigin='0 50%';
+        var ang=(side?-1:1)*(38+Math.random()*22);
+        l.style.transform='rotate('+ang+'deg)';
+        if(side===1)l.style.transform='rotate('+(-ang)+'deg) scaleX(-1)';
+        sp.appendChild(l);
+      }
+    }
+    /* flower head */
+    var hd=document.createElement('div');
+    hd.className='head';
+    hd.style.bottom=(8+s.stalkH)+'%';
+    var PR=s.petals;
+    var petalBase=18;
+    for(var p=0;p<PR;p++){
+      var pe=document.createElement('div');
+      pe.className='petal';
+      var size=(6+Math.random()*4);
+      pe.style.width=size+'px';
+      pe.style.height=(16+Math.random()*8)+'px';
+      pe.style.left='50%';pe.style.top='50%';
+      pe.style.marginLeft=(-size/2)+'px';
+      pe.style.marginTop=(-petalBase-10)+'px';
+      pe.style.transformOrigin='50% '+(petalBase+10)+'px';
+      pe.style.transform='rotate('+(p/PR*360)+'deg)';
+      pe.style.setProperty('--pc1',s.pc1);
+      pe.style.setProperty('--pc2',s.pc2);
+      pe.style.opacity=(0.82+Math.random()*0.18).toFixed(2);
+      hd.appendChild(pe);
+    }
+    var co=document.createElement('div');
+    co.className='core';
+    co.style.width='11px';co.style.height='11px';
+    co.style.left='50%';co.style.top='50%';
+    co.style.marginLeft='-5.5px';co.style.marginTop='-5.5px';
+    co.style.setProperty('--cc',s.core);
+    hd.appendChild(co);
+    sp.appendChild(hd);
+    /* roots below */
+    for(var r=0;r<5;r++){
+      var rt=document.createElement('div');
+      rt.className='root';
+      rt.style.height=(16+Math.random()*22)+'px';
+      rt.style.left='50%';
+      rt.style.bottom='-'+(10+r*4)+'px';
+      rt.style.transform='rotate('+(r*30-60+Math.random()*18)+'deg)';
+      rt.style.opacity=(0.5+Math.random()*0.4).toFixed(2);
+      sp.appendChild(rt);
+    }
+    return sp;
+  }
+
+  var host=document.getElementById('specimens');
+  SPEC.forEach(function(s,idx){
+    var d=document.createElement('article');
+    d.className='sheet';
+    var box=document.createElement('div');
+    box.className='plant';
+    box.appendChild(plant(s));
+    var cap=document.createElement('figcaption');
+    cap.className='cap';
+    cap.innerHTML='<b>'+s.c+'</b>'+
+      '<span><i>'+s.n+'</i></span>'+
+      '<span>'+s.y+' · '+s.p+'</span>'+
+      '<span>Sheet '+(idx+1)+' · pressed 6 weeks</span>';
+    d.appendChild(box);
+    d.appendChild(cap);
+    host.appendChild(d);
+  });
+})();
+</script>
+</body>
+</html>

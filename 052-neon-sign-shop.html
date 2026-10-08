@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NEON &amp; GLASS — A Sign Shop</title>
+<style>
+  :root{
+    --bg:#0b0710;
+    --panel:#171028;
+    --line:rgba(240,225,255,.14);
+    --ink:#f6efff;
+    --dim:rgba(246,239,255,.55);
+    --pink:#ff4fa3;
+    --cyan:#3ee0ff;
+    --lime:#b8ff5c;
+    --amber:#ffb45e;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --serif:"Iowan Old Style",Palatino,Georgia,serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  ::selection{background:var(--pink);color:var(--bg)}
+
+  .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(16px,4vw,44px)}
+  nav{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:24px 0 0;border-bottom:1px solid var(--line)}
+  .brand{font-family:var(--serif);font-size:19px;letter-spacing:.3em;text-transform:uppercase}
+  nav ul{display:flex;gap:clamp(12px,2.2vw,28px);list-style:none;margin:0;padding:0}
+  nav a{color:var(--dim);text-decoration:none;font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;transition:color .2s}
+  nav a:hover{color:var(--ink)}
+
+  .hero{text-align:center;padding:clamp(26px,6vw,70px) 0 clamp(14px,3vw,24px)}
+  .hero .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.3em;text-transform:uppercase;color:var(--cyan);display:block;margin-bottom:22px}
+  .hero h1{font-family:var(--serif);font-weight:400;font-size:clamp(30px,6.4vw,78px);line-height:.96;letter-spacing:-.03em;margin:0 0 20px}
+  .hero h1 i{font-style:italic;color:var(--pink)}
+  .hero p{font-size:14px;line-height:1.8;color:var(--dim);max-width:48ch;margin:0 auto}
+
+  /* ---------- the sign wall ---------- */
+  .wall{
+    position:relative;margin:clamp(20px,4vw,44px) 0;padding:clamp(28px,6vw,72px) clamp(18px,4vw,48px);
+    border:1px solid var(--line);
+    background:
+      radial-gradient(70% 60% at 50% 40%,rgba(30,18,54,.75),rgba(11,7,16,.9)),
+      linear-gradient(180deg,#0d0815,#0a0610);
+    box-shadow:inset 0 0 100px rgba(0,0,0,.7);
+    display:grid;gap:clamp(20px,4vw,36px);justify-items:center;
+    min-height:340px
+  }
+  .brick{
+    position:absolute;inset:0;pointer-events:none;opacity:.14;
+    background-image:
+      repeating-linear-gradient(90deg,rgba(120,90,90,.5) 0 1px,transparent 1px 62px),
+      repeating-linear-gradient(180deg,rgba(120,90,90,.5) 0 1px,transparent 1px 26px);
+  }
+  .sign{
+    position:relative;font-family:var(--serif);text-align:center;line-height:1;
+    letter-spacing:.02em;cursor:pointer;user-select:none;
+    transition:opacity .4s
+  }
+  .sign .txt{
+    position:relative;display:inline-block;
+    text-shadow:
+      0 0 4px currentColor,
+      0 0 12px currentColor,
+      0 0 28px currentColor,
+      0 0 60px currentColor;
+    animation:flick 4.5s infinite;
+  }
+  /* the tube: a thin bright outline drawn with text-stroke in a brighter tone */
+  .sign .tube{
+    position:absolute;inset:0;display:grid;place-items:center;
+    color:#fff8ff;
+    -webkit-text-stroke:1.5px rgba(255,255,255,.9);
+    text-shadow:0 0 10px #fff,0 0 22px currentColor;
+    opacity:.55;pointer-events:none
+  }
+  /* the glass housing that catches the glow */
+  .sign::after{
+    content:"";position:absolute;inset:-14% -8%;border-radius:12px;
+    background:radial-gradient(60% 70% at 50% 50%,currentColor,transparent 70%);
+    opacity:.10;filter:blur(14px);pointer-events:none;z-index:-1
+  }
+  @keyframes flick{
+    0%,100%{opacity:1}
+    41%{opacity:1}42%{opacity:.35}43%{opacity:1}
+    77%{opacity:1}78%{opacity:.5}79%{opacity:.95}80%{opacity:.6}81%{opacity:1}
+  }
+  .sign.off .txt{animation:none;opacity:.06;text-shadow:none}
+  .sign.off .tube{opacity:.05}
+  .sign.off::after{opacity:.02}
+  .s1{font-size:clamp(34px,7vw,84px);color:var(--pink)}
+  .s2{font-size:clamp(26px,5vw,58px);color:var(--cyan);font-style:italic}
+  .s3{font-size:clamp(20px,3.6vw,40px);color:var(--lime);letter-spacing:.3em;text-transform:uppercase;font-family:var(--sans);font-weight:200}
+  .s4{font-size:clamp(22px,4vw,44px);color:var(--amber)}
+  .s5{font-size:clamp(15px,2.6vw,26px);color:var(--pink);font-style:italic;opacity:.8}
+
+  .hint{
+    font-family:var(--mono);font-size:9px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--dim);text-align:center;margin-top:8px
+  }
+  button{
+    font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;
+    background:rgba(255,79,163,.14);border:1px solid rgba(255,79,163,.4);color:var(--ink);
+    padding:12px 20px;border-radius:999px;cursor:pointer;transition:background .2s,color .2s
+  }
+  button:hover{background:var(--pink);color:#1c0611}
+  .tools{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:clamp(18px,4vw,36px) 0}
+
+  /* ---------- colours as a swatch row ---------- */
+  .swatches{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin:clamp(20px,4vw,44px) 0}
+  .swatches div{background:var(--bg);padding:22px 18px;display:grid;gap:10px;justify-items:center}
+  .swatches i{display:block;width:26px;height:26px;border-radius:50%;box-shadow:0 0 18px currentColor}
+  .swatches b{font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;font-weight:400}
+  .swatches span{font-family:var(--mono);font-size:8.5px;color:var(--dim);letter-spacing:.1em}
+
+  .notes{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin:0 0 clamp(24px,5vw,48px)}
+  .notes div{background:var(--bg);padding:28px 26px}
+  .notes b{display:block;font-family:var(--serif);font-weight:400;font-size:32px;color:var(--pink);line-height:1;margin-bottom:12px}
+  .notes h4{font-family:var(--mono);font-size:9px;letter-spacing:.24em;text-transform:uppercase;margin:0 0 12px}
+  .notes p{margin:0;font-size:12.5px;line-height:1.85;color:var(--dim)}
+
+  footer{border-top:1px solid var(--line);padding:26px 0 48px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
+
+  @media (max-width:820px){.notes,.swatches{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="brand">Neon &amp; Glass</div>
+    <ul>
+      <li><a href="#wall">The wall</a></li>
+      <li><a href="#colours">Colours</a></li>
+      <li><a href="#craft">Craft</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <span class="k">Bent by hand · 14 years · 2 400 signs</span>
+    <h1>Gas, glass,<br>and <i>12 000 volts.</i></h1>
+    <p>Every letter is a single length of soft-glass tube, heated over a ribbon
+    burner until it behaves like rope, then bent around a template in one movement.</p>
+  </header>
+
+  <section id="wall">
+    <div class="wall">
+      <div class="brick"></div>
+      <div class="sign s1"><span class="txt">Motel</span></div>
+      <div class="sign s2"><span class="txt">Vacancy</span></div>
+      <div class="sign s3"><span class="txt">Open Late</span></div>
+      <div class="sign s4"><span class="txt">24 Hours</span></div>
+      <div class="sign s5"><span class="txt">diner · next left</span></div>
+    </div>
+    <p class="hint">Click a sign to switch it off · then on again</p>
+    <div class="tools">
+      <button id="all">All on</button>
+      <button id="none">All off</button>
+      <button id="one">Random flicker</button>
+    </div>
+  </section>
+
+  <section class="swatches" id="colours">
+    <div><i style="color:#ff4fa3;background:#ff4fa3"></i><b>Rose</b><span>Ne + Ar</span></div>
+    <div><i style="color:#3ee0ff;background:#3ee0ff"></i><b>Ice</b><span>Ar + Hg</span></div>
+    <div><i style="color:#b8ff5c;background:#b8ff5c"></i><b>Lime</b><span>Ar + Xe</span></div>
+    <div><i style="color:#ffb45e;background:#ffb45e"></i><b>Amber</b><span>He</span></div>
+    <div><i style="color:#c8a8ff;background:#c8a8ff"></i><b>Smoke</b><span>Ne, dimmed</span></div>
+  </section>
+
+  <section class="notes" id="craft">
+    <div><b>850</b><h4>degrees, at the burner</h4><p>Below that the glass will not move; above it, it will move without being asked. The whole skill is the narrow range between.</p></div>
+    <div><b>12 000</b><h4>volts, at the pins</h4><p>Enough to strike the gas and keep it ionised, and enough that a pinched finger will end your afternoon.</p></div>
+    <div><b>1</b><h4>movement per letter</h4><p>You cannot reheat a bend and hope. The tube remembers where it went, and the shop remembers which letters you broke.</p></div>
+  </section>
+
+  <footer>
+    <span>© Neon &amp; Glass</span>
+    <span>Open by appointment · watch your fingers</span>
+    <span>Nothing here is a photograph</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var signs=[].slice.call(document.querySelectorAll('.sign'));
+  signs.forEach(function(s){
+    s.addEventListener('click',function(){s.classList.toggle('off')});
+  });
+  var flickerTimer=null;
+  document.getElementById('all').addEventListener('click',function(){
+    signs.forEach(function(s){s.classList.remove('off')});
+  });
+  document.getElementById('none').addEventListener('click',function(){
+    signs.forEach(function(s){s.classList.add('off')});
+  });
+  document.getElementById('one').addEventListener('click',function(){
+    var b=document.getElementById('one');
+    if(flickerTimer){
+      clearInterval(flickerTimer);flickerTimer=null;
+      b.textContent='Random flicker';
+      signs.forEach(function(s){s.classList.remove('off')});
+      return;
+    }
+    b.textContent='Stop flicker';
+    flickerTimer=setInterval(function(){
+      signs.forEach(function(s){
+        s.classList.toggle('off',Math.random()<0.45);
+      });
+    },340);
+  });
+})();
+</script>
+</body>
+</html>

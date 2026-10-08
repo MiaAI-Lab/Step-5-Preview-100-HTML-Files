@@ -1,0 +1,76 @@
+# BLOOM — a flower that opens petal by petal
+
+## Short title
+Flower Bloom
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a flower built from real
+phyllotaxis — primordia placed at a fixed divergence angle — with the angle adjustable so
+the packing can be seen to work or fail. No external dependencies whatsoever — no CDN, no
+web fonts, no external images, no JS libraries. All CSS and JavaScript inline, works
+offline by double-clicking, responsive, valid HTML5.
+
+Artistic direction: a garden border. Ground #f7f1ee, hairlines rgba(51,39,42,.18), ink
+#33272a with muted #6d5c60, rose #c4596b as the accent and a leaf green #4d7a54. Serif
+headings with italic accent words, uppercase .2em–.4em kickers, monospace figures.
+
+The flower is one canvas: a gradient ground, a shadowed head, a bezier stem with two
+gradient leaves on it, and then the head itself. The head is a stack of primordia, each at
+an angular distance of the divergence angle from the last, whose radius is the square root
+of its index over the total — the Vogel spiral, which is the real distribution a plant
+uses. Each primordium is drawn as an ellipse rotated along the radius, with a linear
+gradient from tip to base and a vein down the middle, shaded by its order so the oldest are
+darker at the centre and the youngest palest at the rim.
+
+Five species with their own palette and primordium count — sunflower, rose, daisy, poppy,
+lavender — and the two with ray florets get a rotating ring of cream petals outside the
+disc. The disc is a radial gradient with forty seeds laid on the same spiral, which is what
+a sunflower's seeds actually do.
+
+Controls: five species swatches, a divergence slider from 90 to 190 degrees, petal size, an
+open slider, Grow it (which adds primordia one per frame) and Back to a bud. Readout:
+primordia placed, the same number expressed as whorls of five, coverage — the fraction of
+petals whose centres land within a petal width of an earlier one — the current divergence
+angle, the head species and the opening percentage.
+
+Layout: nav, centred hero, the bloom canvas with its caption, a dock of swatches, three
+sliders and two buttons, a readout row, then two three-cell note rows on the golden angle,
+symmetry, opening, coverage, growth and colour, then a footer.
+
+Interaction: the head is already full. Visitors drag the divergence off 137.5 and watch the
+petals line up into spokes and holes; drag it back and the packing closes; change the petal
+size to see how many a head can hold; open and close it; take it back to a bud and grow it
+again primordium by primordium; and switch between five species.
+
+## One-paragraph description of the intended design
+A flower on canvas whose head is a Vogel spiral of primordia, each placed at the divergence
+angle from the last and at a radius from the square root of its index, drawn as gradient
+ellipses shaded by order over a bezier stem with two leaves and a disc of seeds on the same
+spiral — with five species palettes, a divergence slider from 90 to 190 degrees that visibly
+breaks and repairs the packing, petal size and opening sliders, a grow mode that adds
+primordia one per frame, and a coverage figure that measures how well the head packs.
+
+## Major visual techniques used
+- Vogel spiral: radius as the square root of index over total, which is the real
+  distribution and the reason the packing is optimal at the golden angle
+- Divergence angle as the single parameter that produces spokes at rational angles and
+  perfect packing at 137.5
+- Petals rotated along their own radius, so the whole head reads as a head seen from above
+- Per-petal gradient from tip to base with a vein, shaded by order so age is visible
+- Coverage measured geometrically: the fraction of petals whose centres fall within a
+  petal width of an earlier one
+- Ray florets as a ring that rotates slowly, only for the species that have them
+- Disc seeds placed on the same spiral as the petals, which is what real seeds do
+- Stem as a single bezier with two leaves placed on it from their own offset
+- Shadow behind the head offset down and right, matching a light from the upper left
+- Grow mode adding one primordium per frame so the pattern can be watched falling into
+  place and then breaking when the angle is moved mid-growth
+- Five palettes seeded from real flower colours, each driving two petal tones and a core
+- Whorls as the primordium count divided by five, so the number reads in botanical terms
+
+## Intended interaction model
+A head to open and to break. Visitors drag the divergence angle and watch the packing fall
+apart into spokes and close again at the golden angle, set the petal size and the opening,
+take the flower back to a bud and grow it primordium by primordium, and switch between five
+species. The coverage figure tells you what your eyes already worked out.

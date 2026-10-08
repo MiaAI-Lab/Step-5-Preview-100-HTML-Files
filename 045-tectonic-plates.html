@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TECTONICS — The Plates, Drawn Slowly</title>
+<style>
+  :root{
+    --bg:#0d0812;
+    --panel:#161020;
+    --line:rgba(220,200,240,.14);
+    --text:#eee6f7;
+    --muted:rgba(238,230,247,.52);
+    --mantle:#ff6b3d;
+    --ridge:#ffb347;
+    --cool:#7b6cff;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --serif:"Iowan Old Style",Palatino,Georgia,serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+  .room{
+    position:fixed;inset:0;z-index:0;
+    background:
+      radial-gradient(70% 50% at 50% 112%,rgba(255,107,61,.20),transparent 68%),
+      radial-gradient(50% 36% at 20% 12%,rgba(123,108,255,.14),transparent 70%),
+      linear-gradient(180deg,#0d0812,#0a0614 60%,#07040e);
+  }
+  #cv{position:fixed;inset:0;z-index:1;display:block}
+
+  .ui{position:fixed;inset:0;z-index:3;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(18px,3.4vw,40px)}
+  .top{display:flex;justify-content:space-between;align-items:flex-start;gap:18px}
+  .k{font-family:var(--mono);font-size:9px;letter-spacing:.34em;text-transform:uppercase;color:var(--ridge)}
+  h1{font-family:var(--serif);font-weight:400;font-style:italic;font-size:clamp(28px,5.2vw,62px);line-height:.98;letter-spacing:-.02em;margin:10px 0 0}
+  h1 b{font-style:normal;font-weight:400;color:var(--ridge)}
+  .top p{margin:12px 0 0;font-size:12px;line-height:1.75;max-width:32ch;color:var(--muted)}
+  .mtr{text-align:right;font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);line-height:2.4}
+  .mtr b{display:block;font-size:15px;color:var(--ridge);font-weight:400;letter-spacing:.02em}
+
+  .bottom{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+  .tray{
+    pointer-events:auto;display:flex;gap:clamp(8px,1.3vw,16px);flex-wrap:wrap;align-items:center;
+    background:rgba(20,12,32,.62);border:1px solid var(--line);border-radius:16px;
+    padding:11px clamp(12px,1.8vw,20px);backdrop-filter:blur(14px)
+  }
+  .g{display:flex;align-items:center;gap:8px}
+  .kk{font-family:var(--mono);font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+  .vv{font-family:var(--mono);font-size:9.5px;color:var(--ridge);min-width:30px;font-variant-numeric:tabular-nums}
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;width:64px;height:14px;background:transparent;cursor:pointer
+  }
+  input[type=range]::-webkit-slider-runnable-track{height:2px;background:var(--line);border-radius:2px}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;border-radius:50%;background:var(--mantle);margin-top:-5px;border:0;box-shadow:0 0 10px rgba(255,107,61,.7)}
+  input[type=range]::-moz-range-track{height:2px;background:var(--line);border-radius:2px}
+  input[type=range]::-moz-range-thumb{width:11px;height:11px;border:0;border-radius:50%;background:var(--mantle)}
+  button{
+    pointer-events:auto;font-family:var(--mono);font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;
+    background:rgba(255,179,71,.12);border:1px solid rgba(255,179,71,.36);color:var(--text);
+    padding:9px 13px;border-radius:999px;cursor:pointer;transition:background .2s,color .2s
+  }
+  button:hover{background:var(--ridge);color:#2a1a05}
+  button.on{background:var(--ridge);color:#2a1a05}
+  .hint{font-family:var(--mono);font-size:8.5px;letter-spacing:.22em;text-transform:uppercase;color:rgba(238,230,247,.4);pointer-events:none}
+
+  @media (max-width:760px){.top p,.mtr,.hint{display:none}.ui{padding:14px}}
+</style>
+</head>
+<body>
+<div class="room"></div>
+<canvas id="cv"></canvas>
+
+<div class="ui">
+  <div class="top">
+    <div>
+      <div class="k">Planetary model · twelve plates</div>
+      <h1>Everything is<br><b>drifting</b> slowly.</h1>
+      <p>Twelve plates on a molten sphere, colliding, subducting and splitting along
+      ridges. Nothing here happens in a lifetime, which is the joke.</p>
+    </div>
+    <div class="mtr">
+      Plates<b id="mP">12</b>
+      Ridge<b id="mR">0</b>
+      Rate<b id="mV">0 cm/yr</b>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <div class="tray">
+      <div class="g"><span class="kk">Speed</span><input type="range" id="sp" min="1" max="100" value="34" aria-label="Drift speed"><span class="vv" id="spV">34</span></div>
+      <div class="g"><span class="kk">Plumes</span><input type="range" id="pl" min="0" max="100" value="40" aria-label="Mantle plumes"><span class="vv" id="plV">40</span></div>
+      <div class="g"><span class="kk">Plates</span><input type="range" id="pn" min="5" max="18" value="12" aria-label="Plate count"><span class="vv" id="pnV">12</span></div>
+      <button id="quakes" class="on">Quakes</button>
+      <button id="reset">Reset</button>
+    </div>
+    <div class="hint">Click a plate to make it split · drag to spin the sphere</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var cv=document.getElementById('cv'),c=cv.getContext('2d');
+  var W,H,DPR=Math.min(window.devicePixelRatio||1,2);
+  var plates=[],plumes=[],quakes=[];
+  var speed=34,plumeAmt=40,want=12,showQuakes=true;
+  var rot=0,rotT=0;
+
+  function rnd(a,b){return a+Math.random()*(b-a)}
+
+  function build(){
+    plates=[];plumes=[];
+    var R=Math.min(W,H)*0.34;
+    for(var i=0;i<want;i++){
+      (function(n){
+        /* each plate is a noisy blob in polar coords */
+        var pts=[];
+        var a0=rnd(0,6.283);
+        var size=rnd(0.35,1.1);
+        for(var k=0;k<=16;k++){
+          var a=a0+k/16*6.283*(0.4+size*0.7);
+          var r=R*(0.35+Math.random()*0.6);
+          pts.push({a:a,r:r});
+        }
+        plates.push({
+          pts:pts,ang:a0,
+          cx:rnd(-R*0.7,R*0.7),cy:rnd(-R*0.6,R*0.6),
+          vx:rnd(-1,1),vy:rnd(-1,1),
+          hue:rnd(180,300),
+          ridge:Math.random()<0.35,
+          drift:rnd(-0.3,0.3),
+          age:0
+        });
+      })(i);
+    }
+    for(var p=0;p<5;p++){
+      plumes.push({a:rnd(0,6.283),r:rnd(0.2,0.9),ph:rnd(0,6.283)});
+    }
+  }
+  function resize(){
+    W=innerWidth;H=innerHeight;
+    cv.width=W*DPR;cv.height=H*DPR;cv.style.width=W+'px';cv.style.height=H+'px';
+    c.setTransform(DPR,0,0,DPR,0,0);
+    build();
+  }
+
+  /* mantle: a hot gradient sphere */
+  function drawMantle(t){
+    var R=Math.min(W,H)*0.36;
+    var cx=W/2,cy=H/2;
+    var g=c.createRadialGradient(cx-R*0.35,cy-R*0.4,R*0.1,cx,cy,R*1.2);
+    g.addColorStop(0,'#ff8a3d');
+    g.addColorStop(.35,'#c8442a');
+    g.addColorStop(.72,'#5a1a2a');
+    g.addColorStop(1,'#1a0a1e');
+    c.fillStyle=g;
+    c.beginPath();c.arc(cx,cy,R*1.2,0,6.283);c.fill();
+    /* the convection: slow rotating bands */
+    c.save();
+    c.globalCompositeOperation='lighter';
+    for(var i=0;i<7;i++){
+      var a=t*0.0002*(0.4+i*0.18)+i;
+      var rr=R*(0.2+i*0.15);
+      for(var k=0;k<40;k++){
+        var th=k/40*6.283+a;
+        var x=cx+Math.cos(th)*rr, y=cy+Math.sin(th)*rr*0.5;
+        var al=(0.02+0.05*Math.abs(Math.sin(th*3+t*0.0005)))*(plumeAmt/100);
+        c.fillStyle='rgba(255,150,80,'+al.toFixed(3)+')';
+        c.beginPath();c.arc(x,y,R*0.05,0,6.283);c.fill();
+      }
+    }
+    c.restore();
+    /* plumes: columns of heat rising */
+    c.save();
+    c.globalCompositeOperation='lighter';
+    for(var q=0;q<plumes.length;q++){
+      var pm=plumes[q];
+      pm.ph+=0.006;
+      var px=cx+Math.cos(pm.a)*R*pm.r;
+      var py=cy+Math.sin(pm.a)*R*pm.r;
+      var h=(0.5+0.5*Math.sin(pm.ph))*R*0.5*(plumeAmt/100);
+      var pg=c.createRadialGradient(px,py,0,px,py,h);
+      pg.addColorStop(0,'rgba(255,220,160,.5)');
+      pg.addColorStop(1,'rgba(255,140,60,0)');
+      c.fillStyle=pg;
+      c.beginPath();c.arc(px,py,h,0,6.283);c.fill();
+    }
+    c.restore();
+  }
+
+  function platePath(p){
+    c.beginPath();
+    for(var i=0;i<p.pts.length;i++){
+      var a=p.pts[i].a+p.drift*0.1;
+      var r=p.pts[i].r;
+      var x=W/2+p.cx+Math.cos(a)*r;
+      var y=H/2+p.cy+Math.sin(a)*r*0.8;
+      if(i===0)c.moveTo(x,y);else c.lineTo(x,y);
+    }
+    c.closePath();
+  }
+
+  function draw(t){
+    rot+=(rotT-rot)*0.04;
+    c.setTransform(DPR,0,0,DPR,0,0);
+    c.clearRect(0,0,W,H);
+    var sp=speed/100;
+    if(sp>0){
+      for(var i=0;i<plates.length;i++){
+        var p=plates[i];
+        p.cx+=p.vx*sp*0.5;
+        p.cy+=p.vy*sp*0.5;
+        p.drift+=0.0004*sp*(p.ridge?1:-1);
+        p.age+=sp*0.01;
+        var R=Math.min(W,H)*0.36;
+        if(Math.abs(p.cx)>R*2.2)p.vx*=-1;
+        if(Math.abs(p.cy)>R*1.8)p.vy*=-1;
+      }
+      /* quakes at plate edges */
+      if(showQuakes&&Math.random()<sp*0.4){
+        var q=plates[(Math.random()*plates.length)|0];
+        quakes.push({x:W/2+q.cx+rnd(-40,40),y:H/2+q.cy+rnd(-30,30),life:1});
+      }
+    }
+
+    drawMantle(t);
+
+    /* the plates themselves: dark slabs with bright rims */
+    for(var k=0;k<plates.length;k++){
+      var pl=plates[k];
+      platePath(pl);
+      /* body */
+      var g2=c.createLinearGradient(W/2+pl.cx-40,H/2+pl.cy-30,W/2+pl.cx+40,H/2+pl.cy+30);
+      g2.addColorStop(0,'hsla('+pl.hue+',40%,22%,.92)');
+      g2.addColorStop(1,'hsla('+(pl.hue+30)+',45%,12%,.95)');
+      c.fillStyle=g2;c.fill();
+      /* rim: ridge (bright) or trench (cool) */
+      c.strokeStyle=pl.ridge?'rgba(255,179,71,.75)':'rgba(123,108,255,.65)';
+      c.lineWidth=pl.ridge?2:1.4;c.stroke();
+      if(pl.ridge){
+        c.save();c.globalCompositeOperation='lighter';
+        c.strokeStyle='rgba(255,200,120,.28)';c.lineWidth=5;c.stroke();
+        c.restore();
+      }
+    }
+
+    /* quake rings */
+    c.save();
+    c.globalCompositeOperation='lighter';
+    for(var w=quakes.length-1;w>=0;w--){
+      var qq=quakes[w];
+      qq.life-=0.02;
+      if(qq.life<=0){quakes.splice(w,1);continue;}
+      c.strokeStyle='rgba(255,230,180,'+(qq.life*0.6).toFixed(3)+')';
+      c.lineWidth=1.2;
+      c.beginPath();c.arc(qq.x,qq.y,(1-qq.life)*26,0,6.283);c.stroke();
+    }
+    c.restore();
+
+    document.getElementById('mP').textContent=plates.length;
+    var ridges=0;
+    for(var r2=0;r2<plates.length;r2++)if(plates[r2].ridge)ridges++;
+    document.getElementById('mR').textContent=ridges;
+    document.getElementById('mV').textContent=Math.round(speed*240)+' cm/yr';
+    requestAnimationFrame(draw);
+  }
+
+  cv.addEventListener('pointerdown',function(e){
+    var r=cv.getBoundingClientRect();
+    var x=e.clientX-r.left,y=e.clientY-r.top;
+    /* nearest plate centre within 60px: split it */
+    var best=null,bd=1e9;
+    for(var i=0;i<plates.length;i++){
+      var d=Math.hypot(x-(W/2+plates[i].cx),y-(H/2+plates[i].cy));
+      if(d<bd){bd=d;best=plates[i];}
+    }
+    if(best&&bd<90&&plates.length<18){
+      /* split: create a smaller offset sibling with opposite velocity */
+      plates.push({
+        pts:best.pts.map(function(pt){return {a:pt.a+rnd(-.2,.2),r:pt.r*0.6}}),
+        ang:best.ang,cx:best.cx+40,cy:best.cy+30,
+        vx:-best.vx,vy:-best.vy,
+        hue:best.hue+30,ridge:!best.ridge,drift:rnd(-.3,.3),age:0
+      });
+      best.vx*=-1;best.vy*=-1;
+      best.ridge=!best.ridge;
+      quakes.push({x:W/2+best.cx,y:H/2+best.cy,life:1});
+    }
+  });
+
+  var dragging=false,lx=0;
+  cv.addEventListener('pointerdown',function(e){dragging=true;lx=e.clientX;});
+  addEventListener('pointermove',function(e){
+    if(!dragging)return;
+    rotT+=(e.clientX-lx)*0.005;
+    lx=e.clientX;
+  });
+  addEventListener('pointerup',function(){dragging=false;});
+
+  document.getElementById('sp').addEventListener('input',function(){
+    speed=+this.value;document.getElementById('spV').textContent=speed;
+  });
+  document.getElementById('pl').addEventListener('input',function(){
+    plumeAmt=+this.value;document.getElementById('plV').textContent=plumeAmt;
+  });
+  document.getElementById('pn').addEventListener('input',function(){
+    want=+this.value;document.getElementById('pnV').textContent=want;
+    while(plates.length>want)plates.pop();
+    while(plates.length<want){
+      var R=Math.min(W,H)*0.34;
+      plates.push({
+        pts:(function(){
+          var pts=[],a0=rnd(0,6.283),size=rnd(0.35,1.1);
+          for(var k=0;k<=16;k++){
+            var a=a0+k/16*6.283*(0.4+size*0.7);
+            pts.push({a:a,r:R*(0.35+Math.random()*0.6)});
+          }
+          return pts;
+        })(),
+        ang:0,cx:rnd(-R*0.7,R*0.7),cy:rnd(-R*0.6,R*0.6),
+        vx:rnd(-1,1),vy:rnd(-1,1),hue:rnd(180,300),
+        ridge:Math.random()<0.35,drift:rnd(-0.3,0.3),age:0
+      });
+    }
+  });
+  var qb=document.getElementById('quakes');
+  qb.addEventListener('click',function(){showQuakes=!showQuakes;this.classList.toggle('on',showQuakes);});
+  document.getElementById('reset').addEventListener('click',build);
+
+  addEventListener('resize',function(){clearTimeout(window.__r);window.__r=setTimeout(resize,140)});
+  resize();
+  requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>

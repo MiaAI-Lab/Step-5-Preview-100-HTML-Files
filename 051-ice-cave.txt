@@ -1,0 +1,83 @@
+# GLACIER — Inside the Blue
+
+## Short title
+Ice Cave
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: an interactive glacier
+ice-cave scene called GLACIER. No external dependencies whatsoever — no CDN, no web
+fonts, no external images, no external SVG files, no JavaScript libraries. All CSS
+and JavaScript inline, works offline by double-clicking, responsive, valid HTML5.
+
+Artistic direction: deep blue ice. Behind the canvas, a CSS cave (#0a2a3d → #062131
+→ #04141f) with a bright cyan radial in the upper left and a deep azure wash lower
+right; its brightness and saturation are recomputed every frame from the Clarity
+slider, so low clarity means murky, cloudy ice and high clarity means glass-clear
+glacier blue. On the canvas, a light shaft follows the pointer as a wide radial
+whose radius scales with the Light slider, and a deep azure shadow gradient covers
+the bottom thirty per cent so the floor always reads as furthest away.
+
+The facets are the substance of the page. Up to one hundred and twenty long thin
+rhombi — the classic ice facet — are placed at random positions and depths, sized by
+random width and height, and rotated by their own angle. Each facet's angle eases
+toward the direction of the light source at 0.008 per frame, with the shortest-path
+wrap handled properly, so every plane in the cave slowly turns to face the light as
+you move the pointer. Each facet's brightness is a Lambert-like term: the absolute
+cosine of the difference between its own angle and the light direction, multiplied
+by the Clarity slider and its depth, filling a three-stop gradient whose lightness
+is lifted by the same term — so facets facing the sun are almost white and facets
+edge-on are nearly invisible. The lit ones (above 0.5) get a bright 0.9px edge
+stroke. A Shimmer toggle adds a per-facet slow self-rotation, which is what makes
+the whole cave glitter.
+
+Meltwater is a second mode: seventy droplets that fall, wrap to the top when they
+leave, drift on per-drop sines, and draw a 22-pixel streak behind them in additive
+blend so they read as running water.
+
+Layout: a full-viewport canvas over the cave with a floating UI overlay whose
+pointer-events pass through except on the controls. Top-left is a monospace
+coordinate label above an italic serif headline with one line in ice cyan, plus a
+short paragraph about why glacier ice is blue. Top-right is a monospace gauge stack
+showing ice temperature, facet count and a refraction index derived from clarity.
+Bottom is a glass tray with three sliders (Clarity, Facets, Light) plus Shimmer and
+Meltwater toggles, and a monospace hint.
+
+Interaction: the pointer is the light source — everything refracts toward it. The
+three sliders retune the ice live: Clarity changes transparency and the page's
+brightness, Facets adds or removes planes, Light widens the shaft. Shimmer adds the
+slow per-facet rotation; Meltwater turns on the falling water. On narrow screens the
+paragraph, gauges and hint hide.
+
+## One-paragraph description of the intended design
+A glacier cave of long thin ice facets, each slowly turning to face the light as
+you move it, its brightness a Lambert term from the angle between its own normal and
+the light so facing planes glow almost white and edge-on planes vanish, scaled by a
+clarity slider that also drives the whole page's brightness and saturation — with
+seventy meltwater streaks and a deep azure floor shadow.
+
+## Major visual techniques used
+- Lambert-like facet brightness: |cos(ownAngle − lightAngle)| × clarity × depth,
+  feeding both the gradient's lightness and its alpha
+- Per-facet angle easing toward the light with shortest-path angle wrapping
+- Long thin rhombus facets at random positions, sizes, depths and rotations
+- Sorted-once depth ordering (far facets first) so the loop does not sort per frame
+- Three-stop gradient fills indexed to the facet's own hue (190–220)
+- Bright 0.9px edge stroke only above a brightness threshold
+- Per-facet slow self-rotation for the Shimmer mode
+- Pointer-following light shaft as a wide radial whose radius scales with Light
+- Deep azure floor shadow over the bottom thirty per cent
+- CSS cave whose brightness and saturation are recomputed per frame from Clarity
+- Meltwater: falling droplets with 22px additive streaks and sine drift, wrapping
+  to the top
+- Live gauges: ice temperature (which changes when Meltwater is on), facet count,
+  and a refraction index derived from clarity
+- Italic serif headline with one ice-cyan line against 8.5px tracked monospace
+- Floating glass tray with backdrop-filter blur; extras hidden under 760px
+
+## Intended interaction model
+A cave you can light. Visitors move the pointer and every facet in the chamber turns
+to catch it, shimmering if they ask it to; the three sliders change how clear the
+ice is, how many facets there are and how wide the shaft is, and Meltwater starts
+the water running. The scene is entirely driven by the light angle, which is the
+pointer.

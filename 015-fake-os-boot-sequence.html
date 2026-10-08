@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>COLDSTART — Firmware 4.11.2</title>
+<style>
+  :root{
+    --bg:#04070a;
+    --fg:#c8f5d8;
+    --dim:#4d7a63;
+    --amber:#ffb347;
+    --red:#ff5f56;
+    --cyan:#5ff2d8;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    background:var(--bg);color:var(--fg);font-family:var(--mono);
+    font-size:clamp(11px,1.35vw,13.5px);line-height:1.62;
+    -webkit-font-smoothing:antialiased;overflow:hidden
+  }
+  #term{
+    height:100%;overflow-y:auto;padding:clamp(16px,3vw,34px) clamp(14px,3vw,34px) 40vh;
+    white-space:pre-wrap;word-break:break-word;tab-size:4
+  }
+  .scan{
+    position:fixed;inset:0;z-index:9;pointer-events:none;
+    background:repeating-linear-gradient(180deg,rgba(0,0,0,.28) 0 1px,transparent 1px 3px)
+  }
+  .vig{position:fixed;inset:0;z-index:8;pointer-events:none;
+    background:radial-gradient(120% 100% at 50% 45%,transparent 55%,rgba(0,0,0,.8))}
+  .flick{position:fixed;inset:0;z-index:7;pointer-events:none;background:rgba(200,245,216,.03);animation:fl 6s infinite}
+  @keyframes fl{0%,100%{opacity:0}47%{opacity:0}48%{opacity:1}49%{opacity:0}82%{opacity:0}83%{opacity:.6}84%{opacity:0}}
+
+  .cur{display:inline-block;width:.62em;height:1.05em;background:var(--fg);vertical-align:-.16em;animation:bl 1.05s steps(1) infinite}
+  @keyframes bl{0%,50%{opacity:1}51%,100%{opacity:0}}
+
+  .ok{color:var(--cyan)}
+  .warn{color:var(--amber)}
+  .bad{color:var(--red)}
+  .dim{color:var(--dim)}
+  .hd{color:#fff;letter-spacing:.14em}
+
+  /* progress bar */
+  .prog{
+    position:fixed;left:0;bottom:0;height:2px;background:var(--cyan);width:0;z-index:10;
+    box-shadow:0 0 12px var(--cyan);transition:width .3s linear
+  }
+  .stat{
+    position:fixed;right:clamp(12px,2vw,24px);bottom:clamp(12px,2vw,24px);z-index:10;
+    font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);text-align:right
+  }
+  .stat b{color:var(--cyan);font-weight:400}
+
+  /* final screen */
+  .done{
+    position:fixed;inset:0;z-index:20;display:none;place-items:center;text-align:center;
+    background:radial-gradient(80% 60% at 50% 40%,#0a1410,#02040a);
+    padding:24px
+  }
+  .done.on{display:grid;animation:fadein .8s}
+  @keyframes fadein{from{opacity:0}to{opacity:1}}
+  .done .mark{
+    width:78px;height:78px;margin:0 auto 26px;border:1px solid var(--cyan);border-radius:50%;
+    display:grid;place-items:center;position:relative;
+    box-shadow:0 0 40px -8px rgba(95,242,216,.5)
+  }
+  .done .mark::after{content:"";position:absolute;inset:-10px;border:1px dashed rgba(95,242,216,.35);border-radius:50%;animation:spin 14s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .done .mark i{width:22px;height:22px;border-radius:50%;background:var(--cyan);box-shadow:0 0 24px var(--cyan)}
+  .done h1{font-size:clamp(18px,3.4vw,34px);font-weight:400;letter-spacing:.3em;margin:0 0 16px;text-transform:uppercase}
+  .done p{color:var(--dim);font-size:12px;letter-spacing:.16em;line-height:2.2;margin:0 auto;max-width:44ch}
+  .done .row{display:flex;gap:10px;justify-content:center;margin-top:30px;flex-wrap:wrap}
+  .done button{
+    font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+    background:transparent;border:1px solid var(--cyan);color:var(--cyan);
+    padding:12px 20px;cursor:pointer;transition:background .2s,color .2s
+  }
+  .done button:hover{background:var(--cyan);color:#02120c}
+
+  @media (prefers-reduced-motion:reduce){.flick,.done .mark::after,.cur{animation:none}}
+</style>
+</head>
+<body>
+<div id="term" aria-live="polite"></div>
+<div class="flick"></div>
+<div class="vig"></div>
+<div class="scan"></div>
+<div class="prog" id="prog"></div>
+<div class="stat">Firmware <b>4.11.2</b><br>Uptime <b id="up">0.0s</b></div>
+
+<div class="done" id="done">
+  <div>
+    <div class="mark"><i></i></div>
+    <h1>System ready</h1>
+    <p>All subsystems nominal. The machine has nothing to report, which after
+    thirty-one checks is the best possible outcome.</p>
+    <div class="row">
+      <button id="again">Run again</button>
+      <button id="skip">Skip to end</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var term=document.getElementById('term');
+  var prog=document.getElementById('prog');
+  var t0=Date.now();
+
+  var LINES=[
+    ['COLDSTART firmware 4.11.2 — (c) 2026 Meridian Systems','hd'],
+    ['','' ],
+    ['[  0.001] CPU: 8 cores @ 3.84GHz — cache 32MB L3',''],
+    ['[  0.014] memory map: 65536M usable, 512M reserved',''],
+    ['[  0.031] ACPI: 14 tables, 3 power states',''],
+    ['[  0.048] PCI: 22 devices on bus 0',''],
+    ['[  0.062]   └─ nvme0: Samsung 990 PRO 2TB (firmware 4B2QJXD7)','dim'],
+    ['[  0.079]   └─ gpu0: discrete, 16384M VRAM','dim'],
+    ['[  0.094]   └─ net0: ethernet, link down','dim'],
+    ['[  0.108] USB: 6 ports, 2 hubs',''],
+    ['[  0.121] thermal: 34.2°C / fan 1180rpm',''],
+    ['','' ],
+    ['Mounting root filesystem...',''],
+    ['[  0.244] EXT4 mounted (rw,relatime,errors=remount-ro)','ok'],
+    ['[  0.259] journal replayed in 12ms','ok'],
+    ['[  0.271] checking 1,284,902 inodes',''],
+    ['[  0.398] filesystem clean','ok'],
+    ['','' ],
+    ['Loading kernel modules',''],
+    ['  ext4 ......................... ok','ok'],
+    ['  nvme-core .................... ok','ok'],
+    ['  i915 ......................... ok','ok'],
+    ['  e1000e ....................... ok','ok'],
+    ['  snd-hda-intel ................ ok','ok'],
+    ['  usbhid ....................... ok','ok'],
+    ['  kvm .......................... ok','ok'],
+    ['','' ],
+    ['Starting device manager',''],
+    ['[  0.612] enumerating 22 devices',''],
+    ['[  0.640]   disk0  online  2.00 TB','dim'],
+    ['[  0.655]   disk1  online  2.00 TB','dim'],
+    ['[  0.671]   raid0  online  4.00 TB (stripe 128k)','dim'],
+    ['[  0.690]   net0   waiting for carrier','warn'],
+    ['[  0.704]   audio0 online  (ALC1220)','dim'],
+    ['[  0.718]   tpm0   online  (2.0, 4 banks)','dim'],
+    ['','' ],
+    ['Starting network services',''],
+    ['[  0.802] dhclient: DISCOVER on eth0',''],
+    ['[  1.104] dhclient: no OFFER received','warn'],
+    ['[  1.118] falling back to link-local 169.254.11.42','warn'],
+    ['[  1.131] firewall: 0 rules loaded',''],
+    ['[  1.146] dns: 1.1.1.1, 8.8.8.8 (unreachable)','warn'],
+    ['','' ],
+    ['Starting system services',''],
+    ['  cron ......... started','ok'],
+    ['  dbus ......... started','ok'],
+    ['  journald ..... started','ok'],
+    ['  logind ...... started','ok'],
+    ['  udev ......... started','ok'],
+    ['  sshd ......... started (port 22)','ok'],
+    ['  nginx ........ started (3 workers)','ok'],
+    ['  postgres ..... started (16.2, port 5432)','ok'],
+    ['  redis ........ started (7.2, port 6379)','ok'],
+    ['  docker ....... started (24 containers)','ok'],
+    ['  containerd ... started','ok'],
+    ['  kubelet ..... started','ok'],
+    ['  telemetry .... started (sampling 1s)','ok'],
+    ['  watchdog ..... started (timeout 30s)','ok'],
+    ['','' ],
+    ['Verifying integrity',''],
+    ['[  2.044] sha256: 4,118 files checked',''],
+    ['[  2.301] 4,118 match, 0 modified, 0 missing','ok'],
+    ['[  2.318] secure boot: enabled, db trusted','ok'],
+    ['[  2.331] measured boot: PCR 0-7 recorded','ok'],
+    ['','' ],
+    ['Calibrating hardware',''],
+    ['[  2.402] display: 3440x1440 @ 144Hz, 10-bit',''],
+    ['[  2.441] audio: 48kHz, 2ch out, 1ch in',''],
+    ['[  2.470] pointer: 1200dpi, 1000Hz polling',''],
+    ['[  2.498] battery: 100%, 4h 12m remaining','ok'],
+    ['[  2.511] sensors: 9 channels nominal','ok'],
+    ['','' ],
+    ['Running self-test',''],
+    ['  cpu stress ......... PASS  12.4s','ok'],
+    ['  memory test ........ PASS  18.1s (65536M)','ok'],
+    ['  disk read .......... PASS  7.1 GB/s','ok'],
+    ['  disk write ......... PASS  5.3 GB/s','ok'],
+    ['  gpu compute ........ PASS  41.2 TFLOPS','ok'],
+    ['  network loopback ... PASS  0.02ms','ok'],
+    ['  thermal soak ....... PASS  71.4°C peak','ok'],
+    ['','' ],
+    ['[  3.118] All checks complete. 31 passed, 0 failed.','hd'],
+    ['[  3.124] Handing off to init...',''],
+    ['','' ],
+    ['Welcome to Meridian OS 4.11.2','hd'],
+    ['Last login: yesterday 23:41 from 10.0.0.14','dim']
+  ];
+
+  var i=0,speed=1,skip=false;
+  function line(){
+    if(i>=LINES.length){finish();return;}
+    var L=LINES[i++];
+    var d=document.createElement('div');
+    if(L[1])d.className=L[1];
+    d.textContent=L[0];
+    term.appendChild(d);
+    term.scrollTop=term.scrollHeight;
+    prog.style.width=(i/LINES.length*100).toFixed(1)+'%';
+    if(skip){setTimeout(line,0);return;}
+    var delay = L[0].length*2.2 + (L[0]===''?60:14);
+    setTimeout(line, Math.min(90, delay/speed));
+  }
+  function finish(){
+    var c=document.createElement('div');
+    c.innerHTML='<span class="ok">meridian</span>:~$ <span class="cur"></span>';
+    term.appendChild(c);
+    term.scrollTop=term.scrollHeight;
+    setTimeout(function(){document.getElementById('done').classList.add('on')},700);
+  }
+  document.getElementById('skip').addEventListener('click',function(){
+    skip=true;
+    document.getElementById('done').classList.remove('on');
+    while(i<LINES.length){
+      var L=LINES[i++];
+      var d=document.createElement('div');
+      if(L[1])d.className=L[1];
+      d.textContent=L[0];
+      term.appendChild(d);
+    }
+    prog.style.width='100%';
+    finish();
+  });
+  document.getElementById('again').addEventListener('click',function(){
+    term.innerHTML='';i=0;skip=false;
+    document.getElementById('done').classList.remove('on');
+    prog.style.width='0%';
+    line();
+  });
+  setInterval(function(){
+    var s=(Date.now()-t0)/1000;
+    document.getElementById('up').textContent=s.toFixed(1)+'s';
+  },100);
+  line();
+})();
+</script>
+</body>
+</html>

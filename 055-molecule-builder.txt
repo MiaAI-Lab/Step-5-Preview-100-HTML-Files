@@ -1,0 +1,85 @@
+# LAB BENCH — Molecule Builder
+
+## Short title
+Molecule Builder
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a laboratory bench where a
+visitor builds molecules atom by atom on canvas, with real valence rules. No external
+dependencies whatsoever — no CDN, no web fonts, no external images, no JS libraries.
+All CSS and JavaScript inline, works offline by double-clicking, responsive, valid
+HTML5.
+
+Artistic direction: a dark workbench. Panel #141b21 on ground #0d1216, hairlines at
+rgba(200,230,220,.13), text #e4f2ec. One accent, phosphor mint #5cf2c0, with amber and
+red reserved for formula subtitles and valence warnings. The bench surface is a very
+faint 34px CSS grid over a mask-image radial fade, so it reads as graph paper lit only
+at the centre. Behind the canvas draw a mint radial wash at 5% so it looks like a
+spotlight.
+
+Element shelf: eight element chips (H, C, N, O, S, P, Cl, Na), each with an element
+ball rendered as a radial-gradient sphere in the element's own colour with a
+14px glow in currentColor, plus a valence number. Bond order buttons (single, double,
+triple) and three view modes: wire (a dark ring in the element colour with the symbol
+inside), ball & stick (a shaded sphere built from a canvas radial-gradient with a
+white 62% highlight at 0, the element colour at 0.45 and black 42% at the rim, with a
+bold symbol) and space fill (the same sphere at 1.28 radius, no symbol).
+
+Bonds are drawn as 2px lines in a pale iron colour, offset perpendicular to the bond
+axis by 4px each for double and triple bonds, and shortened at each end by the atom
+radius so they never poke into a sphere. The live readout counts atoms and bonds,
+derives an empirical formula in Hill order (C, H, then everything else), and reports
+over-valence in red.
+
+Layout: nav with serif brand. Centred hero with mint eyebrow and an italic mint word.
+Then the bench: a two-column grid of element/bond/view shelf and canvas + readout.
+Then three tools (Empty the bench, Build ethanol, Free rotation). Then a three-cell
+recipe row with italic mint titles and amber formulas. Then a three-cell notes row
+with large mint serif figures. Then a ruled mono footer. Stacked to one column at
+820px with the shelf border moving to the bottom.
+
+Interaction: click empty bench to place the currently selected element; drag an atom
+to reposition; drop one atom onto another to bond them at the chosen order; click a
+bond to break it (atoms stay). A click without a drag arms the source atom as a
+glowing green link origin, so a second click on another atom bonds the pair; the rope
+between them is drawn as a dashed mint line while dragging. Over-valence is allowed
+but flagged in the readout and by a transient toast. Hovering an atom tints its ring
+mint; hovering a bond gives a not-allowed cursor. "Build ethanol" lays out nine atoms
+with four single bonds each where chemistry demands it; "Free rotation" adds a slow
+global turn that also breathes the shading of the spheres. The bench opens seeded
+with a water molecule.
+
+## One-paragraph description of the intended design
+A lab bench on a faint grid: an eight-element shelf, single/double/triple bond order
+and three rendering modes (wire rings, shaded ball-and-stick spheres, space fill)
+driving a canvas where atoms are placed, dragged, clicked and dropped onto each other
+to form bonds at the chosen order — click a bond to break it, and the readout below
+counts atoms and bonds, derives an empirical formula in Hill order, and turns red the
+moment any atom goes past its valence.
+
+## Major visual techniques used
+- Element balls as radial-gradient spheres with a 14px glow in currentColor
+- Canvas spheres from a radial-gradient with a white 62% highlight, the mid colour at
+  0.45 and 42% black at the rim, so they read as lit three-dimensional balls
+- Bond order drawn by offsetting parallel strokes 4px perpendicular to the bond axis
+- Bonds shortened at both ends by each atom's radius so they never overlap a sphere
+- Lab bench graph paper from two 1px linear-gradients faded with a radial mask-image
+- Wire view as a dark disc, a 2px ring in the element colour and a centred symbol
+- Empirical formula assembled in Hill order from a live atom census
+- Over-valence allowed, then flagged red, which is what makes the valence check a
+  live feature rather than dead code
+- Click-to-arm link origin with a dashed mint rope drawn while dragging
+- Pointer capture on the canvas so drags survive leaving the element
+- Hover states: mint ring on atoms, not-allowed cursor on bonds
+- A slow global rotation that also breathes the shading of the spheres
+- Bench seeded with a water molecule so the canvas is never empty
+- Two-column bench collapsing to one column at 820px with the shelf border moved to
+  the bottom
+
+## Intended interaction model
+A place to build. Visitors pick an element and tap the bench to place it, drag atoms
+around, drop one onto another to bond them, choose double or triple before bonding,
+and click any bond to snap it. The readout responds in real time — atoms, bonds,
+formula, and a red warning when chemistry objects — and the recipe cards tell you
+what water and ammonia look like before you build them.

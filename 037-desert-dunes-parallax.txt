@@ -1,0 +1,81 @@
+# ERG — Nine Hundred Kilometres of Sand
+
+## Short title
+Desert Dunes Parallax
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: an animated dune field
+called ERG, framed as a meteorological readout from the Grand Erg Oriental. No
+external dependencies whatsoever — no CDN, no web fonts, no external images, no
+external SVG files, no JavaScript libraries. All CSS and JavaScript inline, works
+offline by double-clicking, responsive, valid HTML5.
+
+Artistic direction: late sun over sand. Behind the canvas, a CSS sky runs a
+six-stop vertical gradient from #2a1508 through #5a2c14 and #9c4a20 to #c9742e,
+#d98a40 and finally #8a4a22, with a warm radial bloom at the sun's position and a
+cooler red wash low on the left. On top of that, the canvas draws a low sun with a
+44%-radius radial glow, then three to eleven dune ridges, back to front. Each
+ridge's silhouette is a sum of three sines at different frequencies, phases and
+amplitudes — long primary swell, a shorter secondary, and a fine ripple — so the
+crest is irregular rather than a smooth arc. Far ridges are paler and cooler, near
+ridges darker and warmer, with the vertical gradient computed per ridge from its
+depth fraction. Under every crest a soft dark band (a 44px gradient strip repeated
+at 7px steps, clipped to the ridge) gives the windward shadow that makes each dune
+read as a solid form rather than a silhouette.
+
+The waterless parallax: dragging horizontally accumulates a pan target clamped to
+±1, which eases toward the actual at 0.05 per frame. Every ridge then offsets its
+own x by pan × W × 0.35 × its own lag, where lag increases with the ridge index — so
+dragging walks the dune line and near ridges travel much further than far ones,
+giving real depth. When Drift is on, the sine phases advance slowly so the dunes
+creep; when off, the field is a static drawing. Wind above 10% streams thirty to
+sixty seconds of additive sand streaks across the frame, each a short line whose
+length, speed, height and alpha come from a seeded hash, wrapped horizontally.
+
+Layout: a full-viewport canvas over the sky with a floating UI overlay whose
+pointer-events pass through except on the controls. Top-left is a monospace
+coordinate label above an italic serif headline with one line in sun-gold, plus a
+short paragraph. Top-right is a monospace meter stack showing wind in knots, ridge
+count and mean grain size. Bottom is a glass tray with three sliders — Wind
+(strength), Ridges (3–11) and Relief (amplitude) — plus Drift and Sandstorm
+toggles, and a monospace hint.
+
+Interaction: drag to walk the dune line and feel the parallax depth; set wind,
+ridge count and relief live; turn Drift off to freeze the field; press Sandstorm to
+jump wind to 88% and haze the whole frame with two warm gradient washes. The gauges
+recompute every frame, including the mean grain size which rises with wind speed.
+On narrow screens the paragraph, meters and hint hide.
+
+## One-paragraph description of the intended design
+A dune field at last light: three to eleven ridges of triple-sine silhouettes,
+pale and cool at the back and dark and warm at the front, each with a clipped
+windward shadow under its crest, all walking at different parallax rates as you
+drag, with a low sun, streaming sand streaks whose length rises with wind, and a
+sandstorm that hazes the frame.
+
+## Major visual techniques used
+- Triple-sine ridge silhouettes (long primary, shorter secondary, fine ripple) for
+  irregular crests
+- Per-ridge vertical gradients that pale and cool toward the back, darken and warm
+  toward the front
+- Clipped windward shadow bands: a 44px gradient strip repeated at 7px steps
+- Depth-weighted parallax: per-ridge lag multiplied into a single eased pan value
+- Eased pan (0.05 lerp) accumulated from horizontal drag and clamped to ±1
+- Live drifting phases when Drift is on; frozen silhouette when off
+- CSS sky behind the canvas: six-stop vertical gradient plus two radial washes
+- Low sun with a 44%-radius radial glow and a solid disc
+- Wind-driven sand streaks from a seeded hash, in additive blend, horizontally
+  wrapped, with length and speed scaled by wind
+- Sandstorm haze as two warm gradient washes over the whole frame
+- Live gauges: wind in knots, ridge count, mean grain size derived from wind
+- Non-finite guards on the computed heights
+- Italic serif headline with one sun-gold line against 8.5px tracked monospace
+- Floating glass tray with backdrop-filter blur; extras hidden under 760px
+
+## Intended interaction model
+A place with weather. Visitors set the wind, the number of ridges and the relief,
+then drag to walk along the dune line and feel the near dunes move much further
+than the far ones. Drift freezes the whole field; Sandstorm jumps to high wind and
+hazes the view. The gauges report what the model is currently doing, so it reads as
+a live observation rather than a decorative animation.

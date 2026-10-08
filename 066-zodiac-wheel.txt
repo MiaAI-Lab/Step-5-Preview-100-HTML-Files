@@ -1,0 +1,93 @@
+# THE WHEEL — twelve signs, their aspects, their stars
+
+## Short title
+Zodiac Wheel
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: an interactive zodiac wheel
+that divides the circle into twelve equal thirty-degree signs, draws the aspect angle
+between any two of them, and reveals each sign's real constellation from real
+coordinates. No external dependencies whatsoever — no CDN, no web fonts, no external
+images, no JS libraries. All CSS and JavaScript inline, works offline by double-clicking,
+responsive, valid HTML5.
+
+Artistic direction: a night instrument. Ground #0b0d24, panel #111433, hairlines
+rgba(236,235,248,.14), body #ecebf8 with muted #a5a3c8, gold #e8c46a for the hand and the
+figures and sky blue #8fd0ff for readouts and harmonious aspects, with a rose #e88a8a for
+the discordant ones. Serif headings with italic accent words, uppercase .1em–.4em
+kickers, monospace figures.
+
+The wheel is an SVG on a 560 × 560 viewBox built at load: twelve sectors computed as real
+arc paths from the centre at 280, in three rings — an outer element band, an inner sign
+band and a tick ring. Fire, earth, air and water alternate in strict order, so the colour
+band is the element rule drawn rather than described. Each sector carries its glyph and
+its name, rotated into place along the sector's own angle, and each is a button with
+aria-pressed for its selected state.
+
+Twelve signs are stored with their glyph, element, modality, ruler, dates, brightest
+star and distance, plus a real star map: a set of normalised coordinates and the list of
+pairs to join. Selecting a sign rebuilds the panel and redraws the constellation as an
+SVG whose connecting lines animate in with a stroke-dashoffset reveal, and its brightest
+star named underneath.
+
+Aspects: pick a first sign and a second — either with the panel button or by clicking two
+sectors in turn — and the wheel draws the chord between them at the angle their separation
+demands. The angle is reduced to the shortest way around the circle, looked up in a table
+of conjunction, sextile, square, trine and opposition, and the chord's radius, weight and
+colour follow whether the aspect is soft or hard. Anything else is drawn faint and
+reported as unaspected.
+
+A gold hand points at the sign the sun is in at this minute, computed from the day of the
+year with the hour interpolating degrees inside the sign; it re-reads the machine clock
+every twenty seconds rather than running on an animation.
+
+Layout: nav, centred hero, a two-column wheel and detail panel, an aspect row with the two
+selected signs, the aspect name, the angle and a reading, then a readout row (selected,
+angle, element, modality, wheel now), then two three-cell note rows on thirty degrees,
+aspects, element, the stars, the hand and precession, then a footer. One column under
+900px, links hidden under 780px.
+
+Interaction: click a sector to open its stars; click two sectors (or use the panel button)
+and the wheel draws the aspect between them with its angle and its reading; Clear resets
+the pair. The hand moves on its own, because it is reading the clock.
+
+## One-paragraph description of the intended design
+A zodiac wheel on SVG where twelve thirty-degree sectors are computed as real arcs and
+coloured by the fire-earth-air-water alternation, each one opening a panel that draws the
+sign's real constellation from normalised star coordinates with an animated line reveal —
+and where picking any two signs draws the chord between them at the angle their
+separation gives, looks that angle up among conjugation, sextile, square, trine and
+opposition, and colours and weights the chord accordingly, while a gold hand points at
+the sign the sun is in according to this machine's clock.
+
+## Major visual techniques used
+- Sectors built as genuine arc paths from the centre, so the wheel is geometry rather
+  than twelve images
+- Element alternation drawn as a colour band, making the fire-earth-air-water rule
+  visible instead of asserted
+- Glyphs and sector names placed on the sector's own angle, so they sit along the slice
+- Constellation drawn from normalised coordinates and a pair list, which is the same
+  data format a planetarium uses
+- Line reveal animated with stroke-dasharray and stroke-dashoffset, so the constellation
+  is drawn rather than faded in
+- Aspect angle reduced to the shortest way around the circle before lookup, which is
+  what makes opposition and conjunction both work from one table
+- Chord radius, weight and colour all derived from the aspect's harmony, so a soft
+  aspect and a hard one read differently at a glance
+- Unaspected pairs drawn faint instead of hidden, so "no classical aspect" is a visible
+  state rather than an absence
+- aria-pressed carried on the sectors themselves, so selection is readable by the
+  browser as well as by the stylesheet
+- Two selection paths — the panel button and clicking sectors — funnelled into one
+  function so they cannot disagree
+- The hand computed from day of year plus time of day, re-read on an interval, rather
+  than animated on a loop
+- Brightest star per sign named in the readout, which is the fact that ties the star map
+  to the sector
+
+## Intended interaction model
+An instrument to play. Visitors click a sector to open its constellation, then pick a
+second one and the wheel draws the angle between them with its name and its reading; the
+gold hand quietly tracks the sun's sign from the machine's own clock. Clear resets the
+pair and the aspect chords leave with it.

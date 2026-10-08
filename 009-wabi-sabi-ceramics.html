@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>鍔 — TSUBA CERAMICS · Six Stoneware Forms</title>
+<style>
+  :root{
+    --plaster:#e8e2d6;
+    --plaster-2:#ded6c8;
+    --clay:#b49b7e;
+    --ash:#8f8a7e;
+    --ink:#2e2b26;
+    --ink-soft:rgba(46,43,38,.62);
+    --indigo:#3b4a63;
+    --rust:#9c5a3c;
+    --serif:"Songti SC","Yu Mincho",YuMincho,"Hiragino Mincho ProN",Georgia,"Times New Roman",serif;
+    --sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--plaster);color:var(--ink);font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;
+  }
+  .tex{
+    position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.5;mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='t'><feTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' seed='3'/><feColorMatrix type='saturate' values='0'/></filter><rect width='300' height='300' filter='url(%23t)' opacity='.35'/></svg>");
+  }
+  .light{
+    position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:
+      radial-gradient(80% 60% at 18% 12%,rgba(255,252,244,.9),transparent 62%),
+      radial-gradient(70% 50% at 88% 82%,rgba(196,186,168,.55),transparent 60%);
+  }
+
+  .wrap{position:relative;z-index:2;max-width:1080px;margin:0 auto;padding:0 clamp(20px,5vw,56px)}
+
+  nav{
+    display:flex;align-items:baseline;justify-content:space-between;gap:20px;flex-wrap:wrap;
+    padding:clamp(26px,4vw,48px) 0 0;
+  }
+  .brand{font-family:var(--serif);font-size:22px;letter-spacing:.32em}
+  .brand small{display:block;font-family:var(--mono);font-size:9px;letter-spacing:.3em;color:var(--ink-soft);margin-top:8px}
+  nav ul{display:flex;gap:clamp(14px,3vw,34px);list-style:none;margin:0;padding:0}
+  nav a{
+    color:var(--ink-soft);text-decoration:none;font-family:var(--mono);font-size:9.5px;
+    letter-spacing:.26em;text-transform:uppercase;position:relative;padding-bottom:5px
+  }
+  nav a::after{content:"";position:absolute;left:0;right:100%;bottom:0;height:1px;background:var(--ink);transition:right .5s cubic-bezier(.2,.8,.2,1)}
+  nav a:hover{color:var(--ink)}
+  nav a:hover::after{right:0}
+
+  .hero{padding:clamp(46px,9vw,120px) 0 clamp(40px,7vw,90px);text-align:center}
+  .hero .glyph{
+    font-family:var(--serif);font-size:clamp(70px,17vw,190px);line-height:.9;color:var(--ink);
+    display:block;opacity:.92;
+    animation:breathe 9s ease-in-out infinite;
+  }
+  @keyframes breathe{0%,100%{opacity:.9;transform:scale(1)}50%{opacity:.72;transform:scale(.988)}}
+  .hero h1{
+    font-family:var(--serif);font-weight:400;font-size:clamp(19px,2.6vw,30px);
+    letter-spacing:.3em;margin:26px 0 0;text-transform:uppercase
+  }
+  .hero p{
+    font-family:var(--serif);font-size:clamp(13px,1.7vw,16px);line-height:2.1;color:var(--ink-soft);
+    max-width:36ch;margin:26px auto 0;letter-spacing:.06em
+  }
+  .hero .rule{width:1px;height:64px;background:var(--ash);margin:38px auto 0;opacity:.6}
+
+  /* ---------- the six forms ---------- */
+  .forms{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(20px,4vw,56px) clamp(20px,4vw,44px);padding:clamp(20px,4vw,44px) 0}
+  .vessel{text-align:center;cursor:pointer;position:relative}
+  .vessel .stage{
+    height:clamp(180px,26vw,260px);display:grid;place-items:center;position:relative;
+  }
+  .vessel .stage::after{
+    content:"";position:absolute;left:50%;bottom:14px;transform:translateX(-50%);
+    width:56%;height:14px;border-radius:50%;
+    background:radial-gradient(ellipse at 50% 50%,rgba(46,43,38,.28),transparent 72%);
+    filter:blur(2px);
+  }
+  /* the pottery itself, pure CSS */
+  .pot{position:relative;width:clamp(94px,13vw,140px);transition:transform .9s cubic-bezier(.2,.8,.2,1)}
+  .vessel:hover .pot{transform:translateY(-9px)}
+  .body{
+    margin:0 auto;position:relative;
+    background:linear-gradient(160deg,var(--clay),#a98d70 45%,#c8b394);
+    box-shadow:inset -10px -6px 22px rgba(46,43,38,.28),inset 8px 6px 18px rgba(255,250,240,.4),0 14px 26px -14px rgba(46,43,38,.5);
+  }
+  .body::after{
+    content:"";position:absolute;inset:0;opacity:.5;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'><filter id='k'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='11'/></filter><rect width='150' height='150' filter='url(%23k)' opacity='.4'/></svg>");
+  }
+  .neck{position:absolute;left:50%;transform:translateX(-50%);background:linear-gradient(160deg,#b49b7e,#9c8259);box-shadow:inset 3px 0 8px rgba(46,43,38,.3)}
+  .lip{position:absolute;left:50%;transform:translateX(-50%);border-radius:50%;background:radial-gradient(ellipse at 40% 35%,#e3d6c0,#8f7a5f)}
+  .foot{position:absolute;left:50%;transform:translateX(-50%);background:linear-gradient(180deg,#8f7a5f,#7a6650);border-radius:0 0 5px 5px}
+  .crack{position:absolute;left:50%;width:1px;background:linear-gradient(180deg,transparent,rgba(46,43,38,.55) 20%,rgba(46,43,38,.4) 80%,transparent);transform:translateX(-50%)}
+  .glaze{position:absolute;inset:0;opacity:0;transition:opacity .9s}
+  .vessel:hover .glaze{opacity:1}
+
+  .vessel h3{font-family:var(--serif);font-weight:400;font-size:15px;letter-spacing:.24em;margin:22px 0 8px;text-transform:uppercase}
+  .vessel .no{font-family:var(--mono);font-size:9px;letter-spacing:.3em;color:var(--ink-soft);margin:0}
+  .vessel .note{
+    font-family:var(--serif);font-size:12px;line-height:1.95;color:var(--ink-soft);
+    max-height:0;overflow:hidden;opacity:0;transition:max-height .8s cubic-bezier(.2,.8,.2,1),opacity .6s;
+    letter-spacing:.05em
+  }
+  .vessel:hover .note,.vessel.open .note{max-height:130px;opacity:1;margin-top:12px}
+
+  /* ---------- quote ---------- */
+  .quote{
+    text-align:center;padding:clamp(50px,9vw,120px) 0;border-top:1px solid rgba(46,43,38,.14);
+    border-bottom:1px solid rgba(46,43,38,.14)
+  }
+  .quote blockquote{
+    font-family:var(--serif);font-size:clamp(17px,2.8vw,28px);line-height:2;margin:0;
+    letter-spacing:.14em;max-width:26ch;margin-inline:auto
+  }
+  .quote cite{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.3em;color:var(--ink-soft);margin-top:28px;font-style:normal}
+
+  /* ---------- process ---------- */
+  .proc{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(46,43,38,.16);margin:clamp(50px,9vw,110px) 0}
+  .proc div{background:var(--plaster);padding:clamp(22px,3vw,34px) clamp(16px,2vw,24px)}
+  .proc b{display:block;font-family:var(--serif);font-size:34px;font-weight:400;color:var(--rust);line-height:1}
+  .proc h4{font-family:var(--serif);font-weight:400;font-size:13px;letter-spacing:.24em;margin:16px 0 10px;text-transform:uppercase}
+  .proc p{margin:0;font-size:12px;line-height:1.9;color:var(--ink-soft)}
+
+  footer{
+    display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:0 0 clamp(34px,6vw,60px);
+    font-family:var(--mono);font-size:9px;letter-spacing:.26em;text-transform:uppercase;color:var(--ink-soft)
+  }
+
+  @media (max-width:820px){.forms{grid-template-columns:repeat(2,1fr)}.proc{grid-template-columns:repeat(2,1fr)}}
+  @media (max-width:520px){.forms{grid-template-columns:1fr}}
+  @media (prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;transition-duration:.001ms!important}}
+</style>
+</head>
+<body>
+<div class="light"></div>
+<div class="tex"></div>
+
+<div class="wrap">
+  <nav>
+    <div class="brand">锷 · TSUBA<small>Stoneware studio, Nagano</small></div>
+    <ul>
+      <li><a href="#forms">Forms</a></li>
+      <li><a href="#process">Process</a></li>
+      <li><a href="#visit">Visit</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <span class="glyph" aria-hidden="true">寂</span>
+    <h1>The beauty of the used</h1>
+    <p>Six vessels, thrown one to a morning and fired once, in a wood kiln that
+    decides everything. Where the flame licks longest, the clay gives up and turns
+    to glass. We do not correct it.</p>
+    <div class="rule"></div>
+  </header>
+
+  <section id="forms">
+    <div class="forms">
+
+      <article class="vessel" data-glaze="indigo">
+        <div class="stage">
+          <div class="pot" style="height:190px">
+            <div class="body" style="width:104px;height:132px;border-radius:50% 50% 44% 44%/58% 58% 42% 42%"></div>
+            <div class="neck" style="width:44px;height:34px;top:0;border-radius:6px 6px 0 0"></div>
+            <div class="lip" style="width:52px;height:13px;top:-6px"></div>
+            <div class="foot" style="width:40px;height:9px;bottom:0"></div>
+            <i class="crack" style="top:34%;height:56px;transform:translateX(-50%) rotate(4deg)"></i>
+            <div class="glaze" style="background:linear-gradient(120deg,rgba(59,74,99,.55),transparent 60%);mix-blend-mode:multiply"></div>
+          </div>
+        </div>
+        <h3>Tsuki</h3>
+        <p class="no">No. 一 · 2026</p>
+        <p class="note">A moon jar that never quite closed. The seam runs slightly
+        off true, which is the only way to tell it was made by a person.</p>
+      </article>
+
+      <article class="vessel" data-glaze="ash">
+        <div class="stage">
+          <div class="pot" style="height:190px">
+            <div class="body" style="width:126px;height:88px;border-radius:44% 44% 40% 40%/70% 70% 30% 30%"></div>
+            <div class="neck" style="width:56px;height:52px;top:0;border-radius:8px 8px 0 0"></div>
+            <div class="lip" style="width:66px;height:15px;top:-7px"></div>
+            <div class="foot" style="width:46px;height:10px;bottom:0"></div>
+            <div class="glaze" style="background:linear-gradient(200deg,rgba(143,138,126,.6),transparent 65%);mix-blend-mode:overlay"></div>
+          </div>
+        </div>
+        <h3>Hira</h3>
+        <p class="no">No. 二 · 2026</p>
+        <p class="note">Flat-bellied, thrown in one pull. The ash glaze pooled
+        where the wall was thickest and ran thin where it was not.</p>
+      </article>
+
+      <article class="vessel" data-glaze="rust">
+        <div class="stage">
+          <div class="pot" style="height:190px">
+            <div class="body" style="width:78px;height:126px;border-radius:40% 40% 36% 36%/30% 30% 70% 70%"></div>
+            <div class="neck" style="width:34px;height:44px;top:0;border-radius:5px 5px 0 0"></div>
+            <div class="lip" style="width:42px;height:11px;top:-5px"></div>
+            <div class="foot" style="width:32px;height:8px;bottom:0"></div>
+            <i class="crack" style="top:40%;height:74px;transform:translateX(-50%) rotate(-6deg)"></i>
+            <div class="glaze" style="background:radial-gradient(70% 90% at 30% 60%,rgba(156,90,60,.6),transparent 70%);mix-blend-mode:multiply"></div>
+          </div>
+        </div>
+        <h3>Bin</h3>
+        <p class="no">No. 三 · 2026</p>
+        <p class="note">A narrow bottle for one stem. Fired closest to the fire
+        mouth; it carries the kiln's red signature on one shoulder.</p>
+      </article>
+
+      <article class="vessel" data-glaze="indigo">
+        <div class="stage">
+          <div class="pot" style="height:190px">
+            <div class="body" style="width:150px;height:70px;border-radius:46% 46% 42% 42%/74% 74% 26% 26%"></div>
+            <div class="neck" style="width:62px;height:70px;top:0;border-radius:9px 9px 0 0"></div>
+            <div class="lip" style="width:74px;height:17px;top:-8px"></div>
+            <div class="foot" style="width:50px;height:11px;bottom:0"></div>
+            <div class="glaze" style="background:linear-gradient(150deg,rgba(59,74,99,.5),transparent 62%);mix-blend-mode:multiply"></div>
+          </div>
+        </div>
+        <h3>Hachi</h3>
+        <p class="no">No. 四 · 2026</p>
+        <p class="note">A wide bowl for washing brushes. The first thing we threw
+        each morning and the last thing we washed.</p>
+      </article>
+
+      <article class="vessel" data-glaze="ash">
+        <div class="stage">
+          <div class="pot" style="height:190px">
+            <div class="body" style="width:96px;height:112px;border-radius:38% 38% 46% 46%/40% 40% 60% 60%"></div>
+            <div class="neck" style="width:38px;height:40px;top:0;border-radius:6px 6px 0 0"></div>
+            <div class="lip" style="width:46px;height:12px;top:-6px"></div>
+            <div class="foot" style="width:36px;height:9px;bottom:0"></div>
+            <i class="crack" style="top:30%;height:50px;transform:translateX(-50%) rotate(9deg)"></i>
+            <div class="glaze" style="background:linear-gradient(180deg,rgba(143,138,126,.55),transparent 70%);mix-blend-mode:overlay"></div>
+          </div>
+        </div>
+        <h3>Tsubo</h3>
+        <p class="no">No. 五 · 2026</p>
+        <p class="note">Shouldered jar for tea. Two cracks, both from the reduction,
+        both left exactly where they happened.</p>
+      </article>
+
+      <article class="vessel" data-glaze="rust">
+        <div class="stage">
+          <div class="pot" style="height:190px">
+            <div class="body" style="width:118px;height:60px;border-radius:42% 42% 38% 38%/76% 76% 24% 24%"></div>
+            <div class="neck" style="width:70px;height:38px;top:0;border-radius:8px 8px 0 0"></div>
+            <div class="lip" style="width:84px;height:18px;top:-9px"></div>
+            <div class="foot" style="width:44px;height:10px;bottom:0"></div>
+            <div class="glaze" style="background:radial-gradient(80% 80% at 70% 40%,rgba(156,90,60,.55),transparent 72%);mix-blend-mode:multiply"></div>
+          </div>
+        </div>
+        <h3>Kame</h3>
+        <p class="no">No. 六 · 2026</p>
+        <p class="note">The last of the firing. The kiln was cooling, so the
+        glaze crept and froze mid-slide, which we have decided is its best feature.</p>
+      </article>
+
+    </div>
+  </section>
+
+  <section class="quote">
+    <blockquote>In the kiln's mouth the clay is forgiven for everything it was not
+      able to be on the wheel.</blockquote>
+    <cite>— Tsubaki Rin, master potter, b. 1948</cite>
+  </section>
+
+  <section id="process">
+    <div class="proc">
+      <div><b>一</b><h4>Throw</h4><p>One hundred grams of foot clay, wedged twice, centred until it stops arguing.</p></div>
+      <div><b>二</b><h4>Dry</h4><p>Eight days under cloth. Turning once, on the fourth day, when leather hard.</p></div>
+      <div><b>三</b><h4>Fire</h4><p>Thirty-six hours of red pine. The kiln, not the potter, applies the glaze.</p></div>
+      <div><b>四</b><h4>Keep</h4><p>No piece is corrected, filled or recoated. What leaves the kiln is finished.</p></div>
+    </div>
+  </section>
+
+  <section id="visit" class="quote" style="border-bottom:0">
+    <blockquote style="font-size:clamp(15px,2.2vw,21px);letter-spacing:.1em">The studio opens on the first Saturday of each month, from
+      the hour the sun reaches the kiln door until it leaves it.</blockquote>
+    <cite>Nagano-ken · by appointment only</cite>
+  </section>
+
+  <footer>
+    <span>© Tsuba Ceramics</span>
+    <span>Wood · ash · clay · time</span>
+    <span>三十六時間</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  /* a vessel opens to reveal its note on click too */
+  document.querySelectorAll('.vessel').forEach(function(v){
+    v.addEventListener('click',function(){
+      var was=this.classList.contains('open');
+      document.querySelectorAll('.vessel').forEach(function(x){x.classList.remove('open')});
+      if(!was)this.classList.add('open');
+    });
+  });
+  /* soft reveal on scroll */
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(es){
+      es.forEach(function(e){
+        if(!e.isIntersecting)return;
+        e.target.style.opacity='1';
+        e.target.style.transform='none';
+        io.unobserve(e.target);
+      });
+    },{threshold:.15});
+    document.querySelectorAll('.vessel,.proc div,.quote blockquote').forEach(function(el,i){
+      el.style.opacity='0';
+      el.style.transform='translateY(20px)';
+      el.style.transition='opacity .9s cubic-bezier(.2,.8,.2,1) '+(i%4*90)+'ms,transform .9s cubic-bezier(.2,.8,.2,1) '+(i%4*90)+'ms';
+      io.observe(el);
+    });
+  }
+})();
+</script>
+</body>
+</html>

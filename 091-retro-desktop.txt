@@ -1,0 +1,85 @@
+# DESKTOP 1994 — a machine you have to learn
+
+## Short title
+Retro Desktop
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a mid-nineties desktop with
+draggable windows, a menu bar, a clock and eight applications that each draw themselves — no
+skeuomorphic shells, no images. No external dependencies whatsoever — no CDN, no web fonts,
+no external images, no JS libraries. All CSS and JavaScript inline, works offline by
+double-clicking, responsive, valid HTML5.
+
+Artistic direction: a beige box. Ground #1e1e1c, hairlines rgba(232,230,224,.14, body
+#e8e6e0 with muted #9b978f, system gold #e0c86a as the accent and a steel blue #8fb8e0 for
+the figures. Serif headings with italic accent words, uppercase .2em–.4em kickers,
+monospace figures. The screen itself is a CRT: a bezel built from four box-shadows and a
+scanline overlay from a repeating-linear-gradient.
+
+The desktop is one canvas: a quantised palette over a repeating diamond pattern, a menu bar
+with File Edit View Special Help and a live clock, four bevelled icons down the right edge,
+and the windows. Every window is drawn from a bevel helper — light top-left, dark
+bottom-right, a one-pixel inset — with a striped title bar, a title chip reversed out, and a
+close and zoom box.
+
+Eight apps, each with its own content: Word (a ruler, a menu strip, twelve lines of text
+and a scroll bar), Draw (a tool palette, a circle and two curves), Graph (a bar chart with
+axes), Terminal (a green-on-black session that actually prints), Calc (a display and a
+sixteen-button keypad), Notes (ruled paper with three tasks), Control (a radio list and a
+volume slider) and Trash (a ridged can with a size line).
+
+Colour depth is real. The whole machine's system palette is quantised to the depth you
+choose — two, four, eight, sixteen or four entries at once — and every window re-draws from
+it. Font size cycles the system font and the resolution readout together, the way it did
+when people changed the monitor control panel. Phosphor persistence dims the last frame
+into the new one. Scanlines are drawn on top at a slider-set density.
+
+Windows drag by the title bar only, stack in open order, close from the box in the corner,
+and clicking one brings it forward. Reboot clears everything and reopens two. Readout:
+windows, colour depth, font, resolution, free RAM derived from the window count, and
+uptime.
+
+Layout: nav, centred hero, the CRT with its caption, a dock of two chip rows, three sliders
+and two buttons, a readout row, then two three-cell note rows on eight apps, the system
+font, colour depth, dragging, phosphor and reboot, then a footer.
+
+Interaction: open any app and drag its window around; close it from the corner and the one
+below comes forward; switch the colour depth and watch every window re-draw from a
+quantised palette; cycle the font size and the resolution changes with it; turn on phosphor
+persistence; and reboot to clear the desk.
+
+## One-paragraph description of the intended design
+A mid-nineties desktop on canvas inside a CSS CRT bezel: a quantised system palette over a
+repeating diamond pattern, a menu bar with a live clock, bevelled icons, and eight windows
+that each draw their own contents — Word's ruled page, Draw's tool palette, Graph's bar
+chart, Terminal's green session, Calc's keypad, Notes' ruled paper, Control's radio list and
+Trash's ridged can — draggable by their striped title bars, with a real colour-depth switch
+that quantises the whole palette, a font-size slider that changes the resolution readout
+with it, phosphor persistence and scanlines, and a readout of windows, depth, font,
+resolution, free RAM and uptime.
+
+## Major visual techniques used
+- Bevel as one helper: light top-left, dark bottom-right, then a one-pixel inset, so every
+  chrome element shares the same window manager
+- Striped title bar with the title chip reversed out, which is how the active bar actually
+  read
+- Window stacking as a plain array with the last entry active, so clicking brings forward
+  and closing exposes the one below
+- Drag restricted to the title bar, which is the rule and not a convenience
+- Colour depth as real quantisation of the system palette, so every window re-draws when it
+  changes
+- Font size tied to the resolution readout, because that was the coupling
+- CRT bezel from four box-shadows and a scanline overlay from repeating-linear-gradient,
+  so the page outside the canvas looks like plastic
+- Phosphor persistence as a translucent black fill over the previous frame
+- Each app drawing its own content with vector shapes rather than any asset
+- Terminal printing a real session with a prompt and a date line
+- Free RAM derived from the window count, so the number is a property of the desktop
+- Uptime from one timestamp accumulating in the loop
+
+## Intended interaction model
+A machine to drive. Visitors open the eight apps, drag their windows, stack and close them,
+and switch the whole machine's colour depth, font size, scanlines and persistence. There is
+no compositor and no chrome outside the canvas: the desktop is a list of windows and a
+redraw, and every control changes that redraw.

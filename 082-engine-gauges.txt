@@ -1,0 +1,78 @@
+# ENGINE ROOM — two hundred years of gauges
+
+## Short title
+Steam Gauges
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: an engine-room wall of
+nineteenth-century instruments — brass dials, a mercury U-tube and a sight glass — all
+driven by throttle, load and wear, with hysteresis built in. No external dependencies
+whatsoever — no CDN, no web fonts, no external images, no JS libraries. All CSS and
+JavaScript inline, works offline by double-clicking, responsive, valid HTML5.
+
+Artistic direction: brass on pig iron. Ground #12100c, hairlines rgba(240,231,212,.14),
+body #f0e7d4 with muted #a2947a, brass #e0a63c as the accent and a machinery teal
+#8fd0c0 for the figures. Serif headings with italic accent words, uppercase .2em–.4em
+kickers, monospace figures.
+
+The wall is a riveted plate with horizontal seams, staggered rivet dots and a light from
+the upper left. On it: three brass dials, a mercury U-tube with a printed scale, a sight
+glass full of coolant, and a brass plaque. Every dial is a radial-gradient case with a cream
+face, a red arc at the limit, ticks and printed numbers computed from its own minimum,
+maximum and tick interval, a label and a unit, a needle with a counterweight and a drop
+shadow, and a specular sweep clipped to the glass.
+
+The physics: throttle and load set targets for boiler pressure, engine speed, vacuum, lube
+oil pressure and coolant temperature. Each needle chases its target at a rate scaled by the
+wear, so a worn gauge lags on the way back and an old gauge is only honest at the end of a
+run — which is the mechanism the copy describes. Wear also comes back as the engine runs,
+so nothing stays calibrated.
+
+The mercury column rises with the vacuum reading at its own slow rate, and the sight glass
+level follows the coolant temperature. Blow the safety lifts the valve: the boiler reading
+drops, the wall steams, and the readout says venting. Service the lot resets the wear.
+
+Controls: throttle, load, wear, Blow the safety and Service the lot. Readout: boiler
+pressure, rpm, vacuum, lube oil, coolant and a condition word from the wear, with the
+boiler figure turning red past its red line.
+
+Layout: nav, centred hero, the wall canvas with its caption, a dock of three sliders and
+two buttons, a readout row, then two three-cell note rows on the Bourdon tube, hysteresis,
+the safety valve, the column, the glass and service, then a footer.
+
+Interaction: open the throttle and everything moves together — boiler first, then the
+engine, then the heat. Drag the wear up and watch the needles stop following; service the
+lot and they snap back. Blow the safety and the boiler vents and the wall steams while the
+gauge tells you what you already know.
+
+## One-paragraph description of the intended design
+An engine-room wall on canvas of riveted iron, three brass dials with computed ticks and
+numbers, a mercury U-tube and a sight glass of coolant, all driven by throttle, load and
+wear — where each needle chases its target at a rate scaled by the wear so a worn gauge
+lags on the way back, the mercury column rises slowly with the vacuum, blowing the safety
+vents the boiler and steams the wall, and the readout names the condition from the same
+wear number.
+
+## Major visual techniques used
+- Riveted plate as horizontal seams with staggered rivet dots, stamped every 64 pixels
+- Each dial as a radial-gradient case with a cream face, a computed tick ring and printed
+  numbers derived from its own minimum, maximum and interval
+- Red arc at the limit drawn from the same fraction the needle uses
+- Needle with a counterweight, a drop shadow and a specular sweep clipped to the glass
+- Hysteresis by scaling each needle's chase rate with the wear, which is the actual
+  mechanism of a worn instrument
+- Wear that regenerates from throttle use, so calibration is never permanent
+- Mercury column stroked as a thick path with a meniscus highlight, rising at its own
+  slow rate rather than tracking exactly
+- Sight glass as a thick translucent stroke with a coloured fill inside and a shine
+- Safety valve as a state that drops the boiler target and emits drifting steam circles
+- Brass plaque with two lines of engraved text, centred with textAlign and textBaseline
+- Condition word derived from the wear number, so the readout and the physics agree
+- Boiler readout class toggled red past the red line
+
+## Intended interaction model
+An engine to work. Visitors open the throttle and watch the instruments move in the order
+they actually do, drag the wear up to make them lie, service the lot to make them honest
+again, and blow the safety to vent the boiler. Every number on the wall is the number in
+the readout.

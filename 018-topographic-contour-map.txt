@@ -1,0 +1,85 @@
+# CONTOUR — A Survey of Imaginary Ground
+
+## Short title
+Topographic Contour Map
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: an interactive
+topographic survey map of imaginary ground called CONTOUR. No external dependencies
+whatsoever — no CDN, no web fonts, no external images, no external SVG files, no
+JavaScript libraries. All CSS and JavaScript inline, works offline by
+double-clicking, responsive, valid HTML5.
+
+Artistic direction: a printed Ordnance Survey sheet. Warm paper #efe9dc, deep
+green-black ink #1d2b24, teal #0f766e for one italic word in the title and the
+slider values, and rust #b45309 for the sheet label, summit triangles and hover
+readout. Everything is linework on paper: an 80px graticule at 8% ink, isolines in
+two weights, and small triangles marking named summits with their heights.
+
+The terrain: a heightfield sampled into a Float64Array on a 4-pixel grid, computed
+from five stacked sine waves at different frequencies, amplitudes and directions
+(so the ground has ridges running both ways plus fine detail), plus two Gaussian
+bumps placed at fixed screen-relative positions so the map always has a proper
+summit with a marker. The seed offsets every sine phase, so "New ground" produces
+genuinely different country.
+
+The rendering: a full marching-squares isoline tracer. For each 4×4 sampling cell,
+the four corner heights are compared against a level to build a 4-bit case index,
+and the appropriate edge segments are emitted with linear interpolation along the
+cell edges. Every fifth level is a major contour at 62% ink and 1.3px; the rest are
+minor at 26% ink and 0.8px. The contour interval slider re-derives the level list,
+and the level count and segment total are reported in the stats stack.
+
+A "Shading" toggle adds real hillshading: it reads the canvas back with
+getImageData, computes per-cell gradients from the heightfield in x and y, builds a
+surface normal with a relief-scaled z, takes a dot product against a north-west
+light, and darkens each sampled pixel by (0.62 + lambert × 0.55) — so slopes facing
+the light brighten and slopes facing away sink into shadow, over the whole sheet.
+
+Layout: a full-viewport canvas with a floating UI overlay whose pointer-events pass
+through except on the controls. Top-left is a monospace sheet label ("Sheet 14 · grid
+NH42 · scale 1:24000") above a serif headline with one italic teal word, plus a
+paragraph explaining the method. Top-right is a monospace stats stack showing the
+contour interval, the number of isoline segments drawn, and the total elevation
+range in metres. Bottom is a glass tray with three sliders — Ridge (sine frequency
+1–9), Relief (amplitude 10–100) and Interval (contour spacing 5–60 m) — plus "New
+ground" and "Shading" buttons, and a monospace hint.
+
+Interaction: hovering the sheet draws a rust crosshair through the cursor and prints
+the elevation at that point in metres, computed live from the same height function.
+The Ridge and Relief sliders rebuild the heightfield and re-trace every isoline; the
+Interval slider re-derives the level list. "New ground" reseeds everything. "Shading"
+toggles the hillshade pass and its button fills teal when active. On narrow screens
+the paragraph, stats and hint hide.
+
+## One-paragraph description of the intended design
+A printed survey sheet of country that does not exist: a layered-sine heightfield
+sampled on a 4px grid and traced as marching-squares isolines with indexed major
+contours every fifth line, two named summits with heights, an optional real
+hillshade pass, and a crosshair that reads the elevation under your cursor.
+
+## Major visual techniques used
+- Heightfield built from five stacked sine waves plus two Gaussian peaks, seeded by
+  a single phase offset
+- Marching-squares contour tracing with a 4-bit case index and linear interpolation
+  along cell edges
+- Two-tier contour styling: indexed major lines (62% ink, 1.3px) and minor lines
+  (26% ink, 0.8px) every fifth level
+- Float64Array grid sampling on a 4px lattice for speed
+- Real hillshading via getImageData: per-cell dz/dx and dz/dy, a relief-scaled
+  surface normal, and a Lambert term against a north-west light
+- 80px graticule at 8% ink for the printed-grid feel
+- Hover crosshair with a live elevation readout from the same height function
+- Summit triangles with heights placed on the Gaussian peaks
+- Live segment count and computed elevation range in the stats stack
+- Monospace sheet metadata, serif headline with one italic teal word, and rust
+  accents
+- Floating glass tray with backdrop-filter blur; extras hidden under 760px
+
+## Intended interaction model
+A survey instrument. Visitors move the pointer to read elevations anywhere on the
+sheet, then reshape the country with the Ridge and Relief sliders, change how finely
+it is contoured with the Interval slider, ask for a completely different landscape
+with "New ground", and turn the hillshading on to see the same country in light and
+shadow. The map is entirely redrawn from data on every change.

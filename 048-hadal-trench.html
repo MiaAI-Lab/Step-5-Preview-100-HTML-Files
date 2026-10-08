@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TRENCH — The Hadal Zone, 6 000 m</title>
+<style>
+  :root{
+    --ink:#dcecf4;
+    --dim:rgba(220,236,244,.55);
+    --line:rgba(220,236,244,.14);
+    --jelly:#8fd8ff;
+    --jelly2:#c8a8ff;
+    --glow:#ff9ec4;
+    --amber:#ffd08a;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --serif:"Iowan Old Style",Palatino,Georgia,serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden}
+  body{background:#01060c;color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+  .abyss{
+    position:fixed;inset:0;z-index:0;
+    background:
+      radial-gradient(70% 40% at 50% 100%,rgba(20,90,110,.20),transparent 66%),
+      linear-gradient(180deg,#01131c 0%,#010c14 40%,#01080e 100%);
+    transition:filter 1s linear
+  }
+  #cv{position:fixed;inset:0;z-index:1;display:block}
+
+  .ui{position:fixed;inset:0;z-index:3;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(18px,3.4vw,40px)}
+  .top{display:flex;justify-content:space-between;align-items:flex-start;gap:18px}
+  .k{font-family:var(--mono);font-size:9px;letter-spacing:.32em;text-transform:uppercase;color:var(--glow)}
+  h1{font-family:var(--serif);font-weight:400;font-style:italic;font-size:clamp(28px,5.2vw,62px);line-height:.98;letter-spacing:-.02em;margin:10px 0 0}
+  h1 b{font-style:normal;font-weight:400;color:var(--glow)}
+  .top p{margin:12px 0 0;font-size:12px;line-height:1.75;max-width:32ch;color:var(--dim)}
+  .mtr{text-align:right;font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);line-height:2.4}
+  .mtr b{display:block;font-size:15px;color:var(--glow);font-weight:400;letter-spacing:.02em}
+
+  .bottom{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+  .tray{
+    pointer-events:auto;display:flex;gap:clamp(8px,1.3vw,16px);flex-wrap:wrap;align-items:center;
+    background:rgba(4,18,26,.62);border:1px solid var(--line);border-radius:16px;
+    padding:11px clamp(12px,1.8vw,20px);backdrop-filter:blur(14px)
+  }
+  .g{display:flex;align-items:center;gap:8px}
+  .kk{font-family:var(--mono);font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+  .vv{font-family:var(--mono);font-size:9.5px;color:var(--glow);min-width:30px;font-variant-numeric:tabular-nums}
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;width:64px;height:14px;background:transparent;cursor:pointer
+  }
+  input[type=range]::-webkit-slider-runnable-track{height:2px;background:var(--line);border-radius:2px}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;border-radius:50%;background:var(--glow);margin-top:-5px;border:0;box-shadow:0 0 10px rgba(255,158,196,.7)}
+  input[type=range]::-moz-range-track{height:2px;background:var(--line);border-radius:2px}
+  input[type=range]::-moz-range-thumb{width:11px;height:11px;border:0;border-radius:50%;background:var(--glow)}
+  button{
+    pointer-events:auto;font-family:var(--mono);font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;
+    background:rgba(255,158,196,.12);border:1px solid rgba(255,158,196,.36);color:var(--ink);
+    padding:9px 13px;border-radius:999px;cursor:pointer;transition:background .2s,color .2s
+  }
+  button:hover{background:var(--glow);color:#2e0d1a}
+  button.on{background:var(--glow);color:#2e0d1a}
+  .hint{font-family:var(--mono);font-size:8.5px;letter-spacing:.2em;text-transform:uppercase;color:rgba(220,236,244,.4);pointer-events:none}
+
+  @media (max-width:760px){.top p,.mtr,.hint{display:none}.ui{padding:14px}}
+</style>
+</head>
+<body>
+<div class="abyss" id="abyss"></div>
+<canvas id="cv"></canvas>
+
+<div class="ui">
+  <div class="top">
+    <div>
+      <div class="k">Hadal zone · survey 6 012 m</div>
+      <h1>Relief has no<br><b>shadow here.</b></h1>
+      <p>Six kilometres down, the only light is made by animals. Everything else is
+      ink, and the pressure is one-sixtieth of what a human survives.</p>
+    </div>
+    <div class="mtr">
+      Depth<b id="mD">6 012 m</b>
+      Pressure<b id="mP">61.4 MPa</b>
+      Temp<b id="mT">1.6 °C</b>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <div class="tray">
+      <div class="g"><span class="kk">Current</span><input type="range" id="cur" min="0" max="100" value="42" aria-label="Current strength"><span class="vv" id="curV">42</span></div>
+      <div class="g"><span class="kk">Life</span><input type="range" id="lf" min="0" max="100" value="58" aria-label="Life density"><span class="vv" id="lfV">58</span></div>
+      <div class="g"><span class="kk">Plume</span><input type="range" id="pl" min="0" max="100" value="36" aria-label="Plume activity"><span class="vv" id="plV">36</span></div>
+      <button id="vent" class="on">Vent</button>
+      <button id="calm">Calm</button>
+    </div>
+    <div class="hint">Move the pointer — the animals turn toward it</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var cv=document.getElementById('cv'),c=cv.getContext('2d');
+  var W,H,DPR=Math.min(window.devicePixelRatio||1,2);
+  var cur=42,life=58,plume=36,vent=true;
+  var jellies=[],motes=[],marine=[];
+  var mx=0.5,my=0.5,pmx=0.5,pmy=0.5;
+  var t=0;
+
+  function mkJelly(){
+    return {x:Math.random()*W,y:Math.random()*H,
+      vx:(Math.random()-.5)*0.4,vy:(Math.random()-.5)*0.25,
+      r:Math.min(W,H)*(0.05+Math.random()*0.07),
+      ph:Math.random()*6.283,sp:0.5+Math.random()*0.6,
+      hue:Math.random()<0.5?195:275,tent:6+((Math.random()*8)|0),
+      burst:0};
+  }
+  function mkMote(){
+    return {x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.7+.4,
+      vy:Math.random()*.2+.05,ph:Math.random()*6.283};
+  }
+  function mkMarine(){
+    return {x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.5+.4,
+      vy:Math.random()*.3+.08,ph:Math.random()*6.283};
+  }
+  function build(){
+    jellies=[];motes=[];marine=[];
+    var nj=Math.round(life/100*16);
+    for(var i=0;i<nj;i++)jellies.push(mkJelly());
+    for(var m=0;m<Math.round(life/100*90);m++)motes.push(mkMote());
+    for(var s=0;s<Math.round(life/100*60);s++)marine.push(mkMarine());
+  }
+  function resize(){
+    W=innerWidth;H=innerHeight;
+    cv.width=W*DPR;cv.height=H*DPR;cv.style.width=W+'px';cv.style.height=H+'px';
+    c.setTransform(DPR,0,0,DPR,0,0);
+    build();
+  }
+
+  /* jellyfish: a bell plus trailing tentacles */
+  function drawJelly(j){
+    var pulse=0.5+0.5*Math.sin(j.ph);
+    var r=j.r*(0.82+pulse*0.22);
+    var hue=j.hue;
+    /* tentacles first, behind */
+    c.strokeStyle='hsla('+hue+',90%,72%,'+(0.16+pulse*0.20).toFixed(3)+')';
+    c.lineWidth=1;
+    for(var i=0;i<j.tent;i++){
+      var off=(i/(j.tent-1)-0.5)*r*1.3;
+      c.beginPath();
+      c.moveTo(j.x+off,j.y+r*0.5);
+      var seg=4;
+      for(var s=0;s<=seg;s++){
+        var tt=s/seg;
+        var tx=j.x+off+Math.sin(t*1.2+i+j.ph)*r*0.22*tt;
+        var ty=j.y+r*0.5+tt*r*1.7*(1+pulse*0.2);
+        c.lineTo(tx,ty);
+      }
+      c.stroke();
+    }
+    /* bell */
+    var g=c.createRadialGradient(j.x-r*0.3,j.y-r*0.4,r*0.1,j.x,j.y,r*1.5);
+    g.addColorStop(0,'hsla('+hue+',100%,88%,'+(0.28+pulse*0.22).toFixed(3)+')');
+    g.addColorStop(.45,'hsla('+hue+',95%,70%,'+(0.14+pulse*0.14).toFixed(3)+')');
+    g.addColorStop(1,'hsla('+hue+',95%,65%,0)');
+    c.fillStyle=g;
+    c.beginPath();
+    c.moveTo(j.x-r,j.y+r*0.35);
+    c.quadraticCurveTo(j.x-r*0.5,j.y-r*0.95,j.x,j.y-r*0.72);
+    c.quadraticCurveTo(j.x+r*0.5,j.y-r*0.95,j.x+r,j.y+r*0.35);
+    c.quadraticCurveTo(j.x,j.y+r*0.72,j.x-r,j.y+r*0.35);
+    c.closePath();c.fill();
+    /* inner ribs */
+    c.strokeStyle='hsla('+hue+',100%,86%,'+(0.14+pulse*0.16).toFixed(3)+')';
+    c.lineWidth=0.8;
+    for(var k=1;k<5;k++){
+      var kk=k/5;
+      c.beginPath();
+      c.moveTo(j.x-r+r*2*kk,j.y+r*0.35);
+      c.quadraticCurveTo(j.x-r+r*2*kk,j.y-r*0.4,j.x,j.y-r*0.72);
+      c.stroke();
+    }
+  }
+
+  function draw(){
+    t+=0.016;
+    var cf=cur/100, lf=life/100, pf=plume/100;
+    c.setTransform(DPR,0,0,DPR,0,0);
+    c.clearRect(0,0,W,H);
+
+    /* the vent glow at the trench floor */
+    if(vent){
+      var vy=H*0.88;
+      var vR=Math.max(140,W*0.6*pf);
+      var vg=c.createRadialGradient(W*0.5,vy,0,W*0.5,vy,vR);
+      vg.addColorStop(0,'rgba(255,150,60,'+(0.16+pf*0.20).toFixed(3)+')');
+      vg.addColorStop(.3,'rgba(220,90,50,'+(0.06+pf*0.10).toFixed(3)+')');
+      vg.addColorStop(1,'rgba(180,60,40,0)');
+      c.fillStyle=vg;c.fillRect(0,0,W,H);
+      /* the plume itself: rising dark smoker particles */
+      c.save();
+      c.globalCompositeOperation='lighter';
+      for(var p=0;p<40;p++){
+        var seed2=(p*9301+49297)%233280;
+        var rr=seed2/233280;
+        var px2=W*0.5+(rr-0.5)*W*0.22;
+        var py2=vy-((t*40*(0.5+rr)+rr*H*1.4)%(H*0.7));
+        var sz=2+rr*7;
+        c.fillStyle='rgba(120,140,150,'+(0.03+rr*0.05*pf).toFixed(3)+')';
+        c.beginPath();c.arc(px2,py2,sz,0,6.283);c.fill();
+      }
+      c.restore();
+    }
+
+    pmx+=(mx-pmx)*0.05;pmy+=(my-pmy)*0.05;
+    var px=pmx*W, py=pmy*H;
+
+    /* drifting particles pushed by the current and pulled toward the pointer */
+    c.save();
+    c.globalCompositeOperation='lighter';
+    for(var m=0;m<motes.length;m++){
+      var mo=motes[m];
+      mo.ph+=0.02*mo.vy*3;
+      mo.x+=cf*0.9+Math.sin(mo.ph)*0.15;
+      mo.y+=Math.cos(mo.ph)*0.1;
+      /* gentle attraction to the pointer, the way a beam of light gathers them */
+      var dx=px-mo.x,dy=py-mo.y,d=Math.sqrt(dx*dx+dy*dy)||1;
+      if(d<220){mo.x+=dx/d*0.12;mo.y+=dy/d*0.12;}
+      if(mo.x>W+10)mo.x=-10;
+      if(mo.y>H+10)mo.y=-10;
+      if(mo.y<-10)mo.y=H+10;
+      c.fillStyle='rgba(200,230,245,'+(0.06+lf*0.2).toFixed(3)+')';
+      c.beginPath();c.arc(mo.x,mo.y,mo.r,0,6.283);c.fill();
+    }
+    c.restore();
+
+    /* marine snow falling slowly upward as the current rises */
+    c.save();
+    c.globalCompositeOperation='lighter';
+    for(var s2=0;s2<marine.length;s2++){
+      var mn=marine[s2];
+      mn.y-=cf*0.5+mn.vy;
+      mn.x+=Math.sin(mn.ph+t*0.2)*0.2;
+      if(mn.y<-10){mn.y=H+10;mn.x=Math.random()*W;}
+      mn.ph+=0.01;
+      c.fillStyle='rgba(220,240,250,'+(0.08+lf*0.22).toFixed(3)+')';
+      c.beginPath();c.arc(mn.x,mn.y,mn.r,0,6.283);c.fill();
+    }
+    c.restore();
+
+    /* the jellies */
+    for(var j=0;j<jellies.length;j++){
+      var jj=jellies[j];
+      jj.ph+=0.016*jj.sp;
+      jj.x+=jj.vx+cf*0.5;
+      jj.y+=jj.vy;
+      if(jj.x<-W*0.1)jj.x=W*1.1;
+      if(jj.x>W*1.1)jj.x=-W*0.1;
+      if(jj.y>H+40){jj.y=-40;}
+      if(jj.y<-40)jj.y=H+40;
+      if(Math.random()<0.0015)jj.burst=1;
+      jj.burst*=0.93;
+      drawJelly(jj);
+    }
+
+    /* a faint warm rim at the very bottom, as if from the vent */
+    var bg=c.createLinearGradient(0,H*0.82,0,H);
+    bg.addColorStop(0,'rgba(255,140,60,0)');
+    bg.addColorStop(1,'rgba(255,140,60,'+(0.06+pf*0.10).toFixed(3)+')');
+    c.fillStyle=bg;c.fillRect(0,H*0.82,W,H*0.18);
+
+    document.getElementById('abyss').style.filter='brightness('+(0.7+lf*0.3).toFixed(2)+')';
+    document.getElementById('mD').textContent=(6012+Math.round(cf*3)).toLocaleString()+' m';
+    document.getElementById('mP').textContent=(61.4-(cur-42)*0.02).toFixed(1)+' MPa';
+    document.getElementById('mT').textContent=(1.6+cur/100*0.4).toFixed(1)+' °C';
+    requestAnimationFrame(draw);
+  }
+
+  addEventListener('pointermove',function(e){
+    mx=e.clientX/innerWidth;my=e.clientY/innerHeight;
+  });
+
+  document.getElementById('cur').addEventListener('input',function(){
+    cur=+this.value;document.getElementById('curV').textContent=cur;
+  });
+  document.getElementById('lf').addEventListener('input',function(){
+    life=+this.value;document.getElementById('lfV').textContent=life;build();
+  });
+  document.getElementById('pl').addEventListener('input',function(){
+    plume=+this.value;document.getElementById('plV').textContent=plume;
+  });
+  var vb=document.getElementById('vent');
+  vb.addEventListener('click',function(){vent=!vent;this.classList.toggle('on',vent);});
+  var cb=document.getElementById('calm');
+  cb.addEventListener('click',function(){
+    document.getElementById('cur').value=0;cur=0;document.getElementById('curV').textContent='0';
+    document.getElementById('lf').value=22;life=22;document.getElementById('lfV').textContent='22';
+    document.getElementById('pl').value=0;plume=0;document.getElementById('plV').textContent='0';
+    vent=false;vb.classList.remove('on');
+    build();
+  });
+
+  addEventListener('resize',function(){clearTimeout(window.__r);window.__r=setTimeout(resize,140)});
+  resize();
+  requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>

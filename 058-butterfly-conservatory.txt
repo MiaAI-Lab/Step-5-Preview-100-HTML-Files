@@ -1,0 +1,80 @@
+# CONSERVATORY — butterflies drawn from parameters
+
+## Short title
+Butterfly Conservatory
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a specimen case of six
+butterflies, all of them vector, all of them flapping at their own beat. No external
+dependencies whatsoever — no CDN, no web fonts, no external images, no JS libraries.
+All CSS and JavaScript inline, works offline by double-clicking, responsive, valid
+HTML5.
+
+Artistic direction: a cream specimen drawer. Ground #f6f1e4, cards #fbf7ec, hairlines
+rgba(34,38,46,.18), ink #22262e with muted #5c5749, cinnabar #c8553d for italics and
+active controls and gold #b98a2f for the roman-numeral figures. Serif headings, genus
+in italics, uppercase .2em–.4em kickers.
+
+The insects: six species parameters (scale, wingbeat, tail, base colour, band colour,
+eyespot, vein colour, tags) drive an SVG builder. Each wing is a cubic path whose
+control points are multiplied by the species scale, the hindwing first so the forewing
+overlaps it, mirrored by scale(-1,1), with the body, head and antennae drawn over the
+top. Bands and eyespots are drawn on top of the wing and then clipped by it, so they
+always follow the outline instead of floating beside it.
+
+Wingbeat: each SVG carries its own beat as a CSS custom property and runs a flap
+keyframe that squashes it horizontally on a perspective frame — the same motion a
+spread wing makes when seen from above. Hovering a card pauses its wings and opens them
+full width.
+
+Three toggles: Venation reveals a hidden group of five vein strokes per wing side,
+clipped to the forewing and left out of the initial render; Hold still pauses every
+card's animation; Release lifts each card out of the grid into a fixed, frameless state
+and drifts them on a slow sinusoid with a small rotation, wrapping at the viewport
+edges. Releasing again parks them back where they were.
+
+Layout: nav with serif brand, centred hero with cinnabar kicker and a gold italic word,
+a rules row naming the collection with the three toggles, a three/two/one-column grid of
+specimen cards, then two three-cell rows of notes (wings, bands, eyespots, beat, host,
+paper) with gold roman numerals, then a ruled footer. Responsive at 900, 820, 600 and
+780px.
+
+Interaction: read the case, hover any specimen to stop its wings and see them open,
+turn on Venation to expose the vein structure, Hold still to freeze every card, and
+Release to let the collection leave the drawer and wander the window. Nothing is loaded
+from anywhere and nothing is an image.
+
+## One-paragraph description of the intended design
+A cream specimen drawer holding six butterflies whose bodies, wings, bands, eyespots and
+wingbeats are all generated from per-species parameters in SVG — each wing a cubic path
+scaled by its species factor, each band and eyespot clipped by the wing so it follows the
+outline, each insect flapping at its own rate until you hover it, turn on its venation,
+hold the whole case still, or release the collection to drift around the window.
+
+## Major visual techniques used
+- Wing silhouettes from cubic paths whose control points are multiplied by a species
+  scale, so one curve family produces six different shapes
+- Hindwing drawn before forewing so the overlap reads as depth, then mirrored with
+  scale(-1,1) rather than duplicating coordinates
+- Bands and eyespots drawn through the wing and clipped by it, so pattern always
+  tracks the outline
+- Eyespots as concentric rings plus a pale pupil, offset toward the hindwing margin
+- Wing gradient built from a white highlight into the base colour into the band colour
+- Venation as a second clipped group rendered at opacity 0 and revealed on demand
+- Flap animation as a horizontal squash on a perspective frame, which is the true
+  top-down projection of a spreading wing
+- Per-card wingbeat written as a CSS custom property and consumed by the animation
+  duration, so no two insects share a rhythm
+- aria-pressed used as the state of record for all three toggles
+- Release mode that measures each card, re-anchors it at the origin and drives it with
+  transform, then restores it by taking the same class off
+- Drift along a sinusoid with a small rotation and viewport-edge wrapping
+- A paper palette with hairlines and italics instead of any dark-ground treatment
+
+## Intended interaction model
+A drawer you open and play with. Visitors read the cards, hover a specimen to hold its
+wings open, switch Venation on to see the vein structure underneath, Hold still to
+freeze the case, and Release to let the butterflies wander the window until they are
+recalled. Every specimen is drawn from numbers, so changing a parameter would change
+the insect rather than swapping a picture.

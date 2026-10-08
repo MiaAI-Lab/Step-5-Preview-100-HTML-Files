@@ -1,0 +1,80 @@
+# THE CLOUD BASE — an alpine valley that fills
+
+## Short title
+Alpine Mist
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: an alpine valley that fills with
+fog from the bottom, where the cloud base is a real altitude, the temperature follows the
+lapse rate, and the snow line falls out of the same arithmetic. No external dependencies
+whatsoever — no CDN, no web fonts, no external images, no JS libraries. All CSS and
+JavaScript inline, works offline by double-clicking, responsive, valid HTML5.
+
+Artistic direction: a cold grey valley. Ground #101418, hairlines rgba(233,238,242,.14),
+body #e9eef2 with muted #93a3ad, one accent blue #9fd0e8 and a warm sand #ffd9a0 for the
+figures. Serif headings with italic accent words, uppercase .2em–.4em kickers, monospace
+figures.
+
+The valley is one canvas at 1000 × 560 with five ridges, each a seeded walk drawn back to
+front, each shaded by its depth in the stack, with a sunlit shoulder on the left and a
+shadowed flank on the right. Snow is drawn wherever the temperature is at or below
+freezing, which with a 14-degree sea level and a lapse rate of 6.5 degrees per kilometre is
+a fixed altitude of about 2,150 metres — so the snow line is computed, not drawn by hand.
+
+The altitude of any point on the canvas is a linear map between the valley floor and the
+highest summit on screen, so the cloud-base slider, the readouts and the snow line all read
+the same geometry. The fog is seven bands between the cloud base and the valley floor,
+denser lower down, each wandering on two out-of-phase sines so the top lip is never still,
+with a soft bright edge that thins when the wind is high.
+
+Controls: cloud base, sun angle, wind, Let it lift and Turn to night. Readout: cloud base in
+metres, the valley and summit temperatures from the lapse rate, the snow line, visibility
+from the wind, and how many of the five ridges are clear of the fog — which is counted from
+the same y coordinate the fog is drawn at.
+
+Layout: nav, centred hero, the valley canvas with a live tag, a dock of three sliders and
+two buttons, a readout row, then two three-cell note rows on the lapse rate, the inversion,
+the snow line, clear ridges, sun angle and wind, then a footer.
+
+Interaction: drag the cloud base up and the valley fills until only the top ridges stand out
+of it; let it lift and the floor appears; move the sun and the whole picture re-lights; turn
+to night and everything drops to a quarter of its light, including the fog; and push the
+wind up to tear the top off the fog and lengthen the visibility.
+
+## One-paragraph description of the intended design
+An alpine valley on canvas where five seeded ridges are drawn back to front with sunlit
+shoulders and shadowed flanks, snow is drawn wherever a 6.5-degree-per-kilometre lapse rate
+puts the air at freezing, altitude is a linear map from the canvas to a valley floor and a
+summit, and seven wandering fog bands fill from the bottom up to a cloud base you set —
+with a sun angle that re-lights the whole picture, a wind that thins the fog lip, a night
+mode, and readouts for cloud base, valley and summit temperature, snow line, visibility and
+how many ridges are clear.
+
+## Major visual techniques used
+- Altitude as one linear map between the valley floor and the highest ridge on screen, so
+  the cloud-base slider, the snow line and the readouts all share one geometry
+- Snow line computed from the lapse rate rather than drawn as a fixed line, so the whole
+  picture follows one number
+- Five ridges drawn back to front, each shaded by its depth in the stack, so the valley
+  has real aerial perspective
+- Sunlit shoulder as a left-to-right gradient warm on the left and dark on the right, with
+  the ridge line itself lit on top
+- Fog as seven bands between the cloud base and the floor, denser lower down, each on two
+  out-of-phase sines so the top lip is never still
+- Fog lip as a bright gradient whose alpha drops with the wind, which is what tearing the
+  top off looks like
+- Valley floor only drawn when the cloud base is below it, so the meadow appears as the fog
+  lifts rather than being revealed by a filter
+- Night as one multiplier applied to every colour in the scene, so nothing is re-lit
+  separately
+- Clear ridges counted by comparing the fog's y with each ridge's highest point, so the
+  number is a measurement
+- Visibility bucketed from the wind, which is how a mountain forecast reads
+- Reduced-motion honoured by freezing the fog's time rather than stopping the scene
+
+## Intended interaction model
+A valley you fill and empty. Visitors drag the cloud base up until only the top ridges
+stand out, let it lift to bring the floor back, move the sun to re-light everything, turn
+to night, and push the wind up to thin the lip and lengthen the visibility. Every number in
+the panel is derived from the same altitude map the picture is drawn with.

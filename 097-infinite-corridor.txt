@@ -1,0 +1,44 @@
+## The exact prompt used to generate this HTML file
+
+Generate 100 completely self-contained HTML files. DO NOT LOOK AT ANY OTHER FOLDER.
+ONLY IN THE CURRENT FOLDER. DO THIS AS A NEW AND CLEAN TASK. IGNORE EVERYTHING ELSE
+NOT RELATED TO THE TASK. DO THIS AS A NEW AND CLEAN TASK. IGNORE EVERYTHING ELSE NOT
+RELATED TO THE TASK. DO NOT USE A GENERATOR. NEED TO CREATE THESE HTMLS ONE BY ONE, OR
+ONE BY AGENT. The goal is 100 unique, polished, fully self-contained single-file HTML
+pages, each with its own concept, its own visual language, and its own interaction model.
+
+This is file 097 of 100.
+
+# The Corridor — rooms that do not agree
+
+## Short title
+The Corridor — rooms that do not agree
+
+## One-paragraph description of the intended design
+A cold-bluish architectural drawing of a corridor that cannot exist: the walls are drawn in
+two-point perspective, and the vanishing points move with you so that walking forward
+always reveals another room. Penrose stairs turn through four right angles and arrive where
+they started; a portal in the far wall returns you to the room behind you, so the corridor
+loops without ever bending. Room after room is generated from a Wolfram cellular-automaton
+rule read as a wall plan, so the sequence of rooms is deterministic and the same journey
+always produces the same architecture. A single oil lamp throws a moving pool of light down
+the corridor, the field of view narrows and widens with speed, and the readout reports the
+room number, the depth walked, the turn, the rule and the frame. The palette is one cold
+blue on near-black with a sodium-lamp amber for the light; the notes column explains
+impossible geometry in the same quiet editorial register as the drawing itself.
+
+## Major visual techniques used
+- Two-point perspective projection with vanishing points driven by the walker's heading
+- Penrose stairs built from four right-angle turns with a height discontinuity at the loop
+- Wolfram elementary cellular automaton generating each room's wall plan from one rule
+- A moving point light with radial falloff, pooled light on the floor and on the ceiling
+- Field of view that eases with speed, and depth fog by corridor distance
+- Non-Euclidean portal: an axial coordinate that wraps on itself, so the loop is exact
+- DPR-aware canvas sizing from the layout box, hairline rules, monospaced readout
+
+## Intended interaction model
+Drag or use the arrow keys to walk forward, back and to turn; the field-of-view, depth and
+lamp sliders reshape the projection live; toggle chips switch the Penrose stairs, the
+portal, the cellular-automaton plan and the lamp on and off. The walk is continuous — the
+corridor is one coordinate wrapped onto itself — and a readout reports the room, the
+distance walked, the heading, the rule in force and the frame count.

@@ -1,0 +1,71 @@
+# ORRERY — A Working Model of the Inner Sky
+
+## Short title
+Orrery Solar System
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a working mechanical
+orrery / solar system model called ORRERY. No external dependencies whatsoever —
+no CDN, no web fonts, no external images, no external SVG files, no JavaScript
+libraries. All CSS and JavaScript inline, works offline by double-clicking, responsive,
+valid HTML5.
+
+Artistic direction: a brass-and-glass astronomical instrument floating in space.
+The canvas is a near-black void with a soft centre glow and a sparse field of
+stars. The sun is a warm disc with a wide seven-times-radius halo. Each orbit is a
+hairline circle at 10% blue-white alpha. Planets are shaded spheres — a radial
+gradient offset toward a light source, darkened on the anti-sun side by a second
+crescent arc so the terminator is visible — drawn at true relative radii scaled
+down. Saturn carries two elliptical strokes as rings, rotated −0.42 radians, at two
+alphas and widths. A 260-body asteroid belt can be switched on between Mars and
+Jupiter.
+
+Layout: a full-bleed canvas with three floating glass panels — a control tray
+top-left (sim speed, orbit scale and a labels on/off range, plus Today / Inner /
+All / Belt buttons), an information card top-right that appears only while a body is
+hovered, and a bottom-right clock showing the simulated date and day number. A tiny
+monospace hint sits bottom-left.
+
+Data: eight planets with real semi-major axes in AU, real orbital periods in years,
+real radii in kilometres, real moon counts, true-to-life colours, Latin names, and
+a one-sentence character note each. Positions are computed from absolute time in
+days, so the model is genuine and repeatable: angle = t · 2π / period + a fixed
+per-planet phase.
+
+Interaction: the pointer drags the whole system (eased camera panning on a
+current/target pair), the wheel zooms from 0.25× to 6×, and clicking a body selects
+it — its name, Latin name, orbit, year length, radius, moon count and live orbital
+angle populate the info card. Hovering shows the same card temporarily. Sim speed
+runs from 0 to 6.7×, orbit scale from 0.4× to 2.2×, and labels can be switched off
+for a cleaner sky. "Inner" zooms to the rocky planets, "All" pulls back to the
+whole system, "Today" resets the camera and zoom. The date and day-number clock
+advances with the simulation.
+
+## One-paragraph description of the intended design
+A real orrery drawn on canvas: eight planets at honest relative distances travelling
+at their true orbital rates around a glowing sun, shaded with visible terminators,
+ Saturn ringed, an optional asteroid belt turning between Mars and Jupiter — all
+pannable, zoomable and clickable, with a glass instrument panel that can run the
+sky at six times real speed.
+
+## Major visual techniques used
+- Real astronomical data driving position: angle from elapsed days ÷ orbital period
+- True relative planet radii with a √-zoom falloff so bodies stay legible when
+  zoomed out and become properly huge when zoomed in
+- Terminator shading from an offset dark crescent arc over a light-source radial
+  gradient
+- Saturn's rings as two rotated ellipses at different alpha and line width
+- Eased camera panning using a current/target position pair lerped each frame
+- Wheel zoom clamped between 0.25× and 6×, applied to orbit scale and body size
+- Hit testing on both the planets (radius by true size) and the sun
+- Floating glass panels with backdrop-filter blur and 1px hairline borders
+- Asteroid belt of 260 bodies with per-body radius, phase and angular rate
+- 300-weight display type against 8.5–9px wide-tracked monospace labels
+- Simulated date/day clock driven from the same time variable as the positions
+
+## Intended interaction model
+An instrument to be operated. Visitors drag to move the system, scroll to zoom in
+on the inner planets or out to Neptune, change the speed to watch years pass, and
+click or hover any body to read what it is. Nothing on the page is decorative-only
+except the panels themselves: every control changes the model.

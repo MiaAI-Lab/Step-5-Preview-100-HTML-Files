@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ORBIT GARDEN — Plant a Body</title>
+<style>
+  :root{
+    --void:#05060d;
+    --void2:#0d0a1c;
+    --ink:#e8e6f5;
+    --muted:rgba(232,230,245,.55);
+    --line:rgba(232,230,245,.14);
+    --hot:#ffd27a;
+    --cool:#8fd8ff;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden}
+  body{background:var(--void);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+  #cv{position:fixed;inset:0;z-index:0;cursor:crosshair;touch-action:none}
+
+  .panel{
+    position:fixed;z-index:3;left:50%;bottom:22px;transform:translateX(-50%);
+    display:flex;align-items:center;gap:clamp(8px,1.4vw,18px);flex-wrap:wrap;justify-content:center;
+    background:rgba(12,10,26,.72);border:1px solid var(--line);border-radius:18px;
+    padding:11px clamp(12px,2vw,22px);backdrop-filter:blur(14px);
+    box-shadow:0 24px 60px -30px rgba(0,0,0,.95);max-width:calc(100% - 24px)
+  }
+  .panel .k{font-family:var(--mono);font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+  .panel .v{font-family:var(--mono);font-size:10px;color:var(--hot);min-width:34px;display:inline-block}
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;width:88px;height:16px;background:transparent;cursor:pointer
+  }
+  input[type=range]::-webkit-slider-runnable-track{height:2px;background:var(--line);border-radius:2px}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--cool);margin-top:-6px;border:0;box-shadow:0 0 10px rgba(143,216,255,.7)}
+  input[type=range]::-moz-range-track{height:2px;background:var(--line);border-radius:2px}
+  input[type=range]::-moz-range-thumb{width:13px;height:13px;border:0;border-radius:50%;background:var(--cool)}
+  button{
+    font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;
+    background:transparent;border:1px solid var(--line);color:var(--ink);
+    padding:9px 13px;border-radius:999px;cursor:pointer;transition:background .22s,color .22s,border-color .22s
+  }
+  button:hover{background:var(--ink);color:#07060f;border-color:var(--ink)}
+
+  .hud{position:fixed;z-index:3;top:22px;left:26px;pointer-events:none}
+  .hud .k{font-family:var(--mono);font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--muted)}
+  .hud h1{
+    font-family:var(--sans);font-weight:200;font-size:clamp(24px,4vw,44px);
+    letter-spacing:-.02em;margin:8px 0 6px;line-height:1
+  }
+  .hud h1 b{font-weight:600;background:linear-gradient(100deg,var(--hot),var(--cool));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hud p{margin:0;font-size:12.5px;line-height:1.6;color:var(--muted);max-width:34ch}
+  .stat{position:fixed;z-index:3;top:22px;right:26px;text-align:right;font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);pointer-events:none}
+  .stat b{display:block;font-size:20px;letter-spacing:0;color:var(--ink);font-weight:400;margin-top:4px}
+  @media (max-width:700px){.hud p{display:none}.hud{top:16px;left:16px}.stat{top:16px;right:16px}}
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+
+<div class="hud">
+  <div class="k">Orbit Garden · n-body sandbox</div>
+  <h1>Plant a <b>body</b>.</h1>
+  <p>Drag from anywhere and let go. The length and direction of your drag is the
+  impulse. Release gently for a circle; too slow and it falls in, too fast and it
+  escapes for good.</p>
+</div>
+<div class="stat">Bodies in flight<b id="count">0</b></div>
+
+<div class="panel">
+  <span class="k">Mass</span><span class="v" id="mv">1.0</span>
+  <input type="range" id="mass" min="1" max="40" value="10" aria-label="Mass">
+  <span class="k">Gravity</span><span class="v" id="gv">1.0</span>
+  <input type="range" id="grav" min="10" max="260" value="100" aria-label="Gravity">
+  <span class="k">Trails</span><span class="v" id="tv">on</span>
+  <input type="range" id="trail" min="10" max="160" value="90" aria-label="Trail length">
+  <button id="seed">Seed a system</button>
+  <button id="clear">Clear</button>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var cv=document.getElementById('cv'),c=cv.getContext('2d');
+  var W,H,DPR=Math.min(window.devicePixelRatio||1,2);
+  var bg=document.createElement('canvas'),bgc=bg.getContext('2d');
+  var bodies=[],bgStars=[];
+  var G=100, trailMax=90, massScale=1, drag=null;
+
+  var HUES=[190,210,32,44,290,320,150,265];
+
+  function resize(){
+    W=innerWidth;H=innerHeight;
+    cv.width=W*DPR;cv.height=H*DPR;cv.style.width=W+'px';cv.style.height=H+'px';
+    c.setTransform(DPR,0,0,DPR,0,0);
+    bg.width=W;bg.height=H;
+    paintBG();
+    buildStars();
+    centre();
+  }
+  function buildStars(){
+    bgStars=[];
+    var n=Math.round(W*H/14000);
+    for(var i=0;i<n;i++){
+      bgStars.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.1+.2,a:Math.random()*.5+.12});
+    }
+    paintBG();
+  }
+  function paintBG(){
+    var g=bgc.createRadialGradient(W*0.5,H*0.5,0,W*0.5,H*0.5,Math.max(W,H)*0.8);
+    g.addColorStop(0,'#0b0a1e');g.addColorStop(.55,'#0a0818');g.addColorStop(1,'#04040c');
+    bgc.fillStyle=g;bgc.fillRect(0,0,W,H);
+    var n2=bgc.createRadialGradient(W*0.22,H*0.2,0,W*0.22,H*0.2,Math.max(W,H)*0.6);
+    n2.addColorStop(0,'rgba(120,90,220,.16)');n2.addColorStop(1,'rgba(120,90,220,0)');
+    bgc.fillStyle=n2;bgc.fillRect(0,0,W,H);
+    var n3=bgc.createRadialGradient(W*0.8,H*0.85,0,W*0.8,H*0.85,Math.max(W,H)*0.55);
+    n3.addColorStop(0,'rgba(40,150,190,.13)');n3.addColorStop(1,'rgba(40,150,190,0)');
+    bgc.fillStyle=n3;bgc.fillRect(0,0,W,H);
+    for(var i=0;i<bgStars.length;i++){
+      var s=bgStars[i];
+      bgc.globalAlpha=s.a;bgc.fillStyle='#dfe4ff';
+      bgc.beginPath();bgc.arc(s.x,s.y,s.r,0,6.283);bgc.fill();
+    }
+    bgc.globalAlpha=1;
+  }
+
+  var star={x:0,y:0,r:16,m:2400,hue:40,pulse:0};
+  function centre(){star.x=W/2;star.y=H/2;}
+
+  function makeBody(x,y,vx,vy,m,hue,name){
+    var b={x:x,y:y,vx:vx,vy:vy,m:m,r:Math.max(1.6,Math.cbrt(m)*1.35),hue:hue,
+      trail:[],life:0,name:name||''};
+    bodies.push(b);
+    return b;
+  }
+
+  function seed(){
+    bodies=[];
+    var n=3+((Math.random()*3)|0);
+    var base=Math.min(W,H)*0.22;
+    for(var i=0;i<n;i++){
+      var d=base*(1+i*0.55)+Math.random()*40;
+      var a=Math.random()*6.283;
+      var x=W/2+Math.cos(a)*d, y=H/2+Math.sin(a)*d;
+      /* circular orbit velocity about the star */
+      var sp=Math.sqrt(G*star.m/d)*0.62;
+      var dir=Math.random()<0.5?1:-1;
+      makeBody(x,y,-Math.sin(a)*sp*dir,Math.cos(a)*sp*dir,6+Math.random()*14,HUES[i%HUES.length]);
+    }
+  }
+
+  function step(){
+    var list=bodies.concat([{x:star.x,y:star.y,m:star.m,vx:0,vy:0,hue:40,r:star.r}]);
+    for(var i=0;i<bodies.length;i++){
+      var b=bodies[i];
+      var ax=0,ay=0;
+      for(var j=0;j<list.length;j++){
+        if(i===j)continue;
+        var o=list[j];
+        var dx=o.x-b.x, dy=o.y-b.y;
+        var d2=dx*dx+dy*dy;
+        var d=Math.sqrt(d2)||0.001;
+        if(d< (o.r+b.r)*0.6){
+          /* merge into the other body */
+          var tm=o.m+b.m;
+          o.vx=(o.vx*o.m+b.vx*b.m)/tm;
+          o.vy=(o.vy*o.m+b.vy*b.m)/tm;
+          o.x=(o.x*o.m+b.x*b.m)/tm;
+          o.y=(o.y*o.m+b.y*b.m)/tm;
+          o.m=tm;
+          o.r=Math.max(1.6,Math.cbrt(tm)*1.35);
+          if(j===list.length-1){ star.m=tm; star.r=Math.min(60,Math.cbrt(tm)*1.35); }
+          b.dead=true;
+          break;
+        }
+        var f=G*o.m/(d2*d);
+        ax+=dx*f; ay+=dy*f;
+      }
+      if(b.dead)continue;
+      b.vx+=ax; b.vy+=ay;
+      b.x+=b.vx; b.y+=b.vy;
+      b.life++;
+      b.trail.push(b.x,b.y);
+      if(b.trail.length>trailMax*2)b.trail.splice(0,2);
+      /* cull escapees */
+      if(b.x<-W*0.8||b.x>W*1.8||b.y<-H*0.8||b.y>H*1.8)b.dead=true;
+    }
+    bodies=bodies.filter(function(b){return !b.dead});
+    star.pulse+=0.03;
+  }
+
+  function draw(){
+    c.setTransform(DPR,0,0,DPR,0,0);
+    c.drawImage(bg,0,0,W,H);
+
+    /* star glow */
+    var pr=star.r*(1+0.05*Math.sin(star.pulse));
+    var sg=c.createRadialGradient(star.x,star.y,0,star.x,star.y,pr*9);
+    sg.addColorStop(0,'rgba(255,214,140,.85)');
+    sg.addColorStop(.18,'rgba(255,180,90,.34)');
+    sg.addColorStop(1,'rgba(255,160,60,0)');
+    c.fillStyle=sg;c.beginPath();c.arc(star.x,star.y,pr*9,0,6.283);c.fill();
+    c.fillStyle='#fff4dd';c.beginPath();c.arc(star.x,star.y,pr,0,6.283);c.fill();
+
+    /* trails: one soft full-length stroke plus a bright head */
+    for(var i=0;i<bodies.length;i++){
+      var b=bodies[i], t=b.trail;
+      if(t.length>4){
+        c.lineJoin='round';c.lineCap='round';
+        c.beginPath();
+        c.moveTo(t[0],t[1]);
+        for(var k=2;k<t.length;k+=2)c.lineTo(t[k],t[k+1]);
+        c.strokeStyle='hsla('+b.hue+',85%,66%,.30)';
+        c.lineWidth=Math.max(0.8,b.r*0.9);
+        c.stroke();
+        var head=Math.max(0,t.length-22);
+        c.beginPath();
+        c.moveTo(t[head],t[head+1]);
+        for(var k2=head+2;k2<t.length;k2+=2)c.lineTo(t[k2],t[k2+1]);
+        c.strokeStyle='hsla('+b.hue+',95%,80%,.75)';
+        c.lineWidth=Math.max(1,b.r*1.15);
+        c.stroke();
+      }
+      /* body */
+      var g=c.createRadialGradient(b.x-b.r*0.4,b.y-b.r*0.4,b.r*0.1,b.x,b.y,b.r);
+      g.addColorStop(0,'hsl('+b.hue+',100%,88%)');
+      g.addColorStop(.6,'hsl('+b.hue+',85%,62%)');
+      g.addColorStop(1,'hsl('+b.hue+',70%,34%)');
+      c.fillStyle=g;c.beginPath();c.arc(b.x,b.y,b.r,0,6.283);c.fill();
+      c.strokeStyle='hsla('+b.hue+',100%,80%,.35)';c.lineWidth=1;
+      c.beginPath();c.arc(b.x,b.y,b.r+2.4,0,6.283);c.stroke();
+    }
+
+    /* aim line */
+    if(drag){
+      c.setLineDash([4,6]);
+      c.strokeStyle='rgba(255,210,122,.75)';c.lineWidth=1.2;
+      c.beginPath();c.moveTo(drag.x,drag.y);c.lineTo(drag.x+drag.vx,drag.y+drag.vy);c.stroke();
+      c.setLineDash([]);
+      var L=Math.hypot(drag.vx,drag.vy);
+      if(L>2){
+        var ang=Math.atan2(drag.vy,drag.vx);
+        c.save();c.translate(drag.x+drag.vx,drag.y+drag.vy);c.rotate(ang);
+        c.fillStyle='rgba(255,210,122,.9)';
+        c.beginPath();c.moveTo(0,0);c.lineTo(-11,4.5);c.lineTo(-11,-4.5);c.closePath();c.fill();
+        c.restore();
+      }
+      c.fillStyle='rgba(255,255,255,.85)';
+      c.beginPath();c.arc(drag.x,drag.y,3,0,6.283);c.fill();
+    }
+  }
+
+  function loop(){
+    step();draw();
+    document.getElementById('count').textContent=bodies.length;
+    requestAnimationFrame(loop);
+  }
+
+  function pt(e){var r=cv.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top];}
+  cv.addEventListener('pointerdown',function(e){
+    var p=pt(e);
+    drag={x:p[0],y:p[1],vx:0,vy:0};
+    cv.setPointerCapture(e.pointerId);
+  });
+  cv.addEventListener('pointermove',function(e){
+    if(!drag)return;
+    var p=pt(e);
+    drag.vx=(p[0]-drag.x)*0.14;
+    drag.vy=(p[1]-drag.y)*0.14;
+  });
+  function release(){
+    if(!drag)return;
+    var m=massScale;
+    makeBody(drag.x,drag.y,drag.vx,drag.vy,m,HUES[(Math.random()*HUES.length)|0]);
+    drag=null;
+  }
+  cv.addEventListener('pointerup',release);
+  cv.addEventListener('pointercancel',function(){drag=null;});
+
+  document.getElementById('mass').addEventListener('input',function(){
+    massScale=+this.value/10;
+    document.getElementById('mv').textContent=massScale.toFixed(1);
+  });
+  document.getElementById('grav').addEventListener('input',function(){
+    G=+this.value;
+    document.getElementById('gv').textContent=(G/100).toFixed(2);
+  });
+  document.getElementById('trail').addEventListener('input',function(){
+    trailMax=+this.value;
+  });
+  document.getElementById('clear').addEventListener('click',function(){bodies=[];});
+  document.getElementById('seed').addEventListener('click',seed);
+
+  window.addEventListener('resize',function(){clearTimeout(window.__rt);window.__rt=setTimeout(function(){resize();},140)});
+  resize();seed();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

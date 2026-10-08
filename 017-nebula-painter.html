@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NEBULA — Paint a Sky Nobody Has Seen</title>
+<style>
+  :root{
+    --bg:#03030a;
+    --ink:#f0eaff;
+    --dim:rgba(240,234,255,.5);
+    --line:rgba(240,234,255,.14);
+    --ac:#b48cff;
+    --ac2:#5fe0d0;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --serif:"Iowan Old Style",Palatino,Georgia,serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+  #sky{position:fixed;inset:0;z-index:0;display:block;cursor:crosshair;touch-action:none}
+
+  .ui{position:fixed;inset:0;z-index:2;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(16px,3vw,34px)}
+  .top{display:flex;justify-content:space-between;align-items:flex-start;gap:18px}
+  .k{font-family:var(--mono);font-size:9px;letter-spacing:.36em;text-transform:uppercase;color:var(--ac2)}
+  h1{
+    font-family:var(--serif);font-weight:400;font-style:italic;
+    font-size:clamp(26px,4.6vw,54px);line-height:.98;letter-spacing:-.02em;margin:10px 0 0
+  }
+  h1 b{font-style:normal;font-weight:400;color:var(--ac)}
+  .top p{margin:12px 0 0;font-size:12px;line-height:1.75;max-width:32ch;color:var(--dim)}
+  .stats{text-align:right;font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);line-height:2.4}
+  .stats b{display:block;font-size:15px;color:var(--ink);font-weight:400;letter-spacing:.02em}
+
+  .bottom{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+  .tray{
+    pointer-events:auto;display:flex;gap:clamp(8px,1.3vw,16px);flex-wrap:wrap;align-items:center;
+    background:rgba(14,10,26,.6);border:1px solid var(--line);border-radius:16px;
+    padding:11px clamp(12px,1.8vw,20px);backdrop-filter:blur(14px)
+  }
+  .g{display:flex;align-items:center;gap:8px}
+  .kk{font-family:var(--mono);font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
+  .vv{font-family:var(--mono);font-size:9.5px;color:var(--ac2);min-width:26px;font-variant-numeric:tabular-nums}
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;width:66px;height:14px;background:transparent;cursor:pointer
+  }
+  input[type=range]::-webkit-slider-runnable-track{height:2px;background:var(--line);border-radius:2px}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;border-radius:50%;background:var(--ac);margin-top:-5px;border:0;box-shadow:0 0 10px rgba(180,140,255,.7)}
+  input[type=range]::-moz-range-track{height:2px;background:var(--line);border-radius:2px}
+  input[type=range]::-moz-range-thumb{width:11px;height:11px;border:0;border-radius:50%;background:var(--ac)}
+  button{
+    pointer-events:auto;font-family:var(--mono);font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;
+    background:rgba(180,140,255,.14);border:1px solid rgba(180,140,255,.4);color:var(--ink);
+    padding:9px 13px;border-radius:999px;cursor:pointer;transition:background .2s,color .2s
+  }
+  button:hover{background:var(--ac);color:#0d0618}
+  .hint{font-family:var(--mono);font-size:8.5px;letter-spacing:.22em;text-transform:uppercase;color:rgba(240,234,255,.35);pointer-events:none}
+
+  @media (max-width:760px){.top p,.stats,.hint{display:none}.ui{padding:14px}}
+</style>
+</head>
+<body>
+<canvas id="sky"></canvas>
+
+<div class="ui">
+  <div class="top">
+    <div>
+      <div class="k">Deep field · survey 04</div>
+      <h1>Paint a sky<br><b>nobody has seen.</b></h1>
+      <p>Each press drops a nursery of stars into a cloud of coloured gas. The gas
+      drifts; the stars stay where you put them.</p>
+    </div>
+    <div class="stats">
+      Clouds<b id="sC">0</b>
+      Stars<b id="sS">0</b>
+      Exposure<b id="sE">0.0s</b>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <div class="tray">
+      <div class="g"><span class="kk">Gas</span><input type="range" id="gas" min="0" max="100" value="55" aria-label="Gas"><span class="vv" id="gasV">55</span></div>
+      <div class="g"><span class="kk">Spread</span><input type="range" id="spread" min="10" max="100" value="52" aria-label="Spread"><span class="vv" id="spreadV">52</span></div>
+      <div class="g"><span class="kk">Hue</span><input type="range" id="hue" min="0" max="360" value="265" aria-label="Hue"><span class="vv" id="hueV">265</span></div>
+      <button id="seed">Seed a field</button>
+      <button id="clear">Clear</button>
+      <button id="save">Save</button>
+    </div>
+    <div class="hint">Click or drag to paint</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var cv=document.getElementById('sky'),c=cv.getContext('2d');
+  var W,H,DPR=Math.min(devicePixelRatio||1,2);
+  var clouds=[],stars=[],t0=Date.now();
+  var gas=55,spread=52,hue=265;
+  var painting=false,lastX=0,lastY=0;
+
+  function resize(){
+    W=innerWidth;H=innerHeight;
+    cv.width=W*DPR;cv.height=H*DPR;cv.style.width=W+'px';cv.style.height=H+'px';
+    c.setTransform(DPR,0,0,DPR,0,0);
+    paintGround();
+    /* redraw existing art at the new size by re-compositing */
+    for(var i=0;i<clouds.length;i++)clouds[i].draw(c);
+    for(var j=0;j<stars.length;j++)drawStar(stars[j]);
+  }
+  function paintGround(){
+    var g=c.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,'#03030a');g.addColorStop(.55,'#06040f');g.addColorStop(1,'#020208');
+    c.fillStyle=g;c.fillRect(0,0,W,H);
+    /* faint milky band */
+    var m=c.createLinearGradient(0,H*0.2,W,H*0.8);
+    m.addColorStop(0,'rgba(120,110,200,0)');
+    m.addColorStop(.5,'rgba(120,110,200,.05)');
+    m.addColorStop(1,'rgba(120,110,200,0)');
+    c.fillStyle=m;c.fillRect(0,0,W,H);
+  }
+
+  function Cloud(x,y){
+    this.x=x;this.y=y;
+    this.h=hue+(Math.random()*60-30);
+    this.n=14+((Math.random()*10)|0);
+    this.puffs=[];
+    for(var i=0;i<this.n;i++){
+      var a=Math.random()*6.283,d=Math.random();
+      this.puffs.push({
+        dx:Math.cos(a)*d, dy:Math.sin(a)*d*0.6,
+        r:(0.5+d)*spread*2.2,
+        a:(1-d)*0.20+0.04,
+        ph:Math.random()*6.283,
+        sp:0.3+Math.random()*0.8
+      });
+    }
+  }
+  Cloud.prototype.draw=function(ctx){
+    var t=(Date.now()-t0)/1000;
+    ctx.save();
+    ctx.globalCompositeOperation='screen';
+    for(var i=0;i<this.puffs.length;i++){
+      var p=this.puffs[i];
+      var drift=Math.sin(t*0.08*p.sp+p.ph)*6;
+      var x=this.x+p.dx*spread*2.6, y=this.y+p.dy*spread*2.6+drift;
+      var r=p.r*(1+0.06*Math.sin(t*0.3+p.ph));
+      var g=ctx.createRadialGradient(x,y,0,x,y,r);
+      g.addColorStop(0,'hsla('+this.h+',85%,68%,'+(p.a*gas/100).toFixed(3)+')');
+      g.addColorStop(0.45,'hsla('+(this.h+24)+',80%,52%,'+(p.a*0.4*gas/100).toFixed(3)+')');
+      g.addColorStop(1,'hsla('+this.h+',80%,50%,0)');
+      ctx.fillStyle=g;
+      ctx.beginPath();ctx.arc(x,y,r,0,6.283);ctx.fill();
+    }
+    ctx.restore();
+  };
+
+  function drawStar(s){
+    c.save();
+    c.globalCompositeOperation='screen';
+    var r=s.r*(1+0.10*Math.sin(Date.now()*0.001*s.tw+s.ph));
+    var g=c.createRadialGradient(s.x,s.y,0,s.x,s.y,r*5);
+    g.addColorStop(0,'rgba(255,255,255,.95)');
+    g.addColorStop(.18,'hsla('+s.h+',90%,80%,.6)');
+    g.addColorStop(1,'hsla('+s.h+',90%,70%,0)');
+    c.fillStyle=g;
+    c.beginPath();c.arc(s.x,s.y,r*5,0,6.283);c.fill();
+    c.fillStyle='#fff';
+    c.beginPath();c.arc(s.x,s.y,Math.max(0.5,r*0.5),0,6.283);c.fill();
+    /* diffraction spikes for the bright ones */
+    if(r>1.5){
+      c.strokeStyle='rgba(255,255,255,.32)';c.lineWidth=0.7;
+      c.beginPath();
+      c.moveTo(s.x-r*4,s.y);c.lineTo(s.x+r*4,s.y);
+      c.moveTo(s.x,s.y-r*4);c.lineTo(s.x,s.y+r*4);
+      c.stroke();
+    }
+    c.restore();
+  }
+
+  function plant(x,y){
+    clouds.push(new Cloud(x,y));
+    clouds[clouds.length-1].draw(c);
+    var n=6+((Math.random()*12)|0);
+    for(var i=0;i<n;i++){
+      var a=Math.random()*6.283,d=Math.random()*spread*2.2;
+      stars.push({
+        x:x+Math.cos(a)*d, y:y+Math.sin(a)*d*0.7,
+        r:Math.pow(Math.random(),2.6)*2.2+0.4,
+        h:hue+(Math.random()*80-40),
+        ph:Math.random()*6.283,
+        tw:0.6+Math.random()*1.6
+      });
+    }
+    if(clouds.length>90)clouds.splice(0,10);
+    if(stars.length>1200)stars.splice(0,120);
+    document.getElementById('sC').textContent=clouds.length;
+    document.getElementById('sS').textContent=stars.length;
+  }
+
+  function pt(e){var r=cv.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top];}
+  cv.addEventListener('pointerdown',function(e){
+    var p=pt(e);painting=true;lastX=p[0];lastY=p[1];
+    cv.setPointerCapture(e.pointerId);
+    plant(p[0],p[1]);
+  });
+  cv.addEventListener('pointermove',function(e){
+    if(!painting)return;
+    var p=pt(e);
+    if(Math.hypot(p[0]-lastX,p[1]-lastY)>spread*1.4){
+      plant(p[0],p[1]);lastX=p[0];lastY=p[1];
+    }
+  });
+  ['pointerup','pointercancel','pointerleave'].forEach(function(t){
+    cv.addEventListener(t,function(){painting=false;});
+  });
+
+  document.getElementById('gas').addEventListener('input',function(){
+    gas=+this.value;document.getElementById('gasV').textContent=gas;
+    /* repaint so the change is visible immediately */
+    paintGround();
+    for(var i=0;i<clouds.length;i++)clouds[i].draw(c);
+    for(var j=0;j<stars.length;j++)drawStar(stars[j]);
+  });
+  document.getElementById('spread').addEventListener('input',function(){
+    spread=+this.value;document.getElementById('spreadV').textContent=spread;
+  });
+  document.getElementById('hue').addEventListener('input',function(){
+    hue=+this.value;document.getElementById('hueV').textContent=hue;
+    paintGround();
+    for(var i=0;i<clouds.length;i++){clouds[i].h=hue+(Math.random()*60-30);clouds[i].draw(c);}
+    for(var j=0;j<stars.length;j++){stars[j].h=hue+(Math.random()*80-40);drawStar(stars[j]);}
+  });
+  document.getElementById('seed').addEventListener('click',function(){
+    for(var i=0;i<9;i++){
+      plant(W*(0.12+Math.random()*0.76),H*(0.14+Math.random()*0.7));
+    }
+  });
+  document.getElementById('clear').addEventListener('click',function(){
+    clouds=[];stars=[];paintGround();
+    document.getElementById('sC').textContent='0';
+    document.getElementById('sS').textContent='0';
+  });
+  document.getElementById('save').addEventListener('click',function(){
+    var a=document.createElement('a');
+    a.download='nebula.png';
+    a.href=cv.toDataURL('image/png');
+    a.click();
+  });
+
+  /* exposure clock */
+  setInterval(function(){
+    document.getElementById('sE').textContent=((Date.now()-t0)/1000).toFixed(1)+'s';
+  },100);
+
+  addEventListener('resize',function(){clearTimeout(window.__r);window.__r=setTimeout(resize,140)});
+  resize();
+  /* opening composition */
+  setTimeout(function(){
+    plant(W*0.34,H*0.46);
+    setTimeout(function(){plant(W*0.62,H*0.58)},260);
+    setTimeout(function(){plant(W*0.5,H*0.36)},520);
+  },200);
+})();
+</script>
+</body>
+</html>

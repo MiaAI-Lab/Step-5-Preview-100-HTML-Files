@@ -1,0 +1,90 @@
+# FALLING — A Box of Sand That Behaves
+
+## Short title
+Falling Sand Physics
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a falling-sand cellular
+automaton toy called FALLING. No external dependencies whatsoever — no CDN, no web
+fonts, no external images, no external SVG files, no JavaScript libraries. All CSS
+and JavaScript inline, works offline by double-clicking, responsive, valid HTML5.
+
+Artistic direction: a dark lab bench. Ground #0e1116, panels #161c24, hairline
+rules at 12% white, off-white text #e4eef6, and the palette of the six materials
+themselves doing all the colour work: sand #e0b25e, water #3d8fd0, stone #7d8794,
+fire #e8632a, plant #4fae5e, oil #4a3a2a. Typography is a serif for the headline and
+the figures, a system sans for paragraphs, and 8.5–9.5px wide-tracked monospace for
+every label and readout.
+
+The simulation runs on a Uint8Array of 3-pixel cells, stepped bottom-up with the
+horizontal scan direction flipped every other frame (which removes the directional
+bias that makes naive falling sand drift to one side). Six materials with genuinely
+different rules:
+- Sand: falls straight into empty space, water or fire (swapping with whatever it
+  displaces), otherwise tries both diagonals. This is what makes it cone.
+- Water: falls into empty space, otherwise spreads diagonally then sideways, so it
+  levels out.
+- Oil: falls and spreads like water but slower and more reluctantly sideways.
+- Fire: carries a decaying lifetime in a parallel Float32Array; burns oil and plant
+  on contact by converting them to fire with full life; is extinguished by water;
+  and rises into empty space with a decaying copy of its life.
+- Plant: grows into adjacent empty cells at 2% per frame, but only if water is
+  within its 3×3 neighbourhood — so plant spreads from a water source and stops at
+  dry ground.
+- Stone: static.
+
+Rendering is a single putImageData per two frames, with the canvas scaled up by CSS
+and image-rendering: pixelated so each cell is a crisp square. Each material's
+colour is given a per-cell deterministic jitter (from x·7 + y·13 style hashes) so a
+field of sand shimmers instead of being flat.
+
+Layout: a nav with a monospace brand. A centred hero with a sand-coloured eyebrow,
+a serif headline with one italic sand-coloured word, and a paragraph explaining the
+rules. Then a lab section — a 16:11 box holding the canvas, beside a 260px sidebar
+with a six-cell material picker (each cell bordered in its own colour when
+selected), brush-size and gravity sliders, an "Empty the box" button, and a live
+stats block of occupied cells and step count. Then a three-cell notes row with large
+sand-coloured serif figures explaining sand, water and fire. Then a ruled monospace
+footer.
+
+Interaction: drag inside the box to pour the selected material in a circular brush
+whose radius is set by the brush slider (2–46). Choose among sand, water, stone,
+fire, plant and oil. The gravity slider multiplies the number of simulation steps
+per frame from 0.5× to 4×, so the whole world can be sped up or slowed. "Empty the
+box" clears the grid. The page seeds itself with a rolling sand dune, a stone
+layer, a few stone columns and three plant patches so there is something to play
+with immediately. The lab sidebar stacks under the box below 900px.
+
+## One-paragraph description of the intended design
+A dark-bench sandbox where six materials obey genuinely different rules — sand
+cones, water levels, oil creeps, fire burns fuel and rises, plant only grows near
+water, stone does nothing — stepped bottom-up with alternating scan direction to
+kill directional bias, drawn as crisp per-cell-jittered pixels and paintable with a
+variable brush and a gravity multiplier.
+
+## Major visual techniques used
+- Uint8Array grid of 3px cells stepped bottom-up with alternating scan direction to
+  remove directional drift
+- Six-material cellular ruleset: straight-then-diagonal fall, spread-and-level for
+  liquids, burning with a decaying lifetime parallel array, conditional plant growth
+- Fluid displacement by swap rather than overwrite (sand swaps with water and fire)
+- Fire lifetime stored in a separate Float32Array so fire can fade and rise
+- Plant growth gated on a water neighbour within the 3×3 neighbourhood
+- Single putImageData per two frames with image-rendering: pixelated for crisp cells
+- Per-cell deterministic colour jitter from x/y hashes so material fields shimmer
+- Alternating two-colour jitter in the image-data build loop
+- Circular brush painting with a material-specific fill rule (fire only lights fuel
+  or empty air; solids only fill empty or fire)
+- Gravity multiplier as steps-per-frame repetition from 0.5× to 4×
+- Material picker with per-material border colour on the selected state
+- Live stats of occupied cells (sampled every 20 frames) and step count
+- Self-seeding initial terrain: dune, stone floor, stone columns, plant patches
+- Serif headline with one sand-coloured italic word against 8.5px tracked monospace
+- 16:11 lab box with a 260px sidebar; stacking below 900px
+
+## Intended interaction model
+A toy. Visitors pick a material, set a brush size and a gravity, and drag in the box
+to pour it, watching sand cone, water find its level, fire spread through oil and
+plant, and plant creep outward from any water it touches. "Empty the box" starts
+over. There is no goal; the pleasure is in the materials behaving correctly.

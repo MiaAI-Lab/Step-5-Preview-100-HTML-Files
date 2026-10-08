@@ -1,0 +1,82 @@
+# PAPER CUT — a landscape in six layers
+
+## Short title
+Paper Cut
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a shadow-box landscape built
+from six sheets of flat colour, each one a separate layer that separates from the others
+as you move the pointer. No external dependencies whatsoever — no CDN, no web fonts, no
+external images, no JS libraries. All CSS and JavaScript inline, works offline by
+double-clicking, responsive, valid HTML5.
+
+Artistic direction: cut paper on cream. Ground #f3ece0, board #f7f2e7, hairlines
+rgba(42,38,32,.2), ink #2a2620 with muted #6b6455, terracotta #c2562f and sage #5f7a52
+as the two accents. Serif headings with italic accent words, uppercase .2em–.4em
+kickers, no gradients anywhere on the sheets.
+
+Six sheets, each its own absolutely-positioned SVG on a 1600 × 900 viewBox with
+preserveAspectRatio slice, so they cover a 16:9 board at any width: the sky and its
+horizon wash, the moon with its bite cut out of the board colour, a hill profile built
+from a seeded random walk, a row of pine silhouettes, a field of cut stems with heads,
+and a front row of grass strokes with tips. Every shape is a flat palette colour with
+one darker stroke, which is what a paper cut actually looks like.
+
+The landscape is generated from one seed with a mulberry32 generator, so Cut another
+gives a genuinely different board: different moon position, different hill profile,
+different pine count and height, different stems. Three palettes — dusk, meadow and
+ink — re-draw the whole board in a new set of six tones.
+
+Depth: each layer is translated by the eased pointer position times its own index and
+scaled 1.07 so no gap opens at the edge, and carries a drop-shadow that reads as paper
+thickness. Flatten collapses the whole thing to one colour, kills the parallax and drops
+the shadows, leaving the single silhouette a paper cutter would hold to the light.
+
+Dock: a chip per layer that lifts that sheet out of the board, a depth slider, three
+palette chips, Flatten and Cut another. Readout: sheets on, shapes drawn, current
+parallax distance, palette and mode. Layout: nav, centred hero, the board, the dock, the
+readout row, two three-cell note rows on the knife, the depth, the cut, Flatten, layer
+off and paper, then a footer. Links hidden under 780px.
+
+Interaction: move or drag across the board and the stack separates, with each sheet
+further from the one behind it; lift a sheet out with its chip and see what the board
+was doing under it; change the depth or the palette; flatten the stack into its
+silhouette; and cut another board from a new seed.
+
+## One-paragraph description of the intended design
+A shadow-box landscape on a cream board, built at load from one seed into six flat
+SVG sheets — sky, moon with a cut bite, hill profile, pines, stems, grass — that each
+move at their own rate as the pointer crosses the board so the stack separates like real
+paper, with per-layer chips that lift a sheet out, three palettes that redraw everything,
+a depth slider, and a Flatten mode that collapses the whole thing into the single
+silhouette a paper cutter would hold to the light.
+
+## Major visual techniques used
+- Flat colour with one darker stroke per shape, no gradients, so the sheets read as
+  paper rather than vector art
+- Six separately positioned SVGs over a 16:9 aspect board, each with
+  preserveAspectRatio slice so they always cover
+- Each layer translated by the eased pointer times its index and scaled 1.07, so the
+  parallax never opens a gap at the rim
+- One drop-shadow per sheet, which is the entire depth cue for stacked paper
+- A mulberry32 seeded generator, so a single integer produces a whole landscape and
+  Cut another changes everything at once
+- Hill profile as a clamped random walk, so it never leaves the band it belongs in
+- The moon's bite filled with the board colour rather than a mask, which is how a
+  cut-out actually works
+- Grass strokes drawn with quadratic bends and dots for tips, so the front row is not
+  a repeated clip
+- Pointer target eased toward the actual pointer rather than following it, so the
+  stack separates smoothly
+- Flatten that rebuilds the same scene with shadows, strokes and parallax off
+- Per-layer chips as aria-pressed toggles that set display on the layer element
+- Palettes as arrays of six tones indexed by layer, so a palette change is a re-run of
+  the same generator rather than a recolour pass
+
+## Intended interaction model
+A board you tilt. Visitors move the pointer across it to see the sheets separate, lift
+one out entirely, move the depth to change how far apart they sit, switch palettes to
+redraw the scene, flatten the stack into its silhouette, and cut another board from a
+new seed. Everything is one file, nothing is loaded, and every board is generated where
+it stands.

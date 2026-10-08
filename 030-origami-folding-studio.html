@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ORIGAMI — Eight Folds to a Crane</title>
+<style>
+  :root{
+    --paper:#f5f2e8;
+    --paper2:#e6e0cf;
+    --ink:#1e1c18;
+    --dim:rgba(30,28,24,.58);
+    --line:rgba(30,28,24,.16);
+    --red:#b8342a;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --serif:"Iowan Old Style",Palatino,Georgia,serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--paper);color:var(--ink);font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;overflow-x:hidden
+  }
+  ::selection{background:var(--red);color:var(--paper)}
+
+  .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(16px,4vw,44px)}
+
+  nav{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:24px 0 0}
+  .brand{font-family:var(--serif);font-size:19px;letter-spacing:.28em;text-transform:uppercase}
+  nav ul{display:flex;gap:clamp(12px,2.2vw,28px);list-style:none;margin:0;padding:0}
+  nav a{color:var(--dim);text-decoration:none;font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;transition:color .2s}
+  nav a:hover{color:var(--ink)}
+
+  .hero{text-align:center;padding:clamp(28px,6vw,72px) 0 clamp(16px,3vw,30px)}
+  .hero .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.34em;text-transform:uppercase;color:var(--red);display:block;margin-bottom:22px}
+  .hero h1{font-family:var(--serif);font-weight:400;font-size:clamp(30px,6vw,72px);line-height:1;letter-spacing:-.025em;margin:0 0 20px}
+  .hero h1 i{font-style:italic;color:var(--red)}
+  .hero p{font-size:14px;line-height:1.8;color:var(--dim);max-width:44ch;margin:0 auto}
+
+  .studio{
+    display:grid;grid-template-columns:1.2fr 1fr;gap:clamp(24px,5vw,64px);align-items:center;
+    padding:clamp(20px,4vw,48px) 0
+  }
+  .stage{
+    position:relative;aspect-ratio:1;display:grid;place-items:center;perspective:1400px;
+    background:
+      radial-gradient(60% 50% at 40% 30%,rgba(255,255,255,.85),transparent 70%),
+      linear-gradient(160deg,#efe9da,#e4ddcb);
+    border:1px solid var(--line);
+  }
+  .stage::after{
+    content:"";position:absolute;left:50%;bottom:8%;transform:translateX(-50%);
+    width:46%;height:16px;border-radius:50%;
+    background:radial-gradient(ellipse at 50% 50%,rgba(30,28,24,.22),transparent 72%);
+    filter:blur(1px)
+  }
+  .sheet{
+    position:relative;width:64%;aspect-ratio:1;transform-style:preserve-3d;
+    transition:transform 1.1s cubic-bezier(.5,0,.3,1);
+  }
+  .face{
+    position:absolute;inset:0;
+    background:
+      linear-gradient(150deg,var(--paper) 0%,var(--paper2) 100%);
+    box-shadow:inset 0 0 0 1px rgba(30,28,24,.08);
+    transform-origin:left center;
+    transition:transform 1.1s cubic-bezier(.5,0,.3,1);
+    backface-visibility:visible;
+  }
+  .face.back{
+    background:linear-gradient(150deg,#efe9da,#ddd5c1);
+  }
+  /* the crease pattern: thin ink lines */
+  .face::before{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:
+      linear-gradient(90deg,transparent calc(50% - .5px),rgba(30,28,24,.22) 50%,transparent calc(50% + .5px)),
+      linear-gradient(180deg,transparent calc(50% - .5px),rgba(30,28,24,.16) 50%,transparent calc(50% + .5px)),
+      linear-gradient(45deg,transparent calc(50% - .5px),rgba(30,28,24,.12) 50%,transparent calc(50% + .5px)),
+      linear-gradient(-45deg,transparent calc(50% - .5px),rgba(30,28,24,.12) 50%,transparent calc(50% + .5px));
+  }
+  .face.back{transform:rotateY(180deg)}
+  /* the folded triangular flaps */
+  .flap{
+    position:absolute;width:50%;height:50%;
+    background:linear-gradient(150deg,#f7f4ea,#e8e1d0);
+    box-shadow:inset 0 0 0 1px rgba(30,28,24,.07),0 2px 8px -3px rgba(30,28,24,.3);
+    transform-origin:0 100%;
+    transition:transform 1.1s cubic-bezier(.5,0,.3,1),opacity .8s;
+    opacity:0
+  }
+  .flap.on{opacity:1}
+  .f1{left:50%;top:50%;transform-origin:0 0;transform:rotate(0deg)}
+  .f2{left:0;top:50%;transform-origin:100% 0;transform:rotate(90deg)}
+  .f3{left:0;top:0;transform-origin:100% 100%;transform:rotate(180deg)}
+  .f4{left:50%;top:0;transform-origin:0 100%;transform:rotate(270deg)}
+
+  .steps{list-style:none;margin:0;padding:0}
+  .steps li{
+    display:grid;grid-template-columns:34px 1fr;gap:14px;align-items:baseline;
+    padding:15px 0;border-bottom:1px solid var(--line);cursor:pointer;
+    transition:opacity .3s,padding-left .3s
+  }
+  .steps li:last-child{border-bottom:0}
+  .steps .n{font-family:var(--mono);font-size:10px;color:var(--red);letter-spacing:.1em}
+  .steps .t{font-family:var(--serif);font-size:16px;line-height:1.5}
+  .steps .t small{display:block;font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin-top:6px}
+  .steps li.done .n{color:var(--ink)}
+  .steps li.now{padding-left:10px}
+  .steps li.now .t{font-style:italic}
+
+  .tray{
+    display:flex;gap:clamp(8px,1.4vw,16px);flex-wrap:wrap;align-items:center;justify-content:center;
+    padding:clamp(14px,3vw,26px) 0 clamp(30px,6vw,60px)
+  }
+  button{
+    font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;
+    background:var(--ink);color:var(--paper);border:0;padding:14px 24px;border-radius:999px;cursor:pointer;
+    transition:transform .25s,opacity .25s
+  }
+  button:hover{transform:translateY(-2px);opacity:.88}
+  button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+  button.ghost:hover{border-color:var(--ink)}
+
+  .facts{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin:0 0 clamp(24px,5vw,48px)}
+  .facts div{background:var(--paper);padding:26px 24px}
+  .facts b{display:block;font-family:var(--serif);font-weight:400;font-size:32px;color:var(--red);line-height:1;margin-bottom:10px}
+  .facts h4{font-family:var(--mono);font-size:9px;letter-spacing:.24em;text-transform:uppercase;margin:0 0 12px}
+  .facts p{margin:0;font-size:12.5px;line-height:1.8;color:var(--dim)}
+
+  footer{border-top:1px solid var(--line);padding:26px 0 48px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
+
+  @media (max-width:880px){.studio{grid-template-columns:1fr}.facts{grid-template-columns:1fr}}
+  @media (prefers-reduced-motion:reduce){.sheet,.face,.flap{transition-duration:.001ms}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="brand">Origami</div>
+    <ul>
+      <li><a href="#studio">Studio</a></li>
+      <li><a href="#facts">The craft</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <span class="k">Paper folding · traditional forms</span>
+    <h1>One sheet.<br>No cuts, <i>no glue.</i></h1>
+    <p>Every form below begins as a single square and ends as something else,
+    through nothing but folds. Choose a step; the model turns to meet it.</p>
+  </header>
+
+  <section class="studio" id="studio">
+    <div class="stage">
+      <div class="sheet" id="sheet">
+        <div class="face" id="front">
+          <div class="flap f1"></div><div class="flap f2"></div>
+          <div class="flap f3"></div><div class="flap f4"></div>
+        </div>
+        <div class="face back"></div>
+      </div>
+    </div>
+    <ol class="steps" id="steps"></ol>
+  </section>
+
+  <div class="tray">
+    <button id="prev">◀ Previous fold</button>
+    <button id="next" class="ghost">Next fold ▶</button>
+    <button id="auto" class="ghost">Fold for me</button>
+  </div>
+
+  <section class="facts" id="facts">
+    <div><b>4</b><h4>starting folds</h4><p>A square, halved both ways and corner to corner, gives eight triangular regions and every base there is.</p></div>
+    <div><b>1700s</b><h4>the crane</h4><p>The oldest documented model still folded today; the first instructions appear in a 1797 Japanese treatise on play.</p></div>
+    <div><b>1</b><h4>sheet only</h4><p>No cutting, no gluing, no drawing. If the model needs a line, the model is wrong.</p></div>
+  </section>
+
+  <footer>
+    <span>Folded in CSS · no images</span>
+    <span>Washi 15cm · 90gsm</span>
+    <span>Traditionally 1,000 cranes for a wish</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  /* each step: sheet rotation, front-face rotation, which flaps fold, and the copy */
+  var STEPS=[
+    {t:'Square',s:'Start with a 15cm square of washi, coloured side down.',
+     sh:'rotateX(0deg) rotateY(0deg)', f:'rotateY(0deg)', flaps:[]},
+    {t:'Fold in half',s:'Corner to corner, then unfold. A valley fold along the diagonal.',
+     sh:'rotateX(52deg) rotateY(-24deg)', f:'rotateY(0deg)', flaps:[1]},
+    {t:'Fold again',s:'The other diagonal too, then unfold. Four creases now cross at the centre.',
+     sh:'rotateX(46deg) rotateY(-32deg)', f:'rotateY(24deg)', flaps:[1,2]},
+    {t:'Preliminary base',s:'Collapse both diagonals together. The square becomes a triangle — the start of everything.',
+     sh:'rotateX(38deg) rotateY(-40deg)', f:'rotateY(48deg)', flaps:[1,2,3]},
+    {t:'Petals in',s:'Fold the lower edges to the centre line, then unfold and lift the top corner up.',
+     sh:'rotateX(30deg) rotateY(-46deg)', f:'rotateY(72deg)', flaps:[1,2,3,4]},
+    {t:'Narrow and repeat',s:'Fold the sides in once more and repeat on the reverse. The model is now long and narrow.',
+     sh:'rotateX(24deg) rotateY(-52deg)', f:'rotateY(96deg)', flaps:[1,2,3,4]},
+    {t:'Neck and tail',s:'Two inside reverse folds: one upward for the neck, one down for the tail.',
+     sh:'rotateX(18deg) rotateY(-56deg)', f:'rotateY(120deg)', flaps:[1,2,3,4]},
+    {t:'Head',s:'A small fold at the tip makes the head, and the wings open downward.',
+     sh:'rotateX(14deg) rotateY(-60deg)', f:'rotateY(150deg)', flaps:[1,2,3,4]},
+    {t:'The crane',s:'Inflate the body gently and shape the wings. Eight folds, one sheet, no cuts.',
+     sh:'rotateX(10deg) rotateY(-64deg)', f:'rotateY(180deg)', flaps:[1,2,3,4]}
+  ];
+  var i=0;
+  var sheet=document.getElementById('sheet'),front=document.getElementById('front');
+  var host=document.getElementById('steps');
+
+  STEPS.forEach(function(s,idx){
+    var li=document.createElement('li');
+    li.innerHTML='<span class="n">'+String(idx+1).padStart(2,'0')+'</span>'+
+      '<span class="t">'+s.t+'<small>'+s.s+'</small></span>';
+    li.addEventListener('click',function(){go(idx)});
+    host.appendChild(li);
+  });
+  var items=[].slice.call(host.children);
+  var flaps=[].slice.call(document.querySelectorAll('.flap'));
+
+  function go(n){
+    i=Math.max(0,Math.min(STEPS.length-1,n));
+    var s=STEPS[i];
+    sheet.style.transform=s.sh;
+    front.style.transform=s.f;
+    s.flaps.forEach(function(f){
+      var el=flaps[f-1];
+      el.classList.add('on');
+      el.style.transform='rotate(0deg)';
+    });
+    items.forEach(function(li,idx){
+      li.classList.toggle('done',idx<i);
+      li.classList.toggle('now',idx===i);
+    });
+  }
+  document.getElementById('next').addEventListener('click',function(){go(i+1)});
+  document.getElementById('prev').addEventListener('click',function(){go(i-1)});
+  var ab=document.getElementById('auto'),timer=null;
+  ab.addEventListener('click',function(){
+    if(timer){clearInterval(timer);timer=null;this.textContent='Fold for me';return;}
+    this.textContent='Pause';
+    timer=setInterval(function(){
+      if(i>=STEPS.length-1){clearInterval(timer);timer=null;ab.textContent='Fold for me';return;}
+      go(i+1);
+    },2400);
+  });
+  go(0);
+})();
+</script>
+</body>
+</html>

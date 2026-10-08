@@ -1,0 +1,79 @@
+# 鍔 — TSUBA CERAMICS
+
+## Short title
+Wabi-Sabi Ceramics Studio
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: the studio site of a
+fictional Japanese wood-fired stoneware pottery called TSUBA (锷). Strictly no
+external dependencies — no CDN, no web fonts, no external images, no external SVG
+files, no JavaScript libraries. All CSS and JavaScript inline, works offline from a
+double-click, responsive, valid HTML5.
+
+Artistic direction: wabi-sabi. Quiet, warm, imperfect, asymmetrical. The palette
+is plaster, clay, ash-grey, rust and indigo — nothing saturated, nothing bright.
+Two full-viewport texture layers sit above a soft directional light: a multiply
+paper-grain built from an inline SVG feTurbulence data-URI, and a large off-centre
+radial light that falls from the upper left so the whole page reads as if lit by
+one window. The hero centres on a single enormous Kanji glyph 寂 ("sabi", the beauty
+of transience) that slowly breathes in opacity and scale over nine seconds.
+
+Layout, top to bottom: a quiet left-aligned nav with the studio name in a Mincho
+serif at wide tracking and three tiny monospace links with underline-reveal; a
+centred hero with the breathing glyph, a short uppercase serif title, a
+36-character paragraph at 2.1 line-height, and a 1px vertical rule; a three-column
+grid of six "vessels"; a full-width pull quote; a four-cell process strip; an
+invitation block; a three-part footer.
+
+The six vessels are the centrepiece and are built entirely from CSS — no images,
+no SVG files. Each is a stack of divs: a `.body` whose border-radius is an
+asymmetric eight-value expression (so the silhouette swells the way a thrown pot
+does), a `.neck`, a `.lip` (an ellipse seen in perspective), a `.foot`, one or two
+hairline `.crack` marks, and a `.glaze` div layered on top in multiply or overlay
+blend mode that fades in on hover. Clay colour comes from a linear gradient plus
+inset shadows — a dark inset on one side, a warm light inset on the other — so the
+form reads as round without any drawing at all. A soft elliptical radial-gradient
+shadow sits under each vessel and blurs into the plaster.
+
+Typography: a Japanese Mincho / Songti serif stack for everything that matters
+(names, headings, quotes), a system sans for paragraphs, and a 9px wide-tracked
+monospace only for catalog numbers and footer metadata. Line-heights are generous
+(1.9–2.1) so the page breathes.
+
+Interaction: hovering a vessel lifts it 9px and fades its glaze on, while the pot's
+one-paragraph note expands from max-height 0. Clicking a vessel toggles it "open"
+so the note stays visible — useful on touch devices where there is no hover. A
+IntersectionObserver fades each vessel, process cell and quote up with a 90ms
+stagger on first scroll into view. The glyph keeps breathing regardless. The grid
+drops 3 → 2 → 1 columns and prefers-reduced-motion is honoured.
+
+## One-paragraph description of the intended design
+A hushed ceramics studio page where everything is warm, imperfect and lit from one
+window: plaster-toned paper grain, a slowly breathing Kanji glyph, and six pots
+built purely from CSS border-radius expressions, inset shadow-rounded gradients and
+blend-mode glazes that surface on hover while their note unfolds beneath them.
+
+## Major visual techniques used
+- Pure CSS pottery: asymmetric eight-value border-radius silhouettes (the classic
+  "pot shape" trick) with absolute-positioned neck, elliptical lip, foot and
+  hairline crack marks
+- Volume without drawing: paired inset shadows (dark one side, warm light the
+  other) over a clay linear gradient, plus an inline SVG turbulence data-URI as
+  speckle on the clay surface
+- Blend-mode glazes (multiply / overlay) faded in on hover to suggest ash, indigo
+  and kiln-flash deposits
+- Soft contact shadow from a single elliptical radial-gradient with a blur filter
+- Paper grain and directional light as two fixed, multiply-blended viewport layers
+- Breathing hero glyph: 9-second opacity + scale ease-in-out loop
+- Hover-expand notes animated with max-height transitions; click-to-open for touch
+- IntersectionObserver scroll reveal with a 90ms staggered delay
+- Mincho/Songti serif stack for display, monospace at 9px for catalog metadata
+- 1px vertical hairline rules as the only structural ornament
+- 3 → 2 → 1 responsive column collapse; prefers-reduced-motion honoured
+
+## Intended interaction model
+A gallery read. Visitors scroll through a quiet page and move over (or tap) each
+vessel to see its glaze surface and read the sentence about how it was made; the
+click is only a way to keep a note open on a touch screen. There are no controls to
+operate and nothing to submit — the page's one gesture is attention.

@@ -1,0 +1,81 @@
+# HEAT MAP — a day of a city, hour by hour
+
+## Short title
+City Heatmap
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a city heat map of five districts
+across a twenty-hour grid where each district has its own clock, the weather moves outdoor
+numbers only, and an event moves people into one part of the city. No external dependencies
+whatsoever — no CDN, no web fonts, no external images, no JS libraries. All CSS and
+JavaScript inline, works offline by double-clicking, responsive, valid HTML5.
+
+Artistic direction: a dark dashboard. Ground #0b0c12, hairlines rgba(233,236,247,.14),
+body #e9ecf7 with muted #98a0bd, blue #8fd0ff for the accent and amber #ffd479 for the
+figures and the hour marker. Serif headings with italic accent words, uppercase .2em–.4em
+kickers, monospace figures.
+
+The map is a 20 × 11 grid on a 1000 × 560 canvas. Every cell is coloured, not drawn: a
+six-stop palette from night blue through teal to amber and coral, sampled by the cell's
+value between nought and a hundred, with the number written into the busiest cells.
+
+Each district is a curve, not a colour: a Gaussian on the hour with its own peak, width,
+baseline and amplitude. The Old Market peaks at seven, the Financial district at half ten,
+the Riverside Park at five, the Docks at seven in the evening and the University at nine.
+Each also has an outdooredness, and the weather multiplier only touches the outdoor part of
+it — so rain empties the market and the park and barely moves the financial district. The
+event slider raises one district and slightly lowers the others, which is what an event
+actually does.
+
+The blocks vary inside their district by a stable per-cell multiplier seeded once, so the
+same hour always gives the same map and different hours give genuinely different pictures.
+
+Controls: hour, weather, event, Run the day (which advances the hour on its own) and Find
+the peak — which sweeps every quarter of an hour across all five districts and moves the
+hour to the busiest moment, so the peak is measured. Readout: city mean, busiest and
+quietest district, the peak hour, the spread between the busiest and quietest district in
+points, and the cell count.
+
+Layout: nav, centred hero, the map with a live clock and caption, a colour scale bar from
+quiet to busy, a dock of three sliders and two buttons, a readout row, then two three-cell
+note rows on each cell, five clocks, the event, the peak, the weather and the day, then a
+footer.
+
+Interaction: drag the hour and the whole city changes shape; pull the weather down and the
+outdoor districts empty while the financial district stays full; slide the event up and the
+docks light up at the expense of everything else; press Run the day to watch a full cycle;
+and Find the peak to be taken to the busiest moment the model can produce.
+
+## One-paragraph description of the intended design
+A city heat map on a 20 × 11 canvas grid where each of five districts is a Gaussian curve on
+the hour — different peaks, widths, baselines and outdooredness — multiplied by a weather
+factor that only touches the outdoor part and shifted by an event that raises one district,
+coloured through a six-stop palette from night blue to coral, with stable per-cell variation
+so a given hour always produces the same map, a Run the day mode that advances the hour, and
+a Find the peak button that sweeps all twenty-four hours to jump to the busiest moment.
+
+## Major visual techniques used
+- Choropleth colour from value rather than from anything drawn, so the map is a picture of
+  a number field
+- Six-stop palette sampled by interpolation, with a matching CSS gradient as the scale bar
+  so the legend and the map agree
+- Each district as a Gaussian on the hour with its own peak, width, baseline and amplitude
+- Weather multiplied into the outdoor fraction of each district only, so rain empties
+  streets and barely touches offices
+- Event as a transfer rather than an increase: one district gains, the rest lose slightly
+- Stable per-cell variation from a single seeded stream, so the same hour is reproducible
+- District labels and live values drawn on top of their own rectangles, so the map can be
+  read as well as seen
+- Hour marker as a bar under the grid, tied to the same variable the cells use
+- Peak finding as a real sweep at quarter-hour resolution over all districts
+- Spread as the difference between the busiest and quietest district, computed live
+- City mean accumulated while drawing, so the readout is a by-product of the frame rather
+  than a second pass
+- Reduced-motion honoured by not starting the day automatically
+
+## Intended interaction model
+A day to run. Visitors drag the hour through twenty-four hours and watch the city change
+shape, set the weather to empty the outdoor districts while leaving the financial one full,
+slide an event in to concentrate people in one part of the map, press Run the day for a full
+cycle, and press Find the peak to be taken to the busiest moment the model produces.

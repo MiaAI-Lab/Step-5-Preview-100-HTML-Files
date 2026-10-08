@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Desktop 1994 — a machine you have to learn</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:#1e1e1c;color:#e8e6e0;
+  font:15px/1.62 ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+.serif{font-family:ui-serif,Georgia,"Times New Roman",serif}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.wrap{width:min(1100px,92vw);margin:0 auto}
+nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0 14px;
+  border-bottom:1px solid rgba(232,230,224,.14)}
+nav .brand{font-family:ui-serif,Georgia,serif;font-size:19px}
+nav .brand i{font-style:italic;color:#e0c86a}
+nav ul{display:flex;gap:26px;list-style:none;margin:0;padding:0;font-size:11px;
+  letter-spacing:.24em;text-transform:uppercase;color:#93908a}
+nav a{color:inherit;text-decoration:none}nav a:hover{color:#e0c86a}
+@media(max-width:780px){nav ul{display:none}}
+header.hero{padding:50px 0 22px;text-align:center}
+header.hero .kicker{font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:#e0c86a;
+  margin:0 0 14px}
+header.hero h1{font-family:ui-serif,Georgia,serif;font-weight:400;
+  font-size:clamp(32px,5.6vw,62px);line-height:1.05;margin:0 0 16px}
+header.hero h1 em{font-style:italic;color:#8fb8e0}
+header.hero p{max-width:60ch;margin:0 auto;color:#9b978f}
+.screen{position:relative;border-radius:16px;overflow:hidden;
+  background:repeating-linear-gradient(0deg,#000 0 2px,#0a0a12 2px 3px);
+  border:1px solid rgba(232,230,224,.16);margin-bottom:18px;
+  box-shadow:0 0 0 14px #2a2a26,0 0 0 16px #4a4a44,0 24px 50px -20px #000}
+.screen canvas{display:block;width:100%;height:auto}
+.screen .cap{position:absolute;left:14px;top:12px;font-size:10px;letter-spacing:.26em;
+  text-transform:uppercase;color:rgba(232,230,224,.4);pointer-events:none}
+.dock{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;justify-content:space-between;
+  border-top:1px solid rgba(232,230,224,.14);border-bottom:1px solid rgba(232,230,224,.14);
+  padding:16px 0;margin-bottom:32px}
+.dock label{display:grid;gap:7px;font-size:10px;letter-spacing:.26em;text-transform:uppercase;
+  color:#93908a;min-width:150px}
+input[type=range]{width:100%;accent-color:#e0c86a}
+.btn{background:#e0c86a;color:#221c04;border:0;border-radius:4px;padding:10px 14px;
+  font:inherit;font-size:12px;font-weight:700;letter-spacing:.06em;cursor:pointer;margin:0 6px 6px 0;
+  border-top:2px solid #f0e0a0;border-left:2px solid #f0e0a0;
+  border-right:2px solid #8a7a3a;border-bottom:2px solid #8a7a3a}
+.btn.ghost{background:#3a3a36;color:#e8e6e0;
+  border-top:2px solid #55554e;border-left:2px solid #55554e;
+  border-right:2px solid #1e1e1a;border-bottom:2px solid #1e1e1a}
+.btn:active{transform:translate(1px,1px)}
+.apps{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.apps button{background:#3a3a36;border:1px solid #55554e;border-radius:4px;
+  padding:8px 14px;font:inherit;font-size:12px;color:#e8e6e0;cursor:pointer;
+  font-family:ui-monospace,Menlo,monospace}
+.apps button[aria-pressed="true"]{background:#e0c86a;border-color:#f0e0a0;color:#221c04}
+.readout{display:flex;flex-wrap:wrap;gap:12px 24px;margin-bottom:40px;
+  border-top:1px solid rgba(232,230,224,.14);padding-top:16px}
+.readout div{min-width:88px}
+.readout dt{font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:#93908a;margin:0 0 4px}
+.readout dd{margin:0;font-size:20px;font-family:ui-monospace,Menlo,monospace;color:#e0c86a}
+.cells{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-bottom:46px}
+@media(max-width:820px){.cells{grid-template-columns:1fr}}
+.cell{border-top:1px solid rgba(232,230,224,.16);padding-top:16px}
+.cell .fig{font-family:ui-serif,Georgia,serif;font-size:38px;color:#8fb8e0;line-height:1;margin-bottom:8px}
+.cell h3{font-family:ui-serif,Georgia,serif;font-weight:400;font-style:italic;font-size:21px;margin:0 0 8px}
+.cell p{margin:0;color:#9b978f;font-size:14px}
+footer{border-top:1px solid rgba(232,230,224,.14);padding:22px 0 54px;display:flex;
+  justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:11px;letter-spacing:.2em;
+  text-transform:uppercase;color:#6f6c66}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="brand">Desktop <i>'94</i></div>
+    <ul>
+      <li><a href="#screen">Screen</a></li>
+      <li><a href="#dock">Apps</a></li>
+      <li><a href="#notes">Notes</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <p class="kicker">One screen · eight apps · no mouse</p>
+    <h1 class="serif">A machine you had<br>to <em>learn</em></h1>
+    <p>Nothing here is skeuomorphic decoration for its own sake. The bevels are the
+       window-manager's, the fonts are the ones that shipped, and the apps are the ones
+       that were there — with the shortcuts they actually used.</p>
+  </header>
+
+  <section class="screen" id="screen">
+    <canvas id="c" width="960" height="600"></canvas>
+    <p class="cap">one desktop · drag the windows · close them from the title bar</p>
+  </section>
+
+  <section class="dock" id="dock">
+    <div>
+      <div class="apps" id="apps"></div>
+      <div class="apps" id="farms"></div>
+    </div>
+    <label for="font">Font size <input id="font" type="range" min="1" max="3" value="2"></label>
+    <label for="scan">Scanlines <input id="scan" type="range" min="0" max="100" value="60"></label>
+    <label for="crt">Phosphor <input id="crt" type="range" min="0" max="100" value="0"></label>
+    <div>
+      <button class="btn" id="boot">Reboot</button>
+      <button class="btn ghost" id="close">Close all</button>
+    </div>
+  </section>
+
+  <dl class="readout">
+    <div><dt>Windows</dt><dd id="rW">0</dd></div>
+    <div><dt>Colours</dt><dd id="rC">256</dd></div>
+    <div><dt>Font</dt><dd id="rF">Geneva 10</dd></div>
+    <div><dt>Resolution</dt><dd id="rR">640 × 480</dd></div>
+    <div><dt>Free RAM</dt><dd id="rM">—</dd></div>
+    <div><dt>Uptime</dt><dd id="rU">—</dd></div>
+  </dl>
+
+  <section class="cells">
+    <div class="cell">
+      <div class="fig serif">i</div>
+      <h3>Eight apps</h3>
+      <p>Word, Draw, Graph, Terminal, Calc, Notes, Control and Trash. Each is a real window
+         with a real title bar, a real zoom box and a real close box, and each draws its own
+         contents rather than showing a picture of them.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">ii</div>
+      <h3>The system font</h3>
+      <p>Chicago and Geneva were drawn at specific pixel sizes for specific displays.
+         Cycling the font size slider is the same effect as changing the screen
+         resolution, which is what people actually did.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">iii</div>
+      <h3>Colour depth</h3>
+      <p>Eight colours, sixteen, two hundred and fifty-six or thousands — the palette the
+         whole desktop is drawn from. The buttons row switches the whole machine's colour
+         depth, and every window re-draws.</p>
+    </div>
+  </section>
+
+  <section class="cells" id="notes">
+    <div class="cell">
+      <div class="fig serif">iv</div>
+      <h3>Dragging</h3>
+      <p>Windows drag by their title bar and nothing else, they stack in the order you
+         opened them, and closing one brings the one below forward. There is no compositor
+         here — just a list and a redraw.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">v</div>
+      <h3>Phosphor</h3>
+      <p>Nothing burns in permanently on an LCD, so the persistence is faked: the last
+         frame dims into the new one, which is what a long-persistence tube does.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">vi</div>
+      <h3>Reboot</h3>
+      <p>Reboot closes every window, wipes the desktop and starts again with the boot
+         icon, which is the only honest way to describe what a restart did.</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>Desktop '94 · one canvas, no files</span>
+    <span class="mono">System 7 · 8 MB RAM</span>
+  </footer>
+</div>
+<script>
+(function(){
+"use strict";
+var cv=document.getElementById('c'),ctx=cv.getContext('2d');
+var W=cv.width,H=cv.height;
+var depth=0,fontSize=2,scan=60,phosphor=0,t=0;
+/* the machine's palette: four system colours, quantised to the current depth */
+var SYS={
+  desk:[[0xaa,0xaa,0xaa],[0x88,0x88,0x88],[0xcc,0xcc,0xcc],[0xaa,0x88,0x66]],
+  menu:[[0xff,0xff,0xff],[0xdd,0xdd,0xdd],[0x00,0x00,0x00],[0x77,0x77,0x77]],
+  face:[[0xff,0xff,0xff],[0xc0,0xc0,0xc0],[0x80,0x80,0x80],[0xff,0xff,0xcc]]
+};
+var DEPTHS=[
+ {n:'1 bit',cols:2},{n:'4 colours',cols:4},{n:'8 colours',cols:8},
+ {n:'256 colours',cols:16},{n:'thousands',cols:4}
+];
+/* apps: each one a factory for a window */
+var APPS=[
+ {n:'Word',draw:drawWord,w:260,h:190},
+ {n:'Draw',draw:drawDraw,w:240,h:200},
+ {n:'Graph',draw:drawGraph,w:230,h:180},
+ {n:'Terminal',draw:drawTerm,w:280,h:170},
+ {n:'Calc',draw:drawCalc,w:150,h:190},
+ {n:'Notes',draw:drawNotes,w:200,h:150},
+ {n:'Control',draw:drawCtrl,w:220,h:160},
+ {n:'Trash',draw:drawTrash,w:150,h:130}
+];
+var wins=[],drag=null,menuBar=20;
+var clock={h:9,m:14,s:0};
+function rgb(a){return 'rgb('+a[0]+','+a[1]+','+a[2]+')';}
+/* the palette is quantised to the current depth, like a real indexed mode */
+function pal(a,i){
+  var cols=Math.min(a.length,DEPTHS[depth].cols);
+  var idx=Math.min(cols-1,i);
+  return rgb(a[idx]);
+}
+function font(px,bold){
+  ctx.font=(bold?'bold ':'')+px+'px ui-monospace,Menlo,Consolas,monospace';
+}
+function text(s,x,y,col,bold,px){
+  font(px||(10+fontSize*2),bold);
+  ctx.fillStyle=col;ctx.textAlign='left';ctx.textBaseline='top';
+  ctx.fillText(s,x,y);
+}
+/* ---------- the window chrome ---------- */
+function bevel(x,y,w,h,face){
+  /* the light top-left, dark bottom-right, and a 1px inset, like a real frame */
+  ctx.fillStyle=face;ctx.fillRect(x,y,w,h);
+  ctx.fillStyle='#fff';ctx.fillRect(x,y,w,2);ctx.fillRect(x,y,2,h);
+  ctx.fillStyle='#000';ctx.fillRect(x,y+h-2,w,2);ctx.fillRect(x+w-2,y,2,h);
+  ctx.fillStyle='#888';ctx.fillRect(x+2,y+h-4,w-4,2);ctx.fillRect(x+w-4,y+2,2,h-4);
+}
+function titleBar(w){
+  /* stripes, the way the active bar was drawn */
+  var x=w.x,y=w.y,bar=18;
+  ctx.fillStyle='#000';ctx.fillRect(x,y,w.w,bar);
+  ctx.fillStyle=w.active?'#fff':'#aaa';
+  for(var i=0;i<w.w;i+=4)ctx.fillRect(x+i,y,2,bar);
+  /* the title, reversed out */
+  ctx.fillStyle=w.active?'#000':'#555';
+  ctx.fillRect(x+4,y+3,60,bar-6);
+  ctx.fillStyle=w.active?'#fff':'#999';
+  font(11,true);ctx.textBaseline='middle';ctx.textAlign='left';
+  ctx.fillText(w.title,x+8,y+bar/2);
+  /* the close box and zoom box */
+  ctx.fillStyle=w.active?'#000':'#555';
+  ctx.fillRect(x+w.w-20,y+3,14,bar-6);
+  ctx.fillRect(x+w.w-38,y+3,14,bar-6);
+  if(w.active){
+    ctx.strokeStyle='#fff';ctx.lineWidth=1.6;
+    ctx.beginPath();
+    ctx.moveTo(x+w.w-17,y+bar/2);ctx.lineTo(x+w.w-11,y+bar/2);
+    ctx.moveTo(x+w.w-35,y+bar/2);ctx.lineTo(x+w.w-29,y+bar/2);
+    ctx.stroke();
+  }
+}
+/* ---------- the apps' contents ---------- */
+function drawWord(w){
+  var x=w.x,y=w.y+18,i,px=10+fontSize*2;
+  ctx.fillStyle='#fff';ctx.fillRect(x,y,w.w,w.h-18);
+  /* the ruler */
+  for(i=0;i<w.w-8;i+=8)ctx.fillRect(x+4+i,y+6,1,4);
+  text('File Edit Font Style',x+6,y+14,'#000',false,px-2);
+  ctx.strokeStyle='#000';ctx.lineWidth=.8;
+  ctx.beginPath();ctx.moveTo(x+6,y+28);ctx.lineTo(x+w.w-6,y+28);ctx.stroke();
+  var lines=['THE WHEEL','','A pot is a curve that','went around, and the','desktop is a room you','had to learn to stand up','in. Both of them were','made of the same stuff:','a grid, a font, and a','great deal of patience.','','Here endeth the file.'];
+  for(i=0;i<lines.length;i++)text(lines[i],x+8,y+36+i*(px+3),'#000',i===0,px);
+  /* the scroll bar */
+  bevel(x+w.w-14,y+28,14,w.h-28,'#ccc');
+  ctx.fillStyle='#888';ctx.fillRect(x+w.w-12,y+32,10,20);
+}
+function drawDraw(w){
+  var x=w.x,y=w.y+18;
+  ctx.fillStyle='#fff';ctx.fillRect(x,y,w.w,w.h-18);
+  /* a tool palette down the left */
+  var tools=[['#000','line'],['#000','rect'],['#000','oval'],['#f00','fill']];
+  for(var i=0;i<tools.length;i++)ctx.fillStyle=tools[i][0],ctx.fillRect(x+4,y+4+i*16,10,10);
+  /* a drawing in progress */
+  ctx.strokeStyle='#000';ctx.lineWidth=2;
+  ctx.beginPath();ctx.arc(x+120,y+70,40,0,6.3);ctx.stroke();
+  ctx.fillStyle='#c00';
+  ctx.beginPath();ctx.moveTo(x+120,y+40);ctx.quadraticCurveTo(x+150,y+20,x+160,y+50);
+  ctx.quadraticCurveTo(x+140,y+40,x+120,y+40);ctx.fill();
+  ctx.strokeStyle='#00c';ctx.lineWidth=1.4;
+  ctx.beginPath();ctx.moveTo(x+20,y+130);ctx.quadraticCurveTo(x+120,y+150,x+220,y+130);ctx.stroke();
+  text('Untitled',x+w.w/2-20,y+w.h-24,'#000',false,10);
+}
+function drawGraph(w){
+  var x=w.x,y=w.y+18;
+  ctx.fillStyle='#fff';ctx.fillRect(x,y,w.w,w.h-18);
+  /* a bar chart with axes */
+  ctx.strokeStyle='#000';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(x+16,y+8);ctx.lineTo(x+16,y+w.h-28);
+  ctx.lineTo(x+w.w-8,y+w.h-28);ctx.stroke();
+  var vals=[0.3,0.6,0.45,0.8,0.55,0.9,0.7];
+  for(var i=0;i<vals.length;i++){
+    ctx.fillStyle=i===5?'#c00':'#000';
+    ctx.fillRect(x+22+i*((w.w-40)/vals.length),y+w.h-28-vals[i]*(w.h-56),
+      (w.w-40)/vals.length-4,vals[i]*(w.h-56));
+  }
+  text('Q3',x+w.w-40,y+w.h-24,'#000',false,10);
+}
+function drawTerm(w){
+  var x=w.x,y=w.y+18;
+  ctx.fillStyle='#000';ctx.fillRect(x,y,w.w,w.h-18);
+  var ok='#0f0';
+  var lines=['Welcome to DeskShell 7.1','Type HELP for a list.','','> help','COMMANDS: cd ls mkdir echo date','> date','Thu 08 Oct 2026 09:14','> echo $USER','operator','> _'];
+  var px=10+fontSize*2;
+  for(var i=0;i<lines.length;i++)text(lines[i],x+6,y+8+i*(px+2),ok,false,px);
+}
+function drawCalc(w){
+  var x=w.x,y=w.y+18;
+  var px=10+fontSize*2;
+  ctx.fillStyle='#ccc';ctx.fillRect(x,y,w.w,w.h-18);
+  ctx.fillStyle='#fff';ctx.fillRect(x+8,y+8,w.w-16,26);
+  ctx.textAlign='right';ctx.textBaseline='middle';ctx.fillStyle='#000';
+  font(px,false);
+  ctx.fillText('1,234.56',x+w.w-16,y+21);
+  var keys=['7','8','9','/','4','5','6','*','1','2','3','-','0','.','=','+'];
+  var bw=(w.w-24)/4,bh=22;
+  for(var i=0;i<keys.length;i++){
+    var kx=x+8+(i%4)*bw, ky=y+40+Math.floor(i/4)*bh;
+    bevel(kx,ky,bw-3,bh-3,'#e0e0e0');
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillStyle='#000';font(12,false);
+    ctx.fillText(keys[i],kx+(bw-3)/2,ky+(bh-3)/2);
+  }
+}
+function drawNotes(w){
+  var x=w.x,y=w.y+18;
+  ctx.fillStyle='#ffe';ctx.fillRect(x,y,w.w,w.h-18);
+  text('Monday',x+8,y+8,'#000',true,12);
+  text('— get the code working',x+8,y+28,'#000',false,11);
+  text('— retune the chimes',x+8,y+42,'#000',false,11);
+  text('— refactor the kernel',x+8,y+56,'#000',false,11);
+  ctx.strokeStyle='#ccc';ctx.lineWidth=1;
+  for(var l=70;l<w.h-20;l+=14){ctx.beginPath();ctx.moveTo(x+8,y+l);ctx.lineTo(x+w.w-8,y+l);ctx.stroke();}
+}
+function drawCtrl(w){
+  var x=w.x,y=w.y+18;
+  ctx.fillStyle='#ccc';ctx.fillRect(x,y,w.w,w.h-18);
+  text('Monitors',x+10,y+8,'#000',true,11);
+  text('Depth: '+DEPTHS[depth].n,x+10,y+26,'#000',false,11);
+  var opts=['1 bit','4 colors','8 colors','256 colors','thousands'];
+  for(var i=0;i<opts.length;i++){
+    ctx.fillStyle=i===depth?'#000':'#fff';
+    ctx.beginPath();ctx.arc(x+16,y+44+i*14,4,0,6.3);ctx.fill();
+    text(opts[i],x+26,y+38+i*14,'#000',false,11);
+  }
+  text('Sound',x+10,y+120,'#000',true,11);
+  text('Speaker volume',x+10,y+138,'#000',false,11);
+  bevel(x+8,y+154,w.w-16,10,'#888');
+  ctx.fillStyle='#e0c86a';ctx.fillRect(x+10,y+156,60,6);
+}
+function drawTrash(w){
+  var x=w.x,y=w.y+18;
+  ctx.fillStyle='#ccc';ctx.fillRect(x,y,w.w,w.h-18);
+  /* a can, drawn as a ridged cylinder */
+  ctx.strokeStyle='#000';ctx.lineWidth=1.6;
+  ctx.strokeRect(x+w.w/2-22,y+16,44,60);
+  for(var i=0;i<6;i++){
+    ctx.beginPath();ctx.moveTo(x+w.w/2-22,y+22+i*9);ctx.lineTo(x+w.w/2+22,y+22+i*9);ctx.stroke();
+  }
+  text('2 items · 4.2 MB',x+10,y+w.h-24,'#000',false,10);
+}
+/* ---------- the desktop itself ---------- */
+function drawDesktop(){
+  var dk=pal(SYS.desk,3);
+  ctx.fillStyle=dk;ctx.fillRect(0,0,W,H);
+  /* a desktop pattern: a repeating diamond, like the ones that shipped */
+  ctx.strokeStyle='rgba(255,255,255,.25)';ctx.lineWidth=1;
+  for(var y=0;y<H;y+=32){
+    for(var x=0;x<W;x+=32){
+      ctx.beginPath();
+      ctx.moveTo(x,y+16);ctx.lineTo(x+16,y);ctx.lineTo(x+32,y+16);ctx.lineTo(x+16,y+32);
+      ctx.closePath();ctx.stroke();
+    }
+  }
+  /* the menu bar */
+  bevel(0,0,W,menuBar,pal(SYS.menu,1));
+  text('File',6,4,'#000',false,10);
+  text('Edit',44,4,'#000',false,10);
+  text('View',84,4,'#000',false,10);
+  text('Special',124,4,'#000',false,10);
+  text('Help',180,4,'#000',false,10);
+  /* the clock on the right */
+  var hh=clock.h<10?'0'+clock.h:''+clock.h;
+  var mm=clock.m<10?'0'+clock.m:''+clock.m;
+  text(hh+':'+mm,W-56,4,'#000',false,10);
+  /* icons down the right: two labels each */
+  var icons=['HD','Apps','Docs','Prefs'];
+  for(var i=0;i<icons.length;i++){
+    var ix=W-70, iy=40+i*70;
+    bevel(ix,iy,44,36,pal(SYS.face,1));
+    text(icons[i],ix+2,iy+18,'#000',true,10);
+    text('disk',ix+2,iy+38,'#000',false,9);
+  }
+  /* the windows, back to front */
+  for(var w=0;w<wins.length;w++)drawWin(wins[w]);
+}
+function drawWin(w){
+  var a=APPS[w.app];
+  bevel(w.x,w.y,w.w,w.h,a.draw===drawTerm?'#888':'#ccc');
+  titleBar(w);
+  ctx.save();
+  ctx.beginPath();ctx.rect(w.x,w.y+16,w.w,w.h-16);ctx.clip();
+  a.draw(w);
+  ctx.restore();
+}
+/* ---------- controls ---------- */
+var abox=document.getElementById('apps');
+APPS.forEach(function(a,i){
+  var b=document.createElement('button');
+  b.textContent=a.n;
+  b.setAttribute('aria-pressed','false');
+  b.addEventListener('click',function(){open(i);});
+  abox.appendChild(b);
+});
+var DBOX=[{n:'256',v:3},{n:'16',v:2},{n:'4',v:1},{n:'1 bit',v:0},{n:'32k',v:4}];
+var fbox=document.getElementById('farms');
+DBOX.forEach(function(d,i){
+  var b=document.createElement('button');
+  b.textContent=d.n;
+  b.setAttribute('aria-pressed',String(i===0));
+  b.addEventListener('click',function(){
+    depth=d.v;
+    [].slice.call(fbox.children).forEach(function(o){
+      o.setAttribute('aria-pressed',String(o===b));});
+    document.getElementById('rC').textContent=DEPTHS[d.v].n;
+  });
+  fbox.appendChild(b);
+});
+function open(i){
+  var a=APPS[i];
+  wins.push({app:i,x:40+wins.length*18,y:60+wins.length*14,w:a.w,h:a.h,
+    title:a.n,active:true});
+  wins.forEach(function(w,j){w.active=(j===wins.length-1);});
+}
+function close(w){
+  var i=wins.indexOf(w);
+  if(i>=0)wins.splice(i,1);
+  if(wins.length)wins[wins.length-1].active=true;
+}
+document.getElementById('close').addEventListener('click',function(){wins=[];});
+document.getElementById('boot').addEventListener('click',function(){
+  wins=[];open(0);open(7);
+});
+function bind(id,fn){var el=document.getElementById(id);
+  el.addEventListener('input',function(){fn(+el.value);});}
+bind('font',function(v){fontSize=v;});
+bind('scan',function(v){scan=v;});
+bind('crt',function(v){phosphor=v;});
+/* ---------- dragging ---------- */
+cv.addEventListener('pointerdown',function(e){
+  var r=cv.getBoundingClientRect();
+  var x=(e.clientX-r.left)*(W/r.width),y=(e.clientY-r.top)*(H/r.height);
+  for(var i=wins.length-1;i>=0;i--){
+    var w=wins[i];
+    if(x>=w.x&&x<=w.x+w.w&&y>=w.y&&y<=w.y+18){
+      drag={w:w,dx:x-w.x,dy:y-w.y};
+      /* the close box */
+      if(x>w.x+w.w-20&&x<w.x+w.w-6){close(w);drag=null;return;}
+      /* bring it forward */
+      wins.splice(i,1);wins.push(w);
+      wins.forEach(function(o,j){o.active=(j===wins.length-1);});
+      return;
+    }
+    if(x>=w.x&&x<=w.x+w.w&&y>w.y&&y<w.y+w.h)return;
+  }
+});
+cv.addEventListener('pointermove',function(e){
+  if(!drag)return;
+  var r=cv.getBoundingClientRect();
+  drag.w.x=(e.clientX-r.left)*(W/r.width)-drag.dx;
+  drag.w.y=Math.max(menuBar,(e.clientY-r.top)*(H/r.height)-drag.dy);
+});
+function endDrag(){drag=null;}
+cv.addEventListener('pointerup',endDrag);
+cv.addEventListener('pointercancel',endDrag);
+function readout(){
+  document.getElementById('rW').textContent=wins.length;
+  document.getElementById('rF').textContent=(fontSize===1?'Chicago 12':fontSize===2?'Geneva 10':'Geneva 9');
+  document.getElementById('rR').textContent=fontSize===1?'512 × 384':fontSize===2?'640 × 480':'832 × 624';
+  document.getElementById('rM').textContent=(8192-wins.length*312-wins.length*wins.length*40)+' KB';
+  var s=Math.floor(t);
+  document.getElementById('rU').textContent=Math.floor(s/60)+'m '+(s%60)+'s';
+}
+/* ---------- loop ---------- */
+var last=0;
+function loop(ts){
+  var dt=last?Math.min(.05,(ts-last)/1000):0;last=ts;
+  t+=dt;
+  clock.s+=dt*7;
+  if(clock.s>=60){clock.s-=60;clock.m++;}
+  if(clock.m>=60){clock.m-=60;clock.h=(clock.h+1)%24;}
+  /* phosphor persistence: dim the last frame into the new one */
+  if(phosphor>0){
+    ctx.fillStyle='rgba(0,0,0,'+(phosphor/160)+')';
+    ctx.fillRect(0,0,W,H);
+  }
+  drawDesktop();
+  if(scan>0){
+    ctx.fillStyle='rgba(0,0,0,'+(scan/200)+')';
+    for(var y=0;y<H;y+=3)ctx.fillRect(0,y,W,1);
+  }
+  readout();
+  requestAnimationFrame(loop);
+}
+open(0);open(7);readout();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

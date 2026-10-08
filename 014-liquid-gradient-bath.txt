@@ -1,0 +1,78 @@
+# CHROMA BATH — A Liquid Colour Instrument
+
+## Short title
+Liquid Gradient Bath
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: an interactive liquid
+colour instrument called CHROMA BATH. No external dependencies whatsoever — no CDN,
+no web fonts, no external images, no external SVG files, no JavaScript libraries.
+All CSS and JavaScript inline, works offline by double-clicking, responsive, valid
+HTML5.
+
+Artistic direction: pure colour-field abstraction, like a projected light show or a
+long-exposure of inks in water. There is no illustration and no imagery at all —
+only four to fifteen soft radial blobs of saturated colour drifting over a dark
+gradient ground, composited with globalCompositeOperation 'screen' so they add
+light where they overlap and bloom into new hues. One palette ("Bone") inverts the
+logic to a light ground with 'multiply' blending so the blobs behave like ink on
+paper instead of light in a dark room.
+
+The engine: each blob is a circle with its own velocity, a slow sinusoidal phase
+that adds a wandering drift, and a radius that breathes by ±6% on a doubled phase.
+Blobs bounce softly off the viewport edges by reflecting velocity. Dragging a blob
+switches it to a spring-follow mode where it eases toward the pointer at 0.16 per
+frame, so it feels heavy and liquid; releasing it drops it back into free drift.
+
+Six palettes, each with its own background colour and four blob colours, switchable
+from gradient swatch buttons: Dusk (rose/violet/teal/amber on near-black), Ember
+(orange/red/gold/crimson on warm black), Kelp (teal/lime/green/yellow on deep
+green-black), Bone (terracotta/slate/sage/sand on cream, multiply blend), Ultra
+(fuchsia/purple/blue/cyan on violet-black), and Sand (gold/rust/aqua/bone on
+brown-black). Switching a palette re-colours every live blob and repaints the
+background immediately.
+
+Layout: a full-viewport canvas with a floating UI overlay whose pointer-events pass
+through except on the controls. Top-left is a monospace label above a 200-weight
+sans title and a short paragraph, all in mix-blend-mode:difference so the text
+inverts against whatever colour passes beneath it. Top-right is a monospace
+readout of the current palette name, blob count and a live frame counter. Bottom is
+a glass tray (backdrop-filter blur) with three sliders — Heat (which warms the
+background gradient toward white), Flow (which scales every blob's speed from
+0.15× to 2.35×) and Blur (which controls the density of a per-frame film grain) —
+plus "+ Blob" and "Reset" buttons, and beside it the six palette swatches.
+
+Interaction: drag any blob to pull it around; click empty space to drop a new blob
+there; "+ Blob" adds one at a random position; "Reset" returns to the original
+four. The three sliders retune the running simulation in real time. The palette
+swatches swap the entire colour world. On narrow screens the paragraph and readout
+hide so the colour fills the device.
+
+## One-paragraph description of the intended design
+A projected-light colour bath: soft radial blobs of saturated hue drifting and
+bouncing over a dark gradient, adding light where they overlap, draggable like
+heavy liquid, and retunable live through heat, flow and grain sliders and six
+palette swatches that each re-colour the whole field.
+
+## Major visual techniques used
+- Additive colour compositing with globalCompositeOperation 'screen' (and
+  'multiply' for the one light palette)
+- Soft blobs from three-stop radial gradients (0.95 → 0.42 → 0 alpha)
+- Per-blob velocity plus a sinusoidal wandering drift and a breathing radius
+- Soft edge reflection for boundary collision
+- Spring-follow dragging with 0.16-per-frame easing for a heavy liquid feel
+- Background gradient whose second stop is computed by interpolating the palette
+  base colour toward white by the heat value
+- Per-frame film grain of ~420 random 1.4px rects at alpha scaled by the blur slider
+- mix-blend-mode:difference on the overlay text so it inverts over any colour
+- Floating glass control tray with backdrop-filter blur
+- Gradient swatch buttons built from three-stop linear gradients
+- 200-weight display type against 8.5–9px tracked monospace labels
+- DPR-aware canvas sizing; paragraph and readout hidden under 720px
+
+## Intended interaction model
+A toy. Visitors drag the blobs around, click to add more, and use the three sliders
+to change how hot, how fast and how grainy the bath is, then flip between six
+palettes to change the entire colour world. Nothing on the page has a correct
+state; the instrument is meant to be left running and occasionally disturbed.

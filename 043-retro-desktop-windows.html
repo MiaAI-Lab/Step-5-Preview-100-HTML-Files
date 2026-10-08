@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WINDOWS 95 — A Desktop You Can Rearrange</title>
+<style>
+  :root{
+    --teal:#008080;
+    --teal2:#006070;
+    --grey:#c0c0c0;
+    --grey2:#a8a8a8;
+    --dark:#000080;
+    --white:#ffffff;
+    --text:#000;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:"MS Sans Serif","Microsoft Sans Serif",Tahoma,Geneva,Verdana,ui-sans-serif,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden}
+  body{background:var(--teal);font-family:var(--sans);font-size:13px;color:var(--text);
+    background-image:
+      repeating-linear-gradient(45deg,rgba(255,255,255,.03) 0 2px,transparent 2px 4px);
+    -webkit-font-smoothing:none;user-select:none;touch-action:none}
+
+  /* ---------- desktop ---------- */
+  .desk{position:fixed;inset:0 0 40px 0;overflow:hidden}
+  .icon{
+    position:absolute;width:74px;text-align:center;color:#fff;cursor:pointer;padding:4px;
+    font-size:11px;line-height:1.3
+  }
+  .icon .img{
+    width:34px;height:30px;margin:0 auto 5px;
+    background:linear-gradient(150deg,#fff,#c0c0c0);
+    border:2px solid #808080;box-shadow:2px 2px 0 rgba(0,0,0,.4);
+    display:grid;place-items:center;font-size:15px
+  }
+  .icon.sel .img{outline:2px dotted #fff;outline-offset:2px}
+  .icon.sel{background:var(--dark)}
+
+  /* ---------- window ---------- */
+  .win{
+    position:absolute;background:var(--grey);border:2px solid;
+    border-color:#fff #808080 #808080 #fff;
+    box-shadow:inset 1px 1px 0 #dfdfdf,inset -1px -1px 0 #000,4px 4px 12px rgba(0,0,0,.4);
+    min-width:180px;display:flex;flex-direction:column
+  }
+  .win.min{display:none}
+  .title{
+    background:linear-gradient(90deg,var(--dark),#1084d0);
+    color:#fff;padding:3px 4px;display:flex;align-items:center;gap:6px;
+    font-weight:700;font-size:12px;cursor:grab;flex:0 0 auto
+  }
+  .title:active{cursor:grabbing}
+  .title .txt{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .btn{
+    width:18px;height:16px;background:var(--grey);border:1px solid;
+    border-color:#fff #808080 #808080 #fff;color:#000;font-size:10px;font-weight:700;
+    display:grid;place-items:center;cursor:pointer;flex:0 0 auto;padding:0;line-height:1
+  }
+  .btn:active{border-color:#808080 #fff #fff #808080}
+  .body{
+    flex:1;overflow:auto;padding:10px;background:var(--grey);
+    border-top:1px solid #808080;box-shadow:inset 1px 1px 0 #fff
+  }
+  .fieldset{border:1px solid #808080;box-shadow:1px 1px 0 #fff inset;padding:10px;margin:0 0 12px}
+  .fieldset legend{font-size:11px;font-weight:700;padding:0 5px}
+
+  /* ---------- widgets ---------- */
+  button.w95{
+    background:var(--grey);border:1px solid;border-color:#fff #808080 #808080 #fff;
+    box-shadow:1px 1px 0 #000;padding:4px 14px;font-family:var(--sans);font-size:12px;
+    cursor:pointer;color:var(--text);min-height:23px
+  }
+  button.w95:active{border-color:#808080 #fff #fff #808080;box-shadow:none;transform:translate(1px,1px)}
+  input.w95{
+    background:#fff;border:1px solid;border-color:#808080 #fff #fff #808080;
+    box-shadow:1px 1px 0 #808080;padding:3px 4px;font-family:var(--sans);font-size:12px;width:100%
+  }
+  .bar{height:20px;background:#fff;border:1px solid;border-color:#808080 #fff #fff #808080;
+    box-shadow:1px 1px 0 #808080;padding:2px;display:flex;gap:2px}
+  .bar span{flex:1;background:var(--teal);height:100%}
+  .list{background:#fff;border:1px solid;border-color:#808080 #fff #fff #808080;
+    box-shadow:1px 1px 0 #808080;height:150px;overflow:auto;padding:2px;font-size:12px}
+  .list div{padding:1px 4px}
+  .list div:hover{background:var(--dark);color:#fff}
+  .tabs{display:flex;gap:2px;margin-bottom:-2px;position:relative;z-index:2}
+  .tabs button{
+    background:var(--grey);border:1px solid;border-color:#fff #808080 var(--grey) #fff;
+    padding:3px 12px;font-size:11px;font-family:var(--sans);cursor:pointer
+  }
+  .tabs button.on{background:var(--grey);font-weight:700;padding-bottom:5px}
+  .panel{background:var(--grey);border:1px solid;border-color:#fff #808080 #808080 #fff;padding:10px}
+
+  /* ---------- taskbar ---------- */
+  .taskbar{
+    position:fixed;left:0;right:0;bottom:0;height:40px;background:var(--grey);
+    border-top:2px solid #fff;display:flex;align-items:center;gap:5px;padding:4px 6px;z-index:100
+  }
+  .start{
+    background:var(--grey);border:1px solid;border-color:#fff #808080 #808080 #fff;
+    box-shadow:1px 1px 0 #000;padding:3px 10px 3px 6px;font-weight:700;font-size:13px;
+    display:flex;align-items:center;gap:5px;cursor:pointer;font-family:var(--sans);flex:0 0 auto
+  }
+  .start:active,.start.on{border-color:#808080 #fff #fff #808080;box-shadow:none}
+  .start .flag{width:20px;height:18px;display:grid;grid-template-columns:1fr 1fr;gap:1px}
+  .start .flag i{display:block}
+  .tasks{flex:1;display:flex;gap:4px;overflow:hidden}
+  .tasks button{
+    background:var(--grey);border:1px solid;border-color:#fff #808080 #808080 #fff;
+    padding:4px 10px;font-size:12px;font-family:var(--sans);cursor:pointer;flex:1;
+    min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:left;max-width:170px
+  }
+  .tasks button.on{border-color:#808080 #fff #fff #808080;font-weight:700;background:var(--grey2)}
+  .tray{
+    border:1px solid;border-color:#808080 #fff #fff #808080;padding:3px 9px;font-size:12px;
+    display:flex;align-items:center;gap:8px;flex:0 0 auto
+  }
+
+  /* ---------- start menu ---------- */
+  .menu{
+    position:fixed;left:6px;bottom:42px;width:220px;background:var(--grey);
+    border:2px solid;border-color:#fff #808080 #808080 #fff;box-shadow:2px 2px 0 rgba(0,0,0,.4);
+    display:none;z-index:101
+  }
+  .menu.on{display:flex}
+  .menu .rail{
+    width:26px;background:linear-gradient(0deg,var(--dark),#1084d0);
+    writing-mode:vertical-rl;transform:rotate(180deg);color:#fff;font-weight:700;
+    font-size:15px;letter-spacing:.1em;display:grid;place-items:center;padding:8px 0
+  }
+  .menu .items{flex:1;padding:3px}
+  .menu .items div{padding:6px 10px;font-size:13px;cursor:pointer;display:flex;gap:8px;align-items:center}
+  .menu .items div:hover{background:var(--dark);color:#fff}
+  .menu .sep{height:1px;background:#808080;box-shadow:0 1px 0 #fff;margin:3px 2px}
+
+  @media (max-width:700px){
+    .icon{width:60px;font-size:10px}
+    .win{max-width:calc(100vw - 24px)!important}
+  }
+</style>
+</head>
+<body>
+<div class="desk" id="desk"></div>
+<div class="menu" id="menu">
+  <div class="rail">Windows 95</div>
+  <div class="items">
+    <div data-open="w1">📁 Programs</div>
+    <div data-open="w2">📄 Documents</div>
+    <div data-open="w3">⚙ Settings</div>
+    <div data-open="w4">🎵 Media Player</div>
+    <div class="sep"></div>
+    <div data-open="w5">🔍 Find</div>
+    <div data-open="w6">❓ Help</div>
+    <div class="sep"></div>
+    <div data-action="shutdown">⏻ Shut Down…</div>
+  </div>
+</div>
+
+<div class="taskbar">
+  <div class="start" id="start">
+    <span class="flag">
+      <i style="background:#ff3b30"></i><i style="background:#34c759"></i>
+      <i style="background:#0a84ff"></i><i style="background:#ffcc00"></i>
+    </span>
+    Start
+  </div>
+  <div class="tasks" id="tasks"></div>
+  <div class="tray"><span id="clock">--:--</span></div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var desk=document.getElementById('desk');
+  var tasks=document.getElementById('tasks');
+  var z=10;
+  var wins={};
+
+  var ICONS=[
+    {n:'My Computer',x:24,y:24,open:'w1'},
+    {n:'Recycle Bin',x:24,y:110,open:'w5'},
+    {n:'Network',x:24,y:196,open:'w3'},
+    {n:'briefcase',x:24,y:282,open:'w2'}
+  ];
+  ICONS.forEach(function(ic){
+    var d=document.createElement('div');
+    d.className='icon';
+    d.style.left=ic.x+'px';d.style.top=ic.y+'px';
+    d.innerHTML='<div class="img">'+(ic.n[0]==='M'?'🖥':ic.n[0]==='R'?'🗑':ic.n[0]==='N'?'🌐':'💼')+'</div>'+ic.n;
+    d.addEventListener('click',function(e){
+      e.stopPropagation();
+      desk.querySelectorAll('.icon').forEach(function(x){x.classList.remove('sel')});
+      d.classList.add('sel');
+    });
+    d.addEventListener('dblclick',function(){open(ic.open)});
+    desk.appendChild(d);
+  });
+
+  var DEFS={
+    w1:{t:'My Computer',w:420,h:300,x:60,y:60,
+      body:'<fieldset><legend>Drives</legend>'+
+        '<div class="list">'+
+        '<div>3½ Floppy (A:)</div><div>5¼ Floppy (B:)</div>'+
+        '<div>(C:) 2.1 GB · 412 MB free</div><div>(D:) CD-ROM · W95C_42</div>'+
+        '<div>(E:) Network · \\\\SERVER01</div><div>Control Panel</div>'+
+        '<div>Printers</div><div>Dial-Up Networking</div>'+
+        '</div></fieldset>'+
+        '<div style="display:flex;gap:6px;justify-content:flex-end">'+
+        '<button class="w95" data-act="close">OK</button>'+
+        '<button class="w95" data-act="close">Cancel</button></div>'},
+    w2:{t:'Documents — readme.txt',w:440,h:280,x:120,y:100,
+      body:'<div class="tabs"><button class="on">General</button><button>Details</button></div>'+
+        '<div class="panel"><p style="margin:0 0 10px">Welcome to Windows 95.</p>'+
+        '<p style="margin:0 0 10px">This is a simulation. Nothing here is Microsoft\u2019s and nothing '+
+        'here works, except the windows themselves, which you can move.</p>'+
+        '<p style="margin:0">Double-click a desktop icon. Drag a title bar. Press Start.</p></div>'},
+    w3:{t:'Display Properties',w:400,h:330,x:200,y:70,
+      body:'<div class="tabs"><button>Background</button><button class="on">Appearance</button><button>Screen Saver</button></div>'+
+        '<div class="panel">'+
+        '<fieldset><legend>Scheme</legend>'+
+        '<select class="w95" style="width:100%"><option>Windows Standard</option><option>Brick</option><option>Desert</option><option>Eggplant</option></select>'+
+        '</fieldset>'+
+        '<fieldset><legend>Colour</legend><div class="bar"><span></span><span></span><span></span></div></fieldset>'+
+        '<div style="text-align:center;margin:6px 0 14px">'+
+        '<div style="display:inline-block;border:2px solid;border-color:#808080 #fff #fff #808080;padding:8px 14px;background:#c0c0c0">'+
+        '<b>Active Title</b><br><span style="font-size:11px">inactive title</span></div></div>'+
+        '<div style="display:flex;gap:6px;justify-content:flex-end">'+
+        '<button class="w95" data-act="close">OK</button><button class="w95" data-act="close">Cancel</button><button class="w95" data-act="close">Apply</button></div>'+
+        '</div>'},
+    w4:{t:'Media Player',w:380,h:210,x:240,y:140,
+      body:'<div class="tabs"><button class="on">Now Playing</button></div>'+
+        '<div class="panel" style="text-align:center">'+
+        '<div style="height:6px;background:#fff;border:1px solid;border-color:#808080 #fff #fff #808080;margin:10px 0 4px"><div style="width:38%;height:100%;background:#0a84ff"></div></div>'+
+        '<div style="font-size:11px;margin-bottom:12px">01 · 01:24 / 03:42</div>'+
+        '<div style="display:flex;gap:6px;justify-content:center">'+
+        '<button class="w95">◀◀</button><button class="w95">❚❚</button>'+
+        '<button class="w95">▶</button><button class="w95">▶▶</button>'+
+        '<button class="w95">⏹</button></div>'+
+        '<fieldset style="margin-top:14px"><legend>Volume</legend>'+
+        '<div class="bar"><span></span><span></span><span></span><span></span></div></fieldset>'+
+        '</div>'},
+    w5:{t:'Find: All Files',w:400,h:270,x:150,y:180,
+      body:'<fieldset><legend>Named</legend>'+
+        '<input class="w95" value="*.txt" style="margin-bottom:8px">'+
+        '<div style="display:flex;gap:6px"><select class="w95" style="flex:1"><option>(C:)</option><option>(D:)</option></select>'+
+        '<button class="w95">Find Now</button></div></fieldset>'+
+        '<fieldset><legend>Results</legend><div class="list">'+
+        '<div>autoexec.bat — 118 bytes</div><div>config.sys — 92 bytes</div>'+
+        '<div>readme.txt — 1.4 KB</div><div>system.ini — 2.1 KB</div>'+
+        '</div></fieldset>'},
+    w6:{t:'Help Topics',w:400,h:280,x:180,y:210,
+      body:'<div class="tabs"><button class="on">Contents</button><button>Index</button><button>Find</button></div>'+
+        '<div class="panel"><div class="list">'+
+        '<div>Introduction to Windows 95</div><div>Working with windows</div>'+
+        '<div>Moving a window</div><div>Resizing a window</div>'+
+        '<div>Minimising and maximising</div><div>Using the Start menu</div>'+
+        '<div>Shutting down</div></div></div>'}
+  };
+
+  function open(id){
+    if(wins[id]){
+      wins[id].el.style.display='flex';
+      wins[id].el.classList.remove('min');
+      focusWin(id);
+      return;
+    }
+    var d=DEFS[id];
+    var el=document.createElement('div');
+    el.className='win';
+    el.style.width=d.w+'px';el.style.height=d.h+'px';
+    el.style.left=Math.min(d.x,innerWidth-d.w-20)+'px';
+    el.style.top=Math.min(d.y,innerHeight-d.h-60)+'px';
+    el.style.zIndex=++z;
+    el.innerHTML='<div class="title"><span class="txt">'+d.t+'</span>'+
+      '<span class="btn" data-act="min">_</span>'+
+      '<span class="btn" data-act="max">□</span>'+
+      '<span class="btn" data-act="close">✕</span></div>'+
+      '<div class="body">'+d.body+'</div>';
+    desk.appendChild(el);
+
+    var w={el:el,title:d.t,max:false,px:null,py:null};
+    wins[id]=w;
+
+    /* drag */
+    var bar=el.querySelector('.title');
+    bar.addEventListener('pointerdown',function(e){
+      focusWin(id);
+      var r=el.getBoundingClientRect();
+      var ox=e.clientX-r.left, oy=e.clientY-r.top;
+      bar.setPointerCapture(e.pointerId);
+      function mv(ev){
+        el.style.left=Math.max(-r.width+80,Math.min(innerWidth-80,ev.clientX-ox))+'px';
+        el.style.top=Math.max(0,Math.min(innerHeight-40,ev.clientY-oy))+'px';
+      }
+      function up(){bar.removeEventListener('pointermove',mv);bar.removeEventListener('pointerup',up);}
+      bar.addEventListener('pointermove',mv);
+      bar.addEventListener('pointerup',up);
+    });
+    /* buttons */
+    el.addEventListener('click',function(e){
+      var a=e.target.getAttribute&&e.target.getAttribute('data-act');
+      if(!a)return;
+      e.stopPropagation();
+      if(a==='close'){el.style.display='none';taskBtn(id,false);}
+      if(a==='min'){el.style.display='none';taskBtn(id,false);}
+      if(a==='max'){
+        if(!w.max){
+          w.px=el.style.left;w.py=el.style.top;w.pw=el.style.width;w.ph=el.style.height;
+          el.style.left='0px';el.style.top='0px';
+          el.style.width=innerWidth+'px';el.style.height=(innerHeight-40)+'px';
+          w.max=true;
+        }else{
+          el.style.left=w.px;el.style.top=w.py;el.style.width=w.pw;el.style.height=w.ph;
+          w.max=false;
+        }
+      }
+    });
+    taskBtn(id,true);
+    focusWin(id);
+  }
+
+  function focusWin(id){
+    Object.keys(wins).forEach(function(k){wins[k].el.style.zIndex=z-1});
+    wins[id].el.style.zIndex=++z;
+    tasks.querySelectorAll('button').forEach(function(b){
+      b.classList.toggle('on',b.dataset.win===id);
+    });
+  }
+  function taskBtn(id,on){
+    var ex=tasks.querySelector('[data-win="'+id+'"]');
+    if(on&&!ex){
+      var b=document.createElement('button');
+      b.dataset.win=id;
+      b.textContent=DEFS[id].t;
+      b.addEventListener('click',function(){
+        var el=wins[id].el;
+        if(el.style.display==='none'){el.style.display='flex';}
+        else if(wins[id].el.style.zIndex==z){el.style.display='none';}
+        focusWin(id);
+      });
+      tasks.appendChild(b);
+    }
+    if(!on&&ex)ex.remove();
+  }
+
+  /* start menu */
+  var menu=document.getElementById('menu'),start=document.getElementById('start');
+  start.addEventListener('click',function(e){
+    e.stopPropagation();
+    menu.classList.toggle('on');
+    start.classList.toggle('on',menu.classList.contains('on'));
+  });
+  document.addEventListener('click',function(){
+    menu.classList.remove('on');start.classList.remove('on');
+  });
+  menu.addEventListener('click',function(e){
+    var o=e.target.getAttribute&&e.target.getAttribute('data-open');
+    var a=e.target.getAttribute&&e.target.getAttribute('data-action');
+    if(o){e.stopPropagation();menu.classList.remove('on');start.classList.remove('on');open(o);}
+    if(a==='shutdown'){
+      e.stopPropagation();
+      menu.classList.remove('on');start.classList.remove('on');
+      document.body.innerHTML=
+        '<div style="position:fixed;inset:0;background:#000;display:grid;place-items:center;'+
+        'text-align:center;color:#fff;font-family:var(--sans)">'+
+        '<div><div style="font-family:var(--disp);font-size:clamp(20px,4vw,42px);font-weight:700;margin-bottom:18px">'+
+        'It\u2019s now safe to turn off<br>your computer.</div>'+
+        '<div style="font-size:13px;opacity:.6;margin-bottom:28px">Nothing was running. Nothing was saved.</div>'+
+        '<button class="w95" style="font-size:15px;padding:10px 26px" onclick="location.reload()">Restart</button></div></div>';
+    }
+  });
+
+  /* clock */
+  function tick(){
+    var d=new Date();
+    var p=function(n){return (n<10?'0':'')+n};
+    document.getElementById('clock').textContent=p(d.getHours())+':'+p(d.getMinutes())+' '+(d.getHours()<12?'AM':'PM');
+  }
+  tick();setInterval(tick,1000);
+
+  /* icons can be dragged too */
+  desk.querySelectorAll('.icon').forEach(function(ic){
+    ic.addEventListener('pointerdown',function(e){
+      var r=ic.getBoundingClientRect();
+      var ox=e.clientX-r.left, oy=e.clientY-r.top;
+      ic.setPointerCapture(e.pointerId);
+      function mv(ev){
+        ic.style.left=(ev.clientX-ox)+'px';
+        ic.style.top=(ev.clientY-oy)+'px';
+      }
+      function up(){ic.removeEventListener('pointermove',mv);ic.removeEventListener('pointerup',up);}
+      ic.addEventListener('pointermove',mv);
+      ic.addEventListener('pointerup',up);
+    });
+  });
+
+  /* open one window so the desktop is not bare */
+  setTimeout(function(){open('w2')},300);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+# HERBARIUM — Pressed Specimens, 1873–1901
+
+## Short title
+Botanical Herbarium
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a digitised herbarium of
+fictional pressed plant specimens, called HERBARIUM. No external dependencies
+whatsoever — no CDN, no web fonts, no external images, no external SVG files, no
+JavaScript libraries. All CSS and JavaScript inline, works offline by
+double-clicking, responsive, valid HTML5.
+
+Artistic direction: Victorian pressed-plant sheets. Warm paper #f3eddd with a
+deeper #e9e0ca on hover, ink brown-black #23201a, stem green #4a5f3a, leaf
+#6b8a4e with a lighter variant for alternating leaves, root brown #8a6a4a, and one
+oxblood accent #a33a2a used for the eyebrow and the Latin names. A full-viewport
+paper-fibre texture from an inline SVG feTurbulence data-URI sits over everything
+in multiply blend, and a single vertical hairline down the exact centre of the
+viewport suggests the fold of an opened book. Each sheet carries two diagonal strips
+of faded archival tape at its top corners.
+
+The plants are built in the DOM from a small vocabulary of divs. A vertical stalk
+with a green gradient; leaves placed alternately along it as asymmetric ellipses
+(border-radius 50% 50% 50% 50% / 60% 60% 40% 40%) rotating out from the stalk's
+centre at 38–60°, with every second leaf pair in a lighter green; a flower head
+positioned at the top of the stalk, made of N petals each an ellipse rotated around
+the centre at its own radius with a per-petal opacity variation, plus a small
+radial-gradient core; and five roots dropping below the stalk, each a thin brown
+gradient bar rotated out at a different angle with its own length and opacity. Nine
+specimens are defined — yarrow, oxeye daisy, cornflower, field poppy, tansy,
+viper's bugloss, heather, chicory and foxglove — each with its own petal count,
+petal colours, core colour, leaf count, leaf size, stalk height and whether it has
+the lighter alternate leaves. Everything is assembled from the same function, so the
+nine sheets differ only by their parameters.
+
+Layout: a nav with a serif brand at 0.32em tracking and two links. A centred hero
+with an oxblood eyebrow, a serif headline with one italic stem-green word, and a
+paragraph about pressing. Then a nine-sheet grid built from 1px gaps, each sheet
+with its tape strips, the plant in a 3:4 box, and a caption giving the common name
+in italic serif, the Latin name in oxblood monospace, the year, month and county,
+and the sheet number with the six-week pressing note. Then a second hero-style
+block for the method. Then a ruled monospace footer.
+
+Interaction: hovering a sheet lifts it 6px and warms the paper to the deeper tone,
+which reads as picking the sheet up off the drawer. Nothing else is interactive —
+the plants do not move, because pressed plants do not move. The grid drops 3 → 2 → 1
+columns.
+
+## One-paragraph description of the intended design
+A digitised herbarium of nine pressed plants assembled in the DOM from a shared
+vocabulary of divs: a green-gradient stalk, alternating asymmetric leaf ellipses
+rotating out from it, a radial crown of N petals with a small core, and five
+tapering roots — mounted on warm paper with a fibre texture, a centre fold, corner
+tape strips, and captions in italic serif, Latin name in oxblood monospace, and
+county of origin.
+
+## Major visual techniques used
+- Plants assembled from divs: gradient stalk, asymmetric leaf ellipses, radial petal
+  crowns and tapered root bars
+- Leaf rotation from the stalk centre at 38–60°, with alternating lighter leaves and
+  a scaleX(-1) mirror for the opposite side
+- Petal crowns from N ellipses each rotated around a shared transform-origin at its
+  own radius, with per-petal opacity variation
+- Small radial-gradient cores set via CSS custom properties per specimen
+- Roots as thin vertical gradient bars rotated at different angles with individual
+  lengths and opacities
+- Warm paper ground with an SVG turbulence fibre texture in multiply blend
+- Vertical centre-fold hairline suggesting an opened book
+- Archival tape strips as rotated translucent rectangles hanging over the sheet
+  corners
+- Nine specimens parameterised through one builder function
+- 1px-gap sheet grid with the hairline colour showing through
+- Caption hierarchy: italic serif common name, oxblood Latin name, 8.5px tracked
+  monospace metadata
+- Single oxblood accent against a warm paper/green palette
+- Hover lift and paper-warm on the sheets
+- 3 → 2 → 1 responsive column collapse
+
+## Intended interaction model
+A collection to be looked through. Visitors hover a sheet to lift it and read its
+label; there are no controls and nothing animates, which is the point — a herbarium
+is a collection of things that have been stopped. The page's only responsiveness
+beyond layout is the grid collapsing.

@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Pattern Garden — growth and recursivity</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:#0d1410;color:#eaf2ea;
+  font:15px/1.64 ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.serif{font-family:ui-serif,Georgia,"Times New Roman",serif}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.wrap{width:min(1220px,94vw);margin:0 auto}
+nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0 14px;
+  border-bottom:1px solid rgba(234,242,234,.12)}
+nav .brand{font-family:ui-serif,Georgia,serif;font-size:19px}
+nav .brand i{font-style:italic;color:#8fd46a}
+nav ul{display:flex;gap:26px;list-style:none;margin:0;padding:0;font-size:11px;
+  letter-spacing:.22em;text-transform:uppercase;color:#8fa695}
+nav a{color:inherit;text-decoration:none}nav a:hover{color:#8fd46a}
+@media(max-width:820px){nav ul{display:none}}
+header.hero{padding:56px 0 14px;text-align:center}
+header.hero .kicker{font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:#8fd46a;
+  margin:0 0 14px}
+header.hero h1{font-family:ui-serif,Georgia,serif;font-weight:400;
+  font-size:clamp(34px,5.8vw,64px);line-height:1.05;margin:0 0 16px}
+header.hero h1 em{font-style:italic;color:#8fd46a}
+header.hero p{max-width:62ch;margin:0 auto;color:#9db3a3}
+.grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:38px;
+  align-items:start;margin:24px 0 16px}
+@media(max-width:980px){.grid{grid-template-columns:1fr}}
+.panel{border:1px solid rgba(234,242,234,.15);border-radius:16px;overflow:hidden;
+  background:#0a100c}
+.panel .cap{display:flex;justify-content:space-between;gap:12px;padding:13px 18px;
+  border-bottom:1px solid rgba(234,242,234,.12);font-size:10px;letter-spacing:.26em;
+  text-transform:uppercase;color:#8fa695}
+.panel .cap b{color:#8fd46a;font-weight:600}
+#bed{display:block;width:100%;height:auto;touch-action:none}
+.side{display:grid;gap:24px}
+h2{font-family:ui-serif,Georgia,serif;font-weight:400;font-size:25px;margin:0 0 12px}
+h2 em{font-style:italic;color:#8fd46a}
+p.lead{color:#9db3a3;margin:0 0 16px}
+.rows{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.rows button{background:#101812;border:1px solid rgba(234,242,234,.16);border-radius:999px;
+  padding:8px 13px;font:inherit;font-size:12px;color:#eaf2ea;cursor:pointer}
+.rows button[aria-pressed="true"]{background:#8fd46a;border-color:#8fd46a;color:#0a100c}
+label.slider{display:grid;gap:7px;font-size:10px;letter-spacing:.24em;
+  text-transform:uppercase;color:#8fa695;margin-bottom:12px}
+input[type=range]{width:100%;accent-color:#8fd46a}
+.btn{background:#8fd46a;color:#0a100c;border:0;border-radius:8px;padding:11px 15px;
+  font:inherit;font-size:12px;font-weight:700;letter-spacing:.08em;cursor:pointer;margin:0 8px 8px 0}
+.btn.ghost{background:transparent;color:#eaf2ea;border:1px solid rgba(234,242,234,.24)}
+.btn:hover{filter:brightness(1.06)}
+dl.readout{display:flex;flex-wrap:wrap;gap:14px 26px;margin:0;border-top:1px solid rgba(234,242,234,.12);
+  padding-top:16px}
+dl.readout div{min-width:86px}
+dl.readout dt{font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:#8fa695;margin:0 0 4px}
+dl.readout dd{margin:0;font-size:20px;font-family:ui-monospace,Menlo,monospace;color:#8fd46a}
+.cells{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;margin:46px 0}
+@media(max-width:900px){.cells{grid-template-columns:1fr}}
+.cell{border-top:1px solid rgba(234,242,234,.12);padding-top:16px}
+.cell .fig{font-family:ui-serif,Georgia,serif;font-size:38px;color:#8fd46a;line-height:1}
+.cell h3{font-family:ui-serif,Georgia,serif;font-weight:400;font-style:italic;font-size:21px;margin:8px 0 8px}
+.cell p{margin:0;color:#9db3a3;font-size:14px}
+footer{border-top:1px solid rgba(234,242,234,.12);padding:22px 0 60px;display:flex;
+  justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:11px;letter-spacing:.2em;
+  text-transform:uppercase;color:#6f8a77}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="brand">The Pattern <i>Garden</i></div>
+    <ul>
+      <li><a href="#bed-panel">Bed</a></li>
+      <li><a href="#dock">Plants</a></li>
+      <li><a href="#notes">Notes</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <p class="kicker">Fractals · recursivity · space-colonisation · phyllotaxis</p>
+    <h1 class="serif">A branching tree is<br>a hand-drawn <em>system</em></h1>
+    <p>Lindenmayer's strings, Ohno's phyllotaxis, de Reffye's stochastic buds, Runion's
+       space colonisation, Weber and Penn's tree a and b, Palmer's annual-shingle oak and
+       Honda's symmetric binary tree: seven plants, each running its own real model, grown
+       here from the seed.</p>
+  </header>
+
+  <div class="grid">
+    <section class="panel" id="bed-panel">
+      <div class="cap"><span>The bed</span><b id="cap-plant">Symmetric binary</b></div>
+      <canvas id="bed" width="900" height="620" aria-label="The pattern garden"></canvas>
+    </section>
+
+    <div class="side" id="dock">
+      <div>
+        <h2>Choose a <em>plant</em></h2>
+        <p class="lead">Each of the seven is simulated by the algorithm that named it, not
+           by a picture of it. Stop and they all stop; they are not gifs.</p>
+        <div class="rows" id="plants"></div>
+      </div>
+      <div>
+        <h2>The <em>season</em></h2>
+        <p class="lead">Time runs the simulation forward and back. Flowers, leaves and
+           fruit follow it, and the branch rings do too.</p>
+        <div class="rows" id="seasons"></div>
+      </div>
+      <label class="slider" for="iter">Iterations <input id="iter" type="range" min="1" max="11" value="8"></label>
+      <label class="slider" for="angle">Branch angle <input id="angle" type="range" min="0" max="90" value="34"></label>
+      <label class="slider" for="wind">Wind <input id="wind" type="range" min="0" max="100" value="18"></label>
+      <div>
+        <button class="btn" id="regrow">Regrow</button>
+        <button class="btn ghost" id="hold">Freeze</button>
+      </div>
+      <dl class="readout">
+        <div><dt>Plant</dt><dd id="rP">1</dd></div>
+        <div><dt>Iteration</dt><dd id="rI">0</dd></div>
+        <div><dt>Segments</dt><dd id="rS">0</dd></div>
+        <div><dt>Leaves</dt><dd id="rL">0</dd></div>
+        <div><dt>Wind</dt><dd id="rW">0.0</dd></div>
+      </dl>
+    </div>
+  </div>
+
+  <section class="cells" id="notes">
+    <div class="cell">
+      <div class="fig serif">i</div>
+      <h3>Lindenmayer</h3>
+      <p>An <b>L-system</b> rewrites a string of symbols over and over, and the string is
+         then read as a turtle: F goes forward, + turns left, [ and ] push and pop. The
+         fractal trees, the dragon curve and every other recursive drawing is this.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">ii</div>
+      <h3>Ohno's phyllotaxis</h3>
+      <p>Each new leaf sits at the golden angle, 137.5077°, from the one before, and turned
+         outward by the square root of its index. That is why the florets of a sunflower
+         spiral in sunflowers' pairs, and why the eye never quite closes.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">iii</div>
+      <h3>de Reffye's model</h3>
+      <p>A bud is a small stochastic machine: at each moment it either waits, becomes a
+         flower, sleeps, or produces a lateral shoot — with probabilities set by its age.
+         Grow ten thousand and you have a forest that is not the same twice.</p>
+    </div>
+  </section>
+
+  <section class="cells">
+    <div class="cell">
+      <div class="fig serif">iv</div>
+      <h3>Space colonisation</h3>
+      <p>Runions scattered attraction points around a seed and let every branch tip grow
+         toward the few it can see; the branches kill on contact. The result is the
+         architecture of a real tree, because it is solving the same problem.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">v</div>
+      <h3>Weber and Penn</h3>
+      <p>A tree is specified by a handful of parameters — trunk taper, branch levels, apex
+         angle and split ratio — and the recursion draws each level. Tree a is a fir; tree
+         b is a broadleaf; the parameters are the difference.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">vi</div>
+      <h3>Honda and Palmer</h3>
+      <p>Honda's symmetric binary drawing, and Palmer's annual-shingle oak and simple
+         willow: each a balance of a self-similar model, each a letter to the same family.</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>The Pattern Garden · one canvas, no files</span>
+    <span class="mono" id="foot">7 plants · 6 models</span>
+  </footer>
+</div>
+<script>
+(function(){
+"use strict";
+var cv=document.getElementById('bed'),ctx=cv.getContext('2d');
+var W=cv.width,H=cv.height,GX=W*0.5,GY=H*0.94;
+
+/* ---------- the plants, each the real model that named it ---------- */
+var PLANTS=[
+ {n:'L-system tree',   k:'lsys'},
+ {n:'Phyllotaxis',     k:'phyllo'},
+ {n:'de Reffye',       k:'reffye'},
+ {n:'Space colonisation',k:'colon'},
+ {n:'Weber & Penn',    k:'wp'},
+ {n:'Honda binary',    k:'honda'},
+ {n:'Palmer annual',   k:'palmer'}
+];
+var plant=5;                     /* start on Honda's symmetric binary */
+var iters=8,angle=34,windV=18;
+var season=0.42,seasonDir=1,frozen=false,seed=1,windPx=null;
+
+/* ---------- deterministic pseudo-random: nothing here is a gif ---------- */
+var _s=1;
+function srnd(){_s=(_s*1664525+1013904223)&0x7fffffff;return _s/0x7fffffff;}
+function reseed(n){_s=(n*2654435761)&0x7fffffff||1;}
+
+/* ---------- 1. Lindenmayer ---------- */
+function lindenmayer(axiom,rules,n){
+  var s=axiom;
+  for(var i=0;i<n;i++){
+    var out='';
+    for(var j=0;j<s.length;j++){
+      var c=s[j];
+      out+=rules[c]||c;
+      if(out.length>240000)break;
+    }
+    s=out;
+    if(s.length>240000)break;
+  }
+  return s;
+}
+function drawLsys(){
+  var rules={
+    'X':'F+[[X]-X]-F[-FX]+X',
+    'F':'FF'
+  };
+  var str=lindenmayer('X',rules,iters);
+  var stack=[],x=GX,y=GY,a=-90;
+  var len=H*0.0016*Math.max(2,9-iters);
+  var segs=0,leaves=0;
+  reseed(seed);
+  ctx.lineWidth=Math.max(0.6,2.4*(9-iters)/8+0.6);
+  for(var i=0;i<str.length;i++){
+    var c=str[i];
+    if(c==='F'){
+      var w=windV*0.0006*Math.sin(a*0.3+i*0.02);
+      var nx=x+Math.cos((a+w)*Math.PI/180)*len;
+      var ny=y+Math.sin((a+w)*Math.PI/180)*len;
+      ctx.strokeStyle='hsla(96,'+(20+segs%16)+'%,'+(30+segs%22)+'%,.78)';
+      ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(nx,ny);ctx.stroke();
+      x=nx;y=ny;segs++;
+    }else if(c==='+'){a+=angle*0.6;}
+    else if(c==='-'){a-=angle*0.6;}
+    else if(c==='['){stack.push([x,y,a]);}
+    else if(c===']'){
+      var s=stack.pop();
+      if(s){
+        x=s[0];y=s[1];a=s[2];
+        if(srnd()<season){
+          ctx.fillStyle='hsla('+(60+season*120)+',60%,58%,.85)';
+          ctx.beginPath();ctx.arc(x,y,2.2+season*2.6,0,6.3);ctx.fill();
+          leaves++;
+        }
+      }
+    }
+  }
+  return {segs:segs,leaves:leaves,iter:iters};
+}
+/* ---------- 2. Ohno's phyllotaxis: the golden angle, 137.5077° ---------- */
+var GA=137.50776*Math.PI/180;
+function drawPhyllo(){
+  var n=200+iters*180;
+  var c=Math.min(W,H)*0.0011*(1+iters*0.4);
+  var segs=0,leaves=0;
+  reseed(seed);
+  for(var i=0;i<n;i++){
+    var a=i*GA,r=c*Math.sqrt(i);
+    var x=GX+Math.cos(a)*r,y=GY+Math.sin(a)*r;
+    var sz=Math.max(1.6,5.6-i*0.02)+season*2.6;
+    var hue=(30+i*0.28)%360;
+    ctx.fillStyle='hsla('+hue+','+(44+season*30)+'%,'+(48+season*10)+'%,.9)';
+    ctx.beginPath();ctx.arc(x,y,sz,0,6.3);ctx.fill();
+    leaves++;
+    /* the stem to the centre, so the phyllotaxis reads as a disc of points */
+    ctx.strokeStyle='hsla(96,26%,32%,.18)';ctx.lineWidth=0.5;
+    ctx.beginPath();ctx.moveTo(GX,GY);ctx.lineTo(x,y);ctx.stroke();
+    segs++;
+  }
+  /* the spiral families: the two parastichies that the eye finds first */
+  [1,2,3,5,8].forEach(function(f,k){
+    ctx.strokeStyle='hsla(70,60%,70%,'+(0.5-k*0.06)+')';ctx.lineWidth=0.7;
+    ctx.beginPath();
+    for(var j=0;j<n;j++){
+      var a=j*GA*f,r=c*Math.sqrt(j);
+      var x=GX+Math.cos(a)*r,y=GY+Math.sin(a)*r;
+      if(j===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+  });
+  return {segs:segs,leaves:leaves,iter:iters};
+}
+/* ---------- 3. de Reffye: a bud is a stochastic machine ---------- */
+function drawReffye(){
+  /* the probabilities: a bud of age a waits, flowers, dies, or branches, and the
+     probabilities are age-dependent, which is the whole model */
+  reseed(seed);
+  var segs=0,leaves=0;
+  function P(a){
+    var wait=Math.exp(-a*0.42);
+    var flower=0.22*Math.exp(-Math.pow((a-14)/12,2));
+    var sleep=0.06*Math.exp(-Math.pow((a-26)/16,2));
+    var rest=Math.max(0,1-wait-flower-sleep);
+    return {wait:wait,flower:flower,sleep:sleep,rest:rest};
+  }
+  function grow(x,y,a,age,len,order){
+    if(order>iters+2||len<0.6)return;
+    var p=P(age);
+    var u=srnd(),acc=0,kind='wait';
+    ['wait','flower','sleep','rest'].forEach(function(k){
+      acc+=p[k];
+      if(u<=acc&&kind==='wait'&&p[k]>0)kind=k;
+    });
+    if(kind==='flower'){
+      ctx.fillStyle='hsla('+(330+season*60)+',70%,'+(62+season*8)+'%,.9)';
+      ctx.beginPath();ctx.arc(x,y,len*0.9+1.4,0,6.3);ctx.fill();
+      leaves++;return;
+    }
+    if(kind==='sleep')return;
+    var ang=-90+(order%2?1:-1)*angle*0.9;
+    var nx=x+Math.cos(ang*Math.PI/180)*len*(0.72+srnd()*0.2);
+    var ny=y+Math.sin(ang*Math.PI/180)*len*(0.72+srnd()*0.2);
+    ctx.strokeStyle='hsla(96,'+(22+order*3)+'%,'+(28+order*4)+'%,.8)';
+    ctx.lineWidth=Math.max(0.5,len*0.5);
+    ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(nx,ny);ctx.stroke();
+    segs++;
+    if(kind==='wait')grow(nx,ny,ang,age+1,len*0.94,order);
+    else{
+      grow(nx,ny,ang,0,len*0.8,order+1);
+      if(srnd()<0.7)grow(nx,ny,ang,0,len*0.62,order+1);
+    }
+  }
+  grow(GX,GY,-90,0,H*0.24,0);
+  return {segs:segs,leaves:leaves,iter:iters};
+}
+/* ---------- 4. Runions' space colonisation ---------- */
+var colonTree=null,colonGen=-1;
+function drawColon(){
+  if(colonGen!==iters+seed*100+angle){
+    colonGen=iters+seed*100+angle;
+    reseed(seed);
+    var N=90+iters*90;
+    var att=[];
+    for(var i=0;i<N;i++){
+      var a=srnd()*6.283,r=Math.sqrt(srnd())*Math.min(W,H)*0.42;
+      att.push({x:GX+Math.cos(a)*r,y:GY+Math.sin(a)*r*0.9,dead:false});
+    }
+    var nodes=[{x:GX,y:GY,p:null,d:0,c:[]}];
+    var tips=nodes.slice();
+    var di=angle*0.014+0.5;
+    for(var step=0;step<Math.min(90,24+iters*8);step++){
+      /* every attraction point lists the tips that can see it */
+      att.forEach(function(a){
+        var best=null,bd=1e18;
+        tips.forEach(function(t){
+          if(t.d>iters+3)return;
+          var d=(a.x-t.x)*(a.x-t.x)+(a.y-t.y)*(a.y-t.y);
+          if(d<bd){bd=d;best=t;}
+        });
+        if(best){
+          best.cx=(best.cx||0)+a.x;
+          best.cy=(best.cy||0)+a.y;
+          best.cn=(best.cn||0)+1;
+          if(bd<900)a.dead=true;
+        }
+      });
+      att=att.filter(function(a){return !a.dead;});
+      var nt=[];
+      tips.forEach(function(t){
+        if(t.cn>0){
+          var dx=(t.cx/t.cn-t.x),dy=(t.cy/t.cn-t.y);
+          var m=Math.sqrt(dx*dx+dy*dy)||1;
+          var len=H*0.036*Math.max(0.4,1-t.d/(iters+3));
+          var nd={x:t.x+dx/m*len,y:t.y+dy/m*len,p:t,d:t.d+1};
+          t.c.push(nd);nt.push(nd);
+        }
+      });
+      if(!nt.length)break;
+      tips=nt;
+    }
+    colonTree=nodes;
+  }
+  /* walk it and draw it */
+  var segs=0,leaves=0;
+  var walk=function(n){
+    if(n.p){
+      ctx.strokeStyle='hsla(96,'+(18+n.d*4)+'%,'+(26+n.d*4)+'%,.85)';
+      ctx.lineWidth=Math.max(0.5,(iters-n.d)*0.8+0.6);
+      ctx.beginPath();ctx.moveTo(n.p.x,n.p.y);ctx.lineTo(n.x,n.y);ctx.stroke();
+      segs++;
+      if(!n.c.length&&n.d>1){
+        ctx.fillStyle='hsla('+(60+season*140)+',64%,58%,.9)';
+        ctx.beginPath();ctx.arc(n.x,n.y,1.8+season*2.4,0,6.3);ctx.fill();
+        leaves++;
+      }
+    }
+    n.c.forEach(walk);
+  };
+  walk(colonTree);
+  return {segs:segs,leaves:leaves,iter:iters};
+}
+/* ---------- 5. Weber and Penn: a tree from a handful of parameters ---------- */
+function drawWP(){
+  /* tree a: level 3, taper, ratio, splits, apex angle, ratio power */
+  var p={levels:Math.min(4,1+Math.floor(iters/3)),Vf:2.8,ratio:0.022,
+         ratioPower:1.6,flare:0.76,scaleV:0,scaleD:0,
+         baseSplits:2,apex:(angle*Math.PI/180),maxLen:H*0.34,shape:0.8};
+  var segs=0,leaves=0;
+  reseed(seed);
+  function branch(x,y,dir,len,rad,level){
+    if(level>p.levels||len<1)return;
+    var ex=x+Math.cos(dir)*len,ey=y+Math.sin(dir)*len;
+    ctx.strokeStyle='hsla(96,24%,'+(28+level*6)+'%,.85)';
+    ctx.lineWidth=Math.max(0.5,rad*3);
+    ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(ex,ey);ctx.stroke();
+    segs++;
+    var n=level===0?p.baseSplits:(level<p.levels?2:1);
+    for(var i=0;i<n;i++){
+      var spread=p.apex+(n>1?p.apex*0.7:0);
+      var t=n<2?0:(i/(n-1)-0.5);
+      var dir2=dir+t*spread*2+(srnd()-0.5)*0.12;
+      branch(ex,ey,dir2,len*(p.ratio*p.ratioPower*10+0.55),rad*0.66,level+1);
+    }
+    if(level===p.levels){
+      ctx.fillStyle='hsla('+(70+season*120)+',58%,'+(52+season*10)+'%,.92)';
+      ctx.beginPath();ctx.ellipse(ex,ey,3.2+season*3.4,1.6+season*1.8,dir,0,6.3);ctx.fill();
+      leaves++;
+    }
+  }
+  branch(GX,GY,-90,p.maxLen,2.2,0);
+  return {segs:segs,leaves:leaves,iter:p.levels};
+}
+/* ---------- 6. Honda's symmetric binary tree ---------- */
+function drawHonda(){
+  var segs=0,leaves=0;
+  reseed(seed);
+  var a=angle*Math.PI/180;
+  function branch(x,y,dir,len,level){
+    if(level>iters||len<0.7)return;
+    var lx=x+Math.cos(dir-a)*len,ly=y+Math.sin(dir-a)*len;
+    var rx=x+Math.cos(dir+a)*len,ry=y+Math.sin(dir+a)*len;
+    ctx.strokeStyle='hsla(96,'+(16+level*5)+'%,'+(26+level*5)+'%,.86)';
+    ctx.lineWidth=Math.max(0.5,(iters-level)*0.9+0.5);
+    ctx.beginPath();
+    ctx.moveTo(x,y);ctx.lineTo(lx,ly);ctx.moveTo(x,y);ctx.lineTo(rx,ry);
+    ctx.stroke();
+    segs+=2;
+    branch(lx,ly,dir-a,len*0.75,level+1);
+    branch(rx,ry,dir+a,len*0.75,level+1);
+  }
+  branch(GX,GY,-90,H*0.22,0);
+  leaves=Math.pow(2,iters);
+  return {segs:segs,leaves:leaves,iter:iters};
+}
+/* ---------- 7. Palmer's annual-shingle oak and simple willow ---------- */
+function drawPalmer(){
+  var segs=0,leaves=0;
+  reseed(seed);
+  var oak=seed%2===0;
+  function branch(x,y,dir,len,level){
+    if(level>iters||len<1)return;
+    var nx=x+Math.cos(dir)*len,ny=y+Math.sin(dir)*len;
+    ctx.strokeStyle=oak?'hsla(96,22%,'+(26+level*6)+'%,.86)'
+                        :'hsla(110,36%,'+(30+level*6)+'%,.8)';
+    ctx.lineWidth=Math.max(0.5,(iters-level)*0.85+0.5);
+    ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(nx,ny);ctx.stroke();
+    segs++;
+    /* the shingle: leaves in a whorl along the branch */
+    var n=oak?3:2;
+    for(var i=0;i<n;i++){
+      var a=dir+Math.PI+(i-n/2)*0.5;
+      var lx2=x+Math.cos(a)*len*0.8,ly2=y+Math.sin(a)*len*0.8;
+      ctx.strokeStyle='hsla('+(80+season*120)+',54%,'+(50+season*12)+'%,.9)';
+      ctx.lineWidth=0.9;
+      ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(lx2,ly2);ctx.stroke();
+      leaves++;
+    }
+    branch(nx,ny,dir-angle*0.01,len*0.78,level+1);
+    branch(nx,ny,dir+angle*0.012,len*0.72,level+1);
+    if(oak&&level<iters-1)
+      branch(nx,ny,dir+(srnd()-0.5)*0.6,len*0.4,level+2);
+  }
+  branch(GX,GY,-90,H*0.2,0);
+  return {segs:segs,leaves:leaves,iter:iters};
+}
+/* ---------- season: the only thing that moves on its own ---------- */
+var sky=[["#8fb6d6","#e8d9b0"],["#7fa9cc","#d8c87c"],["#c98a52","#6d5f7a"],
+         ["#4a5470","#2c3040"],["#3e4a60","#23272f"]];
+function seasonColor(){
+  var t=season, i=Math.min(sky.length-2,Math.floor(t*(sky.length-1))), f=t*(sky.length-1)-i;
+  function mix(a,b,k){
+    function h2r(h){return [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];}
+    var A=h2r(a),B=h2r(b);
+    return 'rgb('+Math.round(A[0]+(B[0]-A[0])*k)+','+Math.round(A[1]+(B[1]-A[1])*k)+','+Math.round(A[2]+(B[2]-A[2])*k)+')';
+  }
+  return [mix(sky[i][0],sky[i+1][0],f),mix(sky[i][1],sky[i+1][1],f)];
+}
+function drawGround(){
+  var c=seasonColor();
+  var g=ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,c[0]);g.addColorStop(1,c[1]);
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  var gy=GY;
+  var g2=ctx.createLinearGradient(0,gy,0,H);
+  g2.addColorStop(0,'hsla(96,22%,'+(16+season*10)+'%,1)');
+  g2.addColorStop(1,'hsla(96,18%,'+(9+season*6)+'%,1)');
+  ctx.fillStyle=g2;ctx.fillRect(0,gy,W,H-gy);
+  ctx.strokeStyle='hsla(96,24%,'+(24+season*8)+'%,.5)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(0,gy);ctx.lineTo(W,gy);ctx.stroke();
+  return c;
+}
+/* ---------- the render ---------- */
+function render(){
+  var stat;
+  drawGround();
+  if(PLANTS[plant].k==='lsys')stat=drawLsys();
+  else if(PLANTS[plant].k==='phyllo')stat=drawPhyllo();
+  else if(PLANTS[plant].k==='reffye')stat=drawReffye();
+  else if(PLANTS[plant].k==='colon')stat=drawColon();
+  else if(PLANTS[plant].k==='wp')stat=drawWP();
+  else if(PLANTS[plant].k==='honda')stat=drawHonda();
+  else stat=drawPalmer();
+  return stat;
+}
+function tick(){
+  if(!frozen&&seasonDir!==0){
+    season+=0.0016*seasonDir;
+    if(season>1){season=1;seasonDir=-1;}
+    if(season<0){season=0;seasonDir=1;}
+  }
+  var st=render();
+  if(!rI)return;
+  rP.textContent=String(plant+1)+' / 7';
+  rI.textContent=st.iter;
+  rS.textContent=st.segs.toLocaleString();
+  rL.textContent=st.leaves.toLocaleString();
+  rW.textContent=windV.toFixed(1);
+}
+/* ---------- canvas sizing, device pixels and all ---------- */
+function fit(){
+  var box=cv.parentNode,r=box.getBoundingClientRect();
+  var dpr=Math.min(2,window.devicePixelRatio||1);
+  cv.width=Math.max(320,Math.round(r.width*dpr));
+  cv.height=Math.max(320,Math.round(r.height*dpr));
+  W=cv.width;H=cv.height;GX=W*0.5;GY=H*0.94;
+  ctx.setTransform(1,0,0,1,0,0);
+  colonGen=-1;
+  render();
+}
+/* ---------- wire the controls that are already in the page ---------- */
+var elPlants=document.getElementById('plants');
+var elSeasons=document.getElementById('seasons');
+var slIter=document.getElementById('iter'),
+    slAngle=document.getElementById('angle'),
+    slWind=document.getElementById('wind');
+var btnRegrow=document.getElementById('regrow'),
+    btnHold=document.getElementById('hold');
+var rP=document.getElementById('rP'),rI=document.getElementById('rI'),
+    rS=document.getElementById('rS'),rL=document.getElementById('rL'),
+    rW=document.getElementById('rW'),capPlant=document.getElementById('cap-plant'),
+    foot=document.getElementById('foot');
+/* the render loop lives below but reads these; they exist already */
+
+function chip(host,label,on,fn){
+  var b=document.createElement('button');
+  b.type='button';
+  b.textContent=label;
+  b.title=label;
+  b.setAttribute('aria-pressed',on?'true':'false');
+  b.addEventListener('click',function(){
+    fn();
+    var sib=b.parentNode.children;
+    for(var j=0;j<sib.length;j++)sib[j].setAttribute('aria-pressed','false');
+    b.setAttribute('aria-pressed','true');
+    paint();
+  });
+  host.appendChild(b);
+  return b;
+}
+var sel=0;
+function paint(){
+  var k=PLANTS[plant].k;
+  var ty;
+  if(k==='lsys')ty='String rewriting';
+  else if(k==='phyllo')ty='Golden angle';
+  else if(k==='reffye')ty='Stochastic buds';
+  else if(k==='colon')ty='Space colonisation';
+  else if(k==='wp')ty='Parameterised';
+  else if(k==='honda')ty='Symmetric binary';
+  else ty='Annual shingles';
+  capPlant.textContent=ty;
+  slIter.value=iters;
+  slAngle.value=angle;
+  slWind.value=windV;
+  btnHold.textContent=frozen?'Unfreeze':'Freeze';
+  btnHold.classList.toggle('on',frozen);
+  foot.textContent='7 plants · 6 algorithms · one seed';
+}
+/* the plant buttons */
+PLANTS.forEach(function(p,i){
+  chip(elPlants,p.n,i===plant,function(){plant=i;colonGen=-1;sel=i;});
+});
+/* the seasons */
+[['Spring 0.1',0.1],['Early summer 0.3',0.3],['High summer 0.5',0.5],
+ ['Late summer 0.7',0.7],['Autumn 0.85',0.85],['Bare 1.0',1.0]].forEach(function(d,i){
+  chip(elSeasons,d[0],i===2,function(){season=d[1];seasonDir=0;});
+});
+/* the sliders */
+slIter.addEventListener('input',function(){iters=+slIter.value;colonGen=-1;render();});
+slAngle.addEventListener('input',function(){angle=+slAngle.value;colonGen=-1;render();});
+slWind.addEventListener('input',function(){windV=+slWind.value*0.6;render();});
+btnRegrow.addEventListener('click',function(){seed=(seed*7+13)%9973;colonGen=-1;render();});
+btnHold.addEventListener('click',function(){frozen=!frozen;paint();});
+
+/* ---------- keyboard ---------- */
+window.addEventListener('keydown',function(e){
+  var k=e.key;
+  if(k>='1'&&k<='7'){plant=+k-1;colonGen=-1;}
+  else if(k==='+'||k==='='){iters=Math.min(12,iters+1);colonGen=-1;}
+  else if(k==='-'){iters=Math.max(1,iters-1);colonGen=-1;}
+  else if(k==='f'){frozen=!frozen;}
+  else if(k==='r'){seed=(seed*7+13)%9973;colonGen=-1;}
+  else return;
+  e.preventDefault();
+  paint();render();
+});
+
+/* ---------- pointer wind ---------- */
+cv.addEventListener('pointermove',function(e){
+  var r=cv.getBoundingClientRect();
+  windPx=((e.clientX-r.left)/r.width-0.5)*60;
+});
+cv.addEventListener('pointerleave',function(){windPx=null;});
+/* the pointer leans on the wind, and the wind bends the growth */
+function applyWind(){
+  if(windPx!==null&&Math.abs(windPx)>5){
+    var t=Math.max(0,Math.min(60,windPx*0.9+windV*0.2));
+    windV+= (t-windV)*0.12;
+    slWind.value=Math.round(windV/0.6);
+    if(rW)rW.textContent=windV.toFixed(1);
+    return true;
+  }
+  return false;
+}
+
+/* ---------- boot ---------- */
+fit();
+paint();
+window.addEventListener('resize',fit);
+window.setInterval(function(){
+  if(applyWind())render();
+  tick();
+},1000/30);
+})();
+
+</script>
+</body>
+</html>

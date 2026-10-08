@@ -1,0 +1,77 @@
+# INDEX 99 — A Concrete Exhibition of Typography
+
+## Short title
+Swiss Brutalist Poster Index
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page for a fictional
+letterpress typography exhibition called "INDEX 99". Absolutely no external
+dependencies — no CDN, no web fonts, no external images, no external SVG files, no
+JavaScript libraries. All CSS and JavaScript inline, works offline by opening the
+file directly, responsive, valid HTML5.
+
+Artistic direction: hard Swiss / brutalist print design. No shadows except flat
+ones, no gradients except hard-stop ones used as printed ink fields, no rounded
+corners anywhere. The page is built on a visible twelve-column grid: a 1px
+column-rule is painted onto the body background so the grid is literally part of
+the layout. Everything is separated by 2px solid black borders that meet edge to
+edge, like a printed form.
+
+Layout, top to bottom: a sticky black-ruled top bar with a red square mark, venue
+and dates in monospace cells, and inverting black-on-paper nav links; a hero with
+a giant condensed uppercase headline (CONCRETE / TYPE struck through by a rotated
+red bar / INDEX 99) mixing outline type, solid type and a red word, followed by a
+three-cell bordered meta strip; a full-width black marquee band of huge condensed
+type alternating solid red words and outlined paper words, scrolling forever; a
+poster wall — a 4-column grid built from 2px gaps showing the black background
+underneath, each cell a CSS-only "print" (conic gradients, repeating-linear
+gradient rasters, hard-stop linear splits, radial dots) with a title set in
+mix-blend-mode:exclusion so it inverts against the artwork; category filter
+buttons in monospace; a bordered programme table where hovering a row inverts it
+to black with a red date; a three-column about block; and a ruled footer.
+
+Typography: only three stacks, all system — "Arial Narrow"/Impact-style condensed
+for display, Helvetica/Arial for body, and monospace for every label and metadata
+cell. Type sizes are extreme (210px headline against 9.5px labels) and tracking is
+tight on display, wide and uppercase on labels.
+
+Colour palette: warm paper #efede6, true black #12100e, signal red #ff3b1f, and a
+single blue #0b3cff used exactly once as an accent. Selection colour is red.
+
+Interaction: clicking any poster inverts it from paper to black (and its title
+drops out of blend mode to paper); the category buttons filter the wall; hovering
+a programme row inverts it; the nav and filter buttons invert on hover. Pressing
+the "G" key staggers a flip through every poster in sequence. The layout collapses
+from four columns to two to one, and the top bar sheds its metadata cells on
+narrow screens.
+
+## One-paragraph description of the intended design
+A brutalist exhibition index that behaves like a printed object: a visible
+twelve-column grid, 2px black rules everywhere, hard-stop gradient "posters" with
+blend-mode titles, a giant condensed headline struck through with a red bar, and an
+infinite black marquee — raw, loud, and rigourously ordered, with invert-on-hover
+as its single interaction vocabulary.
+
+## Major visual techniques used
+- Visible 12-column grid painted as a repeating background-image on the body
+- Hard brutalist rules: 2px solid black borders forming continuous cells, zero
+  border-radius, zero soft shadows
+- Extreme type scale contrast (210px condensed headline vs 9.5px monospace labels)
+- Outline display type via -webkit-text-stroke with transparent fill
+- Rotated strike-through bar using an absolutely positioned ::after and transform
+- Infinite marquee using a duplicated inline string translated -50%
+- CSS-only poster artwork from conic-gradient, repeating-linear-gradient
+  (raster fields) and hard-stop linear splits
+- mix-blend-mode:exclusion so titles invert automatically over any artwork
+- Click-to-invert poster states and a staggered keyboard-triggered flip cascade
+- Category filtering via data attributes and display toggling
+- Row-inverting table hover states
+- Fluid type via clamp() with 4 → 2 → 1 column collapse and a shrinking top bar
+
+## Intended interaction model
+A browsable archive. Visitors filter the poster wall by category, click posters to
+invert them and read the plate number, and discover the "G" key easter egg that
+flips the whole wall in a wave. Everything else is static print language; the page
+asks to be looked at rather than operated, and degrades to a single readable
+column on a phone.

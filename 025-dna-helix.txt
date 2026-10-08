@@ -1,0 +1,79 @@
+# HELIX — Chromosome 7, Region 14
+
+## Short title
+DNA Helix
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a genome-browser-style
+page with a rotating DNA double helix, called HELIX. No external dependencies
+whatsoever — no CDN, no web fonts, no external images, no external SVG files, no
+JavaScript libraries. All CSS and JavaScript inline, works offline by
+double-clicking, responsive, valid HTML5.
+
+Artistic direction: a scientific journal plate. Warm off-white #f4f6f2 ground with
+a faint 48px squared grid baked into the body background, ink-green text #16211c,
+and a four-colour base palette used consistently everywhere: green #1f7a5a
+(adenine), red #c2452d (thymine), blue #2b4b8f (guanine), ochre #c8971f (cytosine).
+Typography is a high-contrast serif for headings and numbers, a monospace at
+9.5–11px for labels, metadata and sequence, and a system sans for paragraphs.
+
+The helix: ninety vertical stations, each placed along a taper that fades the
+molecule at both ends, at an angle advancing 2.6 full turns over the length plus a
+time term that makes it spin. Each station has two backbone positions 180° apart
+and two z-depths from the sine of their angles. All ninety stations are collected
+into an array and sorted by average depth each frame, so the back of the molecule
+draws first and the front draws over it — genuine fake-3D without WebGL. Backbone
+beads are drawn with radius scaled by depth and taper and alpha from
+0.30 + depth × 0.55. Each rung carries three beads interpolated along it, coloured
+blue or ochre by which side of the midline they fall on, with a faint connecting
+line behind them. A soft two-sided gradient wash behind the model suggests the
+major and minor grooves. Pressing R reverses the spin.
+
+Below the helix, a sequence strip of two hundred vertical blocks, each one of the
+four base colours chosen at random, each with a tooltip giving its base name and
+its genomic coordinate. Hovering a block rewrites a caption line with that base
+name and its chr7 coordinate.
+
+Layout: a nav with a monospace brand and three links. A hero split between a serif
+headline (one word in italic green), a paragraph about two metres of DNA per cell,
+a four-item colour legend, and the helix canvas on its square stage. Then a
+bordered sequence panel with the 200 blocks and the hover caption. Then a
+three-cell panel of large serif green numerals (3.4 nm per turn, 2.0 metres per
+cell, 20 ångströms wide) with explanatory paragraphs. Then a mirrored detail
+section about the CFTR gene with a monospace key-value list (location, exons,
+length, protein, strand). Then a ruled monospace footer.
+
+Interaction: the helix spins continuously and reverses on pressing R; the sequence
+blocks respond to hover. There are no other controls. The hero and detail sections
+collapse to one column under 880px.
+
+## One-paragraph description of the intended design
+A genome-browser plate: a depth-sorted DNA double helix of ninety stations with
+tapered ends, two coloured backbones and three-bead base rungs spinning behind a
+groove wash, above a 200-block sequence strip that names its base and coordinate
+under your cursor, in the four-colour palette of a scientific journal.
+
+## Major visual techniques used
+- Fake-3D by depth sorting: all helix stations collected per frame and sorted by
+  average z before drawing
+- Tapered station placement (sin(f·π)) so the molecule fades at both ends
+- Two backbone positions 180° apart, with bead radius and alpha driven by sine of
+  the angle (depth) and the taper
+- Three-bead base rungs with colour split at the midline by interpolated z
+- Faint rung lines drawn behind the beads
+- Major/minor groove wash from a horizontal two-sided gradient behind the model
+- 200-block sequence strip with random base assignment and coordinate tooltips
+- Hover caption rewritten from the block's data attributes
+- Four-colour base palette applied consistently to legend, sequence and rungs
+- Scientific-journal typography: serif display, 9.5px monospace metadata, sans body
+- 48px squared grid baked into the page background
+- 1px-gap panel grids showing the hairline colour underneath
+- Two-column hero and detail collapsing to one under 880px
+
+## Intended interaction model
+An explanatory plate that runs itself. Visitors watch the helix turn (and press R
+to reverse it), then hover across the sequence strip to identify individual bases
+and their genomic coordinates. Everything else is static reference material — the
+three structure figures and the gene panel — presented as a journal would present
+it.

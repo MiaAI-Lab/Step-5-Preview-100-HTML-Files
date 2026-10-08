@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HELIX — Chromosome 7, Region 14</title>
+<style>
+  :root{
+    --bg:#f4f6f2;
+    --ink:#16211c;
+    --dim:rgba(22,33,28,.55);
+    --line:rgba(22,33,28,.14);
+    --a:#1f7a5a;
+    --b:#c2452d;
+    --c:#2b4b8f;
+    --d:#c8971f;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --serif:"Iowan Old Style",Palatino,Georgia,serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--bg);color:var(--ink);font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;
+    background-image:
+      linear-gradient(90deg,rgba(22,33,28,.035) 1px,transparent 1px),
+      linear-gradient(180deg,rgba(22,33,28,.035) 1px,transparent 1px);
+    background-size:48px 48px;
+  }
+  ::selection{background:var(--a);color:var(--bg)}
+
+  .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(18px,4vw,44px)}
+
+  nav{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:26px 0 0}
+  .brand{font-family:var(--mono);font-size:10px;letter-spacing:.3em;text-transform:uppercase}
+  .brand b{color:var(--a);font-weight:400}
+  nav ul{display:flex;gap:clamp(12px,2.2vw,28px);list-style:none;margin:0;padding:0}
+  nav a{color:var(--dim);text-decoration:none;font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;transition:color .2s}
+  nav a:hover{color:var(--ink)}
+
+  .hero{display:grid;grid-template-columns:1fr 1fr;gap:clamp(20px,4vw,52px);align-items:center;padding:clamp(24px,5vw,70px) 0}
+  .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.3em;text-transform:uppercase;color:var(--b);display:block;margin-bottom:20px}
+  h1{font-family:var(--serif);font-weight:400;font-size:clamp(30px,5vw,60px);line-height:1;letter-spacing:-.025em;margin:0 0 22px}
+  h1 i{font-style:italic;color:var(--a)}
+  .hero p{font-size:14px;line-height:1.85;color:var(--dim);max-width:44ch;margin:0 0 28px}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase}
+  .legend span{display:flex;align-items:center;gap:7px}
+  .legend i{width:10px;height:10px;border-radius:50%;display:block}
+
+  .stage{position:relative;aspect-ratio:1;display:grid;place-items:center}
+  #cv{width:100%;height:100%;display:block}
+
+  .seq{
+    border:1px solid var(--line);border-radius:14px;padding:20px 22px;background:rgba(255,255,255,.6);
+    margin:clamp(20px,4vw,44px) 0
+  }
+  .seq .bar{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px;flex-wrap:wrap;gap:10px}
+  .seq .bar b{font-family:var(--mono);font-size:9.5px;letter-spacing:.24em;text-transform:uppercase}
+  .seq .bar span{font-family:var(--mono);font-size:10px;color:var(--b)}
+  .blocks{display:flex;gap:3px;flex-wrap:wrap}
+  .blocks i{display:block;width:14px;height:26px;border-radius:2px;transition:transform .25s,box-shadow .25s;cursor:pointer}
+  .blocks i:hover{transform:translateY(-4px);box-shadow:0 6px 14px -6px rgba(22,33,28,.6)}
+
+  .panels{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin:clamp(20px,4vw,44px) 0}
+  .panels div{background:var(--bg);padding:26px 24px}
+  .panels b{display:block;font-family:var(--serif);font-weight:400;font-size:34px;color:var(--a);line-height:1;margin-bottom:10px}
+  .panels h4{font-family:var(--mono);font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;margin:0 0 12px}
+  .panels p{margin:0;font-size:12.5px;line-height:1.8;color:var(--dim)}
+
+  .detail{
+    display:grid;grid-template-columns:1fr 1fr;gap:clamp(20px,4vw,52px);align-items:center;
+    padding:clamp(20px,4vw,50px) 0
+  }
+  .detail h2{font-family:var(--serif);font-weight:400;font-size:clamp(22px,3.4vw,38px);line-height:1.1;letter-spacing:-.02em;margin:0 0 18px}
+  .detail p{font-size:13.5px;line-height:1.85;color:var(--dim);margin:0 0 14px}
+  .keyval{font-family:var(--mono);font-size:11px;line-height:2.2}
+  .keyval div{display:flex;justify-content:space-between;gap:14px;border-bottom:1px dashed var(--line);padding:7px 0}
+  .keyval span{color:var(--dim);letter-spacing:.1em;text-transform:uppercase;font-size:9.5px}
+
+  footer{border-top:1px solid var(--line);padding:28px 0 46px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
+
+  @media (max-width:880px){.hero,.detail{grid-template-columns:1fr}.panels{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="brand">Genome Viewer · <b>v3.1</b></div>
+    <ul>
+      <li><a href="#seq">Sequence</a></li>
+      <li><a href="#stats">Structure</a></li>
+      <li><a href="#gene">CFTR region</a></li>
+    </ul>
+  </nav>
+
+  <section class="hero">
+    <div>
+      <span class="k">Chromosome 7 · q31.2 · hg38</span>
+      <h1>Two metres of<br><i>instruction,</i> folded.</h1>
+      <p>Each cell carries about two metres of DNA. To fit, it wraps, coils and
+      coils again — the model opposite runs at a scale where one turn is 3.4
+      nanometres and one pixel is roughly a millionth of a millimetre.</p>
+      <div class="legend">
+        <span><i style="background:var(--a)"></i>Adenine</span>
+        <span><i style="background:var(--b)"></i>Thymine</span>
+        <span><i style="background:var(--c)"></i>Guanine</span>
+        <span><i style="background:var(--d)"></i>Cytosine</span>
+      </div>
+    </div>
+    <div class="stage"><canvas id="cv"></canvas></div>
+  </section>
+
+  <section class="seq" id="seq">
+    <div class="bar"><b>Exon 14 · 200 base pairs</b><span>Hover a block to identify it</span></div>
+    <div class="blocks" id="blocks"></div>
+  </section>
+
+  <section class="panels" id="stats">
+    <div><b>3.4</b><h4>nm per turn</h4><p>Ten base pairs per full revolution of the double helix, rising 0.34 nanometres per step.</p></div>
+    <div><b>2.0</b><h4>metres per cell</h4><p>Every human cell holds roughly two metres of it, packed into a nucleus six microns wide.</p></div>
+    <div><b>20</b><h4>angstroms wide</h4><p>The helix itself is two nanometres across — a thousand times thinner than a sheet of paper.</p></div>
+  </section>
+
+  <section class="detail" id="gene">
+    <div>
+      <span class="k">CFTR · 117.5 kb</span>
+      <h2>The region opposite.</h2>
+      <p>The CFTR gene spans 27 exons across 188 kilobases and encodes a
+      chloride channel found on the surface of epithelial cells. Misfolding of the
+      encoded protein is the most common cause of cystic fibrosis.</p>
+      <p>The helix opposite is rendered from the same geometry at every position —
+      major and minor grooves, base-pair rungs, and a phosphate backbone that
+      catches the light on one side only.</p>
+    </div>
+    <div class="keyval">
+      <div><span>Location</span><b>7q31.2</b></div>
+      <div><span>Exons</span><b>27</b></div>
+      <div><span>Length</span><b>188,702 bp</b></div>
+      <div><span>Protein</span><b>1,480 aa</b></div>
+      <div><span>Strand</span><b>reverse</b></div>
+    </div>
+  </section>
+
+  <footer>
+    <span>Rendered locally · no network</span>
+    <span>Coordinates hg38 chr7:117,480,000</span>
+    <span>Press R to reverse the spin</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  /* ---------- sequence blocks ---------- */
+  var BASES=[
+    {n:'Adenine',c:'#1f7a5a',t:'pairs with Thymine'},
+    {n:'Thymine',c:'#c2452d',t:'pairs with Adenine'},
+    {n:'Guanine',c:'#2b4b8f',t:'pairs with Cytosine'},
+    {n:'Cytosine',c:'#c8971f',t:'pairs with Guanine'}
+  ];
+  var bh=document.getElementById('blocks');
+  for(var i=0;i<200;i++){
+    var b=document.createElement('i');
+    var base=BASES[(Math.random()*4)|0];
+    b.style.background=base.c;
+    b.title=base.n+' · '+(117480000+i);
+    b.dataset.n=base.n;
+    bh.appendChild(b);
+  }
+  var lbl=bh.parentNode.querySelector('.bar span');
+  bh.addEventListener('pointerover',function(e){
+    if(e.target.tagName!=='I')return;
+    lbl.textContent=e.target.dataset.n+' · chr7:117,480,'+String(+e.target.title.split('· ')[1]).slice(-3);
+  });
+
+  /* ---------- helix ---------- */
+  var cv=document.getElementById('cv'),c=cv.getContext('2d');
+  var W,H,DPR=Math.min(devicePixelRatio||1,2);
+  var spin=1,t=0;
+  function size(){
+    var r=cv.getBoundingClientRect();
+    W=r.width||400;H=r.height||400;
+    cv.width=W*DPR;cv.height=H*DPR;
+    c.setTransform(DPR,0,0,DPR,0,0);
+  }
+  function draw(){
+    if(!W){requestAnimationFrame(draw);return;}
+    c.setTransform(DPR,0,0,DPR,0,0);
+    c.clearRect(0,0,W,H);
+    var cx=W/2, cy=H/2;
+    var R=Math.min(W,H)*0.30;
+    var turns=2.6;
+    var N=90;
+
+    /* major / minor groove shading: two soft vertical bands behind the model */
+    var gg=c.createLinearGradient(cx-R,0,cx+R,0);
+    gg.addColorStop(0,'rgba(31,122,90,.07)');
+    gg.addColorStop(.5,'rgba(22,33,28,.02)');
+    gg.addColorStop(1,'rgba(194,69,45,.07)');
+    c.fillStyle=gg;c.fillRect(cx-R,cy-R*1.7,R*2,R*3.4);
+
+    /* collect the geometry so we can sort by depth */
+    var pts=[];
+    for(var i=0;i<N;i++){
+      var f=i/(N-1);
+      var y=cy-R*1.55+f*R*3.1;
+      var a=f*Math.PI*2*turns + t*spin;
+      /* a gentle taper so the molecule looks like it fades at both ends */
+      var taper=Math.sin(f*Math.PI)*0.35+0.65;
+      var x1=cx+Math.cos(a)*R*taper;
+      var x2=cx+Math.cos(a+Math.PI)*R*taper;
+      var z1=Math.sin(a);
+      var z2=Math.sin(a+Math.PI);
+      pts.push({y:y,x1:x1,x2:x2,z1:z1,z2:z2,f:f,taper:taper});
+    }
+    /* sort by average depth so back strands draw first */
+    pts.sort(function(p,q){return ((p.z1+p.z2)/2)-((q.z1+q.z2)/2)});
+
+    for(var k=0;k<pts.length;k++){
+      var p=pts[k];
+      var depth=(p.z1+p.z2)/2;
+      var alpha=0.30+depth*0.55;
+      /* backbone 1 (front strand) */
+      c.fillStyle='rgba(31,122,90,'+alpha.toFixed(3)+')';
+      c.beginPath();c.arc(p.x1,p.y,Math.max(1.6,4.2*p.taper*(0.5+depth*0.6)),0,6.283);c.fill();
+      /* backbone 2 */
+      c.fillStyle='rgba(194,69,45,'+alpha.toFixed(3)+')';
+      c.beginPath();c.arc(p.x2,p.y,Math.max(1.6,4.2*p.taper*(0.5+p.z2*0.6)),0,6.283);c.fill();
+      /* the rung: two half-steps, one for each base */
+      var steps=3;
+      for(var s=1;s<=steps;s++){
+        var m=s/(steps+1);
+        var rx=p.x1+(p.x2-p.x1)*m, rz=p.z1+(p.z2-p.z1)*m;
+        var col=rz>0?'43,75,143':'200,151,31';
+        var a2=alpha*(0.45+Math.abs(rz)*0.5);
+        var w=Math.max(1.4,(Math.abs(p.x2-p.x1)/steps)*0.62*(0.6+rz*0.5));
+        c.fillStyle='rgba('+col+','+a2.toFixed(3)+')';
+        c.beginPath();c.arc(rx,p.y,w,0,6.283);c.fill();
+      }
+      /* the horizontal rung line, faint, behind the beads */
+      c.strokeStyle='rgba(22,33,28,'+(0.10+depth*0.16).toFixed(3)+')';
+      c.lineWidth=1;
+      c.beginPath();c.moveTo(p.x1,p.y);c.lineTo(p.x2,p.y);c.stroke();
+    }
+
+    t+=0.012;
+    requestAnimationFrame(draw);
+  }
+  addEventListener('keydown',function(e){
+    if(e.key==='r'||e.key==='R')spin*=-1;
+  });
+  addEventListener('resize',function(){clearTimeout(window.__r);window.__r=setTimeout(size,140)});
+  size();
+  requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,82 @@
+# ARCADE — Cabinet 07, 1983
+
+## Short title
+Arcade Cabinet 07
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a 1983 arcade cabinet whose
+screen is a real, playable game of Snake. No external dependencies whatsoever — no
+CDN, no web fonts, no external images, no JS libraries. All CSS and JavaScript
+inline, works offline by double-clicking, responsive, valid HTML5.
+
+Artistic direction: a dark arcade floor at #0a0c14 with one green light source. The
+cabinet is a vertical metal gradient (#1b2133 to #0c0f18) with a 40px green glow
+spread beneath it as if the marquee is lighting the machine. Palette: phosphor green
+#4dff9b, amber #ffc44d, alert red #ff4d6a, cold cyan #4dd2ff.
+
+The marquee is set in italic serif green with three stacked text-shadows at 6, 20 and
+46 pixels, so the title reads as a backlit plastic header; beneath it a mono
+sub-line and a faint vertical light band from a ::after gradient. The screen is a
+300×300 canvas with `image-rendering:pixelated`, stroked twice — once with a
+translucent border and once with a 6px black inset so it reads as a recessed bezel —
+and covered by a CRT treatment: 3px repeating scanlines and a radial vignette,
+composited with mix-blend-mode:multiply.
+
+The game itself is a 20×20 grid at 15px cells, drawn every frame with a faint green
+grid, a food pellet that pulses with Date.now()/160, and a snake whose head is solid
+green with a 10px blur glow while the trailing segments fade linearly from 85% to 30%
+green alpha. Every cell is a rounded rect drawn through a hand-rolled quadratic
+curve helper. Score and high score are zero-padded to four digits like a real cabinet.
+
+Control panel: a recessed round joystick well (inset dark shadow top, faint light
+bounce bottom) with a red ball top that is a pseudo-element, and two amber round
+buttons with a hard 4px bottom shadow and an inset highlight, which travel 3px and
+collect a dark inset shadow on :active. Then a pill "Insert coin" button that inverts
+amber on hover. Below the cabinet: Start, Pause, Reset buttons.
+
+Layout: nav with serif brand. Centred hero with green eyebrow and an italic green
+word. Then the cabinet in full. Then a three-cell floor-notes row with large green
+serif figures (25¢, 19 cabinets, 412 points). Then a ruled mono footer.
+
+Interaction: arrow keys or WASD turn the snake (reversing into itself is refused);
+Space toggles pause or starts; R restarts. The on-screen joystick is draggable with
+pointer capture — drag or click a direction to turn. Button A pauses/starts, Button B
+starts. "Insert coin" and "Start game" both start; "Pause" toggles; "Reset" clears
+and returns to Ready. On an attract screen (before the first start) a 90ms interval
+repaints the board so the food keeps pulsing. Dying shows "Game over" and freezes the
+snake where it lies. The high score persists for the session and updates live.
+The floor-notes grid collapses to one column under 820px.
+
+## One-paragraph description of the intended design
+A 1983 cabinet standing on a dark arcade floor: a green backlit marquee over a
+scanned, vignetted 20×20 pixel canvas where a real game of Snake runs, the snake's
+head glowing green and its segments fading down the tail, four-digit zero-padded
+score and high score, a recessed joystick well with a red ball top and two amber
+buttons, all driveable by arrows, WASD, dragging the stick, or the on-screen
+controls.
+
+## Major visual techniques used
+- Phosphor-green marquee from three stacked text-shadows at 6, 20 and 46 pixels
+- CRT screen: `image-rendering:pixelated` canvas, 3px repeating scanlines and a
+  radial vignette with mix-blend-mode:multiply
+- Bezelled screen from a translucent border plus a 6px inset black box-shadow
+- Snake drawn with a fading alpha gradient along its length and a 10px blurred glow
+  on the head only
+- Food pellet pulsing from Date.now()/160 in the sine
+- Rounded rectangles hand-drawn with quadratic curves (no external helper)
+- Joystick well from opposite inset shadows; red ball as a ::after with its own glow
+- Round amber buttons with a hard 4px bottom shadow and inset highlight that travel
+  3px and gain an inset dark shadow on :active
+- Keyboard and pointer-capture joystick both feeding one turn function that refuses
+  reversing
+- Zero-padded four-digit score and high-score display
+- Attract-mode repaint interval keeping the food pulsing before play
+- 20×20 grid at 15px cells, four-digit LEDs, mono HUD
+- Responsive: notes grid to one column under 820px, canvas scales to container width
+
+## Intended interaction model
+Insert coin, then drive. Visitors play with the real keyboard (arrows/WASD/Space/R),
+by dragging the joystick well, or with the on-screen A/B buttons; the deck buttons
+add Start, Pause and Reset. The cabinet is a game first, and the arcade-floor notes
+are the flavour text around it.

@@ -1,0 +1,78 @@
+# HOTARU — A Field at Dusk
+
+## Short title
+Firefly Field
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: an interactive firefly
+field called HOTARU. No external dependencies whatsoever — no CDN, no web fonts, no
+external images, no external SVG files, no JavaScript libraries. All CSS and
+JavaScript inline, works offline by double-clicking, responsive, valid HTML5.
+
+Artistic direction: a meadow at last light. The ground is a vertical gradient from
+night blue #050d14 through deep teal #08161a to a green-black field floor #0d2016,
+with two soft green radial washes low in the frame suggesting distant hedges. A
+swaying grass silhouette is drawn on canvas as a few hundred quadratic curves, one
+per blade, bending on a per-blade sine phase. Everything else is the beetles.
+
+Each firefly carries position, velocity, a radius, a flash phase, a wander speed
+and a bob phase. Its motion is a slow wander: two sine terms at different
+frequencies and phases add small continuous accelerations, velocity damps at 0.985
+and is clamped, so the flight is meandering rather than ballistic. The pointer
+repels: within 150 pixels, each beetle is pushed directly away from the cursor with
+a force that falls to zero at the boundary — so you part the swarm as you move
+through it. Beetles are constrained to the lower 60% of the screen and bounce off
+the edges.
+
+The flash is the whole point. Each beetle's phase advances at a rate set by the
+Rate slider; a flash value is computed as (sin(phase)+1)/2 raised to the 14th power,
+which produces a very short bright pulse with a long dark gap. Above a threshold
+the beetle draws a wide radial halo (white core through amber to transparent) plus
+a tiny white dot, all in globalCompositeOperation 'lighter' so overlapping flashes
+bloom; below it, the beetle draws only a faint amber body so the swarm remains
+visible between flashes. "Synchronise" snaps every phase to an arithmetic sequence,
+which makes the whole field pulse together for a moment before drifting apart again.
+
+Layout: a full-viewport canvas over the gradient field with a floating UI overlay
+whose pointer-events pass through except on the controls. Top-left is a monospace
+label above an italic serif headline with one line in firefly amber, plus a short
+paragraph. Top-right is a monospace meter stack showing how many beetles are
+currently lit, the distance to the nearest one, and a running phase value. Bottom
+is a glass tray with three sliders — Count (20–600), Rate (flash speed) and Wander
+(drift strength) — plus Synchronise and Dawn buttons, and a monospace hint.
+
+Interaction: move the pointer through the field to part the swarm and see the
+nearest-beetle readout respond. The three sliders change the population, flash rate
+and drift live — Count adds or removes beetles without disturbing the others. Dawn
+runs a loop that brightens the whole frame with a warm gradient and then returns to
+dusk. On narrow screens the paragraph, meters and hint hide.
+
+## One-paragraph description of the intended design
+A meadow at dusk where hundreds of fireflies meander on their own sine-driven
+wander, flee your cursor with a distance-weighted push, and flash in short bright
+pulses computed from a phase raised to the fourteenth power — haloed and additively
+blended so overlaps bloom — with synchronise, dawn, and count, rate and wander
+sliders.
+
+## Major visual techniques used
+- Two-sine wander acceleration with damping and clamping for meandering flight
+- Distance-weighted pointer repulsion (falls to zero at 150 px) so the swarm parts
+- Flash pulse from (sin φ + 1)/2 raised to the 14th power — short bright, long dark
+- Additive compositing ('lighter') so overlapping halos bloom into brighter light
+- Three-stop radial halos (white core → amber → transparent) plus a white core dot
+- Faint amber body drawn between flashes so the swarm stays visible
+- Phase arithmetic sequencing for the synchronise gesture
+- Per-blade quadratic grass silhouette with independent sine sway phases
+- Vertical dusk gradient with two low radial hedge washes
+- NaN and infinity guards plus velocity clamping after the interaction forces
+- Live meters: lit count, nearest distance, running phase
+- Sliders that add or remove agents without disturbing existing ones
+- Italic serif headline with one amber line against 8.5px tracked monospace
+- Floating glass tray with backdrop-filter blur; extras hidden under 760px
+
+## Intended interaction model
+An ambient scene you can disturb. Visitors move the pointer to part the swarm, then
+shape the field with the count, rate and wander sliders, snap the flashes into
+unison with Synchronise, or let Dawn wash the field in warm light and let it fade
+back to dusk. There is nothing to complete — the page is a place to put a cursor.

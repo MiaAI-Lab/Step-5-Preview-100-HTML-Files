@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Vent — a volcano that builds pressure</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:#120f0e;color:#f0e7e2;
+  font:15px/1.62 ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+.serif{font-family:ui-serif,Georgia,"Times New Roman",serif}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.wrap{width:min(1100px,92vw);margin:0 auto}
+nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0 14px;
+  border-bottom:1px solid rgba(240,231,226,.14)}
+nav .brand{font-family:ui-serif,Georgia,serif;font-size:19px}
+nav .brand i{font-style:italic;color:#ff8a3c}
+nav ul{display:flex;gap:26px;list-style:none;margin:0;padding:0;font-size:11px;
+  letter-spacing:.24em;text-transform:uppercase;color:#9a8b84}
+nav a{color:inherit;text-decoration:none}nav a:hover{color:#ff8a3c}
+@media(max-width:780px){nav ul{display:none}}
+header.hero{padding:54px 0 30px;text-align:center}
+header.hero .kicker{font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:#ff8a3c;
+  margin:0 0 14px}
+header.hero h1{font-family:ui-serif,Georgia,serif;font-weight:400;
+  font-size:clamp(32px,5.6vw,64px);line-height:1.05;margin:0 0 16px}
+header.hero h1 em{font-style:italic;color:#ffd05c}
+header.hero p{max-width:58ch;margin:0 auto;color:#a89a93}
+/* ---------- the section ---------- */
+.mount{position:relative;border:1px solid rgba(240,231,226,.16);border-radius:16px;
+  overflow:hidden;background:#0a0808;margin-bottom:18px}
+.mount canvas{display:block;width:100%;height:auto;touch-action:none;cursor:crosshair}
+.mount .cap{position:absolute;left:14px;top:12px;font-size:10px;letter-spacing:.28em;
+  text-transform:uppercase;color:rgba(240,231,226,.5);pointer-events:none}
+/* ---------- dock ---------- */
+.dock{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;justify-content:space-between;
+  border-top:1px solid rgba(240,231,226,.14);border-bottom:1px solid rgba(240,231,226,.14);
+  padding:16px 0;margin-bottom:32px}
+.dock label{display:grid;gap:7px;font-size:10px;letter-spacing:.26em;text-transform:uppercase;
+  color:#9a8b84;min-width:160px}
+input[type=range]{width:100%;accent-color:#ff8a3c}
+.btn{background:#ff8a3c;color:#2a0f02;border:0;border-radius:8px;padding:11px 15px;
+  font:inherit;font-size:12px;font-weight:700;letter-spacing:.08em;cursor:pointer;margin:0 6px 6px 0}
+.btn.ghost{background:transparent;color:#f0e7e2;border:1px solid rgba(240,231,226,.24)}
+.btn:hover{filter:brightness(1.07)}
+.readout{display:flex;flex-wrap:wrap;gap:12px 30px;margin-bottom:40px;
+  border-top:1px solid rgba(240,231,226,.14);padding-top:16px}
+.readout div{min-width:84px}
+.readout dt{font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:#9a8b84;margin:0 0 4px}
+.readout dd{margin:0;font-size:21px;font-family:ui-monospace,Menlo,monospace;color:#ffd05c}
+.readout dd.hot{color:#ff5a2a}
+.cells{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-bottom:46px}
+@media(max-width:820px){.cells{grid-template-columns:1fr}}
+.cell{border-top:1px solid rgba(240,231,226,.16);padding-top:16px}
+.cell .fig{font-family:ui-serif,Georgia,serif;font-size:38px;color:#ff8a3c;line-height:1;margin-bottom:8px}
+.cell h3{font-family:ui-serif,Georgia,serif;font-weight:400;font-style:italic;font-size:21px;margin:0 0 8px}
+.cell p{margin:0;color:#a89a93;font-size:14px}
+footer{border-top:1px solid rgba(240,231,226,.14);padding:22px 0 54px;display:flex;
+  justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:11px;letter-spacing:.2em;
+  text-transform:uppercase;color:#7d6f69}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="brand">The <i>Vent</i></div>
+    <ul>
+      <li><a href="#mount">Section</a></li>
+      <li><a href="#dock">Pressure</a></li>
+      <li><a href="#notes">Notes</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <p class="kicker">Chamber · conduit · vent</p>
+    <h1 class="serif">Pressure is just<br>magma with <em>nowhere</em></h1>
+    <p>The mountain is a lid. Under it a chamber fills, and the only thing deciding when
+       it goes is whether the gas can get out faster than it can dissolve. Click the
+       mountain to add magma and see how long the lid holds.</p>
+  </header>
+
+  <section class="mount" id="mount">
+    <canvas id="v" width="960" height="560"></canvas>
+    <p class="cap">section · not to scale · click to add magma</p>
+  </section>
+
+  <section class="dock" id="dock">
+    <label for="visc">Viscosity <input id="visc" type="range" min="1" max="100" value="62"></label>
+    <label for="gas">Gas <input id="gas" type="range" min="0" max="100" value="44"></label>
+    <label for="cool">Cooling <input id="cool" type="range" min="0" max="100" value="38"></label>
+    <div>
+      <button class="btn" id="push">Force the vent</button>
+      <button class="btn ghost" id="quiet">Go quiet</button>
+    </div>
+  </section>
+
+  <dl class="readout">
+    <div><dt>Pressure</dt><dd id="rP">0%</dd></div>
+    <div><dt>Chamber</dt><dd id="rC">—</dd></div>
+    <div><dt>Eruptions</dt><dd id="rE">0</dd></div>
+    <div><dt>Lava length</dt><dd id="rL">0 m</dd></div>
+    <div><dt>State</dt><dd id="rS">quiet</dd></div>
+  </dl>
+
+  <section class="cells">
+    <div class="cell">
+      <div class="fig serif">i</div>
+      <h3>The chamber</h3>
+      <p>A melt with gas dissolved in it under pressure. Push it down and the gas stays
+         in solution; take the lid off and it comes out of solution like a shaken bottle,
+         and the melt becomes a foam that can be thrown a kilometre.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">ii</div>
+      <h3>Viscosity</h3>
+      <p>Runny basalt lets gas leave politely and flows away as lava. Sticky rhyolite
+         holds the gas until it fails, and fails explosively. The slider is the whole
+         difference between Hawaii and Tambora.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">iii</div>
+      <h3>Cooling</h3>
+      <p>Lava that stops moving starts growing a crust, and the crust thickens until the
+         flow is a plug. The flows in this section keep their shape once they set, so you
+         can watch the edifice grow outward.</p>
+    </div>
+  </section>
+
+  <section class="cells" id="notes">
+    <div class="cell">
+      <div class="fig serif">iv</div>
+      <h3>Ash</h3>
+      <p>An eruption that fragments the melt makes a column, and the column falls back
+         outward, so the deposit thins with distance. Here the fallout simply drifts
+         downwind and fades.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">v</div>
+      <h3>Seismic</h3>
+      <p>Rock cracking makes the swarm that comes first. This section has no sound, but
+         the tremor line under the mountain moves with the pressure, which is the same
+         signal.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">vi</div>
+      <h3>Quiet</h3>
+      <p>Go quiet and the system relaxes: gas bleeds off, the magma drains back down,
+         and the vent seals. A volcano spends almost all of its time in this state.</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>The Vent · one canvas, no files</span>
+    <span class="mono">chamber · conduit · flank</span>
+  </footer>
+</div>
+<script>
+(function(){
+"use strict";
+var cv=document.getElementById('v'),ctx=cv.getContext('2d');
+var W=cv.width,H=cv.height;
+var visc=62,gas=44,cool=38;
+var pressure=0,chamber=0.4,eruptions=0,venting=0,t=0;
+var magma=[],lava=[],ash=[],bombs=[],set_=[],tremor=0;
+var VX=W*0.5,CY=H*0.86;
+
+/* the mountain profile: a cone with a crater, from a seeded walk */
+function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;
+  var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;
+  return((t^t>>>14)>>>0)/4294967296;};}
+var rnd=mulberry(1207);
+var profile=[];
+for(var i=0;i<=48;i++){
+  var x=i/48;
+  var h=H*0.5*(1-x*x*0.92)+Math.sin(x*22)*3+rnd()*3;
+  profile.push({x:x*W,y:H-h});
+}
+function groundY(x){
+  var f=x/W*48,i=Math.min(47,Math.floor(f)),a=profile[i],b=profile[i+1];
+  var r=f-i;return a.y+(b.y-a.y)*r;
+}
+function flankY(x){return groundY(x);}
+
+/* ---------- physics ---------- */
+function step(dt){
+  t+=dt;
+  /* gas comes out of solution as the melt rises; pressure rises with the chamber */
+  var fill=0.015+gas*0.0004;
+  pressure+=(chamber*(0.5+gas/120)-pressure*0.05)*dt;
+  if(pressure>1){
+    erupt();
+    pressure*=0.35;
+  }
+  /* quiet draining */
+  pressure=Math.max(0,pressure-cool*0.0004*dt);
+  tremor=pressure;
+  /* magma blobs rising in the conduit */
+  if(Math.random()<chamber*0.9)magma.push({x:VX+(Math.random()-.5)*10,y:CY-10,
+    r:3+Math.random()*5,v:-(30+visc*-0.15+Math.random()*30),hot:1});
+  for(var m=magma.length-1;m>=0;m--){
+    var b=magma[m];
+    b.y+=b.v*dt;
+    b.x+=(VX-b.x)*dt*1.5;
+    if(b.y<groundY(b.x)+4){
+      if(venting>0){/* thrown out */}
+      magma.splice(m,1);
+    }
+  }
+  /* an eruption throws bombs and ash */
+  if(venting>0){
+    venting-=dt;
+    for(var k=0;k<4;k++){
+      bombs.push({x:VX+(Math.random()-.5)*14,y:groundY(VX)-4,
+        vx:(Math.random()-.5)*260,vy:-(120+Math.random()*260),r:2+Math.random()*6,life:3});
+    }
+    for(var a2=0;a2<6;a2++){
+      ash.push({x:VX+(Math.random()-.5)*40,y:groundY(VX)-10,
+        vx:20+Math.random()*60,vy:-(40+Math.random()*90),r:4+Math.random()*10,life:6});
+    }
+    /* lava pours out of the vent and runs down the flank */
+    if(Math.random()<0.7){
+      var dir=Math.random()<0.5?-1:1;
+      lava.push({x:VX+dir*6,y:groundY(VX)-2,vx:dir*(30+visc*-0.2),vy:0,
+        r:3+Math.random()*4,heat:1,trail:[{x:VX+dir*6,y:groundY(VX)-2}]});
+    }
+  }
+  /* lava: run downhill, cool, and set */
+  for(var l=lava.length-1;l>=0;l--){
+    var f=lava[l];
+    f.vy+=(260-f.vy)*dt*0.2;
+    var nx=f.x+f.vx*dt, ny=f.y+f.vy*dt;
+    var g=groundY(nx);
+    if(ny>g-2){
+      ny=g-2;
+      /* downhill direction along the flank */
+      var slope=(groundY(nx+6)-groundY(nx-6))/12;
+      f.vx+=(slope*260)*(1-visc/140)*dt*3;
+      f.vy*=0.2;
+      if(Math.abs(f.vx)<4||nx<10||nx>W-10){
+        f.heat-=dt*(0.05+cool*0.004);
+        if(f.heat<=0){
+          /* set: keep the trail as rock, drop the particle */
+          f.trail.forEach(function(p){set_.push(p);});
+          if(set_.length>2600)set_.splice(0,set_.length-2600);
+          lava.splice(l,1);continue;
+        }
+      }
+    }
+    f.x=Math.max(4,Math.min(W-4,nx));f.y=ny;
+    if(!f.last||Math.abs(f.x-f.last.x)+Math.abs(f.y-f.last.y)>3){
+      f.trail.push({x:f.x,y:f.y});
+      f.last={x:f.x,y:f.y};
+      if(f.trail.length>900)lava.splice(l,1);
+    }
+  }
+  /* bombs: ballistic, they land and stay as blocks */
+  for(var bm=bombs.length-1;bm>=0;bm--){
+    var o=bombs[bm];
+    o.vy+=420*dt;o.x+=o.vx*dt;o.y+=o.vy*dt;o.life-=dt;
+    if(o.y>groundY(o.x)-2||o.life<=0){
+      set_.push({x:o.x,y:groundY(o.x)-1,s:o.r});
+      bombs.splice(bm,1);
+    }
+  }
+  /* ash: drifts downwind and fades */
+  for(var ah=ash.length-1;ah>=0;ah--){
+    var s=ash[ah];
+    s.x+=s.vx*dt*(1-gas/200);s.y+=s.vy*dt+s.r*dt*0.4;
+    s.life-=dt;
+    if(s.life<=0||s.y>H){ash.splice(ah,1);}
+  }
+}
+function erupt(){
+  venting=0.9+gas*0.012;
+  eruptions++;
+  var cols=document.getElementById('rS');
+  cols.textContent='erupting';
+  cols.classList.add('hot');
+}
+
+/* ---------- drawing ---------- */
+function draw(){
+  /* sky: heated by the eruption */
+  var heat=venting>0?Math.min(1,venting):0;
+  var sky=ctx.createLinearGradient(0,0,0,H);
+  sky.addColorStop(0,'rgb('+(24+heat*70)+','+(20+heat*30)+','+(18+heat*8)+')');
+  sky.addColorStop(1,'#0a0808');
+  ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
+  /* tremor: a line that shakes with pressure */
+  ctx.strokeStyle='rgba(255,138,60,'+(0.1+pressure*0.5)+')';ctx.lineWidth=1;
+  ctx.beginPath();
+  for(var x0=0;x0<W;x0+=6){
+    var y0=H-16+Math.sin(t*30+x0*0.2)*pressure*10;
+    ctx.lineTo(x0,y0);
+  }
+  ctx.stroke();
+  /* the chamber */
+  var cg=ctx.createRadialGradient(VX,CY,10,VX,CY,150);
+  cg.addColorStop(0,'rgba(255,90,20,'+(0.35+chamber*0.5)+')');
+  cg.addColorStop(1,'rgba(255,90,20,0)');
+  ctx.fillStyle=cg;ctx.beginPath();ctx.arc(VX,CY,150,0,6.3);ctx.fill();
+  ctx.fillStyle='rgba(255,120,30,'+(0.18+chamber*0.3)+')';
+  ctx.beginPath();
+  ctx.ellipse(VX,CY,150*chamber+60,52*chamber+18,0,0,6.3);ctx.fill();
+  /* the conduit */
+  ctx.strokeStyle='rgba(255,120,30,'+(0.2+chamber*0.4)+')';ctx.lineWidth=10*chamber+4;
+  ctx.beginPath();ctx.moveTo(VX,CY);ctx.lineTo(VX,groundY(VX)+2);ctx.stroke();
+  /* the mountain */
+  var rock=ctx.createLinearGradient(0,H*0.2,0,H);
+  rock.addColorStop(0,'#2a2320');rock.addColorStop(1,'#14100e');
+  ctx.fillStyle=rock;
+  ctx.beginPath();ctx.moveTo(0,H);
+  for(var i=0;i<=48;i++)ctx.lineTo(profile[i].x,profile[i].y);
+  ctx.lineTo(W,H);ctx.closePath();ctx.fill();
+  /* set lava and bombs, as rock */
+  set_.forEach(function(p){
+    ctx.fillStyle='rgba(30,22,18,.92)';
+    if(p.s!==undefined){ctx.fillRect(p.x-p.s/2,p.y-p.s/2,p.s,p.s);}
+    else ctx.fillRect(p.x-1.5,p.y-1.5,3,3);
+  });
+  /* lava trails: hot where fast, dark where cooling */
+  lava.forEach(function(f){
+    ctx.strokeStyle='hsla('+(20+ (1-f.heat)*10)+',95%,'+(40+f.heat*25)+'%,'+(0.35+f.heat*0.6)+')';
+    ctx.lineWidth=f.r*1.6;ctx.lineCap='round';
+    ctx.beginPath();
+    for(var i2=1;i2<f.trail.length;i2++){
+      ctx.moveTo(f.trail[i2-1].x,f.trail[i2-1].y);
+      ctx.lineTo(f.trail[i2].x,f.trail[i2].y);
+    }
+    ctx.stroke();
+    ctx.fillStyle='hsla('+(30+(1-f.heat)*8)+',100%,'+(58+f.heat*20)+'%,'+(0.4+f.heat*0.5)+')';
+    ctx.beginPath();ctx.arc(f.x,f.y,f.r,0,6.3);ctx.fill();
+  });
+  /* magma blobs in the conduit */
+  magma.forEach(function(b){
+    ctx.fillStyle='rgba(255,140,40,.85)';
+    ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,6.3);ctx.fill();
+    ctx.fillStyle='rgba(255,230,180,.9)';
+    ctx.beginPath();ctx.arc(b.x-b.r*0.3,b.y-b.r*0.3,b.r*0.4,0,6.3);ctx.fill();
+  });
+  /* bombs */
+  bombs.forEach(function(o){
+    ctx.fillStyle='rgba(60,30,20,.95)';
+    ctx.beginPath();ctx.arc(o.x,o.y,o.r,0,6.3);ctx.fill();
+    ctx.strokeStyle='rgba(255,140,50,.8)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(o.x,o.y);ctx.lineTo(o.x-o.vx*0.03,o.y-o.vy*0.03);ctx.stroke();
+  });
+  /* ash: soft grey puffs that fade with life */
+  ctx.globalCompositeOperation='lighter';
+  ash.forEach(function(s){
+    var g=ctx.createRadialGradient(s.x,s.y,1,s.x,s.y,s.r*2);
+    g.addColorStop(0,'rgba(200,190,185,'+(0.30*Math.min(1,s.life/3))+')');
+    g.addColorStop(1,'rgba(200,190,185,0)');
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(s.x,s.y,s.r*2,0,6.3);ctx.fill();
+  });
+  ctx.globalCompositeOperation='source-over';
+  /* the vent glow */
+  if(venting>0){
+    var vg=ctx.createRadialGradient(VX,groundY(VX),2,VX,groundY(VX),90);
+    vg.addColorStop(0,'rgba(255,220,160,'+(0.5*Math.min(1,venting))+')');
+    vg.addColorStop(1,'rgba(255,120,40,0)');
+    ctx.fillStyle=vg;ctx.beginPath();ctx.arc(VX,groundY(VX),90,0,6.3);ctx.fill();
+  }
+  /* labels, drawn in the style of a diagram */
+  ctx.font='10px ui-monospace,Menlo,monospace';
+  ctx.fillStyle='rgba(240,231,226,.42)';
+  ctx.fillText('magma chamber',VX+165,CY+4);
+  ctx.fillText('conduit',VX+12,(CY+groundY(VX))/2);
+  ctx.fillText('vent',VX+8,groundY(VX)-8);
+}
+/* ---------- controls, readout ---------- */
+function bind(id,fn){var el=document.getElementById(id);
+  el.addEventListener('input',function(){fn(+el.value);});}
+bind('visc',function(v){visc=v;});
+bind('gas',function(v){gas=v;});
+bind('cool',function(v){cool=v;});
+document.getElementById('push').addEventListener('click',function(){
+  pressure=Math.min(0.99,pressure+0.22);chamber=Math.min(1,chamber+0.1);
+});
+document.getElementById('quiet').addEventListener('click',function(){
+  venting=0;pressure=0;ash=[];bombs=[];
+  document.getElementById('rS').textContent='quiet';
+  document.getElementById('rS').classList.remove('hot');
+});
+cv.addEventListener('pointerdown',function(e){
+  var r=cv.getBoundingClientRect();
+  var x=(e.clientX-r.left)*(W/r.width);
+  /* clicking the mountain adds magma: it pushes the chamber up */
+  chamber=Math.min(1,chamber+0.08);
+  pressure+=0.06;
+  for(var i=0;i<8;i++)magma.push({x:x+(i-4)*3,y:CY-20-i*4,
+    r:2+Math.random()*4,v:-(40+Math.random()*60),hot:1});
+});
+function readout(){
+  var p=document.getElementById('rP');
+  p.textContent=Math.round(pressure*100)+'%';
+  p.classList.toggle('hot',pressure>0.8);
+  document.getElementById('rC').textContent=Math.round(chamber*100)+'% full';
+  document.getElementById('rE').textContent=eruptions;
+  var len=0;lava.forEach(function(f){len+=f.trail.length;});
+  document.getElementById('rL').textContent=Math.round(len*1.4)+' m';
+  if(venting<=0&&document.getElementById('rS').textContent==='erupting'){
+    document.getElementById('rS').textContent='quiet';
+    document.getElementById('rS').classList.remove('hot');
+  }
+}
+var last=0;
+function loop(ts){
+  var dt=last?Math.min(.05,(ts-last)/1000):0;last=ts;
+  step(dt);draw();readout();
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

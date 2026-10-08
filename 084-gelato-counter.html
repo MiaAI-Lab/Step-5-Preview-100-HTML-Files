@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Scale — one cone, five flavours, one scoop</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:#fff6ee;color:#3a2a2a;
+  font:15px/1.62 ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+.serif{font-family:ui-serif,Georgia,"Times New Roman",serif}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.wrap{width:min(1100px,92vw);margin:0 auto}
+nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0 14px;
+  border-bottom:1px solid rgba(58,42,42,.18)}
+nav .brand{font-family:ui-serif,Georgia,serif;font-size:19px}
+nav .brand i{font-style:italic;color:#e0654a}
+nav ul{display:flex;gap:26px;list-style:none;margin:0;padding:0;font-size:11px;
+  letter-spacing:.24em;text-transform:uppercase;color:#94817c}
+nav a{color:inherit;text-decoration:none}nav a:hover{color:#e0654a}
+@media(max-width:780px){nav ul{display:none}}
+header.hero{padding:52px 0 24px;text-align:center}
+header.hero .kicker{font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:#e0654a;
+  margin:0 0 14px}
+header.hero h1{font-family:ui-serif,Georgia,serif;font-weight:400;
+  font-size:clamp(32px,5.6vw,64px);line-height:1.05;margin:0 0 16px}
+header.hero h1 em{font-style:italic;color:#4a7a8c}
+header.hero p{max-width:60ch;margin:0 auto;color:#7a6660}
+.case{position:relative;border:1px solid rgba(58,42,42,.16);border-radius:16px;
+  overflow:hidden;background:#f7ece0;margin-bottom:18px}
+.case canvas{display:block;width:100%;height:auto;touch-action:none;cursor:crosshair}
+.case .cap{position:absolute;left:14px;top:12px;font-size:10px;letter-spacing:.26em;
+  text-transform:uppercase;color:rgba(58,42,42,.45);pointer-events:none}
+.dock{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;justify-content:space-between;
+  border-top:1px solid rgba(58,42,42,.18);border-bottom:1px solid rgba(58,42,42,.18);
+  padding:16px 0;margin-bottom:32px}
+.dock label{display:grid;gap:7px;font-size:10px;letter-spacing:.26em;text-transform:uppercase;
+  color:#94817c;min-width:150px}
+input[type=range]{width:100%;accent-color:#e0654a}
+.btn{background:#e0654a;color:#fff4ef;border:0;border-radius:8px;padding:11px 15px;
+  font:inherit;font-size:12px;font-weight:700;letter-spacing:.08em;cursor:pointer;margin:0 6px 6px 0}
+.btn.ghost{background:transparent;color:#3a2a2a;border:1px solid rgba(58,42,42,.3)}
+.btn:hover{filter:brightness(1.07)}
+.flavours{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.flavours button{width:34px;height:34px;border-radius:50%;border:2px solid transparent;cursor:pointer}
+.flavours button[aria-pressed="true"]{border-color:#3a2a2a;transform:scale(1.12)}
+.readout{display:flex;flex-wrap:wrap;gap:12px 24px;margin-bottom:40px;
+  border-top:1px solid rgba(58,42,42,.18);padding-top:16px}
+.readout div{min-width:84px}
+.readout dt{font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:#94817c;margin:0 0 4px}
+.readout dd{margin:0;font-size:20px;font-family:ui-monospace,Menlo,monospace;color:#4a7a8c}
+.ticket{display:grid;grid-template-columns:1fr 200px;gap:20px;align-items:start;margin-bottom:44px}
+@media(max-width:900px){.ticket{grid-template-columns:1fr}}
+.rows{border:1px solid rgba(58,42,42,.18);border-radius:12px;padding:6px 16px;background:#fffaf5}
+.row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;
+  border-bottom:1px dotted rgba(58,42,42,.2);font-size:14px}
+.row:last-child{border-bottom:0}
+.row span{color:#7a6660}
+.row b{font-family:ui-monospace,Menlo,monospace;color:#3a2a2a;font-weight:500}
+.nutr{border:1px solid rgba(58,42,42,.18);border-radius:12px;padding:14px 16px;background:#fffaf5}
+.nutr h2{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:#94817c;
+  margin:0 0 10px;font-weight:600}
+.nutr .bar{margin-bottom:10px}
+.nutr .top{display:flex;justify-content:space-between;font-size:12px;color:#7a6660}
+.nutr .track{height:7px;border-radius:4px;background:#f0e2d6;overflow:hidden;margin-top:4px}
+.nutr .fill{height:100%;background:linear-gradient(90deg,#e0654a,#e8a33c)}
+.cells{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-bottom:46px}
+@media(max-width:820px){.cells{grid-template-columns:1fr}}
+.cell{border-top:1px solid rgba(58,42,42,.2);padding-top:16px}
+.cell .fig{font-family:ui-serif,Georgia,serif;font-size:38px;color:#4a7a8c;line-height:1;margin-bottom:8px}
+.cell h3{font-family:ui-serif,Georgia,serif;font-weight:400;font-style:italic;font-size:21px;margin:0 0 8px}
+.cell p{margin:0;color:#7a6660;font-size:14px}
+footer{border-top:1px solid rgba(58,42,42,.18);padding:22px 0 54px;display:flex;
+  justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:11px;letter-spacing:.2em;
+  text-transform:uppercase;color:#94817c}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="brand">The <i>Scale</i></div>
+    <ul>
+      <li><a href="#case">Counter</a></li>
+      <li><a href="#dock">Flavours</a></li>
+      <li><a href="#notes">Notes</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <p class="kicker">Overrun · freezing point · one scoop</p>
+    <h1 class="serif">An ice cream is<br>mostly <em>air</em></h1>
+    <p>A scoop is a foam: a lattice of ice crystals, fat and milk solids with air whipped
+       through it. The air is a quarter of the volume by law and up to a half by
+       practice, and it is the reason a scoop can be lighter than the cream that made it.</p>
+  </header>
+
+  <section class="case" id="case">
+    <canvas id="c" width="1000" height="520"></canvas>
+    <p class="cap">drag the scoop out of the tub · the scale reads in grams</p>
+  </section>
+
+  <section class="dock" id="dock">
+    <div>
+      <div class="flavours" id="flavours"></div>
+      <div class="flavours" id="cones"></div>
+    </div>
+    <label for="size">Scoop size <input id="size" type="range" min="20" max="120" value="62"></label>
+    <label for="over">Overrun <input id="over" type="range" min="0" max="100" value="34"></label>
+    <label for="hard">Freezer <input id="hard" type="range" min="0" max="100" value="22"></label>
+    <div>
+      <button class="btn" id="scoop">Scoop it</button>
+      <button class="btn ghost" id="cone">Onto a cone</button>
+    </div>
+  </section>
+
+  <section class="ticket">
+    <div class="rows" id="rows"></div>
+    <div class="nutr" id="nutr"></div>
+  </section>
+
+  <dl class="readout">
+    <div><dt>Flavour</dt><dd id="rF">stracciatella</dd></div>
+    <div><dt>Weight</dt><dd id="rW">—</dd></div>
+    <div><dt>Volume</dt><dd id="rV">—</dd></div>
+    <div><dt>Overrun</dt><dd id="rO">34%</dd></div>
+    <div><dt>Temperature</dt><dd id="rT">—</dd></div>
+    <div><dt>Cones</dt><dd id="rC">0</dd></div>
+  </dl>
+
+  <section class="cells">
+    <div class="cell">
+      <div class="fig serif">i</div>
+      <h3>Overrun</h3>
+      <p>The extra volume the churn whips in, as a percentage of the mix. At zero the scoop
+         is the density of cream; at a hundred it is half air and half everything else, and
+         the same scoop weighs a third less.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">ii</div>
+      <h3>Freezing</h3>
+      <p>Ice cream is scoopable between minus sixteen and minus twelve. Pulled colder it is
+         a brick; left warmer it melts and the foam collapses, and the air leaves for good.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">iii</div>
+      <h3>The scoop</h3>
+      <p>A scoop is a hemisphere with a curl, and the curl is what makes it come away from
+         the tub cleanly. Drag it out and the weight on the scale falls as the air holds it
+         up.</p>
+    </div>
+  </section>
+
+  <section class="cells" id="notes">
+    <div class="cell">
+      <div class="fig serif">iv</div>
+      <h3>The ticket</h3>
+      <p>Weight, volume, air volume, mix volume and price are all computed from the scoop
+         size and the overrun. A bigger scoop is not a heavier one once the air is in.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">v</div>
+      <h3>Nutrition</h3>
+      <p>The bars are the mix, not the air: fat, sugar and protein per hundred grams of the
+         mix itself, so they do not change with the overrun — only the weight does.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">vi</div>
+      <h3>Cones</h3>
+      <p>Onto a cone drops the scoop onto a waffle and adds one to the count. The cone is
+         drawn with a lattice and a rolled rim, because that is what it is.</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>The Scale · one canvas, no files</span>
+    <span class="mono">grams · ml · overrun %</span>
+  </footer>
+</div>
+<script>
+(function(){
+"use strict";
+var cv=document.getElementById('c'),ctx=cv.getContext('2d');
+var W=cv.width,H=cv.height;
+var size=62,over=34,hard=22,cones=0,t=0;
+var FLAVOURS=[
+ {n:'fior di latte',a:'#f4e6c8',b:'#dcc9a0',chip:null,fat:9,sugar:14,prot:4},
+ {n:'stracciatella',a:'#f4e6c8',b:'#dcc9a0',chip:'#3a2a1c',fat:10,sugar:15,prot:4},
+ {n:'pistachio',a:'#c8d8a0',b:'#a8b878',chip:'#8a9a58',fat:11,sugar:13,prot:5},
+ {n:'cioccolato',a:'#6b4a34',b:'#3e2a1c',chip:null,fat:12,sugar:18,prot:5},
+ {n:'fragola',a:'#f0a8a8',b:'#d47878',chip:'#c85a6a',fat:8,sugar:16,prot:4},
+ {n:'caffè',a:'#a8845c',b:'#6b4e34',chip:null,fat:10,sugar:15,prot:4},
+ {n:'limone',a:'#f0e8a0',b:'#d8cc78',chip:null,fat:7,sugar:17,prot:3},
+ {n:'nocciola',a:'#c8a878',b:'#9c7c50',chip:'#7a5c38',fat:12,sugar:16,prot:5}
+];
+var fl=FLAVOURS[1];
+var CONES=[
+ {n:'waffle',a:'#d8a860',b:'#a87838'},   /* warm tan */
+ {n:'chocolate',a:'#6b4a34',b:'#3e2a1c'},
+ {n:'sugar',a:'#e8d8b8',b:'#c0a878'},
+ {n:'cake',a:'#c8805a',b:'#9c5c3a'}
+];
+var coneType=CONES[0];
+function mix(a,b,k){
+  var A=[parseInt(a.slice(1,3),16),parseInt(a.slice(3,5),16),parseInt(a.slice(5,7),16)];
+  var B=[parseInt(b.slice(1,3),16),parseInt(b.slice(3,5),16),parseInt(b.slice(5,7),16)];
+  return 'rgb('+Math.round(A[0]+(B[0]-A[0])*k)+','+Math.round(A[1]+(B[1]-A[1])*k)+
+    ','+Math.round(A[2]+(B[2]-A[2])*k)+')';
+}
+/* the scoop: a hemisphere with a curl, its size in pixels from the slider */
+/* the tub */
+var tubX=W*0.26,tubY=H*0.52,tubR=110;
+/* the scoop position: starts in the tub, drags out */
+var scoop={x:tubX,y:tubY,r:size,drag:false,out:0};
+/* weight and volume from the mix density and the overrun */
+function volumeML(){
+  /* a hemisphere of radius r has 2/3 pi r^3 cubic pixels; scale to ml */
+  var r=scoop.r;
+  return (2/3)*Math.PI*r*r*r/40;
+}
+function mixML(){return volumeML()/(1+over/100);}
+function airML(){return volumeML()-mixML();}
+function weightG(){
+  /* the mix density of ice cream base is about 1.1 g/ml */
+  return mixML()*1.1;
+}
+function tempC(){
+  /* the freezer slider maps from -6 to -20 */
+  return (-6-hard*0.14).toFixed(1);
+}
+/* ---------- drawing ---------- */
+function draw(){
+  /* the counter */
+  var g=ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'#f7ece0');g.addColorStop(1,'#e8d8c8');
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  /* the tub: a stainless pan with a rolled rim */
+  ctx.fillStyle='#b8b4b0';
+  ctx.beginPath();ctx.ellipse(tubX,tubY,tubR*1.16,tubR*0.34,0,0,6.3);ctx.fill();
+  ctx.fillStyle='#d4d0cc';
+  ctx.beginPath();ctx.ellipse(tubX,tubY-6,tubR*1.1,tubR*0.3,0,0,6.3);ctx.fill();
+  /* the ice cream inside the tub, with a scooped hollow */
+  ctx.fillStyle=fl.b;
+  ctx.beginPath();ctx.ellipse(tubX,tubY-4,tubR,tubR*0.26,0,0,6.3);ctx.fill();
+  /* chips in the tub */
+  if(fl.chip){
+    ctx.fillStyle=fl.chip;
+    for(var i=0;i<26;i++){
+      var a=i*1.31,r=Math.sqrt(i/26)*tubR*0.92;
+      ctx.beginPath();ctx.ellipse(tubX+Math.cos(a)*r,tubY-4+Math.sin(a)*r*0.26,
+        3.2,1.7,a,0,6.3);ctx.fill();
+    }
+  }
+  /* the scale base */
+  ctx.fillStyle='#8c8884';
+  ctx.fillRect(W*0.74,H*0.66,200,16);
+  ctx.fillStyle='#f7ece0';
+  ctx.fillRect(W*0.74,H*0.70,200,60);
+  ctx.strokeStyle='#3a2a2a';ctx.lineWidth=1.4;
+  ctx.strokeRect(W*0.74,H*0.70,200,60);
+  /* the display */
+  ctx.fillStyle='#2b3a34';
+  ctx.fillRect(W*0.74+16,H*0.70+12,168,36);
+  ctx.fillStyle=hard>60?'#ffb0a0':'#8fe0b0';
+  ctx.font='26px ui-monospace,Menlo,monospace';
+  ctx.textAlign='right';ctx.textBaseline='middle';
+  ctx.fillText(weightG().toFixed(0)+' g',W*0.74+168,H*0.70+31);
+  ctx.fillStyle='#8c8884';
+  ctx.font='9px ui-monospace,Menlo,monospace';
+  ctx.textAlign='center';
+  ctx.fillText('SCALE · tare on scoop',W*0.74+100,H*0.70+54);
+  /* the cone, if one has been dropped */
+  if(cones>0&&scoop.out<0.05){
+    drawCone(scoop.x,scoop.y+scoop.r*0.4);
+  }
+  /* the scoop */
+  drawScoop();
+  /* the flavour label on the tub */
+  ctx.fillStyle='#e0654a';
+  ctx.font='12px ui-serif,Georgia,serif';
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(fl.n,tubX,tubY+tubR*0.62);
+  /* the freezer thermometer */
+  drawTemp();
+  /* the scale drawing of the scoop at the far end */
+  ctx.strokeStyle='rgba(58,42,42,.25)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(scoop.x,40);ctx.lineTo(scoop.x,60);ctx.stroke();
+}
+/* a hemisphere with a curl, drawn as a gradient ball with a curl across it */
+function drawScoop(){
+  var x=scoop.x,y=scoop.y,r=scoop.r;
+  /* the shadow */
+  ctx.fillStyle='rgba(58,42,42,.18)';
+  ctx.beginPath();ctx.ellipse(x+8,y+r*0.55,r*0.95,r*0.22,0,0,6.3);ctx.fill();
+  /* the body */
+  var sg=ctx.createRadialGradient(x-r*0.3,y-r*0.4,r*0.1,x,y,r);
+  sg.addColorStop(0,mix(fl.a,'#ffffff',0.55));
+  sg.addColorStop(0.5,fl.a);
+  sg.addColorStop(1,fl.b);
+  ctx.fillStyle=sg;
+  ctx.beginPath();ctx.arc(x,y,r,Math.PI,0);ctx.closePath();ctx.fill();
+  /* the curl: a wide flat band across the top, which is what a scoop actually is */
+  ctx.fillStyle=mix(fl.a,fl.b,0.4);
+  ctx.beginPath();
+  ctx.ellipse(x,y,r*0.92,r*0.30,0,0,6.3);ctx.fill();
+  ctx.fillStyle=mix(fl.a,'#ffffff',0.25);
+  ctx.beginPath();ctx.ellipse(x,y-r*0.05,r*0.78,r*0.16,0,0,6.3);ctx.fill();
+  /* chips on the surface */
+  if(fl.chip){
+    ctx.fillStyle=fl.chip;
+    for(var c=0;c<14;c++){
+      var a2=c*2.4,rr=Math.sqrt(c/14)*r*0.8;
+      ctx.fillRect(x+Math.cos(a2)*rr-2.6,y-r*0.28+Math.sin(a2)*rr*0.22-1.4,5.2,2.8);
+    }
+  }
+  /* the air bubbles: a foam, after all */
+  ctx.fillStyle='rgba(255,255,255,.4)';
+  for(var b=0;b<10;b++){
+    var ab=b*1.9,rb=Math.sqrt(b/10)*r*0.7;
+    ctx.beginPath();ctx.arc(x+Math.cos(ab)*rb,y-r*0.35+Math.sin(ab)*rb*0.2,
+      1.4+b*0.12,0,6.3);ctx.fill();
+  }
+}
+function drawCone(x,y){
+  /* the waffle cone: a triangle with a lattice and a rolled rim */
+  ctx.fillStyle=coneType.a;
+  ctx.beginPath();
+  ctx.moveTo(x-34,y);
+  ctx.lineTo(x+34,y);
+  ctx.lineTo(x+4,y+150);
+  ctx.closePath();ctx.fill();
+  ctx.strokeStyle=coneType.b;ctx.lineWidth=1.2;
+  for(var i=1;i<6;i++){
+    ctx.beginPath();ctx.moveTo(x-34+i*11.3,y);ctx.lineTo(x+4+ (i-2.5)*1.4,y+150);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(x+34-i*11.3,y);ctx.lineTo(x+4-(i-2.5)*1.4,y+150);ctx.stroke();
+  }
+  /* the rolled rim */
+  ctx.fillStyle=coneType.b;
+  ctx.beginPath();ctx.ellipse(x,y,34,8,0,0,6.3);ctx.fill();
+  ctx.fillStyle=coneType.a;
+  ctx.beginPath();ctx.ellipse(x,y,28,5.5,0,0,6.3);ctx.fill();
+}
+function drawTemp(){
+  var x=W*0.90,y=H*0.20;
+  ctx.fillStyle='#f7ece0';ctx.fillRect(x-40,y-70,80,150);
+  ctx.strokeStyle='#3a2a2a';ctx.lineWidth=1.4;ctx.strokeRect(x-40,y-70,80,150);
+  ctx.fillStyle='#3a2a2a';ctx.font='9px ui-monospace,Menlo,monospace';
+  ctx.textAlign='center';
+  ctx.fillText('FREEZER',x,y-58);
+  /* a vertical bar with the scoopable band marked */
+  var top=y-40,h=110;
+  ctx.fillStyle='#e8d8c8';ctx.fillRect(x-14,top,28,h);
+  /* the scoopable band, -12 to -16 */
+  var band=(((-12-tempC())/8));
+  ctx.fillStyle='#8fe0b0';
+  ctx.fillRect(x-14,top+((1-Math.max(0,Math.min(1,band)))*h),28,h*0.22);
+  /* the column */
+  var level=(((-6-tempC())/14));
+  ctx.fillStyle=hard>60?'#e0654a':'#4a7a8c';
+  ctx.fillRect(x-14,top+(1-Math.max(0,Math.min(1,level)))*h,28,Math.max(2,level*h));
+  ctx.fillStyle='#3a2a2a';
+  ctx.fillText(tempC()+'°',x,top+h+14);
+  ctx.fillText('scoopable',x,top+h+28);
+}
+
+/* ---------- controls, ticket, loop ---------- */
+var fbox=document.getElementById('flavours');
+FLAVOURS.forEach(function(f,i){
+  var b=document.createElement('button');
+  b.title=f.n;
+  b.style.background='radial-gradient(circle at 35% 30%,'+f.a+','+f.b+')';
+  b.setAttribute('aria-pressed',String(i===1));
+  b.addEventListener('click',function(){
+    fl=f;
+    [].slice.call(fbox.children).forEach(function(o){
+      o.setAttribute('aria-pressed',String(o===b));});
+    document.getElementById('rF').textContent=f.n;
+  });
+  fbox.appendChild(b);
+});
+var cbox=document.getElementById('cones');
+CONES.forEach(function(c,i){
+  var b=document.createElement('button');
+  b.title=c.n;
+  b.style.background=linear(c.a,c.b);
+  b.setAttribute('aria-pressed',String(i===0));
+  b.addEventListener('click',function(){
+    coneType=c;
+    [].slice.call(cbox.children).forEach(function(o){
+      o.setAttribute('aria-pressed',String(o===b));});
+  });
+  cbox.appendChild(b);
+});
+function linear(a,b){return 'linear-gradient(135deg,'+a+','+b+')';}
+function bind(id,fn){var el=document.getElementById(id);
+  el.addEventListener('input',function(){fn(+el.value);});}
+bind('size',function(v){scoop.r=v;});
+bind('over',function(v){over=v;});
+bind('hard',function(v){hard=v;});
+document.getElementById('scoop').addEventListener('click',function(){
+  scoop.out=scoop.out>0.5?0:1;
+});
+document.getElementById('cone').addEventListener('click',function(){
+  cones++;scoop.out=1;
+});
+/* dragging the scoop out of the tub */
+cv.addEventListener('pointerdown',function(e){
+  var r=cv.getBoundingClientRect();
+  var x=(e.clientX-r.left)*(W/r.width),y=(e.clientY-r.top)*(H/r.height);
+  if(Math.hypot(x-scoop.x,y-scoop.y)<scoop.r*1.2){
+    scoop.drag=true;cv.setPointerCapture(e.pointerId);
+  }
+});
+cv.addEventListener('pointermove',function(e){
+  if(!scoop.drag)return;
+  var r=cv.getBoundingClientRect();
+  scoop.x=(e.clientX-r.left)*(W/r.width);
+  scoop.y=(e.clientY-r.top)*(H/r.height);
+  var d=Math.hypot(scoop.x-tubX,scoop.y-tubY);
+  scoop.out=Math.max(0,Math.min(1,(d-tubR*0.6)/120));
+});
+function endDrag(){scoop.drag=false;}
+cv.addEventListener('pointerup',endDrag);
+cv.addEventListener('pointercancel',endDrag);
+function ticket(){
+  var rows=[
+    ['Flavour',fl.n],
+    ['Scoop weight',weightG().toFixed(0)+' g'],
+    ['Scoop volume',volumeML().toFixed(0)+' ml'],
+    ['Mix in it',mixML().toFixed(0)+' ml'],
+    ['Air in it',airML().toFixed(0)+' ml'],
+    ['Overrun',over+'%'],
+    ['Price',(0.9+volumeML()*0.018).toFixed(2)+' €']
+  ];
+  var box=document.getElementById('rows');
+  box.innerHTML='';
+  rows.forEach(function(r){
+    var d=document.createElement('div');d.className='row';
+    d.innerHTML='<span>'+r[0]+'</span><b>'+r[1]+'</b>';
+    box.appendChild(d);
+  });
+  var n=document.getElementById('nutr');
+  n.innerHTML='<h2>Per 100 g of mix</h2>';
+  [['Fat',fl.fat,20],['Sugar',fl.sugar,25],['Protein',fl.prot,8]].forEach(function(m){
+    var d=document.createElement('div');d.className='bar';
+    d.innerHTML='<div class="top"><span>'+m[0]+'</span><span>'+m[1]+' g</span></div>'+
+      '<div class="track"><div class="fill" style="width:'+(m[1]/m[2]*100)+'%"></div></div>';
+    n.appendChild(d);
+  });
+}
+function readout(){
+  document.getElementById('rW').textContent=weightG().toFixed(0)+' g';
+  document.getElementById('rV').textContent=volumeML().toFixed(0)+' ml';
+  document.getElementById('rO').textContent=over+'%';
+  document.getElementById('rT').textContent=tempC()+' °C';
+  document.getElementById('rC').textContent=cones;
+}
+var last=0;
+function loop(ts){
+  var dt=last?Math.min(.05,(ts-last)/1000):0;last=ts;
+  t+=dt;
+  scoop.r+= (size-scoop.r)*dt*3;
+  /* the tub drops as it is emptied */
+  draw();ticket();readout();
+  requestAnimationFrame(loop);
+}
+draw();ticket();readout();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

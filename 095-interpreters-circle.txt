@@ -1,0 +1,83 @@
+# THE INTERPRETER'S CIRCLE — harmony you can see
+
+## Short title
+Interpreter's Circle
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: Paul Hindemith's circle of
+twelve notes ordered by the closeness of each interval to the root, where a chord is a
+vector with a direction and a pull, and where every instrument is drawn on canvas and
+sounds from real partial amplitudes. No external dependencies whatsoever — no CDN, no web
+fonts, no external images, no JS libraries. All CSS and JavaScript inline, works offline
+by double-clicking, responsive, valid HTML5.
+
+Artistic direction: a warm printed score. Ground #f6f2ea, hairlines rgba(32,24,15,.16),
+body #20180f with muted #5c5040, ink brown #8c5a1e as the accent and brass #c99a5c for
+the instrument. Serif headings with italic accent words, uppercase .2em–.4em kickers,
+monospace figures.
+
+Hindemith's circle is the table [0,7,4,3,10,2,9,5,8,11,6,1] — the root, then the fifth,
+the major third, the minor third, and so on outward — so a note's position on the ring is
+how far it sits from home. Tension is the mean of the chord's notes' positions divided by
+eleven. A chord's vector is the sum of its notes' unit vectors on that circle, drawn as
+an arrow from the centre; the resolution is that arrow's angle read as a step round the
+circle.
+
+The instruments are drawn as vector line art — a clarinet of cylinder, bell and mouthpiece;
+a violin of two bezier waists; an oboe of body, flare and four key holes; a flute of a tube
+with seven finger holes — and their timbres are stacks of partials with real amplitudes.
+A clarinet's even harmonics are almost silent, a flute has almost nothing above the
+second, an oboe is reedy and hollow, a violin is rich above the octave. The sound is Web
+Audio: one sine oscillator per partial above each note's fundamental, with a slow vibrato
+LFO, through a shared gain whose level is the volume slider.
+
+Ten chords: major, minor, diminished, augmented, sus 4, dominant seventh, major seventh,
+minor seventh, diminished seventh and a Neapolitan. Controls: ten chords, four instruments,
+tension, volume, reed weight, Resolve it, Circle of fifths. Dragging over a note lights
+it. Readout: chord, root, tension, vector angle, resolves to.
+
+Layout: nav, centred hero, the circle canvas with its caption beside a control column,
+then two three-cell note rows on the ordering, the vector, the additive timbre and the
+partials, then a footer.
+
+Interaction: the page opens on a C dominant seventh. Visitors switch chords and watch the
+arrow swing and the tension climb, press Resolve it and hear the chord settle and a ring
+expand out of the centre, flip to the circle of fifths to see the same twelve notes in the
+other order, switch instruments and hear the timbre change wholesale because the partials
+do, drag the reed weight to sharpen or hollow the sound, and touch a note to light it.
+
+## One-paragraph description of the intended design
+A warm-inked circle of twelve notes on canvas, ordered by Hindemith's interval table so a
+note's place on the ring is its distance from the root — where each chord is an arrow
+summed from its notes' unit vectors and its tension is the mean of their positions, four
+vector-drawn instruments sit at the foot of the ring with their partial amplitudes printed
+beneath them, and pressing a chord sounds it through Web Audio as one sine oscillator per
+partial with a slow vibrato.
+
+## Major visual techniques used
+- Hindemith's circle as the table [0,7,4,3,10,2,9,5,8,11,6,1], so position is interval
+  distance from the root, and a toggle to the circle of fifths for the other reading
+- The chord's vector as the sum of its notes' unit vectors, drawn as a gradient arrow with
+  a filled head from the centre of the ring
+- Tension as the mean of the chord's notes' positions divided by eleven, blended with the
+  tension slider
+- Resolution read as the vector's angle in steps round the circle, and named as a major
+  chord on that root
+- Instruments drawn as vector line art: clarinet of cylinder, bell and mouthpiece; violin
+  of two bezier waists; oboe of body, flare and four keys; flute of a tube with seven holes
+- Partial amplitudes printed as a bar strip under the ring, scaled by the reed weight, so
+  the timbre is visible as well as audible
+- A wave drawn round each sounding note, with a lobe count equal to the note's pitch class
+- Radial glow on each active note, with a hit envelope that decays
+- Two dashed echo rings inside and outside the main ring
+- Web Audio timbre: one sine oscillator per partial above each note's fundamental, with a
+  slow vibrato LFO per partial, through a shared gain
+- Ten chords including diminished seventh and a Neapolitan
+
+## Intended interaction model
+A score you can hear. Visitors pick a chord and watch the arrow swing and the tension
+climb; press Resolve it and a ring expands out of the centre as the chord settles; flip to
+the circle of fifths to see the same twelve notes in the other order; switch instrument and
+hear the timbre change wholesale because the partials do; drag the reed weight to sharpen
+or hollow the sound; and touch a note to light it.

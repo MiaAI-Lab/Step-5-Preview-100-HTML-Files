@@ -1,0 +1,79 @@
+# TRENCH — The Hadal Zone, 6 000 m
+
+## Short title
+Hadal Trench
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a hadal-trench
+biome scene called TRENCH. No external dependencies whatsoever — no CDN, no web
+fonts, no external images, no external SVG files, no JavaScript libraries. All CSS
+and JavaScript inline, works offline by double-clicking, responsive, valid HTML5.
+
+Artistic direction: the deepest water on the planet. An abyss gradient (#01131c →
+#010c14 → #01080e) with a teal wash at the floor, whose CSS brightness is
+recomputed every frame from the Life slider so the whole page breathes between
+populated and empty. The light source is a hydrothermal vent at the bottom centre:
+a warm orange radial whose radius scales with the Plume slider, over which forty
+dark smoker particles rise on a hash-driven position, wrapping vertically.
+
+Three animal populations, each drawn in additive blend. Marine snow falls upward
+when the Current slider is positive, drifting on per-particle sines. Fine motes are
+pushed horizontally by the current and gently attracted toward the pointer within
+220 pixels, so a cursor gathers them the way a submersible's beam gathers
+plankton — the page's one physical joke. Up to sixteen jellyfish drift past on
+their own velocities; each has a bell whose radius pulses on its own phase, five
+internal ribs, and six to thirteen tentacles drawn as four-segment sine-wobbling
+curves behind it, all tinted either hue 195 (cyan) or hue 275 (violet). Each jelly
+has a random burst state that decays at 0.93 per frame, thickening its bell when
+firing.
+
+Layout: a full-viewport canvas over the abyss with a floating UI overlay whose
+pointer-events pass through except on the controls. Top-left is a monospace label
+above an italic serif headline with one line in bioluminescent pink, plus a short
+paragraph. Top-right is a monospace gauge stack showing depth, pressure and
+temperature, each derived live from the current setting. Bottom is a glass tray
+with three sliders (Current 0–100, Life 0–100, Plume 0–100) plus Vent and Calm
+buttons, and a monospace hint.
+
+Interaction: the Current slider pushes everything sideways and pulls marine snow
+upward; Life changes the population counts (rebuilding all three arrays) and the
+page brightness; Plume scales the vent glow and the smoker density. Vent toggles
+the whole thermal feature off. Calm zeroes everything and rebuilds, which is the
+calmest the trench ever gets. Moving the pointer gathers the motes. On narrow
+screens the paragraph, gauges and hint hide.
+
+## One-paragraph description of the intended design
+A hydrothermal trench: a vent glowing at the floor with dark smoker particles
+rising through it, marine snow carried upward by the current, fine motes that
+gather toward your cursor, and up to sixteen pulsing jellyfish with sine-wobbling
+tentacles in cyan and violet — all additively blended over an abyss gradient whose
+brightness, population and vent scale are retunable live.
+
+## Major visual techniques used
+- Warm vent radial whose radius and alpha scale with the Plume slider
+- Forty smoker particles positioned from an integer hash, wrapping vertically
+- Marine snow pushed upward by the current, on per-particle sine drift
+- Motes gathered toward the pointer within a 220-pixel radius, plus horizontal
+  current push
+- Jellyfish bells whose radius pulses on a per-animal phase, with five internal
+  ribs drawn as quadratic curves
+- Tentacles as four-segment sine-wobbling curves drawn behind the bell
+- Two-colour jelly palette (hue 195 cyan, hue 275 violet) split across the population
+- Burst states that thicken the bell and decay at 0.93 per frame
+- Additive compositing ('lighter') for all three populations
+- CSS abyss gradient whose brightness is recomputed per frame from Life
+- Warm floor rim gradient at the bottom 18% of the frame
+- Live gauges: depth (6012 + current), pressure and temperature, each derived from
+  the current setting
+- Calm preset that zeroes all three sliders, turns the vent off and rebuilds the
+  populations
+- Italic serif headline with one pink line against 8.5px tracked monospace
+- Floating glass tray with backdrop-filter blur; extras hidden under 760px
+
+## Intended interaction model
+A scene you can tune. Visitors set the current, the density of life and the vent
+activity, then watch the trench repopulate itself; moving the pointer gathers the
+motes. Vent strips the heat away, and Calm empties everything to the stillest
+possible frame. The populations rebuild whenever Life changes, so the page responds
+to every slider immediately.

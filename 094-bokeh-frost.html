@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Frost on Glass — circles of confusion</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:#0c1014;color:#e8f0f6;
+  font:15px/1.62 ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+.serif{font-family:ui-serif,Georgia,"Times New Roman",serif}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.wrap{width:min(1120px,92vw);margin:0 auto}
+nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0 14px;
+  border-bottom:1px solid rgba(232,240,246,.14)}
+nav .brand{font-family:ui-serif,Georgia,serif;font-size:19px}
+nav .brand i{font-style:italic;color:#9fd8f0}
+nav ul{display:flex;gap:26px;list-style:none;margin:0;padding:0;font-size:11px;
+  letter-spacing:.24em;text-transform:uppercase;color:#8496a3}
+nav a{color:inherit;text-decoration:none}nav a:hover{color:#9fd8f0}
+@media(max-width:780px){nav ul{display:none}}
+header.hero{padding:52px 0 20px;text-align:center}
+header.hero .kicker{font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:#9fd8f0;
+  margin:0 0 14px}
+header.hero h1{font-family:ui-serif,Georgia,serif;font-weight:400;
+  font-size:clamp(32px,5.6vw,62px);line-height:1.05;margin:0 0 16px}
+header.hero h1 em{font-style:italic;color:#ffd8a0}
+header.hero p{max-width:60ch;margin:0 auto;color:#93a4b2}
+.glass{position:relative;border:1px solid rgba(232,240,246,.16);border-radius:16px;
+  overflow:hidden;background:#080c10;margin-bottom:18px}
+.glass canvas{display:block;width:100%;height:auto;touch-action:none;cursor:crosshair}
+.glass .cap{position:absolute;left:14px;top:12px;font-size:10px;letter-spacing:.26em;
+  text-transform:uppercase;color:rgba(232,240,246,.5);pointer-events:none}
+.dock{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;justify-content:space-between;
+  border-top:1px solid rgba(232,240,246,.14);border-bottom:1px solid rgba(232,240,246,.14);
+  padding:16px 0;margin-bottom:32px}
+.dock label{display:grid;gap:7px;font-size:10px;letter-spacing:.26em;text-transform:uppercase;
+  color:#8496a3;min-width:150px}
+input[type=range]{width:100%;accent-color:#9fd8f0}
+.btn{background:#9fd8f0;color:#04222c;border:0;border-radius:8px;padding:11px 15px;
+  font:inherit;font-size:12px;font-weight:700;letter-spacing:.08em;cursor:pointer;margin:0 6px 6px 0}
+.btn.ghost{background:transparent;color:#e8f0f6;border:1px solid rgba(232,240,246,.24)}
+.btn:hover{filter:brightness(1.07)}
+.rows{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.rows button{background:#0d1620;border:1px solid rgba(232,240,246,.16);border-radius:999px;
+  padding:8px 14px;font:inherit;font-size:12px;color:#e8f0f6;cursor:pointer}
+.rows button[aria-pressed="true"]{background:#9fd8f0;border-color:#9fd8f0;color:#04222c}
+.readout{display:flex;flex-wrap:wrap;gap:12px 24px;margin-bottom:40px;
+  border-top:1px solid rgba(232,240,246,.14);padding-top:16px}
+.readout div{min-width:88px}
+.readout dt{font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:#8496a3;margin:0 0 4px}
+.readout dd{margin:0;font-size:20px;font-family:ui-monospace,Menlo,monospace;color:#ffd8a0}
+.cells{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-bottom:46px}
+@media(max-width:820px){.cells{grid-template-columns:1fr}}
+.cell{border-top:1px solid rgba(232,240,246,.16);padding-top:16px}
+.cell .fig{font-family:ui-serif,Georgia,serif;font-size:38px;color:#9fd8f0;line-height:1;margin-bottom:8px}
+.cell h3{font-family:ui-serif,Georgia,serif;font-weight:400;font-style:italic;font-size:21px;margin:0 0 8px}
+.cell p{margin:0;color:#93a4b2;font-size:14px}
+footer{border-top:1px solid rgba(232,240,246,.14);padding:22px 0 54px;display:flex;
+  justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:11px;letter-spacing:.2em;
+  text-transform:uppercase;color:#6a7a86}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="brand">Frost on <i>Glass</i></div>
+    <ul>
+      <li><a href="#glass">Glass</a></li>
+      <li><a href="#dock">Lens</a></li>
+      <li><a href="#notes">Notes</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <p class="kicker">Circle of confusion · hexagonal crystals · diffraction</p>
+    <h1 class="serif">A ring is the hole<br>the light came <em>through</em></h1>
+    <p>An out-of-focus point of light is not a soft blob. It is the shape of the aperture,
+       projected — which is why a bright window becomes a ring at f/2 and a hexagon at
+       f/16, and why the frost's own edges pick up colour.</p>
+  </header>
+
+  <section class="glass" id="glass">
+    <canvas id="c" width="1000" height="560"></canvas>
+    <p class="cap">drag the focus · every ring grows from the focus distance</p>
+  </section>
+
+  <section class="dock" id="dock">
+    <div>
+      <div class="rows" id="blades"></div>
+      <div class="rows" id="lights"></div>
+    </div>
+    <label for="f">Focal length <input id="f" type="range" min="1" max="200" value="85"></label>
+    <label for="ap">Aperture <input id="ap" type="range" min="0" max="100" value="52"></label>
+    <label for="dist">Focus distance <input id="dist" type="range" min="5" max="100" value="26"></label>
+    <div>
+      <button class="btn" id="refrost">Re-frost the glass</button>
+      <button class="btn ghost" id="defrost">Wipe a patch</button>
+    </div>
+  </section>
+
+  <dl class="readout">
+    <div><dt>Circles</dt><dd id="rC">—</dd></div>
+    <div><dt>CoC radius</dt><dd id="rR">—</dd></div>
+    <div><dt>Blades</dt><dd id="rB">7</dd></div>
+    <div><dt>Max aperture</dt><dd id="rD">—</dd></div>
+    <div><dt>Hyperfocal</dt><dd id="rH">—</dd></div>
+    <div><dt>Depth of field</dt><dd id="rF">—</dd></div>
+  </dl>
+
+  <section class="cells">
+    <div class="cell">
+      <div class="fig serif">i</div>
+      <h3>Circle of confusion</h3>
+      <p>How far a point spreads depends on the aperture, the focus distance and how far
+         the point is from the plane of focus. Wide open, a streetlight fills a ring; at
+         f/16 the same light is a small hexagon.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">ii</div>
+      <h3>The shape of the hole</h3>
+      <p>Diaphragm blades straighten into a polygon. Five blades give a pentagon, six a
+         hexagon, nine a nine-sided figure that reads as a circle and eleven as a rounder
+         one. The bokeh is the aperture's silhouette.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">iii</div>
+      <h3>Frost</h3>
+      <p>Water vapour landing on cold glass grows as hexagonal plates, then dendrites,
+         because ice's crystal structure is hexagonal and growth follows its own
+         structure. Every edge is a hexagon at a different scale.</p>
+    </div>
+  </section>
+
+  <section class="cells" id="notes">
+    <div class="cell">
+      <div class="fig serif">iv</div>
+      <h3>Diffraction</h3>
+      <p>The thin coloured fringe on a bright edge is the light bending round the same
+         crystal edges it grew past. Colour there is physics, not decoration.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">v</div>
+      <h3>Depth of field</h3>
+      <p>Change focal length or aperture and the near and far limits of sharpness move with
+         them. The numbers in the corner are the ones the blur circles are generated from.</p>
+    </div>
+    <div class="cell">
+      <div class="fig serif">vi</div>
+      <h3>Wipe</h3>
+      <p>Wipe a patch and the frost clears in the shape of the drag: the rings behind it
+         come into focus, which is what wiping frost off a window actually does.</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>Frost on Glass · one canvas, no files</span>
+    <span class="mono">f/1.4 – f/22 · 5–11 blades</span>
+  </footer>
+</div>
+<script>
+(function(){
+"use strict";
+var cv=document.getElementById('c'),ctx=cv.getContext('2d');
+var W=cv.width,H=cv.height;
+var foc=85,apSlider=52,dist=26,t=0;
+var BLADES=[5,6,7,9,11];
+var blades=7;
+var LIGHTS=[
+ {n:'streetlights',col:'#ffd8a0',n_:46,r:[10,26]},
+ {n:'neon',col:'#ff9ec8',n_:32,r:[8,22]},
+ {n:'car lights',col:'#fff0e0',n_:40,r:[7,20]},
+ {n:'candles',col:'#ffcf90',n_:28,r:[6,18]},
+ {n:'phosphor',col:'#9fd8f0',n_:52,r:[5,16]}
+];
+var lights=LIGHTS[0];
+/* the lights, generated once per kind */
+var points=[];
+function makePoints(){
+  points=[];
+  for(var i=0;i<lights.n_;i++){
+    points.push({
+      x:Math.random()*W,y:Math.random()*H*0.86,
+      z:0.55+Math.random()*0.45,
+      ph:Math.random()*6.28,
+      hue:lights.col
+    });
+  }
+}
+makePoints();
+/* the frost: a set of hexagon plates seeded once, and a wiped list */
+var plates=[];
+function makePlates(){
+  plates=[];
+  for(var i=0;i<120;i++){
+    plates.push({
+      x:Math.random()*W,y:Math.random()*H,
+      s:8+Math.random()*40,
+      rot:Math.random()*1.05,
+      branches:3+((Math.random()*3)|0)
+    });
+  }
+  plates.sort(function(a,b){return b.s-a.s;});
+}
+makePlates();
+var wiped=[];
+/* ---------- the optics ---------- */
+function fstop(){
+  /* the aperture slider maps f/1.4 at the bottom to f/22 at the top */
+  var f=1.4*Math.pow(22/1.4,apSlider/100);
+  return f;
+}
+function maxAperture(){
+  /* a lens's fastest stop lengthens with focal length, roughly */
+  return Math.max(1.4,foc*0.016+1.2);
+}
+function aperture(){
+  var f=fstop();
+  return Math.max(maxAperture(),f);
+}
+function cocRadius(){
+  /* a 0.05 mm circle of confusion, on a 44mm vertical frame */
+  var N=aperture(),F=foc,u=dist*100;
+  var v=F*u/(u-F);
+  return Math.abs(N*F*(u-v)/1000)*2.2;
+}
+function hyperfocal(){
+  /* H = f^2 / (N c) + f, with c = 0.05 mm and everything in mm */
+  var N=aperture();
+  return foc*foc/(N*0.05)+foc;
+}
+function dof(){
+  var H_=hyperfocal();
+  return {near:H_*dist*1000/(H_+dist*1000),
+          far:H_*dist*1000/(H_-dist*1000)};
+}
+/* ---------- drawing ---------- */
+function hexPath(cx,cy,s,rot){
+  ctx.beginPath();
+  for(var i=0;i<6;i++){
+    var a=rot+i*Math.PI/3;
+    var x=cx+Math.cos(a)*s,y=cy+Math.sin(a)*s;
+    if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+  }
+  ctx.closePath();
+}
+function drawFrost(){
+  /* the plates: a pale translucent hex with a rim, then dendrites */
+  ctx.fillStyle='rgba(220,240,250,.07)';
+  ctx.strokeStyle='rgba(235,245,255,.30)';
+  ctx.lineWidth=1;
+  plates.forEach(function(p){
+    hexPath(p.x,p.y,p.s,p.rot);
+    ctx.fill();ctx.stroke();
+    /* dendrites: branches along the edges */
+    for(var b=0;b<p.branches;b++){
+      var a=p.rot+b*Math.PI/3;
+      ctx.beginPath();
+      ctx.moveTo(p.x,p.y);
+      ctx.lineTo(p.x+Math.cos(a)*p.s*1.35,p.y+Math.sin(a)*p.s*1.35);
+      ctx.stroke();
+      /* side spurs */
+      var sp=0.5;
+      ctx.beginPath();
+      ctx.moveTo(p.x+Math.cos(a)*p.s*sp,p.y+Math.sin(a)*p.s*sp);
+      ctx.lineTo(p.x+Math.cos(a+0.6)*p.s*0.85,p.y+Math.sin(a+0.6)*p.s*0.85);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(p.x+Math.cos(a)*p.s*sp,p.y+Math.sin(a)*p.s*sp);
+      ctx.lineTo(p.x+Math.cos(a-0.6)*p.s*0.85,p.y+Math.sin(a-0.6)*p.s*0.85);
+      ctx.stroke();
+    }
+  });
+  /* the wiped patches: the frost cleared there, so the rings come into focus */
+  wiped.forEach(function(w){
+    ctx.save();
+    ctx.beginPath();
+    for(var i=0;i<w.pts.length;i++){
+      var x=w.pts[i].x,y=w.pts[i].y;
+      if(i===0)ctx.moveTo(x,y-w.r);else ctx.lineTo(x,y-w.r);
+    }
+    for(var i2=w.pts.length-1;i2>=0;i2--){
+      ctx.lineTo(w.pts[i2].x,w.pts[i2].y+w.r);
+    }
+    ctx.closePath();ctx.clip();
+    ctx.clearRect(0,0,W,H);
+    /* the wipe also scuffs: a smear of frost edge */
+    ctx.globalCompositeOperation='source-over';
+    ctx.restore();
+  });
+}
+function drawBokeh(){
+  /* each light is a disc the size of its circle of confusion, in the shape of the
+     aperture, and it drifts with parallax */
+  var c=cocRadius();
+  points.forEach(function(p,idx){
+    var r=(p.r||14)*c*0.42*p.z;
+    if(r<0.7)return;
+    var x=p.x+Math.sin(t*0.2+p.ph)*10, y=p.y+Math.cos(t*0.17+p.ph)*8;
+    /* the brightness a wide-open lens gives */
+    var a=Math.min(0.85,0.25+c*0.9);
+    /* the disc: a radial gradient into the aperture shape */
+    ctx.save();
+    ctx.translate(x,y);
+    ctx.rotate(idx*0.7);
+    /* the aperture polygon: the silhouette of the diaphragm */
+    ctx.beginPath();
+    for(var i=0;i<blades;i++){
+      var ang=i/blades*Math.PI*2;
+      var rr=r*(1+0.06*Math.sin(t*2+p.ph));
+      var px=Math.cos(ang)*rr,py=Math.sin(ang)*rr;
+      if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);
+    }
+    ctx.closePath();
+    var g=ctx.createRadialGradient(0,0,r*0.1,0,0,r);
+    g.addColorStop(0,'rgba(255,255,255,'+a+')');
+    g.addColorStop(0.55,p.hue);
+    g.addColorStop(0.92,'rgba(255,255,255,.55)');
+    g.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle=g;ctx.fill();
+    /* the rim, which is the edge of the blades */
+    ctx.strokeStyle='rgba(255,255,255,'+(a*0.6)+')';ctx.lineWidth=Math.max(0.5,r*0.06);
+    ctx.stroke();
+    ctx.restore();
+    /* the diffraction colour on the rim */
+    if(r>4){
+      ctx.strokeStyle='rgba(159,216,240,.18)';ctx.lineWidth=0.8;
+      ctx.beginPath();ctx.arc(x,y,r*1.12,0,6.3);ctx.stroke();
+    }
+  });
+}
+function draw(){
+  /* the background: a dark street */
+  var g=ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'#0a0e13');g.addColorStop(1,'#05080b');
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  /* the plane of focus: a faint band where things are sharp */
+  var fy=H*(1-dist/110);
+  var fg=ctx.createLinearGradient(0,fy-60,0,fy+60);
+  fg.addColorStop(0,'rgba(159,216,240,0)');
+  fg.addColorStop(0.5,'rgba(159,216,240,.05)');
+  fg.addColorStop(1,'rgba(159,216,240,0)');
+  ctx.fillStyle=fg;ctx.fillRect(0,fy-60,W,120);
+  /* the bokeh, behind the glass */
+  drawBokeh();
+  /* the frost on top */
+  drawFrost();
+  /* a caption in the corner */
+  ctx.fillStyle='rgba(232,240,246,.55)';
+  ctx.font='10px ui-monospace,Menlo,monospace';
+  ctx.textAlign='left';ctx.textBaseline='top';
+  ctx.fillText('f/'+aperture().toFixed(1)+' · '+foc+'mm · focus '+dist+' m',12,H-18);
+}
+
+/* ---------- controls, readout, loop ---------- */
+var bbox=document.getElementById('blades');
+BLADES.forEach(function(b,i){
+  var b2=document.createElement('button');
+  b2.textContent=b+' blades';
+  b2.setAttribute('aria-pressed',String(b===7));
+  b2.addEventListener('click',function(){
+    blades=b;
+    [].slice.call(bbox.children).forEach(function(o){
+      o.setAttribute('aria-pressed',String(o===b2));});
+    document.getElementById('rB').textContent=String(b);
+  });
+  bbox.appendChild(b2);
+});
+var lbox=document.getElementById('lights');
+LIGHTS.forEach(function(l,i){
+  var b=document.createElement('button');
+  b.textContent=l.n;
+  b.setAttribute('aria-pressed',String(i===0));
+  b.addEventListener('click',function(){
+    lights=l;wiped=[];
+    [].slice.call(lbox.children).forEach(function(o){
+      o.setAttribute('aria-pressed',String(o===b));});
+    makePoints();
+  });
+  lbox.appendChild(b);
+});
+function bind(id,fn){var el=document.getElementById(id);
+  el.addEventListener('input',function(){fn(+el.value);});}
+bind('f',function(v){foc=v;});
+bind('ap',function(v){apSlider=v;});
+bind('dist',function(v){dist=v;});
+document.getElementById('refrost').addEventListener('click',function(){
+  makePlates();wiped=[];
+});
+document.getElementById('defrost').addEventListener('click',function(){
+  wiped=[];
+});
+/* dragging wipes the frost */
+var wiping=false,curWipe=null;
+function wipeAt(e){
+  var r=cv.getBoundingClientRect();
+  var x=(e.clientX-r.left)*(W/r.width),y=(e.clientY-r.top)*(H/r.height);
+  if(!curWipe){curWipe={pts:[],r:26};wiped.push(curWipe);}
+  curWipe.pts.push({x:x,y:y});
+  if(curWipe.pts.length>90)curWipe.pts.shift();
+  curWipe.r=26;
+}
+cv.addEventListener('pointerdown',function(e){
+  wiping=true;curWipe=null;cv.setPointerCapture(e.pointerId);
+  wipeAt(e);
+});
+cv.addEventListener('pointermove',function(e){if(wiping)wipeAt(e);});
+function endWipe(){wiping=false;curWipe=null;}
+cv.addEventListener('pointerup',endWipe);
+cv.addEventListener('pointercancel',endWipe);
+function readout(){
+  document.getElementById('rC').textContent=points.length;
+  document.getElementById('rR').textContent=cocRadius().toFixed(1)+' mm';
+  document.getElementById('rD').textContent='f/'+aperture().toFixed(1);
+  var hf=hyperfocal()/1000;
+  document.getElementById('rH').textContent=hf<1?(hf*1000).toFixed(0)+' m':hf.toFixed(1)+' m';
+  var d=dof();
+  document.getElementById('rF').textContent=d.near.toFixed(1)+' – '+
+    (d.far>9999?'∞':d.far.toFixed(1))+' m';
+}
+var last=0;
+function loop(ts){
+  var dt=last?Math.min(.05,(ts-last)/1000):0;last=ts;
+  t+=dt;draw();readout();
+  requestAnimationFrame(loop);
+}
+points.forEach(function(p){p.r=lights.r[0]+Math.random()*(lights.r[1]-lights.r[0]);});
+draw();readout();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

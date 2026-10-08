@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ROSETTE — A Symmetry Engine</title>
+<style>
+  :root{
+    --bg:#0d0a14;
+    --bg2:#171026;
+    --ink:#f4ecff;
+    --dim:rgba(244,236,255,.5);
+    --line:rgba(244,236,255,.14);
+    --a:#ff6ec7;
+    --b:#7b6cff;
+    --c:#4ee0c0;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --serif:"Iowan Old Style",Palatino,Georgia,serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+  .bgg{position:fixed;inset:0;z-index:0;
+    background:radial-gradient(70% 60% at 50% 50%,#1b1230,#0d0a14 70%)}
+  #cv{position:fixed;inset:0;z-index:1;display:block}
+
+  .ui{position:fixed;inset:0;z-index:2;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(16px,3vw,34px)}
+  .top{display:flex;justify-content:space-between;align-items:flex-start;gap:18px}
+  .k{font-family:var(--mono);font-size:9px;letter-spacing:.34em;text-transform:uppercase;color:var(--c)}
+  h1{font-family:var(--serif);font-weight:400;font-style:italic;font-size:clamp(26px,4.6vw,54px);line-height:.98;letter-spacing:-.02em;margin:10px 0 0}
+  h1 b{font-style:normal;font-weight:400;background:linear-gradient(100deg,var(--a),var(--b) 50%,var(--c));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .top p{margin:12px 0 0;font-size:12px;line-height:1.75;max-width:32ch;color:var(--dim)}
+  .readout{text-align:right;font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);line-height:2.4}
+  .readout b{display:block;font-size:15px;color:var(--ink);font-weight:400;letter-spacing:.02em}
+
+  .bottom{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+  .tray{
+    pointer-events:auto;display:flex;gap:clamp(8px,1.3vw,16px);flex-wrap:wrap;align-items:center;
+    background:rgba(20,14,34,.62);border:1px solid var(--line);border-radius:16px;
+    padding:11px clamp(12px,1.8vw,20px);backdrop-filter:blur(14px)
+  }
+  .g{display:flex;align-items:center;gap:8px}
+  .kk{font-family:var(--mono);font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
+  .vv{font-family:var(--mono);font-size:9.5px;color:var(--c);min-width:22px;font-variant-numeric:tabular-nums}
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;width:64px;height:14px;background:transparent;cursor:pointer
+  }
+  input[type=range]::-webkit-slider-runnable-track{height:2px;background:var(--line);border-radius:2px}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;border-radius:50%;background:var(--a);margin-top:-5px;border:0;box-shadow:0 0 10px rgba(255,110,199,.7)}
+  input[type=range]::-moz-range-track{height:2px;background:var(--line);border-radius:2px}
+  input[type=range]::-moz-range-thumb{width:11px;height:11px;border:0;border-radius:50%;background:var(--a)}
+  button{
+    pointer-events:auto;font-family:var(--mono);font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;
+    background:rgba(255,110,199,.14);border:1px solid rgba(255,110,199,.4);color:var(--ink);
+    padding:9px 13px;border-radius:999px;cursor:pointer;transition:background .2s,color .2s
+  }
+  button:hover{background:var(--a);color:#20061a}
+  button.on{background:var(--a);color:#20061a}
+  .hint{font-family:var(--mono);font-size:8.5px;letter-spacing:.22em;text-transform:uppercase;color:rgba(244,236,255,.4);pointer-events:none}
+
+  @media (max-width:760px){.top p,.readout,.hint{display:none}.ui{padding:14px}}
+</style>
+</head>
+<body>
+<div class="bgg"></div>
+<canvas id="cv"></canvas>
+
+<div class="ui">
+  <div class="top">
+    <div>
+      <div class="k">Symmetry engine · order N</div>
+      <h1>Draw once.<br><b>See it N times.</b></h1>
+      <p>Place a petal and the engine mirrors it around the centre. Change the
+      order, the layers and the warp, and the same stroke becomes a different flower.</p>
+    </div>
+    <div class="readout">
+      Petals<b id="rP">0</b>
+      Order<b id="rO">12</b>
+      Strokes<b id="rS">0</b>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <div class="tray">
+      <div class="g"><span class="kk">Order</span><input type="range" id="order" min="3" max="36" value="12" aria-label="Rotational order"><span class="vv" id="orderV">12</span></div>
+      <div class="g"><span class="kk">Rings</span><input type="range" id="rings" min="1" max="9" value="4" aria-label="Ring count"><span class="vv" id="ringsV">4</span></div>
+      <div class="g"><span class="kk">Warp</span><input type="range" id="warp" min="0" max="100" value="34" aria-label="Warp"><span class="vv" id="warpV">34</span></div>
+      <div class="g"><span class="kk">Hue</span><input type="range" id="hue" min="0" max="360" value="290" aria-label="Hue"><span class="vv" id="hueV">290</span></div>
+      <button id="mirror" class="on">Mirror</button>
+      <button id="petal">Add petal</button>
+      <button id="clear">Clear</button>
+    </div>
+    <div class="hint">Click inside the ring to place a petal</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var cv=document.getElementById('cv'),c=cv.getContext('2d');
+  var W,H,DPR=Math.min(devicePixelRatio||1,2);
+  var order=12,rings=4,warp=34,hue=290,mirror=true;
+  var petals=[];
+
+  function resize(){
+    W=innerWidth;H=innerHeight;
+    cv.width=W*DPR;cv.height=H*DPR;cv.style.width=W+'px';cv.style.height=H+'px';
+    c.setTransform(DPR,0,0,DPR,0,0);
+    render();
+  }
+  function cx(){return W/2}
+  function cy(){return H*0.52}
+
+  /* one petal in polar coordinates: r(t) from t=0..1 */
+  function petalPath(R,r0,theta,shape,warpAmt){
+    c.beginPath();
+    var N=40;
+    for(var i=0;i<=N;i++){
+      var t=i/N;
+      /* base silhouette: a leaf/lens shape */
+      var base=Math.sin(t*Math.PI);
+      /* warp with an asymmetric term so petals lean */
+      var w=1+warpAmt*0.35*Math.sin(t*Math.PI*2+shape);
+      var rr=r0+(R-r0)*base*w;
+      var a=theta+ (t-0.5)*shape*0.42;
+      var x=cx()+Math.cos(a)*rr, y=cy()+Math.sin(a)*rr;
+      if(i===0)c.moveTo(x,y);else c.lineTo(x,y);
+    }
+    c.closePath();
+  }
+
+  function drawPetal(p){
+    var R=Math.min(W,H)*0.46*p.r;
+    var r0=R*p.r0;
+    var warpAmt=warp/100;
+    var reps=mirror?order*2:order;
+    var step=6.283/reps;
+    var off=mirror?step/2:0;
+    c.save();
+    c.globalCompositeOperation='lighter';
+    for(var ring=0;ring<rings;ring++){
+      var rr=1-ring/rings*0.62;
+      for(var i=0;i<reps;i++){
+        var th=p.theta+i*step*2+off+ring*0.4;
+        petalPath(R*rr,r0*rr,th,p.shape+i*0.02,warpAmt);
+        var h=(hue+ring*14+i*1.6)%360;
+        var g=c.createLinearGradient(cx(),cy(),cx()+Math.cos(th)*R,cy()+Math.sin(th)*R);
+        g.addColorStop(0,'hsla('+h+',85%,60%,0)');
+        g.addColorStop(.45,'hsla('+h+',90%,66%,'+(0.10+p.a*0.5).toFixed(3)+')');
+        g.addColorStop(1,'hsla('+((h+40)%360)+',95%,74%,'+(0.05+p.a*0.35).toFixed(3)+')');
+        c.fillStyle=g;
+        c.fill();
+        c.strokeStyle='hsla('+h+',100%,80%,'+(0.05+p.a*0.28).toFixed(3)+')';
+        c.lineWidth=0.7;
+        c.stroke();
+      }
+    }
+    c.restore();
+  }
+
+  function render(){
+    c.setTransform(DPR,0,0,DPR,0,0);
+    c.clearRect(0,0,W,H);
+
+    /* faint guide rings */
+    c.strokeStyle='rgba(244,236,255,.06)';c.lineWidth=1;
+    for(var g=1;g<=rings;g++){
+      c.beginPath();c.arc(cx(),cy(),Math.min(W,H)*0.46*(1-g/rings*0.62),0,6.283);c.stroke();
+    }
+
+    for(var i=0;i<petals.length;i++)drawPetal(petals[i]);
+
+    /* centre */
+    var cr=Math.min(W,H)*0.02;
+    var cg=c.createRadialGradient(cx(),cy(),0,cx(),cy(),cr*4);
+    cg.addColorStop(0,'rgba(255,255,255,.9)');
+    cg.addColorStop(.2,'hsla('+hue+',90%,75%,.5)');
+    cg.addColorStop(1,'hsla('+hue+',90%,70%,0)');
+    c.fillStyle=cg;c.beginPath();c.arc(cx(),cy(),cr*4,0,6.283);c.fill();
+
+    document.getElementById('rP').textContent=petals.length;
+    document.getElementById('rO').textContent=order+(mirror?' ×2':'');
+    document.getElementById('rS').textContent=petals.length*order*(mirror?2:1)*rings;
+  }
+
+  cv.addEventListener('pointerdown',function(e){
+    var r=cv.getBoundingClientRect();
+    var x=e.clientX-r.left-cx(), y=e.clientY-r.top-cy();
+    var d=Math.hypot(x,y);
+    var R=Math.min(W,H)*0.46;
+    if(d>R*1.05)return;
+    var theta=Math.atan2(y,x);
+    petals.push({
+      theta:theta,
+      r:0.55+Math.random()*0.5,
+      r0:0.10+Math.random()*0.22,
+      shape:0.5+Math.random()*1.5,
+      a:0.5+Math.random()*0.5
+    });
+    if(petals.length>18)petals.shift();
+    render();
+  });
+
+  function bind(id,key,fmt){
+    var el=document.getElementById(id);
+    el.addEventListener('input',function(){
+      window[key]=+this.value;
+      document.getElementById(id+'V').textContent=fmt?fmt(this.value):this.value;
+      render();
+    });
+  }
+  bind('order','order');
+  bind('rings','rings');
+  bind('warp','warp');
+  bind('hue','hue');
+  document.getElementById('mirror').addEventListener('click',function(){
+    mirror=!mirror;this.classList.toggle('on',mirror);render();
+  });
+  document.getElementById('petal').addEventListener('click',function(){
+    petals.push({
+      theta:Math.random()*6.283,
+      r:0.55+Math.random()*0.5,
+      r0:0.10+Math.random()*0.22,
+      shape:0.5+Math.random()*1.5,
+      a:0.5+Math.random()*0.5
+    });
+    if(petals.length>18)petals.shift();
+    render();
+  });
+  document.getElementById('clear').addEventListener('click',function(){petals=[];render();});
+
+  addEventListener('resize',function(){clearTimeout(window.__r);window.__r=setTimeout(resize,140)});
+  resize();
+  /* seed a starting rosette */
+  for(var s=0;s<3;s++){
+    petals.push({theta:s*2.1,r:0.7+s*0.1,r0:0.14,shape:1.0+s*0.3,a:0.8});
+  }
+  render();
+})();
+</script>
+</body>
+</html>

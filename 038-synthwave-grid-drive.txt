@@ -1,0 +1,90 @@
+# OUTRUN — Highway 88, Night Shift
+
+## Short title
+Synthwave Grid Drive
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a synthwave driving
+scene called OUTRUN. No external dependencies whatsoever — no CDN, no web fonts, no
+external images, no external SVG files, no JavaScript libraries. All CSS and
+JavaScript inline, works offline by double-clicking, responsive, valid HTML5.
+
+Artistic direction: 1983 arcade cabinet, saturated. Neon magenta #ff3ea5 and neon
+cyan #3ee0ff, with a sun that runs from pale yellow through orange into magenta, a
+purple sky from #0a0212 through #1d0733 to #480c46, and a violet floor fading to
+near-black. Behind the canvas, a CSS haze stacks two radial washes (magenta low, cyan
+mid) over a four-stop purple vertical gradient. Type is a 200-weight uppercase sans
+headline with one word carrying a magenta→cyan gradient clipped to the text, against
+8.5–9.5px wide-tracked monospace.
+
+The scene is drawn in strict depth order every frame. Sky first, then a neon
+mountain range along the horizon — six peaks, each stroked with a pink hairline —
+then the gradient floor, then a cyan-to-magenta glow band at the horizon. The sun
+is the centrepiece: a disc filled with a vertical three-stop gradient, clipped to a
+circle, with seven horizontal slats cut out of it that get thicker toward the
+bottom, all wrapped in a wide warm radial glow. Below the horizon, a perspective
+grid: twenty-six horizontal magenta lines whose screen y is (k/26)^2.9 scaled into
+the lower half, so they bunch at the horizon and spread toward the viewer, offset
+by a modulus of travelled distance so they rush toward you; and twenty-nine cyan
+vertical lines converging on a vanishing point at W/2 + x·0.5 that itself slides
+with steering. Road markings scroll on the centre line, growing with perspective.
+The car is a low wedge drawn as a path near the bottom, bobbing slightly on the
+distance travelled, with two red tail lights in a blur glow. A fog gradient scales
+with the Fog slider, and a 3px CRT scanline grid goes over the whole frame.
+
+The driving model: speed is integrated into distance, and steering is a value that
+accelerates from keyboard input and damps back toward zero when released — so the
+car slides a little rather than stopping dead. Steering shifts both the vanishing
+point and the sun's x position (at different rates, which is what sells the
+parallax), and slides the mountains at a third rate. Arrow keys drive, shift brakes,
+and the sliders set speed, steering and fog directly. Sun and Peaks can be toggled
+off to see the bare grid.
+
+Layout: a full-viewport canvas over the purple haze with a floating UI overlay whose
+pointer-events pass through except on the controls. Top-left is a monospace
+night-shift label above the uppercase headline with a gradient word, plus a short
+paragraph. Top-right is a monospace meter stack showing speed, distance travelled
+and current lane offset. Bottom is a glass tray with three sliders (Speed 10–200,
+Steer −100…100, Fog 0–100) plus Sun and Peaks toggles, and a monospace hint.
+
+Interaction: the scene runs continuously. The arrow keys (or W/A/S/D) drive and the
+sliders override the live values, so a visitor can either play it as a driving toy
+or just watch it cruise at 88. Fog thickens and thins the whole frame; Sun and Peaks
+strip the scene back to bare geometry. On narrow screens the paragraph, meters and
+hint hide.
+
+## One-paragraph description of the intended design
+A synthwave highway that sells the illusion with real perspective maths: a slatted
+neon sun with a wide glow, a pink-outlined mountain range sliding at its own rate,
+twenty-six magenta horizon lines bunched by a power curve and rushing toward you, and
+twenty-nine cyan lines converging on a vanishing point that slides with steering —
+all over a low wedge of a car with red tail lights, under CRT scanlines and a fog
+gradient.
+
+## Major visual techniques used
+- Perspective grid with screen y = (k/26)^2.9 scaled into the lower half, so lines
+  bunch at the horizon and spread toward the viewer
+- Distance-modulus scrolling so grid lines rush rather than slide
+- Vertical lines converging on a vanishing point that slides with steering, while
+  the sun slides at a different rate and the mountains at a third — true parallax
+- Slatted sun: a clipped circle filled with a vertical gradient, then seven
+  horizontal cut-outs that thicken toward the bottom, plus a wide radial glow
+- Neon-outlined mountain range along the horizon
+- Cyan-to-magenta horizon glow band
+- Car drawn as a low path with distance-based bob and two blurred red tail lights
+- Steering as an accelerating input value with damping, so the car slides
+- CRT scanlines as 3px horizontal fills at 14% black over the whole frame
+- Fog as a three-stop vertical gradient whose alpha scales with the Fog slider
+- Keyboard driving (arrows or WASD) with shift-to-brake, plus matching sliders
+- Sun and Peaks layer toggles for a bare-geometry view
+- Live gauges: speed, distance, lane offset
+- 200-weight uppercase sans with a magenta→cyan gradient-clipped word against 8.5px
+  tracked monospace
+- Floating glass tray with backdrop-filter blur; extras hidden under 760px
+
+## Intended interaction model
+A driving toy or a screensaver. Visitors press the arrow keys (or WASD) to drive and
+steer, hold shift to brake, and use the three sliders to set speed, steering and fog
+directly — or ignore the controls entirely and let it cruise. Sun and Peaks strip the
+scene back to geometry. The overlay never traps the pointer.

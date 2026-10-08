@@ -1,0 +1,82 @@
+# ROSETTE — A Symmetry Engine
+
+## Short title
+Mandala Symmetry Engine
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: an interactive radial
+symmetry / mandala generator called ROSETTE. No external dependencies whatsoever —
+no CDN, no web fonts, no external images, no external SVG files, no JavaScript
+libraries. All CSS and JavaScript inline, works offline by double-clicking, responsive,
+valid HTML5.
+
+Artistic direction: a glowing compass rose in a dark room. The ground is a radial
+gradient from #1b1230 at the centre to #0d0a14, with faint concentric guide rings at
+6% white behind the artwork. Petals are drawn in globalCompositeOperation 'lighter'
+so every repetition adds light, and each is filled with a linear gradient running
+from transparent at the centre through a saturated mid-stop to a brighter
+hue-shifted tip, with a hairline stroke of the same hue family. Hue is derived per
+ring (14° apart) and per repetition (1.6° apart) so a single rosette sweeps through
+a spectrum rather than repeating one colour. A bright white-to-hue radial sits at
+the centre.
+
+The geometry: a petal is defined in polar coordinates. Along t=0…1 its radius
+follows a leaf silhouette r(t) = sin(t·π), warped by an asymmetric term
+1 + (warp/100)·0.35·sin(t·2π + shape) so the petal leans to one side, while its angle
+advances by (t−0.5)·shape·0.42 — so the petal sweeps rather than growing straight
+out. Each petal carries a random radius fraction, inner radius, shape constant and
+alpha. The engine then repeats that petal `order` times around the circle (and twice
+that many when Mirror is on, with a half-step offset to interleave the two
+rotations), and repeats the whole thing across `rings` concentric layers at
+progressively smaller radii, each layer rotated by 0.4 radians and hue-shifted.
+
+Layout: a full-viewport canvas with a floating UI overlay whose pointer-events pass
+through except on the controls. Top-left is a monospace label above an italic serif
+headline whose second line carries a pink→violet→mint gradient clipped to the text,
+plus a short paragraph. Top-right is a monospace readout of petal count, effective
+order and the total number of strokes being drawn. Bottom is a glass tray with four
+sliders — Order (rotational symmetry 3–36), Rings (concentric layers 1–9), Warp
+(asymmetry 0–100) and Hue (0–360) — plus Mirror, Add petal and Clear buttons, and a
+monospace hint.
+
+Interaction: clicking anywhere inside the outer guide ring places a new petal at
+that angle, with randomised radius, inner radius, shape and alpha; clicking outside
+the ring does nothing. "Add petal" places one at a random angle. Every slider
+re-renders the whole rosette instantly, and because the petals are stored as data
+the same composition can be re-symmetrised at any order, ring count or warp at any
+time. Clear empties the array. Petals are capped at 18, oldest discarded first, so
+the canvas never becomes mud. On narrow screens the paragraph, readout and hint hide.
+
+## One-paragraph description of the intended design
+A dark-room symmetry engine: each click plants a warped polar petal — a lens
+silhouette leaning off-axis by a slider-controlled amount — which the engine repeats
+around the centre at any order from 3 to 36, mirrored into double rotation, stacked
+across up to nine concentric hue-shifted rings, all additively blended into light.
+
+## Major visual techniques used
+- Polar petal geometry: sin(t·π) leaf silhouette with an asymmetric warp term and an
+  angular sweep so petals lean
+- Rotational repetition at 3–36 fold order, with an optional doubled mirror rotation
+  offset by half a step
+- Concentric ring repetition at decreasing radii with per-ring rotation and hue shift
+- Per-repetition hue derivation (ring ×14°, instance ×1.6°) for spectral sweeps
+- Additive compositing (globalCompositeOperation 'lighter') so overlaps glow
+- Linear gradient fills from transparent at the centre to a hue-shifted bright tip
+- Hairline strokes in the same hue family as the fill
+- Faint concentric guide rings at 6% white behind the artwork
+- White-to-hue radial glow at the centre
+- Petals stored as data and re-rendered from scratch on every control change
+- Pointer angle → petal placement with a radius test against the guide ring
+- FIFO cap of 18 petals so the canvas never muds
+- Italic serif headline with a three-stop gradient-clipped line against 8.5px
+  tracked monospace labels
+- Floating glass tray with backdrop-filter blur; extras hidden under 760px
+
+## Intended interaction model
+A canvas to compose on. Visitors click inside the ring to plant petals where they
+want them, then reshape the whole composition with the four sliders — more or fewer
+fold symmetry, more or fewer concentric rings, more or less warp, a different hue —
+watching the same petals re-symmetrise instantly. Mirror doubles the order, Add
+petal randomises, Clear starts again. The composition is always editable and never
+committed.

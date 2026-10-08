@@ -1,0 +1,84 @@
+# DESCENT — Abyssal Diver, 4 200 m
+
+## Short title
+Deep Sea Descent
+
+## The exact prompt used to generate this HTML file
+
+Create a completely self-contained single-file HTML page: a deep-sea submersible
+descent simulation called DESCENT. No external dependencies whatsoever — no CDN,
+no web fonts, no external images, no external SVG files, no JavaScript libraries.
+All CSS and JavaScript inline, works offline by double-clicking, responsive, valid
+HTML5.
+
+Artistic direction: the lightless ocean. Behind the canvas, a CSS sea runs from
+#03222f through #021a26, #01121c and #010a11 with a faint cyan wash at the top,
+and its brightness is recomputed every frame from the current depth so the page
+itself darkens as you sink — from a bright 1.0 at the surface to 0.25 on the bottom.
+The submersible is built in CSS: an elliptical hull of pale grey-blue radial
+gradient with paired inset shadows and its own turbulence-data-URI speckle, a dark
+viewport ring, a thruster pod, a manipulator arm, a landing skid, and an amber lamp
+whose drop-shadow makes it a real light source.
+
+The water has three populations, each behaving differently. One hundred and sixty
+marine-snow particles drift on per-mote phase sine, and are pushed upward whenever
+the descent rate is positive, so they stream past as you sink. Eighteen
+bioluminescent animals swim on their own velocities; each is drawn in additive blend
+as a radial-gradient halo whose alpha is multiplied by (1 − ambient), so they are
+completely invisible in the upper sunlit zone and only begin to glow once the ambient
+light has died — half at hue 190 (cyan) and half at 290 (violet). Each has a burst
+state that flares to five times its size and decays at 0.94 per frame, triggered at
+random, so the dark punctuates with brief individual flashes. The lamp casts a wide
+warm radial gradient whose radius scales with the Lights slider.
+
+Depth drives everything. As depth rises from 0 to 4 200 m, the ambient term falls to
+zero, the depth gradient overlay darkens, the CSS sea brightness drops, the gauges
+change (depth in metres, pressure in MPa, temperature falling from 18.4 °C), and the
+bioluminescent population lights up. Dragging horizontally thrusts the submersible:
+a target x accumulates, eases toward the actual at 0.04, and the hull pitches with
+the accumulated velocity, so the vehicle leans as it moves.
+
+Layout: a full-viewport canvas over the sea, the CSS submersible fixed near the
+bottom, and a floating UI overlay whose pointer-events pass through except on the
+controls. Top-left is a monospace label above an italic serif headline with one line
+in pale cyan, plus a paragraph about light and pressure. Top-right is a monospace
+gauge stack. Bottom is a glass tray with three sliders (Descent 0–100, Lights 0–100,
+Marine snow 0–100) plus Dive and Surface buttons, and a monospace hint.
+
+Interaction: set the descent rate with the slider or press Dive to dive at full
+rate; Surface stops the descent and rises automatically back to zero, resetting the
+environment. The Lights slider changes the lamp cone's radius and brightness, and
+Marine snow changes particle density. Dragging sideways thrusts and banks the
+submersible. On narrow screens the paragraph, gauges and hint hide.
+
+## One-paragraph description of the intended design
+A submersible in the lightless ocean: as depth climbs, the CSS sea dims, the depth
+overlay darkens, the gauges shift toward hundreds of atmospheres, and eighteen
+bioluminescent animals — cyan and violet halos in additive blend, alpha gated by
+ambient light, flaring on random bursts — begin to glow, while one hundred and sixty
+marine-snow particles stream upward past a lamp cone whose size you control.
+
+## Major visual techniques used
+- CSS sea whose brightness is recomputed every frame from current depth
+- Depth-driven overlay gradient that darkens as ambient light falls
+- Bioluminescence gated by (1 − ambient): invisible in daylight, glowing in the dark
+- Radial-gradient halos in 'lighter' blend with burst states that flare and decay at
+  0.94 per frame
+- Two-colour life palette (cyan hue 190, violet hue 290) split across the population
+- Marine-snow particles on per-mote sine phase, pushed upward by descent rate
+- Lamp cone as a wide warm radial gradient whose radius scales with the Lights slider
+- CSS submersible: elliptical hull with paired inset shadows, turbulence speckle,
+  dark viewport ring, thruster, manipulator, skid and amber lamp with drop-shadow
+- Horizontal thrust with eased target/actual separation and hull pitch from
+  accumulated velocity
+- Live gauges: depth, pressure (0.1 + depth × 0.0102 MPa) and temperature
+- Dive/Surface buttons that write the descent slider and manage their own lit states
+- Italic serif headline with one pale-cyan line against 8.5px tracked monospace
+- Floating glass tray with backdrop-filter blur; extras hidden under 760px
+
+## Intended interaction model
+A dive you control. Visitors set a descent rate or press Dive, then watch the world
+go dark and the animals begin to light up, drag sideways to move and bank the
+submersible, adjust the lamp and the snow, and press Surface to come back up. The
+environment responds to depth continuously, so the page is as much a reading of a
+curve as it is a scene.
