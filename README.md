@@ -1,4 +1,4 @@
-# StepFun 5 Preview · 100 HTML Files
+# Step 5 Preview · 100 HTML Files
 
 One hundred self-contained single-file HTML pages. Every page carries its CSS,
 JavaScript and prompt inline — **no CDN, no web fonts, no images, no libraries**.
